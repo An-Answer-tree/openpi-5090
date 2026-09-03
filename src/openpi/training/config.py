@@ -761,6 +761,58 @@ _CONFIGS = [
         pytorch_weight_path="/path/to/your/pytorch_weight_path",
         num_train_steps=30_000,
     ),
+    TrainConfig(
+        name="pi05_libero_backview_lora",
+        model=pi0_config.Pi0Config(
+            pi05=True,
+            action_horizon=10,
+            discrete_state_input=False,
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+        ),
+        data=SimpleDataConfig(
+            repo_id="libero_multiview_tuned_6view_lerobot",
+            assets=AssetsConfig(asset_id="libero_multiview"),
+            base_config=DataConfig(
+                prompt_from_task=True,
+                repack_transforms=_transforms.Group(
+                    inputs=[
+                        _transforms.RepackTransform(
+                            {
+                                "observation/image": "backview_image",
+                                "observation/state": "state",
+                                "actions": "actions",
+                                "prompt": "prompt",
+                            }
+                        )
+                    ]
+                ),
+            ),
+            data_transforms=lambda model: _transforms.Group(
+                inputs=[libero_policy.LiberoInputs(model_type=model.model_type, use_wrist_image=False)],
+                outputs=[libero_policy.LiberoOutputs()],
+            ),
+        ),
+        batch_size=32,
+        lr_schedule=_optimizer.CosineDecaySchedule(
+            warmup_steps=10_000,
+            peak_lr=5e-5,
+            decay_steps=1_000_000,
+            decay_lr=5e-5,
+        ),
+        optimizer=_optimizer.AdamW(clip_gradient_norm=1.0),
+        ema_decay=None,
+        weight_loader=weight_loaders.CheckpointWeightLoader("gs://openpi-assets/checkpoints/pi05_base/params"),
+        freeze_filter=pi0_config.Pi0Config(
+            pi05=True,
+            action_horizon=10,
+            discrete_state_input=False,
+            paligemma_variant="gemma_2b_lora",
+            action_expert_variant="gemma_300m_lora",
+        ).get_freeze_filter(),
+        fsdp_devices=4,
+        num_train_steps=30_000,
+    ),
     #
     # Fine-tuning Aloha configs.
     #

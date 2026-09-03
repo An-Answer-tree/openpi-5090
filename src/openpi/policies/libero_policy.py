@@ -38,6 +38,7 @@ class LiberoInputs(transforms.DataTransformFn):
     # Determines which model will be used.
     # Do not change this for your own dataset.
     model_type: _model.ModelType
+    use_wrist_image: bool = True
 
     def __call__(self, data: dict) -> dict:
         # Possibly need to parse images to uint8 (H,W,C) since LeRobot automatically
@@ -50,7 +51,12 @@ class LiberoInputs(transforms.DataTransformFn):
         # of image, e.g. wrist images, you can comment it out here and replace it with zeros like we do for the
         # right wrist image below.
         base_image = _parse_image(data["observation/image"])
-        wrist_image = _parse_image(data["observation/wrist_image"])
+        if self.use_wrist_image:
+            wrist_image = _parse_image(data["observation/wrist_image"])
+            wrist_image_mask = np.True_
+        else:
+            wrist_image = np.zeros_like(base_image)
+            wrist_image_mask = np.True_ if self.model_type == _model.ModelType.PI0_FAST else np.False_
 
         # Create inputs dict. Do not change the keys in the dict below.
         inputs = {
@@ -63,7 +69,7 @@ class LiberoInputs(transforms.DataTransformFn):
             },
             "image_mask": {
                 "base_0_rgb": np.True_,
-                "left_wrist_0_rgb": np.True_,
+                "left_wrist_0_rgb": wrist_image_mask,
                 # We only mask padding images for pi0 model, not pi0-FAST. Do not change this for your own dataset.
                 "right_wrist_0_rgb": np.True_ if self.model_type == _model.ModelType.PI0_FAST else np.False_,
             },
