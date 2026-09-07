@@ -3,50 +3,46 @@
 #SBATCH --partition=batch
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=128G
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=96G
 #SBATCH --gres=gpu:4
 #SBATCH --time=3-00:00:00
-#SBATCH --exclude=gpu01
-#SBATCH --output=/opt/liutong/openpi_slurm/logs/%x_%j.out
+#SBATCH --output=/home/liutong/Projects/openpi-5090/slurm-log/%x_%j.out
 
 set -euo pipefail
 
-repo_root=/home/liutong/Projects/openpi-5090
-env_root=/var/tmp/liutong/conda-envs/openpi
-env_archive=/opt/liutong/openpi_slurm/openpi-env.tar.zst
-log_root=/opt/liutong/openpi_slurm/logs
-checkpoint_root=/opt/liutong/openpi-5090-checkpoints
-gpu_log=${log_root}/${SLURM_JOB_NAME}_${SLURM_JOB_ID}_gpu.csv
+export CONDA_ENVS_PATH=/home/liutong/miniconda3/envs
+source /home/liutong/miniconda3/etc/profile.d/conda.sh
+conda activate openpi
 
-mkdir -p /var/tmp/liutong/conda-envs "${log_root}" "${checkpoint_root}"
-if [[ ! -x "${env_root}/bin/python" ]]; then
-  tar -C /var/tmp/liutong/conda-envs \
-    -I /home/liutong/miniconda3/bin/zstd \
-    -xf "${env_archive}"
-fi
+mkdir -p /opt/liutong/openpi-5090-checkpoints
 
 nvidia-smi \
   --query-gpu=timestamp,index,uuid,memory.used,utilization.gpu \
   --format=csv,noheader,nounits \
-  --loop=5 > "${gpu_log}" &
-monitor_pid=$!
-trap 'kill "${monitor_pid}" 2>/dev/null || true' EXIT
+  --loop=5 > "/home/liutong/Projects/openpi-5090/slurm-log/${SLURM_JOB_NAME}_${SLURM_JOB_ID}_gpu.csv" &
+trap 'kill $! 2>/dev/null || true' EXIT
 
 export HF_LEROBOT_HOME=/opt/liutong
+export HF_DATASETS_OFFLINE=1
+export HF_HUB_DISABLE_TELEMETRY=1
+export HF_HUB_OFFLINE=1
 export OPENPI_DATA_HOME=/home/liutong/.cache/openpi
-export PATH="${env_root}/lib/python3.11/site-packages/nvidia/cuda_nvcc/bin:${PATH}"
+export PATH="${CONDA_PREFIX}/lib/python3.11/site-packages/nvidia/cuda_nvcc/bin:${PATH}"
 export PYTHONDONTWRITEBYTECODE=1
 export PYTHONUNBUFFERED=1
 export TOKENIZERS_PARALLELISM=false
+export TRANSFORMERS_OFFLINE=1
+export WANDB_MODE=disabled
 export XLA_PYTHON_CLIENT_MEM_FRACTION=0.95
 export XLA_PYTHON_CLIENT_PREALLOCATE=false
 
-cd "${repo_root}"
-"${env_root}/bin/python" scripts/train.py pi05_libero_backview_lora \
+cd /home/liutong/Projects/openpi-5090
+python scripts/train.py pi05_libero_backview_lora \
   --exp-name=pi05_libero_backview_lora_fsdp4_bs32_30k \
-  --checkpoint-base-dir="${checkpoint_root}" \
+  --checkpoint-base-dir=/opt/liutong/openpi-5090-checkpoints \
   --data.assets.assets-dir=/home/liutong/Projects/openpi/assets/pi05_libero_agentview_wrist \
+  --weight-loader.params-path=/home/liutong/.cache/openpi-5090/pi05_base/params \
   --batch-size=32 \
   --fsdp-devices=4 \
   --num-workers=8 \
