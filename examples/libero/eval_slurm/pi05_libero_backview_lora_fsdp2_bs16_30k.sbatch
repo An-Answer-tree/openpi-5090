@@ -8,7 +8,7 @@
 #SBATCH --mem=96G
 #SBATCH --gres=gpu:4
 #SBATCH --time=3-00:00:00
-#SBATCH --output=/home/liutong/Projects/openpi-5090/slurm-log/%x_%j.out
+#SBATCH --output=/opt/liutong/openpi-5090-evals/slurm-log/%x_%j.out
 
 set -euo pipefail
 
