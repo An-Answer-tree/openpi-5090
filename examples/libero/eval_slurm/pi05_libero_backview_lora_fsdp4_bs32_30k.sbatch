@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=eval-bv-lora4
 #SBATCH --partition=batch
+#SBATCH --exclude=gpu03
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
