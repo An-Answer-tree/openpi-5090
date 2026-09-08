@@ -33,9 +33,12 @@ export PYTHONDONTWRITEBYTECODE=1
 export PYTHONUNBUFFERED=1
 export TOKENIZERS_PARALLELISM=false
 export TRANSFORMERS_OFFLINE=1
+export TMPDIR="/opt/liutong/openpi-slurm-tmp/${SLURM_JOB_ID}"
 export WANDB_MODE=disabled
 export XLA_PYTHON_CLIENT_MEM_FRACTION=0.95
 export XLA_PYTHON_CLIENT_PREALLOCATE=false
+
+mkdir -p "${TMPDIR}"
 
 cd /home/liutong/Projects/openpi-5090
 python scripts/train.py pi05_libero_backview_lora \
