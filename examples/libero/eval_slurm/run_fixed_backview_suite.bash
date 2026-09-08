@@ -64,7 +64,7 @@ curl --silent --fail --noproxy '*' "http://127.0.0.1:${port}/healthz" >/dev/null
 set +u
 conda activate openpi-libero
 set -u
-CUDA_VISIBLE_DEVICES="${gpu_id}" MUJOCO_EGL_DEVICE_ID=0 \
+CUDA_VISIBLE_DEVICES="${gpu_id}" MUJOCO_EGL_DEVICE_ID="${gpu_id}" \
   python -m examples.libero.multiview_eval.main \
   --host 127.0.0.1 \
   --port "${port}" \
