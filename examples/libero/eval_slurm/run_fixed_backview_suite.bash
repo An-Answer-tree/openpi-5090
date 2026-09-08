@@ -75,4 +75,5 @@ CUDA_VISIBLE_DEVICES="${gpu_id}" MUJOCO_EGL_DEVICE_ID="${gpu_id}" \
   --num-steps-wait 10 \
   --num-trials-per-task "${num_trials}" \
   --video-out-path "${eval_dir}/videos" \
+  --save-videos \
   --seed 7
