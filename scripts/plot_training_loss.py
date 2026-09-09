@@ -14,6 +14,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--two-gpu-log", type=pathlib.Path, required=True)
     parser.add_argument("--four-gpu-log", type=pathlib.Path, required=True)
+    parser.add_argument("--four-gpu-cosine-log", type=pathlib.Path, required=True)
     parser.add_argument("--output", type=pathlib.Path, required=True)
     return parser.parse_args()
 
@@ -27,11 +28,13 @@ def read_loss(log_path: pathlib.Path) -> tuple[list[int], list[float]]:
 def plot_loss(
     two_gpu_log: pathlib.Path,
     four_gpu_log: pathlib.Path,
+    four_gpu_cosine_log: pathlib.Path,
     output: pathlib.Path,
 ) -> None:
     """Plots losses by optimization step and samples processed."""
     two_gpu_steps, two_gpu_losses = read_loss(two_gpu_log)
     four_gpu_steps, four_gpu_losses = read_loss(four_gpu_log)
+    cosine_steps, cosine_losses = read_loss(four_gpu_cosine_log)
 
     plt.rcParams.update(
         {
@@ -44,16 +47,26 @@ def plot_loss(
             "ps.fonttype": 42,
         }
     )
-    fig, axes = plt.subplots(1, 2, figsize=(7.0, 2.7), sharey=True)
+    fig, axes = plt.subplots(1, 2, figsize=(7.0, 2.8), sharey=True)
     series = (
-        (two_gpu_steps, two_gpu_losses, 16, "2 GPUs, global BS 16", "#0072B2", "-"),
-        (four_gpu_steps, four_gpu_losses, 32, "4 GPUs, global BS 32", "#D55E00", "--"),
+        (two_gpu_steps, two_gpu_losses, 16, "2 GPUs, BS 16, default LR", "#0072B2", "-", "o"),
+        (four_gpu_steps, four_gpu_losses, 32, "4 GPUs, BS 32, default LR", "#D55E00", "--", "s"),
+        (cosine_steps, cosine_losses, 32, "4 GPUs, BS 32, cosine LR", "#009E73", "-.", "^"),
     )
 
-    for steps, losses, batch_size, label, color, line_style in series:
-        axes[0].plot(steps, losses, label=label, color=color, linestyle=line_style, linewidth=1.5)
+    for steps, losses, batch_size, label, color, line_style, marker in series:
+        plot_kwargs = {
+            "color": color,
+            "label": label,
+            "linestyle": line_style,
+            "linewidth": 1.4,
+            "marker": marker,
+            "markevery": 30,
+            "markersize": 2.8,
+        }
+        axes[0].plot(steps, losses, **plot_kwargs)
         samples = [step * batch_size for step in steps]
-        axes[1].plot(samples, losses, label=label, color=color, linestyle=line_style, linewidth=1.5)
+        axes[1].plot(samples, losses, **plot_kwargs)
 
     axes[0].set_xlabel("Optimization step")
     axes[1].set_xlabel("Samples processed")
@@ -61,7 +74,7 @@ def plot_loss(
     for axis in axes:
         axis.grid(axis="y", color="#D9D9D9", linewidth=0.6)
         axis.spines[["top", "right"]].set_visible(False)
-    axes[0].legend(frameon=False)
+    axes[0].legend(frameon=False, fontsize=7)
 
     output.parent.mkdir(parents=True, exist_ok=True)
     fig.tight_layout()
@@ -73,7 +86,7 @@ def plot_loss(
 def main() -> None:
     """Runs the loss plotting command."""
     args = parse_args()
-    plot_loss(args.two_gpu_log, args.four_gpu_log, args.output)
+    plot_loss(args.two_gpu_log, args.four_gpu_log, args.four_gpu_cosine_log, args.output)
 
 
 if __name__ == "__main__":
