@@ -15,7 +15,7 @@ num_trials=$6
 
 test -f "${checkpoint_dir}/_CHECKPOINT_METADATA"
 mkdir -p "${eval_dir}"
-export TMPDIR="/opt/liutong/openpi-slurm-tmp/${SLURM_JOB_ID}/${suite_name}"
+export TMPDIR="/dev/shm/openpi-slurm-tmp/${SLURM_JOB_ID}/${suite_name}"
 mkdir -p "${TMPDIR}"
 
 source /home/liutong/miniconda3/etc/profile.d/conda.sh
