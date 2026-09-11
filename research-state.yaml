@@ -1,0 +1,45 @@
+project:
+  title: "ACPD LoRA distillation on RTX 5090"
+  question: "Can paper-faithful ACPD distillation train a LoRA pi0.5 student with effective batch size 32 on four 32 GB RTX 5090 GPUs?"
+  status: active
+  started: "2026-09-11"
+  domain: "robot policy distillation"
+
+literature:
+  key_papers:
+    - id: acpd2027
+      title: "AAAI 2027 ACPD manuscript"
+      source: "AAAI_2027_ACPD.pdf"
+      relevance: "Defines the privileged-cue selector, variance regularizer, ACL, and training objective."
+  open_problems:
+    - "Memory and throughput of a frozen full teacher plus a LoRA student on four 32 GB GPUs."
+  evidence_gaps:
+    - "No 5090 ACPD memory measurement yet."
+
+hypotheses:
+  - id: H1
+    statement: "FSDP4 with a global micro-batch of 8 and four accumulation steps can run ACPD LoRA with effective batch size 32 without OOM."
+    status: active
+    motivation: "LoRA removes most student optimizer state while FSDP shards both model states and rematerialization limits activations."
+    parent: null
+    priority: high
+
+experiments:
+  proxy_metric: "Two finite optimizer steps with nonzero selector gradients and peak GPU memory below 32 GB."
+  baseline_value: null
+  best_value: null
+  total_runs: 0
+  trajectory: []
+
+outer_loop:
+  cycle: 0
+  last_direction: null
+  last_reflection: ""
+
+workspace:
+  findings: "findings.md"
+  log: "research-log.md"
+  literature_dir: "literature/"
+  experiments_dir: "experiments/"
+  to_human_dir: "to_human/"
+  paper_dir: "paper/"
