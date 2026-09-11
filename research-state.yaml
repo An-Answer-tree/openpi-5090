@@ -14,27 +14,43 @@ literature:
   open_problems:
     - "Memory and throughput of a frozen full teacher plus a LoRA student on four 32 GB GPUs."
   evidence_gaps:
-    - "No 5090 ACPD memory measurement yet."
+    - "Long-run stability and final task success of the four view-specific students are not measured yet."
 
 hypotheses:
   - id: H1
-    statement: "FSDP4 with a global micro-batch of 8 and four accumulation steps can run ACPD LoRA with effective batch size 32 without OOM."
-    status: active
+    statement: "FSDP4 with global micro-batch 8 and four accumulation steps can run ACPD LoRA with effective batch size 32 without OOM."
+    status: supported
     motivation: "LoRA removes most student optimizer state while FSDP shards both model states and rematerialization limits activations."
     parent: null
+    priority: high
+  - id: H2
+    statement: "FSDP4 can increase the physical global batch to 32 without gradient accumulation or OOM."
+    status: supported
+    motivation: "H1 left enough memory headroom to test the complete batch in one optimizer step."
+    parent: H1
     priority: high
 
 experiments:
   proxy_metric: "Two finite optimizer steps with nonzero selector gradients and peak GPU memory below 32 GB."
   baseline_value: null
   best_value: null
-  total_runs: 0
-  trajectory: []
+  total_runs: 2
+  trajectory:
+    - run_id: acpd-lora-5090-smoke-126759
+      batch_size: 8
+      gradient_accumulation_steps: 4
+      peak_gpu_memory_mib: 17291
+      status: completed
+    - run_id: acpd-lora-5090-physical-bs32-126936
+      batch_size: 32
+      gradient_accumulation_steps: 1
+      peak_gpu_memory_mib: 17337
+      status: completed
 
 outer_loop:
-  cycle: 0
-  last_direction: null
-  last_reflection: ""
+  cycle: 1
+  last_direction: "promote physical global batch 32 to four view-specific runs"
+  last_reflection: "Both batch implementations fit comfortably. Physical batch 32 gives the intended full-batch variance statistic and avoids accumulation overhead."
 
 workspace:
   findings: "findings.md"

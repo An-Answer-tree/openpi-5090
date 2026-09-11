@@ -6,11 +6,11 @@ Can paper-faithful ACPD distillation train a LoRA pi0.5 student with effective b
 
 ## Current Understanding
 
-The student can use the repository's existing pi0.5 LoRA variants. LoRA reduces student gradient and optimizer memory, but the frozen full teacher and ACPD auxiliary heads remain resident. The initial stable configuration therefore combines FSDP4, rematerialization, no EMA, and a global micro-batch of 8 accumulated four times.
+The student can use the repository's existing pi0.5 LoRA variants. LoRA reduces student gradient and optimizer memory, but the frozen full teacher and ACPD auxiliary heads remain resident. The stable configuration combines FSDP4, rematerialization, no EMA, and a physical global batch of 32.
 
 ## Key Results
 
-No 5090 ACPD run has been measured yet.
+Two backview 5090 smoke runs completed successfully. Job 126759 used global micro-batch 8 with four accumulation steps; job 126936 used physical global batch 32 with no accumulation. Both completed two optimizer steps with finite losses and nonzero selector, predictor, and LoRA gradients. Peak sampled GPU memory was 17,291 MiB/card and 17,337 MiB/card, respectively.
 
 ## Patterns and Insights
 
@@ -24,9 +24,9 @@ The paper method requires gradients through the cue selector while stopping grad
 
 ## Open Questions
 
-- Does global micro-batch 8 leave enough memory headroom on each RTX 5090?
-- If it does, can global micro-batch 16 with two accumulation steps improve throughput?
+- Do the four 30K view-specific runs remain stable after the smoke configuration is promoted?
+- Does checkpoint writing remain the dominant wall-clock cost at the configured save interval?
 
 ## Optimization Trajectory
 
-No completed runs.
+The physical global batch 32 run is preferred because it uses the complete batch for the variance statistic and removes unnecessary accumulation steps. The sampled peak was about 16.9 GiB/card, leaving about 15.1 GiB before the nominal 32 GiB device limit.

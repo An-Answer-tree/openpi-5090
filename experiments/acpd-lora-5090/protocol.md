@@ -35,3 +35,7 @@ Run backview for two optimizer steps. The hypothesis is supported for launch fea
 - observed peak memory stays below the 32 GB device limit.
 
 If this configuration fails from device OOM, reduce the global micro-batch to 4 and use eight accumulation steps. If it succeeds with substantial headroom, test global micro-batch 16 with two accumulation steps as an exploratory throughput optimization.
+
+## Exploratory Follow-up
+
+After H1 was supported by job 126759, job 126936 tested a physical global batch of 32 with no accumulation. It also completed two finite optimizer steps, kept all required gradient norms nonzero, and reached a sampled peak of 17,337 MiB per GPU. The full runs therefore use physical global batch 32 and accumulation 1 so that the cue variance is computed over the complete batch.

@@ -330,7 +330,7 @@ class Block(nn.Module):
         xs = [_gated_residual(x, y, gate) for x, y, gate in zip(xs, out, gates, strict=True)]
         xs = sharding.activation_sharding_constraint(xs)
 
-        return xs, kv_cache
+        return xs, (kv_cache, xs[1])
 
 
 KVCache: TypeAlias = tuple[at.Float[at.Array, "l b _t _k _h"], at.Float[at.Array, "l b _t _v _h"]]
@@ -397,18 +397,47 @@ class Module(nn.Module):
         kv_cache: KVCache | None = None,
         deterministic: bool = True,
     ) -> tuple[Sequence[at.Float[at.Array, "b _t _d"] | None], KVCache]:
+        outputs, kv_cache, _ = self.forward_with_intermediates(
+            embedded,
+            positions,
+            mask,
+            adarms_cond,
+            kv_cache=kv_cache,
+            deterministic=deterministic,
+        )
+        return outputs, kv_cache
+
+    @at.typecheck
+    def forward_with_intermediates(
+        self,
+        embedded: Sequence[at.Float[at.Array, "b _t _d"] | None],
+        positions: at.Int[at.Array, "b t"],
+        mask: at.Bool[at.Array, "b t s"],
+        adarms_cond: Sequence[at.Float[at.Array, "b _d"] | None] | None = None,
+        *,
+        kv_cache: KVCache | None = None,
+        deterministic: bool = True,
+    ):
         embedded = jax.tree.map(lambda e: e.astype(self.embed_dtype), embedded)
         mask = jnp.asarray(mask)[:, None, :, :]
         if adarms_cond is None:
             adarms_cond = [None] * len(self.configs)
 
-        embedded, kv_cache = self.layers(embedded, kv_cache, positions, mask, adarms_cond, deterministic)
+        embedded, (kv_cache, action_intermediates) = self.layers(
+            embedded,
+            kv_cache,
+            positions,
+            mask,
+            adarms_cond,
+            deterministic,
+        )
 
         assert all(e.dtype == jnp.dtype(self.embed_dtype) for e in embedded if e is not None)
 
-        return [
+        outputs = [
             f(e, a)[0] if e is not None else e for f, e, a in zip(self.final_norms, embedded, adarms_cond, strict=True)
-        ], kv_cache
+        ]
+        return outputs, kv_cache, action_intermediates
 
     def init(self, use_adarms: Sequence[bool]):
         """Convenience method for initializing all parameters, necessary due to the quirks of linen."""
