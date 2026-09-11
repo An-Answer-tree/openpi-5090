@@ -51,3 +51,13 @@ loss convergence.
 This single-seed 5K experiment cannot establish final policy quality. A
 benchmark evaluation or full-length replicated experiment is required before
 making a task-success claim.
+
+## Pre-Run Infrastructure Amendment
+
+The scheduler estimated a one-week wait for four contiguous GPUs. Before any
+layer run started, job 127114 was submitted as a two-step feasibility check for
+two-device FSDP with the same physical global batch of 32. If it completes
+without OOM, all three controlled runs will use two-device FSDP, 16 CPUs, and
+64 GB host memory. If it fails, the original four-device allocation remains the
+fallback. FSDP device count is an infrastructure variable shared by all three
+runs and does not change the scientific comparison.

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=pi05-bv-acpd-l6-5k
+#SBATCH --job-name=pi05-bv-acpd-l6l12-5k
 #SBATCH --partition=batch
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=32
-#SBATCH --mem=96G
-#SBATCH --gres=gpu:4
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=64G
+#SBATCH --gres=gpu:2
 #SBATCH --time=2-00:00:00
 #SBATCH --output=/home/liutong/Projects/openpi-5090/slurm-log/%x_%j.out
 
@@ -43,8 +43,8 @@ trap 'kill $! 2>/dev/null || true' EXIT
 
 cd /home/liutong/Projects/openpi-5090
 python -m scripts.distillation_acpd.train_distill \
-  --name=pi05_libero_backview_acpd_lora_layer6 \
-  --exp-name=pi05_libero_backview_acpd_lora_fsdp4_layer6_bs32_5k \
+  --name=pi05_libero_backview_acpd_lora_layers6_12 \
+  --exp-name=pi05_libero_backview_acpd_lora_fsdp2_layers6_12_bs32_5k \
   --student-config-name=pi05_libero_backview_lora \
   --student-init-params=/home/liutong/.cache/openpi-5090/pi05_base/params \
   --teacher-params=/opt/liutong/openpi_checkpoints/fixed_dataset/sft/agentview_wrist/29999/params \
@@ -57,7 +57,7 @@ python -m scripts.distillation_acpd.train_distill \
   --acpd-loss-weight=0.2 \
   --acpd-variance-loss-weight=0.1 \
   --action-corr-loss-weight=0.5 \
-  --align-layers 6 \
+  --align-layers 6 12 \
   --acpd-memory-dim=1024 \
   --acpd-projector-hidden-dim=2048 \
   --acpd-detach-query \
@@ -76,5 +76,5 @@ python -m scripts.distillation_acpd.train_distill \
   --log-interval=100 \
   --save-interval=5000 \
   --keep-period=5000 \
-  --fsdp-devices=4 \
+  --fsdp-devices=2 \
   --no-wandb-enabled
