@@ -61,3 +61,14 @@ without OOM, all three controlled runs will use two-device FSDP, 16 CPUs, and
 64 GB host memory. If it fails, the original four-device allocation remains the
 fallback. FSDP device count is an infrastructure variable shared by all three
 runs and does not change the scientific comparison.
+
+## Execution Amendment
+
+The smoke check completed on an RTX 5090 with two-device FSDP, physical global
+batch 32, and a peak of about 31.4 GiB per GPU. The controlled runs therefore
+use that two-device configuration. The batch queue estimated a multi-day wait,
+so the same scripts were submitted to debug01, which has RTX 5090 GPUs. The
+first multi-worker launch stalled while fetching its first batch; all three
+controlled launchers use `num_workers=0`, as validated by the smoke run. These
+are scheduling and input-pipeline changes only; model, loss, optimizer, seed,
+and layer settings remain unchanged.

@@ -67,7 +67,7 @@ python -m scripts.distillation_acpd.train_distill \
   --seed=42 \
   --batch-size=32 \
   --gradient-accumulation-steps=1 \
-  --num-workers=8 \
+  --num-workers=0 \
   --num-train-steps=5000 \
   --warmup-steps=1000 \
   --peak-lr=2.5e-5 \
