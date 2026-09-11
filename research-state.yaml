@@ -29,6 +29,12 @@ hypotheses:
     motivation: "H1 left enough memory headroom to test the complete batch in one optimizer step."
     parent: H1
     priority: high
+  - id: H3
+    statement: "ACPD at layers 6 and 12 converges faster during the first 5K backview steps than ACPD at either layer alone."
+    status: active
+    motivation: "The paper selects both layers without reporting a layer ablation; a controlled short run can test whether the additional head improves early optimization."
+    parent: H2
+    priority: high
 
 experiments:
   proxy_metric: "Two finite optimizer steps with nonzero selector gradients and peak GPU memory below 32 GB."
@@ -48,9 +54,9 @@ experiments:
       status: completed
 
 outer_loop:
-  cycle: 1
-  last_direction: "promote physical global batch 32 to four view-specific runs"
-  last_reflection: "Both batch implementations fit comfortably. Physical batch 32 gives the intended full-batch variance statistic and avoids accumulation overhead."
+  cycle: 2
+  last_direction: "run a controlled 5K backview ablation before full four-view training"
+  last_reflection: "The paper does not establish that both selected layers are necessary. Compare layers 6, 12, and 6+12 using supervised-loss convergence under otherwise identical settings."
 
 workspace:
   findings: "findings.md"
