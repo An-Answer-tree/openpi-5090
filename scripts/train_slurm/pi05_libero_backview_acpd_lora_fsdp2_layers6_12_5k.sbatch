@@ -15,7 +15,7 @@ export CONDA_ENVS_PATH=/home/liutong/miniconda3/envs
 source /home/liutong/miniconda3/etc/profile.d/conda.sh
 conda activate openpi
 
-export HF_LEROBOT_HOME=/opt/liutong
+export HF_LEROBOT_HOME=/tmp/openpi-fixed-dataset
 export HF_DATASETS_OFFLINE=1
 export HF_HUB_DISABLE_TELEMETRY=1
 export HF_HUB_OFFLINE=1
@@ -67,7 +67,7 @@ python -m scripts.distillation_acpd.train_distill \
   --seed=42 \
   --batch-size=32 \
   --gradient-accumulation-steps=1 \
-  --num-workers=0 \
+  --num-workers=8 \
   --num-train-steps=5000 \
   --warmup-steps=1000 \
   --peak-lr=2.5e-5 \

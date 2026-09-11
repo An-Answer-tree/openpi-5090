@@ -68,7 +68,10 @@ The smoke check completed on an RTX 5090 with two-device FSDP, physical global
 batch 32, and a peak of about 31.4 GiB per GPU. The controlled runs therefore
 use that two-device configuration. The batch queue estimated a multi-day wait,
 so the same scripts were submitted to debug01, which has RTX 5090 GPUs. The
-first multi-worker launch stalled while fetching its first batch; all three
-controlled launchers use `num_workers=0`, as validated by the smoke run. These
-are scheduling and input-pipeline changes only; model, loss, optimizer, seed,
-and layer settings remain unchanged.
+first multi-worker launch stalled while fetching its first batch over NFS. The
+complete 123 GiB dataset was copied to debug01 local NVMe, and the controlled
+launchers use `num_workers=8` against that local copy. The smoke run validated
+the same model path with `num_workers=0`; the local copy removes its NFS input
+bottleneck while retaining the normal worker setting. These are scheduling and
+input-pipeline changes only; model, loss, optimizer, seed, and layer settings
+remain unchanged.
