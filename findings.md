@@ -20,6 +20,8 @@ The exact Table 1 ACPD scores are reproduced by the old V6.3 `historical_sg` log
 
 Table 2 uses the joint-selector V6 implementation, but it is not a controlled ablation. The reported Cue-only A row is ungated, Cue+ACL A is gated, and Cue+ACL A+W is ungated. The manuscript does not define or disclose the teacher-reliability gate. Consequently, Table 2 is evidence that some V6 configurations performed above SFT, but its row differences cannot isolate the effects of ACL or the wrist view.
 
+The manuscript's learning-rate description also differs from the old launchers. Both SFT and ACPD inherit a 10K warmup to `5e-5`, followed by a schedule whose peak and final rates are both `5e-5`; it is constant after warmup rather than cosine-decayed. The current LoRA experiment uses a true 1K-warmup, 30K cosine decay from `2.5e-5` to `2.5e-6`. This is a deliberate LoRA engineering choice, not a reproduction of the manuscript schedule, and has not yet been tuned for ACPD.
+
 At 5K LoRA steps, layers 12 and 6+12 have essentially the same supervised-loss convergence. Their final-window means are 0.03257 and 0.03237, respectively, so the dual-layer improvement is only 0.61% and does not meet the pre-registered 1% rule. The cue prediction also becomes easy rapidly: its weighted loss falls from more than twice the flow loss at initialization to about 2% of the flow loss by step 4,900. This is compatible with either successful representation alignment or selector-predictor co-adaptation; loss values alone cannot distinguish them.
 
 The next controlled test isolates flow-only, Cue-only, and ACL-only optimization within the same trainer and RNG schedule. Parameter tuning is deferred until this component test identifies which term changes student learning.
@@ -31,6 +33,7 @@ The next controlled test isolates flow-only, Cue-only, and ACL-only optimization
 - Teacher visual and action features depend on the noisy action and flow time, so they cannot be fully precomputed without changing the method.
 - Main-table provenance must be corrected or rerun: V6.3 historical stop-gradient results cannot be described as the joint-selector, variance-regularized method.
 - Table 2 must use one gate policy across every row, or explicitly include the gate as an ablation factor.
+- The paper must report the schedule that produced its tables or rerun with the stated cosine schedule.
 
 ## Open Questions
 
