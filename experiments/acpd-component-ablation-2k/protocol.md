@@ -32,7 +32,8 @@ The Full ACPD curve is the first 2K steps of completed job 127143. Its dataset
 was a byte copy of the same fixed dataset; all new runs read the original
 shared path without copying. Model initialization, seed 42, shuffled sample
 order, teacher, batch size 32, two-device FSDP, LoRA ranks, 1K warmup, and 30K
-cosine schedule remain fixed.
+cosine schedule remain fixed. No run uses the historical teacher-reliability
+gate, which is absent from the manuscript objective.
 
 All three new runs retain the complete teacher and auxiliary forward graph even
 when a loss weight is zero. This keeps RNG use and logged diagnostics matched.

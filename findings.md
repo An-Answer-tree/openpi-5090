@@ -16,7 +16,9 @@ Two backview 5090 smoke runs completed successfully. Job 126759 used global micr
 
 The paper method requires gradients through the cue selector while stopping gradients only through the student query and teacher features. Historical V6.4 is not paper-faithful because it stops gradients through the selected cue and omits the variance term.
 
-The exact Table 1 ACPD scores are reproduced by the old V6.3 `historical_sg` logs. That implementation deliberately stops the selected cue and omits the variance regularizer, unlike Equations 2-5 in the manuscript. Table 2 does come from the joint-selector V6 implementation and provides genuine positive task-success evidence for that version under full-parameter fine-tuning.
+The exact Table 1 ACPD scores are reproduced by the old V6.3 `historical_sg` logs. That implementation deliberately stops the selected cue and omits the variance regularizer, unlike Equations 2-5 in the manuscript. The exact SFT scores come from the corresponding old full-parameter `libero_multiview` runs, not the current fixed dataset.
+
+Table 2 uses the joint-selector V6 implementation, but it is not a controlled ablation. The reported Cue-only A row is ungated, Cue+ACL A is gated, and Cue+ACL A+W is ungated. The manuscript does not define or disclose the teacher-reliability gate. Consequently, Table 2 is evidence that some V6 configurations performed above SFT, but its row differences cannot isolate the effects of ACL or the wrist view.
 
 At 5K LoRA steps, layers 12 and 6+12 have essentially the same supervised-loss convergence. Their final-window means are 0.03257 and 0.03237, respectively, so the dual-layer improvement is only 0.61% and does not meet the pre-registered 1% rule. The cue prediction also becomes easy rapidly: its weighted loss falls from more than twice the flow loss at initialization to about 2% of the flow loss by step 4,900. This is compatible with either successful representation alignment or selector-predictor co-adaptation; loss values alone cannot distinguish them.
 
@@ -28,6 +30,7 @@ The next controlled test isolates flow-only, Cue-only, and ACL-only optimization
 - Effective batch size is `global micro-batch * gradient accumulation steps`.
 - Teacher visual and action features depend on the noisy action and flow time, so they cannot be fully precomputed without changing the method.
 - Main-table provenance must be corrected or rerun: V6.3 historical stop-gradient results cannot be described as the joint-selector, variance-regularized method.
+- Table 2 must use one gate policy across every row, or explicitly include the gate as an ablation factor.
 
 ## Open Questions
 

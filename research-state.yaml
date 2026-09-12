@@ -16,6 +16,7 @@ literature:
   evidence_gaps:
     - "Long-run stability and final task success of the four view-specific students are not measured yet."
     - "The current LoRA runs lack a trainer-matched flow-only control, so similar supervised loss does not isolate ACPD's effect."
+    - "The manuscript's Table 2 mixes gated and ungated V6 runs, confounding the claimed Cue, ACL, and wrist-view ablations."
 
 hypotheses:
   - id: H1
