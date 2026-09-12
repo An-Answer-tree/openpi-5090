@@ -15,6 +15,7 @@ literature:
     - "Memory and throughput of a frozen full teacher plus a LoRA student on four 32 GB GPUs."
   evidence_gaps:
     - "Long-run stability and final task success of the four view-specific students are not measured yet."
+    - "The current LoRA runs lack a trainer-matched flow-only control, so similar supervised loss does not isolate ACPD's effect."
 
 hypotheses:
   - id: H1
@@ -33,6 +34,12 @@ hypotheses:
     statement: "ACPD at layers 6 and 12 converges faster during the first 5K backview steps than ACPD at either layer alone."
     status: active
     motivation: "The paper selects both layers without reporting a layer ablation; a controlled short run can test whether the additional head improves early optimization."
+    parent: H2
+    priority: high
+  - id: H4
+    statement: "Under an otherwise identical LoRA training graph, Cue or ACL changes early supervised-loss convergence relative to flow-only training."
+    status: active
+    motivation: "The layer comparison cannot establish ACPD efficacy, and the historical SFT log uses a different RNG split. A component ablation inside the same distillation trainer isolates the optimization effect."
     parent: H2
     priority: high
 
@@ -54,9 +61,9 @@ experiments:
       status: completed
 
 outer_loop:
-  cycle: 2
-  last_direction: "run a controlled 5K backview ablation before full four-view training"
-  last_reflection: "The paper does not establish that both selected layers are necessary. Compare layers 6, 12, and 6+12 using supervised-loss convergence under otherwise identical settings."
+  cycle: 3
+  last_direction: "separate method efficacy from layer choice with a trainer-matched component ablation"
+  last_reflection: "The two completed layer runs are nearly identical to each other and to historical LoRA SFT loss. Test flow-only, Cue-only, and ACL-only in the same graph before tuning weights."
 
 workspace:
   findings: "findings.md"
