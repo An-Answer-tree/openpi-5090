@@ -34,6 +34,7 @@ The next controlled test isolates flow-only, Cue-only, and ACL-only optimization
 - Main-table provenance must be corrected or rerun: V6.3 historical stop-gradient results cannot be described as the joint-selector, variance-regularized method.
 - Table 2 must use one gate policy across every row, or explicitly include the gate as an ablation factor.
 - The paper must report the schedule that produced its tables or rerun with the stated cosine schedule.
+- gpu03 has a lost physical GPU and unreliable GPU isolation; ACPD jobs must exclude that node. This is an infrastructure failure, not evidence about the method or batch-size feasibility.
 
 ## Open Questions
 

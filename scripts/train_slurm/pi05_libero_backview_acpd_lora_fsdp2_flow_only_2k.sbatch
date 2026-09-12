@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=pi05-bv-flow-2k
 #SBATCH --partition=batch
+#SBATCH --exclude=gpu03
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
