@@ -20,7 +20,7 @@ Run three backview students with `align_layers` set to `{6}`, `{12}`, and
 - frozen agentview+wrist teacher checkpoint at step 29,999;
 - fixed multiview dataset and synchronized sample transforms;
 - LoRA ranks 16 for PaliGemma and 32 for the action expert;
-- four-device FSDP, physical global batch 32, no gradient accumulation;
+- two-device FSDP, physical global batch 32, no gradient accumulation;
 - 5,000 optimizer steps and logs every 100 steps;
 - 1,000-step warmup to 2.5e-5 followed by the original 30K cosine schedule;
 - `lambda_cue=0.2`, `lambda_var=0.1`, and `lambda_ACL=0.5`.
@@ -69,9 +69,8 @@ batch 32, and a peak of about 31.4 GiB per GPU. The controlled runs therefore
 use that two-device configuration. The batch queue estimated a multi-day wait,
 so the same scripts were submitted to debug01, which has RTX 5090 GPUs. The
 first multi-worker launch stalled while fetching its first batch over NFS. The
-complete 123 GiB dataset was copied to debug01 local NVMe, and the controlled
-launchers use `num_workers=8` against that local copy. The smoke run validated
-the same model path with `num_workers=0`; the local copy removes its NFS input
-bottleneck while retaining the normal worker setting. These are scheduling and
-input-pipeline changes only; model, loss, optimizer, seed, and layer settings
-remain unchanged.
+complete 123 GiB dataset was copied to debug01 local NVMe for the completed
+layers 6+12 and layer 12 runs. The layer 6 run uses the original shared dataset
+path on the ordinary batch partition, as requested by the operator. All runs
+use `num_workers=8`; the source dataset and model, loss, optimizer, seed, and
+layer settings remain unchanged.
