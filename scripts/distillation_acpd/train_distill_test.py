@@ -10,6 +10,7 @@ from scripts.distillation_acpd.train_distill import _acpd_variance_loss
 from scripts.distillation_acpd.train_distill import _action_corr_loss
 from scripts.distillation_acpd.train_distill import _add_scaled_gradients
 from scripts.distillation_acpd.train_distill import _micro_step_train_rng
+from scripts.distillation_acpd.train_distill import _per_sample_prediction_error
 from scripts.distillation_acpd.train_distill import _scale_gradients
 
 
@@ -80,6 +81,13 @@ def test_action_corr_loss_ignores_libero_padding_dimensions():
     teacher = jnp.asarray([[[1.0, 2.0, -5.0], [3.0, 4.0, 7.0]]])
 
     np.testing.assert_allclose(_action_corr_loss(student, teacher, task_action_dim=2), 0.0, atol=1e-6)
+
+
+def test_per_sample_prediction_error_reduces_non_batch_dimensions():
+    prediction = jnp.asarray([[[1.0, 2.0]], [[3.0, 5.0]]])
+    target = jnp.asarray([[[0.0, 0.0]], [[1.0, 1.0]]])
+
+    np.testing.assert_allclose(_per_sample_prediction_error(prediction, target), [2.5, 10.0])
 
 
 def test_gradient_accumulation_averages_independent_microbatches():

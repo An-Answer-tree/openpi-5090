@@ -84,6 +84,7 @@ class DistillTrainConfig:
     log_interval: int = 100
     save_interval: int = 5_000
     keep_period: int | None = 5_000
+    save_final_checkpoint: bool = True
     overwrite: bool = False
     resume: bool = False
     wandb_enabled: bool = True
@@ -378,6 +379,14 @@ def _action_corr_loss(student_v_t: at.Array, teacher_v_t: at.Array, *, task_acti
     return 1.0 - jnp.mean(jnp.sum(student * teacher, axis=-1))
 
 
+def _per_sample_prediction_error(prediction: at.Array, target: at.Array) -> at.Array:
+    """Computes mean squared prediction error for each batch item."""
+    return jnp.mean(
+        jnp.square(prediction.astype(jnp.float32) - target.astype(jnp.float32)),
+        axis=tuple(range(1, prediction.ndim)),
+    )
+
+
 def _acpd_prediction_loss(
     predicted_cue: at.Array,
     privileged_cue: at.Array,
@@ -457,6 +466,8 @@ def compute_gradients(
         teacher_v_t = jax.lax.stop_gradient(teacher_v_t)
         supervised_loss = jnp.mean(jnp.square(student_v_t - target_v_t))
         action_corr_loss = _action_corr_loss(student_v_t, teacher_v_t)
+        student_task_error = _per_sample_prediction_error(student_v_t[..., :7], target_v_t[..., :7])
+        teacher_task_error = _per_sample_prediction_error(teacher_v_t[..., :7], target_v_t[..., :7])
 
         layer_losses = []
         prediction_losses = []
@@ -508,6 +519,9 @@ def compute_gradients(
             "acpd_variance_loss": acpd_variance_loss,
             "weighted_acpd_loss": weighted_acpd_loss,
             "action_corr_loss": action_corr_loss,
+            "student_task_loss": jnp.mean(student_task_error),
+            "teacher_task_loss": jnp.mean(teacher_task_error),
+            "teacher_better_ratio": jnp.mean((teacher_task_error < student_task_error).astype(jnp.float32)),
             "acpd_to_supervised_ratio": weighted_acpd_loss / jnp.maximum(supervised_loss, 1e-6),
             **per_layer,
         }
@@ -691,7 +705,9 @@ def main(config: DistillTrainConfig):
             infos = []
         batch = next(data_iter)
 
-        if (step % config.save_interval == 0 and step > start_step) or step == config.num_train_steps - 1:
+        periodic_save = step % config.save_interval == 0 and step > start_step
+        final_save = config.save_final_checkpoint and step == config.num_train_steps - 1
+        if periodic_save or final_save:
             _checkpoints.save_state(checkpoint_manager, student_state, data_loader, step)
 
     logging.info("Waiting for checkpoint manager to finish")
