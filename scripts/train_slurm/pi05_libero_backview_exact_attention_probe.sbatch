@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=pi05-bv-visual-probe
+#SBATCH --job-name=pi05-bv-exact-attn
 #SBATCH --partition=batch
 #SBATCH --exclude=gpu03
 #SBATCH --nodes=1
@@ -8,7 +8,7 @@
 #SBATCH --mem=64G
 #SBATCH --gres=gpu:2
 #SBATCH --time=1-00:00:00
-#SBATCH --output=/home/liutong/Projects/openpi-5090/slurm-log/%x_%j.out
+#SBATCH --output=/opt/liutong/openpi-5090-research/acpd-exact-attention-probe/slurm-log/%x_%j.out
 
 set -euo pipefail
 
@@ -32,28 +32,34 @@ export WANDB_MODE=disabled
 export XLA_PYTHON_CLIENT_MEM_FRACTION=0.95
 export XLA_PYTHON_CLIENT_PREALLOCATE=false
 
-mkdir -p /home/liutong/Projects/openpi-5090/slurm-log
 mkdir -p "${TMPDIR}"
+mkdir -p /opt/liutong/openpi-5090-research/acpd-exact-attention-probe/results
 
 nvidia-smi \
   --query-gpu=timestamp,index,uuid,memory.used,utilization.gpu \
   --format=csv,noheader,nounits \
-  --loop=5 > "/home/liutong/Projects/openpi-5090/slurm-log/${SLURM_JOB_NAME}_${SLURM_JOB_ID}_gpu.csv" &
+  --loop=5 > "/opt/liutong/openpi-5090-research/acpd-exact-attention-probe/slurm-log/${SLURM_JOB_NAME}_${SLURM_JOB_ID}_gpu.csv" &
 trap 'kill $! 2>/dev/null || true' EXIT
 
 cd /home/liutong/Projects/openpi-5090
-python -m scripts.distillation_acpd.visual_message_probe \
-  --student-init-params=/home/liutong/.cache/openpi-5090/pi05_base/params \
+python -m scripts.distillation_acpd.exact_attention_probe \
+  --student-init-params=/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/task_success_5k/pi05_libero_backview_flow_only_5k/pi05_libero_backview_lora_fsdp2_bs32_5k/4999/params \
   --teacher-params=/opt/liutong/openpi_checkpoints/fixed_dataset/sft/agentview_wrist/29999/params \
   --assets-dir=/home/liutong/Projects/openpi/assets/pi05_libero_agentview_wrist \
+  --result-dir=/opt/liutong/openpi-5090-research/acpd-exact-attention-probe/results \
   --dataset-repo-id=libero_multiview_tuned_6view_lerobot \
   --student-view-key=backview_image \
   --teacher-view-key=agentview_image \
   --wrist-view-key=wrist_image \
-  --batch-size=32 \
+  --layers 6 9 12 \
+  --probe-seeds 11 29 47 \
+  --batch-size=8 \
+  --gradient-accumulation-steps=4 \
   --num-train-steps=500 \
-  --log-interval=50 \
-  --num-workers=8 \
+  --num-validation-batches=32 \
+  --validation-fraction=0.1 \
   --learning-rate=1e-3 \
+  --log-interval=50 \
+  --bootstrap-samples=2000 \
   --seed=42 \
   --fsdp-devices=2

@@ -147,7 +147,7 @@ class AcpdPi0(pi0.Pi0):
         list[at.Float[at.Array, "b ah ae"]],
     ]:
         observation = _model.preprocess_observation(rng, observation, train=train)
-        prefix_tokens, prefix_mask, prefix_ar_mask, image_tokens = self._embed_prefix_with_image_tokens(observation)
+        prefix_tokens, prefix_mask, prefix_ar_mask, image_tokens, _ = self._embed_prefix_with_image_tokens(observation)
         suffix_tokens, suffix_mask, suffix_ar_mask, adarms_cond = self.embed_suffix(
             observation, noisy_actions, timestep
         )
@@ -177,15 +177,69 @@ class AcpdPi0(pi0.Pi0):
         )
         return v_t, privileged_visual_tokens, hiddens
 
+    @at.typecheck
+    def compute_attention_contributions(
+        self,
+        rng: at.KeyArrayLike | None,
+        observation: _model.Observation,
+        noisy_actions: _model.Actions,
+        timestep: at.Float[at.Array, " b"],
+        *,
+        train: bool = False,
+    ):
+        """Returns exact agentview and wrist contributions to action attention."""
+        observation = _model.preprocess_observation(rng, observation, train=train)
+        prefix_tokens, prefix_mask, prefix_ar_mask, _, image_slices = self._embed_prefix_with_image_tokens(
+            observation
+        )
+        suffix_tokens, suffix_mask, suffix_ar_mask, adarms_cond = self.embed_suffix(
+            observation, noisy_actions, timestep
+        )
+        input_mask = jnp.concatenate([prefix_mask, suffix_mask], axis=1)
+        ar_mask = jnp.concatenate([prefix_ar_mask, suffix_ar_mask], axis=0)
+        attn_mask = pi0.make_attn_mask(input_mask, ar_mask)
+        positions = jnp.cumsum(input_mask, axis=1) - 1
+
+        source_masks = jnp.zeros((2, input_mask.shape[1]), dtype=bool)
+        for source_index, name in enumerate(("base_0_rgb", "left_wrist_0_rgb")):
+            start, end = image_slices[name]
+            source_masks = source_masks.at[source_index, start:end].set(True)
+
+        (_, suffix_out), _, _, diagnostics = self.PaliGemma.llm(
+            [prefix_tokens, suffix_tokens],
+            mask=attn_mask,
+            positions=positions,
+            source_masks=source_masks,
+            adarms_cond=[None, adarms_cond],
+            method="forward_with_attention_contributions",
+        )
+        contributions, shuffled_contributions, total_attention = diagnostics
+        layer_indices = [self._layer_index(layer, contributions.shape[0]) for layer in self.align_layers]
+        contributions = jnp.stack([contributions[index] for index in layer_indices], axis=0)
+        shuffled_contributions = jnp.stack([shuffled_contributions[index] for index in layer_indices], axis=0)
+        total_attention = jnp.stack([total_attention[index] for index in layer_indices], axis=0)
+
+        v_t = self.action_out_proj(suffix_out[:, -self.action_horizon :])
+        contributions = jnp.transpose(contributions[:, :, :, -self.action_horizon :], (2, 0, 1, 3, 4))
+        shuffled_contributions = jnp.transpose(
+            shuffled_contributions[:, :, :, -self.action_horizon :], (2, 0, 1, 3, 4)
+        )
+        total_attention = jnp.transpose(total_attention[:, :, -self.action_horizon :], (1, 0, 2, 3))
+        return v_t, contributions, shuffled_contributions, total_attention
+
     def _embed_prefix_with_image_tokens(self, observation: _model.Observation):
         input_mask = []
         ar_mask = []
         tokens = []
         image_tokens_by_name = {}
+        image_slices = {}
+        token_offset = 0
 
         for name in observation.images:
             image_tokens, _ = self.PaliGemma.img(observation.images[name], train=False)
             image_tokens_by_name[name] = image_tokens
+            image_slices[name] = (token_offset, token_offset + image_tokens.shape[1])
+            token_offset += image_tokens.shape[1]
             tokens.append(image_tokens)
             input_mask.append(einops.repeat(observation.image_masks[name], "b -> b s", s=image_tokens.shape[1]))
             ar_mask += [False] * image_tokens.shape[1]
@@ -201,4 +255,5 @@ class AcpdPi0(pi0.Pi0):
             jnp.concatenate(input_mask, axis=1),
             jnp.asarray(ar_mask),
             image_tokens_by_name,
+            image_slices,
         )

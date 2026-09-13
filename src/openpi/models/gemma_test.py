@@ -34,3 +34,40 @@ def test_module_optionally_returns_action_intermediates():
     prefix_mask = mask[:, :3, :3]
     prefix_outputs, _ = llm(prefix, prefix_positions, prefix_mask)
     assert prefix_outputs[1] is None
+
+
+def test_attention_source_contributions_reconstruct_action_attention():
+    config = gemma.get_config("dummy")
+    module = gemma.Module(configs=[config, config], embed_dtype="bfloat16")
+    embedded = [jnp.ones((2, 3, config.width)), jnp.ones((2, 2, config.width))]
+    positions = jnp.broadcast_to(jnp.arange(5), (2, 5))
+    mask = jnp.ones((2, 5, 5), dtype=bool)
+    source_masks = jnp.asarray(
+        [
+            [True, True, False, False, False],
+            [False, False, True, True, True],
+        ]
+    )
+    llm = nnx_bridge.ToNNX(module)
+    llm.lazy_init(rngs=nnx.Rngs(0), method="init", use_adarms=[False, False])
+
+    outputs, _ = llm(embedded, positions, mask)
+    diagnostic_outputs, _, _, diagnostics = llm(
+        embedded,
+        positions,
+        mask,
+        source_masks,
+        method="forward_with_attention_contributions",
+    )
+    contributions, shuffled_contributions, total_attention = diagnostics
+
+    assert contributions.shape == (config.depth, 2, 2, 2, config.width)
+    assert shuffled_contributions.shape == contributions.shape
+    reconstruction = np.asarray(contributions.sum(axis=1))
+    total_attention = np.asarray(total_attention)
+    relative_error = np.linalg.norm(reconstruction - total_attention) / np.linalg.norm(total_attention)
+    assert relative_error < 1e-3
+    np.testing.assert_allclose(
+        np.asarray(outputs[1], dtype=np.float32),
+        np.asarray(diagnostic_outputs[1], dtype=np.float32),
+    )

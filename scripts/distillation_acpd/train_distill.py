@@ -134,6 +134,7 @@ class PairedLiberoDistillTransform:
     student_use_wrist_image: bool = False
     teacher_use_wrist_image: bool = True
     wrist_view_key: str = "wrist_image"
+    include_episode_index: bool = False
 
     def __post_init__(self):
         object.__setattr__(
@@ -172,7 +173,10 @@ class PairedLiberoDistillTransform:
             self._teacher_transform,
             use_wrist_image=self.teacher_use_wrist_image,
         )
-        return {"student": student, "teacher": teacher, "actions": actions}
+        output = {"student": student, "teacher": teacher, "actions": actions}
+        if self.include_episode_index:
+            output["episode_index"] = np.asarray(data["episode_index"], dtype=np.int32)
+        return output
 
     def _make_view(
         self,
@@ -198,20 +202,31 @@ class PairedLiberoDistillTransform:
 class PairedDataLoader:
     """Converts transformed dictionaries to OpenPI model inputs."""
 
-    def __init__(self, data_config: _config.DataConfig, torch_loader: _data_loader.TorchDataLoader):
+    def __init__(
+        self,
+        data_config: _config.DataConfig,
+        torch_loader: _data_loader.TorchDataLoader,
+        *,
+        include_episode_index: bool = False,
+    ):
         self._data_config = data_config
         self._torch_loader = torch_loader
+        self._include_episode_index = include_episode_index
 
     def data_config(self) -> _config.DataConfig:
         return self._data_config
 
     def __iter__(self):
         for batch in self._torch_loader:
-            yield (
+            model_batch = (
                 _model.Observation.from_dict(batch["teacher"]),
                 _model.Observation.from_dict(batch["student"]),
                 batch["actions"],
             )
+            if self._include_episode_index:
+                yield (*model_batch, batch["episode_index"])
+            else:
+                yield model_batch
 
 
 def _make_distill_model_config(
@@ -232,7 +247,11 @@ def _make_distill_model_config(
     )
 
 
-def _make_student_train_config(config: DistillTrainConfig) -> _config.TrainConfig:
+def _make_student_train_config(
+    config: DistillTrainConfig,
+    *,
+    create_acpd_heads: bool = True,
+) -> _config.TrainConfig:
     base = _config.get_config(config.student_config_name)
     data = dataclasses.replace(
         base.data,
@@ -244,7 +263,7 @@ def _make_student_train_config(config: DistillTrainConfig) -> _config.TrainConfi
         name=config.name,
         project_name=config.project_name,
         exp_name=config.exp_name,
-        model=_make_distill_model_config(base.model, config, create_acpd_heads=True),
+        model=_make_distill_model_config(base.model, config, create_acpd_heads=create_acpd_heads),
         weight_loader=AcpdCheckpointWeightLoader(config.student_init_params),
         data=data,
         lr_schedule=_optimizer.CosineDecaySchedule(
@@ -291,6 +310,8 @@ def _create_paired_data_loader(
     *,
     sharding_: jax.sharding.Sharding,
     shuffle: bool,
+    episodes: Sequence[int] | None = None,
+    include_episode_index: bool = False,
 ) -> PairedDataLoader:
     data_config = train_config.data.create(train_config.assets_dirs, train_config.model)
     logging.info("data_config: %s", data_config)
@@ -299,7 +320,12 @@ def _create_paired_data_loader(
     if data_config.repo_id != "fake" and data_config.norm_stats is None:
         raise ValueError("Normalization stats are required for ACPD training.")
 
-    dataset = _data_loader.create_torch_dataset(data_config, train_config.model.action_horizon, train_config.model)
+    dataset = _data_loader.create_torch_dataset(
+        data_config,
+        train_config.model.action_horizon,
+        train_config.model,
+        episodes=episodes,
+    )
     dataset = _data_loader.TransformedDataset(
         dataset,
         [
@@ -313,6 +339,7 @@ def _create_paired_data_loader(
                 student_use_wrist_image=config.student_use_wrist_image,
                 teacher_use_wrist_image=config.teacher_use_wrist_image,
                 wrist_view_key=config.wrist_view_key,
+                include_episode_index=include_episode_index,
             )
         ],
     )
@@ -326,7 +353,7 @@ def _create_paired_data_loader(
         seed=train_config.seed,
         framework="jax",
     )
-    return PairedDataLoader(data_config, torch_loader)
+    return PairedDataLoader(data_config, torch_loader, include_episode_index=include_episode_index)
 
 
 def _init_frozen_model_state(
