@@ -144,11 +144,20 @@ def create_torch_dataset(
     dataset_meta = lerobot_dataset.LeRobotDatasetMetadata(repo_id)
     dataset = lerobot_dataset.LeRobotDataset(
         data_config.repo_id,
-        episodes=list(episodes) if episodes is not None else None,
         delta_timestamps={
             key: [t / dataset_meta.fps for t in range(action_horizon)] for key in data_config.action_sequence_keys
         },
     )
+    if episodes is not None:
+        frame_indices = [
+            index
+            for episode in episodes
+            for index in range(
+                int(dataset.episode_data_index["from"][episode]),
+                int(dataset.episode_data_index["to"][episode]),
+            )
+        ]
+        dataset = torch.utils.data.Subset(dataset, frame_indices)
 
     if data_config.prompt_from_task:
         dataset = TransformedDataset(dataset, [_transforms.PromptFromLeRobotTask(dataset_meta.tasks)])

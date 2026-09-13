@@ -1,6 +1,8 @@
 import dataclasses
+import types
 
 import jax
+import torch
 
 from openpi.models import pi0_config
 from openpi.training import config as _config
@@ -32,6 +34,38 @@ def test_torch_data_loader_infinite():
 
     for _ in range(10):
         _ = next(data_iter)
+
+
+def test_create_torch_dataset_uses_global_episode_indices(monkeypatch):
+    class FakeLeRobotDataset:
+        def __init__(self, repo_id, *, delta_timestamps):
+            del repo_id, delta_timestamps
+            self.episode_data_index = {
+                "from": torch.tensor([0, 2, 5]),
+                "to": torch.tensor([2, 5, 6]),
+            }
+
+        def __getitem__(self, index):
+            return index
+
+        def __len__(self):
+            return 6
+
+    monkeypatch.setattr(
+        _data_loader.lerobot_dataset,
+        "LeRobotDatasetMetadata",
+        lambda repo_id: types.SimpleNamespace(fps=10),
+    )
+    monkeypatch.setattr(_data_loader.lerobot_dataset, "LeRobotDataset", FakeLeRobotDataset)
+
+    dataset = _data_loader.create_torch_dataset(
+        _config.DataConfig(repo_id="test"),
+        action_horizon=2,
+        model_config=object(),
+        episodes=[2, 0],
+    )
+
+    assert [dataset[index] for index in range(len(dataset))] == [5, 0, 1]
 
 
 def test_torch_data_loader_parallel():
