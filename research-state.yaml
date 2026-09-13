@@ -43,6 +43,12 @@ hypotheses:
     motivation: "The layer comparison cannot establish ACPD efficacy, and the historical SFT log uses a different RNG split. A component ablation inside the same distillation trainer isolates the optimization effect."
     parent: H2
     priority: high
+  - id: H5
+    statement: "Full ACPD improves pooled four-suite backview success by at least 2 percentage points over trainer-matched Flow-only training at 5K steps."
+    status: active
+    motivation: "H4 shows active auxiliary gradients but indistinguishable supervised convergence, so task success is the next discriminating measurement."
+    parent: H4
+    priority: high
 
 experiments:
   proxy_metric: "Two finite optimizer steps with nonzero selector gradients and peak GPU memory below 32 GB."
