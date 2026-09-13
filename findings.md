@@ -14,6 +14,8 @@ Two backview 5090 smoke runs completed successfully. Job 126759 used global micr
 
 The trainer-matched 2K component ablation does not support an early-convergence effect at the pre-registered 1% resolution. Relative to Flow-only, Cue-only changed the primary and final-window supervised losses by +0.80% and +0.98%, ACL-only by -0.31% and -0.63%, and Full ACPD by +0.11% and +0.16%. All four runs completed with physical batch 32 on two-device FSDP at about 31.4 GiB peak memory per card.
 
+The 5K layer ablation also does not support the dual-layer hypothesis. Layer 6, layer 12, and layers 6+12 have primary losses of 0.040565, 0.040882, and 0.040682, respectively. Layer 6 is also best in the final window at 0.032250, versus 0.032570 and 0.032370. The matched 5K Flow-only and Full ACPD checkpoints are now complete; their supervised-loss differences remain below 0.5%, so policy evaluation is the remaining discriminator.
+
 ## Patterns and Insights
 
 The paper method requires gradients through the cue selector while stopping gradients only through the student query and teacher features. Historical V6.4 is not paper-faithful because it stops gradients through the selected cue and omits the variance term.
@@ -24,7 +26,7 @@ Table 2 uses the joint-selector V6 implementation, but it is not a controlled ab
 
 The manuscript's learning-rate description also differs from the old launchers. Both SFT and ACPD inherit a 10K warmup to `5e-5`, followed by a schedule whose peak and final rates are both `5e-5`; it is constant after warmup rather than cosine-decayed. The current LoRA experiment uses a true 1K-warmup, 30K cosine decay from `2.5e-5` to `2.5e-6`. This is a deliberate LoRA engineering choice, not a reproduction of the manuscript schedule, and has not yet been tuned for ACPD.
 
-At 5K LoRA steps, layers 12 and 6+12 have essentially the same supervised-loss convergence. Their final-window means are 0.03257 and 0.03237, respectively, so the dual-layer improvement is only 0.61% and does not meet the pre-registered 1% rule. The cue prediction also becomes easy rapidly: its weighted loss falls from more than twice the flow loss at initialization to about 2% of the flow loss by step 4,900. This is compatible with either successful representation alignment or selector-predictor co-adaptation; loss values alone cannot distinguish them.
+At 5K LoRA steps, single layer 6 has the lowest primary and final-window supervised losses. Layers 6+12 are 0.29% and 0.37% worse in those windows, so the extra head is not justified by early convergence. The cue prediction also becomes easy rapidly: its weighted loss falls from more than twice the flow loss at initialization to about 2% of the flow loss by step 4,900. This is compatible with either successful representation alignment or selector-predictor co-adaptation; loss values alone cannot distinguish them.
 
 The component test confirms that both auxiliary branches are active without establishing an optimization advantage. Cue-only retains nonzero selector and predictor gradients and reaches 0.996 cue cosine without variance collapse by step 1,900. ACL nearly doubles the mean LoRA gradient norm and slightly lowers action-correlation loss. Despite these changes, Full ACPD is nearly indistinguishable from Flow-only on supervised convergence. This is consistent with either weak opposing component effects or auxiliary changes that are not visible in the training-loss proxy.
 
@@ -52,6 +54,6 @@ The teacher is better than the student on about 99.9% of sampled task-dimension 
 
 The physical global batch 32 run is preferred because it uses the complete batch for the variance statistic and removes unnecessary accumulation steps. The sampled peak was about 16.9 GiB/card, leaving about 15.1 GiB before the nominal 32 GiB device limit.
 
-The dual-layer head is not justified by the completed early-loss comparison unless the running layer-6 run is worse than layer 12 and later task evaluation shows a benefit. The current default for follow-up diagnostics remains layers 6+12 only to reuse the completed full-objective trajectory as a matched control.
+The dual-layer head is not justified by the completed early-loss comparison. Layer 6 is the preferred configuration for new experiments, while the existing layers 6+12 checkpoint remains the matched Full ACPD control for the pending task-success evaluation.
 
 H4 rules out supervised-loss weight tuning as the next step. The efficient next branch is sequential: first compare saved 5K Flow-only and Full ACPD policies on backview benchmarks; only if Full ACPD improves task success should Cue-only and ACL-only be promoted to checkpoint-producing runs.

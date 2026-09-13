@@ -33,7 +33,7 @@ hypotheses:
     priority: high
   - id: H3
     statement: "ACPD at layers 6 and 12 converges faster during the first 5K backview steps than ACPD at either layer alone."
-    status: active
+    status: not_supported
     motivation: "The paper selects both layers without reporting a layer ablation; a controlled short run can test whether the additional head improves early optimization."
     parent: H2
     priority: high
@@ -70,7 +70,7 @@ experiments:
 outer_loop:
   cycle: 4
   last_direction: "test task success with matched saved Flow-only and Full ACPD checkpoints"
-  last_reflection: "Cue, ACL, and Full ACPD all changed 2K supervised convergence by less than 1% versus Flow-only. The branches are active and the teacher is stronger, so benchmark success is now more informative than loss-weight tuning."
+  last_reflection: "Layer 6 has the best 5K supervised convergence, while Full ACPD and matched Flow-only differ by less than 1%. The saved policies must now be compared by benchmark success."
 
 workspace:
   findings: "findings.md"
