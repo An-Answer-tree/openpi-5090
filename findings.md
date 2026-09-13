@@ -12,6 +12,8 @@ The student can use the repository's existing pi0.5 LoRA variants. LoRA reduces 
 
 Two backview 5090 smoke runs completed successfully. Job 126759 used global micro-batch 8 with four accumulation steps; job 126936 used physical global batch 32 with no accumulation. Both completed two optimizer steps with finite losses and nonzero selector, predictor, and LoRA gradients. Peak sampled GPU memory was 17,291 MiB/card and 17,337 MiB/card, respectively.
 
+The trainer-matched 2K component ablation does not support an early-convergence effect at the pre-registered 1% resolution. Relative to Flow-only, Cue-only changed the primary and final-window supervised losses by +0.80% and +0.98%, ACL-only by -0.31% and -0.63%, and Full ACPD by +0.11% and +0.16%. All four runs completed with physical batch 32 on two-device FSDP at about 31.4 GiB peak memory per card.
+
 ## Patterns and Insights
 
 The paper method requires gradients through the cue selector while stopping gradients only through the student query and teacher features. Historical V6.4 is not paper-faithful because it stops gradients through the selected cue and omits the variance term.
@@ -24,7 +26,9 @@ The manuscript's learning-rate description also differs from the old launchers. 
 
 At 5K LoRA steps, layers 12 and 6+12 have essentially the same supervised-loss convergence. Their final-window means are 0.03257 and 0.03237, respectively, so the dual-layer improvement is only 0.61% and does not meet the pre-registered 1% rule. The cue prediction also becomes easy rapidly: its weighted loss falls from more than twice the flow loss at initialization to about 2% of the flow loss by step 4,900. This is compatible with either successful representation alignment or selector-predictor co-adaptation; loss values alone cannot distinguish them.
 
-The next controlled test isolates flow-only, Cue-only, and ACL-only optimization within the same trainer and RNG schedule. Parameter tuning is deferred until this component test identifies which term changes student learning.
+The component test confirms that both auxiliary branches are active without establishing an optimization advantage. Cue-only retains nonzero selector and predictor gradients and reaches 0.996 cue cosine without variance collapse by step 1,900. ACL nearly doubles the mean LoRA gradient norm and slightly lowers action-correlation loss. Despite these changes, Full ACPD is nearly indistinguishable from Flow-only on supervised convergence. This is consistent with either weak opposing component effects or auxiliary changes that are not visible in the training-loss proxy.
+
+The teacher is better than the student on about 99.9% of sampled task-dimension flow targets during the 2K runs, with a primary-window MSE of 0.01595 versus about 0.229 for the student. Teacher reliability is therefore not the immediate bottleneck, and the historical reliability gate is not justified by this diagnostic. The next useful discriminator is task success from matched saved checkpoints, not a sweep over Cue and ACL weights.
 
 ## Lessons and Constraints
 
@@ -35,16 +39,19 @@ The next controlled test isolates flow-only, Cue-only, and ACL-only optimization
 - Table 2 must use one gate policy across every row, or explicitly include the gate as an ablation factor.
 - The paper must report the schedule that produced its tables or rerun with the stated cosine schedule.
 - gpu03 has a lost physical GPU and unreliable GPU isolation; ACPD jobs must exclude that node. This is an infrastructure failure, not evidence about the method or batch-size feasibility.
+- Early supervised-loss convergence is too insensitive to select ACPD components; use it for sanity checks and use benchmark success for method decisions.
 
 ## Open Questions
 
 - Do the four 30K view-specific runs remain stable after the smoke configuration is promoted?
 - Does checkpoint writing remain the dominant wall-clock cost at the configured save interval?
-- Is the teacher more accurate than the student on the exact sampled flow targets throughout LoRA training?
-- Does Cue or ACL improve task success even when supervised flow loss is unchanged?
+- Does the teacher's strong early flow-target advantage persist later in training?
+- Does Full ACPD improve task success over a trainer-matched Flow-only checkpoint even though their supervised losses are indistinguishable?
 
 ## Optimization Trajectory
 
 The physical global batch 32 run is preferred because it uses the complete batch for the variance statistic and removes unnecessary accumulation steps. The sampled peak was about 16.9 GiB/card, leaving about 15.1 GiB before the nominal 32 GiB device limit.
 
-The dual-layer head is not justified by the completed early-loss comparison unless the pending layer-6 run is worse than layer 12 and later task evaluation shows a benefit. The current default for follow-up diagnostics remains layers 6+12 only to reuse the completed full-objective trajectory as a matched control.
+The dual-layer head is not justified by the completed early-loss comparison unless the running layer-6 run is worse than layer 12 and later task evaluation shows a benefit. The current default for follow-up diagnostics remains layers 6+12 only to reuse the completed full-objective trajectory as a matched control.
+
+H4 rules out supervised-loss weight tuning as the next step. The efficient next branch is sequential: first compare saved 5K Flow-only and Full ACPD policies on backview benchmarks; only if Full ACPD improves task success should Cue-only and ACL-only be promoted to checkpoint-producing runs.

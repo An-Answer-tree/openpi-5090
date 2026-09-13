@@ -15,7 +15,7 @@ literature:
     - "Memory and throughput of a frozen full teacher plus a LoRA student on four 32 GB GPUs."
   evidence_gaps:
     - "Long-run stability and final task success of the four view-specific students are not measured yet."
-    - "The current LoRA runs lack a trainer-matched flow-only control, so similar supervised loss does not isolate ACPD's effect."
+    - "The trainer-matched 2K component runs have no saved checkpoints, so unchanged supervised loss cannot determine task-success effects."
     - "The manuscript's Table 2 mixes gated and ungated V6 runs, confounding the claimed Cue, ACL, and wrist-view ablations."
 
 hypotheses:
@@ -39,7 +39,7 @@ hypotheses:
     priority: high
   - id: H4
     statement: "Under an otherwise identical LoRA training graph, Cue or ACL changes early supervised-loss convergence relative to flow-only training."
-    status: active
+    status: not_supported
     motivation: "The layer comparison cannot establish ACPD efficacy, and the historical SFT log uses a different RNG split. A component ablation inside the same distillation trainer isolates the optimization effect."
     parent: H2
     priority: high
@@ -62,9 +62,9 @@ experiments:
       status: completed
 
 outer_loop:
-  cycle: 3
-  last_direction: "separate method efficacy from layer choice with a trainer-matched component ablation"
-  last_reflection: "The two completed layer runs are nearly identical to each other and to historical LoRA SFT loss. Test flow-only, Cue-only, and ACL-only in the same graph before tuning weights."
+  cycle: 4
+  last_direction: "test task success with matched saved Flow-only and Full ACPD checkpoints"
+  last_reflection: "Cue, ACL, and Full ACPD all changed 2K supervised convergence by less than 1% versus Flow-only. The branches are active and the teacher is stronger, so benchmark success is now more informative than loss-weight tuning."
 
 workspace:
   findings: "findings.md"
