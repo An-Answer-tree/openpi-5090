@@ -46,7 +46,7 @@ hypotheses:
   - id: H5
     statement: "Full ACPD improves pooled four-suite backview success by at least 2 percentage points over trainer-matched Flow-only training at 5K steps."
     status: active
-    motivation: "H4 shows active auxiliary gradients but indistinguishable supervised convergence, so task success is the next discriminating measurement."
+    motivation: "H4 shows active auxiliary gradients but indistinguishable supervised convergence, so task success is the next discriminating measurement. Promotion also requires the paired episode-bootstrap 95% confidence interval to exclude zero."
     parent: H4
     priority: high
   - id: H6
@@ -86,9 +86,9 @@ experiments:
       status: completed
 
 outer_loop:
-  cycle: 6
-  last_direction: "measure exact privileged-view attention contributions before another policy run"
-  last_reflection: "H6 is not a valid attention measurement because it compares unprojected hidden and visual features with nearly uniform weights. H7 uses the teacher's real Q/K/V, full softmax, output projection, and AdaRMS gate, with an episode-held-out same-query shuffled-view control."
+  cycle: 7
+  last_direction: "run the pre-registered 5K policy comparison while the exact attention probe waits for resources"
+  last_reflection: "H7 tests whether privileged targets are recoverable, while H5 directly tests whether the existing ACPD objective changed policy success. Matching episodes and a paired confidence interval make the low-cost H5 screen more informative than another training-loss comparison."
 
 workspace:
   results: "EXPERIMENT_RESULTS.md"
