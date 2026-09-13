@@ -1,6 +1,6 @@
 project:
   title: "ACPD LoRA distillation on RTX 5090"
-  question: "Can paper-faithful ACPD distillation train a LoRA pi0.5 student with effective batch size 32 on four 32 GB RTX 5090 GPUs?"
+  question: "How can privileged agentview+wrist information train a stronger weak-view pi0.5 student?"
   status: active
   started: "2026-09-11"
   domain: "robot policy distillation"
@@ -51,14 +51,20 @@ hypotheses:
     priority: high
   - id: H6
     statement: "A frozen backview student can predict teacher visual attention messages without teacher action-token shortcuts."
-    status: active
+    status: abandoned
     motivation: "The current cue loss is solved through teacher action memory; a visual-only probe tests whether privileged visual information is recoverable before a new policy run."
     parent: H5
     priority: high
   - id: H6.1
     statement: "Layer 9 gives a larger correct-minus-shuffled cosine gap than layers 6 and 12 for the existing visual-message proxy."
-    status: active
+    status: abandoned
     motivation: "The 18-layer action expert has no designated fusion layer, so a matched short scan tests whether middle-layer action semantics improve proxy recoverability."
+    parent: H6
+    priority: high
+  - id: H7
+    statement: "An adapted backview student can predict the teacher's exact per-view attention contribution on held-out episodes, especially where the privileged teacher has the largest flow-error advantage."
+    status: active
+    motivation: "The old learned cue and H6 proxy admit shortcuts; exact Q/K/V attention contributions provide a fixed privileged target and a same-query shuffled-view control."
     parent: H6
     priority: high
 
@@ -80,9 +86,9 @@ experiments:
       status: completed
 
 outer_loop:
-  cycle: 5
-  last_direction: "run a 500-step visual-only privileged-message probe before changing the policy objective"
-  last_reflection: "The existing selector reaches near-perfect cue cosine while using teacher action tokens as a shortcut. H6 tests whether the backview can recover the teacher's visual message without that shortcut."
+  cycle: 6
+  last_direction: "measure exact privileged-view attention contributions before another policy run"
+  last_reflection: "H6 is not a valid attention measurement because it compares unprojected hidden and visual features with nearly uniform weights. H7 uses the teacher's real Q/K/V, full softmax, output projection, and AdaRMS gate, with an episode-held-out same-query shuffled-view control."
 
 workspace:
   results: "EXPERIMENT_RESULTS.md"

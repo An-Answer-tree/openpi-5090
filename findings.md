@@ -2,7 +2,8 @@
 
 ## Research Question
 
-Can paper-faithful ACPD distillation train a LoRA pi0.5 student with effective batch size 32 on four 32 GB RTX 5090 GPUs?
+How can privileged `agentview+wrist` information train a stronger weak-view
+pi0.5 student?
 
 ## Current Understanding
 
@@ -32,6 +33,21 @@ The component test confirms that both auxiliary branches are active without esta
 
 The teacher is better than the student on about 99.9% of sampled task-dimension flow targets during the 2K runs, with a primary-window MSE of 0.01595 versus about 0.229 for the student. Teacher reliability is therefore not the immediate bottleneck, and the historical reliability gate is not justified by this diagnostic. The next useful discriminator is task success from matched saved checkpoints, not a sweep over Cue and ACL weights.
 
+The H6 visual-message proxy is not a valid transformer attention contribution.
+It compares teacher action hidden states with unprojected SigLIP tokens, then
+divides already normalized dot products by `sqrt(1024)`. The resulting softmax
+is nearly uniform, so the target is close to a global visual average. Rolling
+the complete target also changes its action-conditioned component. Job 127810
+was cancelled before its first batch after this design audit; no H6 result is
+claimed.
+
+The next branch replaces the learned or heuristic cue with the teacher's exact
+per-view attention residual: real Q/K/V projections, the full attention
+softmax, the action expert output projection, and the AdaRMS residual gate. A
+same-query control changes only one view's K/V tensors. This directly tests
+whether privileged visual information is predictable from backview, including
+the samples where the teacher has the largest flow-error advantage.
+
 ## Lessons and Constraints
 
 - Train one student view per four-GPU job; do not place four teacher-student pairs in one allocation.
@@ -42,6 +58,9 @@ The teacher is better than the student on about 99.9% of sampled task-dimension 
 - The paper must report the schedule that produced its tables or rerun with the stated cosine schedule.
 - gpu03 has a lost physical GPU and unreliable GPU isolation; ACPD jobs must exclude that node. This is an infrastructure failure, not evidence about the method or batch-size feasibility.
 - Early supervised-loss convergence is too insensitive to select ACPD components; use it for sanity checks and use benchmark success for method decisions.
+- A privileged target must be fixed independently of the predictor and compared
+  with a control that preserves noisy action and timestep; otherwise shared
+  action inputs can masquerade as transferred visual information.
 
 ## Open Questions
 
@@ -49,6 +68,8 @@ The teacher is better than the student on about 99.9% of sampled task-dimension 
 - Does checkpoint writing remain the dominant wall-clock cost at the configured save interval?
 - Does the teacher's strong early flow-target advantage persist later in training?
 - Does Full ACPD improve task success over a trainer-matched Flow-only checkpoint even though their supervised losses are indistinguishable?
+- Can a backview-adapted student predict the teacher's exact agentview or wrist
+  attention contribution on held-out episodes and on teacher-advantage samples?
 
 ## Optimization Trajectory
 
