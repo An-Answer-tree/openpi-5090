@@ -49,6 +49,12 @@ hypotheses:
     motivation: "H4 shows active auxiliary gradients but indistinguishable supervised convergence, so task success is the next discriminating measurement."
     parent: H4
     priority: high
+  - id: H6
+    statement: "A frozen backview student can predict teacher visual attention messages without teacher action-token shortcuts."
+    status: active
+    motivation: "The current cue loss is solved through teacher action memory; a visual-only probe tests whether privileged visual information is recoverable before a new policy run."
+    parent: H5
+    priority: high
 
 experiments:
   proxy_metric: "Two finite optimizer steps with nonzero selector gradients and peak GPU memory below 32 GB."
@@ -68,9 +74,9 @@ experiments:
       status: completed
 
 outer_loop:
-  cycle: 4
-  last_direction: "test task success with matched saved Flow-only and Full ACPD checkpoints"
-  last_reflection: "Layer 6 has the best 5K supervised convergence, while Full ACPD and matched Flow-only differ by less than 1%. The saved policies must now be compared by benchmark success."
+  cycle: 5
+  last_direction: "run a 500-step visual-only privileged-message probe before changing the policy objective"
+  last_reflection: "The existing selector reaches near-perfect cue cosine while using teacher action tokens as a shortcut. H6 tests whether the backview can recover the teacher's visual message without that shortcut."
 
 workspace:
   results: "EXPERIMENT_RESULTS.md"
