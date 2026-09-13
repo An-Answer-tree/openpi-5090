@@ -65,6 +65,7 @@ python -m scripts.distillation_acpd.train_distill \
   --assets-dir=/home/liutong/Projects/openpi/assets/pi05_libero_agentview_wrist \
   --asset-id=libero_multiview \
   --checkpoint-base-dir=/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/layers_5k \
+  --overwrite \
   --seed=42 \
   --batch-size=32 \
   --gradient-accumulation-steps=1 \
