@@ -55,6 +55,12 @@ hypotheses:
     motivation: "The current cue loss is solved through teacher action memory; a visual-only probe tests whether privileged visual information is recoverable before a new policy run."
     parent: H5
     priority: high
+  - id: H6.1
+    statement: "Layer 9 gives a larger correct-minus-shuffled cosine gap than layers 6 and 12 for the existing visual-message proxy."
+    status: active
+    motivation: "The 18-layer action expert has no designated fusion layer, so a matched short scan tests whether middle-layer action semantics improve proxy recoverability."
+    parent: H6
+    priority: high
 
 experiments:
   proxy_metric: "Two finite optimizer steps with nonzero selector gradients and peak GPU memory below 32 GB."
