@@ -73,6 +73,8 @@ outer_loop:
   last_reflection: "Layer 6 has the best 5K supervised convergence, while Full ACPD and matched Flow-only differ by less than 1%. The saved policies must now be compared by benchmark success."
 
 workspace:
+  results: "EXPERIMENT_RESULTS.md"
+  instructions: "AGENTS.md"
   findings: "findings.md"
   log: "research-log.md"
   literature_dir: "literature/"
