@@ -82,6 +82,16 @@
 | H6 启发式 visual-message probe | 终止 | target 近似全局视觉平均，shuffle 对照也不正确，未产生有效结果。 |
 | H7 精确 attention contribution probe | 运行中 | 使用真实 Q/K/V、同 query 的视觉 K/V shuffle 和 held-out episode；结果未完成前不下结论。 |
 
+## H8/H9：ACPD-v2 筛选
+
+| 实验 | 配置 | Job | 状态 |
+|---|---|---:|---|
+| H8 ACL-only | FSDP2，global BS32，5K，seed 42 | 128417 | 等待资源 |
+| H8 四套验证 | 4 GPU，2,000 episodes，依赖 H8 | 128421 | 等待依赖 |
+| H9 ACPD-v2 | H7 选层后确定唯一分支，FSDP4，effective BS32，5K | - | 等待 H7 |
+
+H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success 比 H8 高至少 `1.5` 个百分点，且配对 bootstrap 95% CI 下界大于 0。
+
 ## 证据
 
 | 内容 | 位置 |
@@ -93,6 +103,8 @@
 | H5 协议 | `experiments/acpd-task-success-5k/protocol.md` |
 | H5 分析 | `experiments/acpd-task-success-5k/analysis.md` |
 | H7 协议 | `experiments/acpd-exact-attention-probe/protocol.md` |
+| H8 协议 | `experiments/acpd-acl-only-5k/protocol.md` |
+| H9 协议 | `experiments/acpd-v2-5k/protocol.md` |
 
 ## Checkpoint 路径检索
 
@@ -110,6 +122,7 @@
 | ACPD layer 12，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/layers_5k/pi05_libero_backview_acpd_lora_layer12/pi05_libero_backview_acpd_lora_fsdp2_layer12_bs32_5k/4999` |
 | Full ACPD 6+12，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/layers_5k/pi05_libero_backview_acpd_lora_layers6_12/pi05_libero_backview_acpd_lora_fsdp2_layers6_12_bs32_5k/4999` |
 | Flow-only，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/task_success_5k/pi05_libero_backview_flow_only_5k/pi05_libero_backview_lora_fsdp2_bs32_5k/4999` |
+| H8 ACL-only，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/task_success_5k/pi05_libero_backview_acl_only_5k/pi05_libero_backview_acpd_lora_fsdp2_bs32_5k/4999` |
 | H4 组件消融，2K | 按协议不保存 checkpoint |
 
 ## 验证结果路径检索
@@ -126,3 +139,4 @@
 | SFT-cosine 60K | `/opt/liutong/openpi-5090-evals/pi05_libero_backview_lora_fsdp4_bs32_cosine_30k/59999` | 完成 |
 | Full ACPD 6+12，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/full-acpd-layers6-12/4999` | 完成，`6.50%` pooled |
 | Flow-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/flow-only/4999` | 完成，`4.45%` pooled |
+| H8 ACL-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/acl-only/4999` | 等待训练 |
