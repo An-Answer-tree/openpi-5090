@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# -ne 6 ]]; then
-  echo "Usage: $0 CHECKPOINT_DIR EVAL_DIR GPU_ID PORT SUITE NUM_TRIALS" >&2
+if [[ $# -lt 6 || $# -gt 7 ]]; then
+  echo "Usage: $0 CHECKPOINT_DIR EVAL_DIR GPU_ID PORT SUITE NUM_TRIALS [POLICY_CONFIG]" >&2
   exit 2
 fi
 
@@ -12,6 +12,7 @@ gpu_id=$3
 port=$4
 suite_name=$5
 num_trials=$6
+policy_config=${7:-pi05_libero_backview_lora}
 
 test -f "${checkpoint_dir}/_CHECKPOINT_METADATA"
 mkdir -p "${eval_dir}"
@@ -44,7 +45,7 @@ CUDA_VISIBLE_DEVICES="${gpu_id}" python scripts/serve_policy.py \
   --port "${port}" \
   --no-record \
   policy:checkpoint \
-  --policy.config pi05_libero_backview_lora \
+  --policy.config "${policy_config}" \
   --policy.dir "${checkpoint_dir}" &
 server_pid=$!
 trap 'kill "${server_pid}" 2>/dev/null || true; wait "${server_pid}" 2>/dev/null || true' EXIT

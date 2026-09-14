@@ -68,6 +68,7 @@ class DistillTrainConfig:
     acpd_memory_dim: int = 1024
     acpd_projector_hidden_dim: int = 2048
     acpd_detach_query: bool = True
+    exact_contribution_fusion: bool = False
 
     assets_dir: str = tyro.MISSING
     asset_id: str = "libero_multiview"
@@ -116,7 +117,7 @@ class AcpdCheckpointWeightLoader:
         flat_loaded = traverse_util.flatten_dict(loaded_params, sep="/")
         flat_ref = traverse_util.flatten_dict(params, sep="/")
         for key, value in flat_ref.items():
-            if key.startswith("acpd_aux_heads/") and key not in flat_loaded:
+            if key.startswith(("acpd_aux_heads/", "exact_contribution_head/")) and key not in flat_loaded:
                 flat_loaded[key] = value
         return traverse_util.unflatten_dict(flat_loaded, sep="/")
 
@@ -234,6 +235,7 @@ def _make_distill_model_config(
     config: DistillTrainConfig,
     *,
     create_acpd_heads: bool,
+    exact_contribution_fusion: bool,
 ) -> pi0_distill_acpd.AcpdPi0Config:
     if not isinstance(model_config, pi0_config.Pi0Config):
         raise ValueError(f"ACPD only supports Pi0Config, got {type(model_config).__name__}.")
@@ -244,6 +246,7 @@ def _make_distill_model_config(
         acpd_memory_dim=config.acpd_memory_dim,
         acpd_projector_hidden_dim=config.acpd_projector_hidden_dim,
         create_acpd_heads=create_acpd_heads,
+        exact_contribution_fusion=exact_contribution_fusion,
     )
 
 
@@ -263,7 +266,12 @@ def _make_student_train_config(
         name=config.name,
         project_name=config.project_name,
         exp_name=config.exp_name,
-        model=_make_distill_model_config(base.model, config, create_acpd_heads=create_acpd_heads),
+        model=_make_distill_model_config(
+            base.model,
+            config,
+            create_acpd_heads=create_acpd_heads,
+            exact_contribution_fusion=config.exact_contribution_fusion,
+        ),
         weight_loader=AcpdCheckpointWeightLoader(config.student_init_params),
         data=data,
         lr_schedule=_optimizer.CosineDecaySchedule(
@@ -299,7 +307,12 @@ def _make_teacher_train_config(
     )
     return dataclasses.replace(
         student_config,
-        model=_make_distill_model_config(model_config, config, create_acpd_heads=False),
+        model=_make_distill_model_config(
+            model_config,
+            config,
+            create_acpd_heads=False,
+            exact_contribution_fusion=False,
+        ),
         weight_loader=_weight_loaders.CheckpointWeightLoader(config.teacher_params),
     )
 
@@ -424,6 +437,20 @@ def _acpd_prediction_loss(
     return jnp.mean(1.0 - cosine), jnp.mean(cosine)
 
 
+def _exact_contribution_loss(
+    prediction: at.Array,
+    target: at.Array,
+) -> tuple[at.Array, at.Array, at.Array]:
+    """Returns view-normalized MSE, cosine, and target power."""
+    prediction = prediction.astype(jnp.float32)
+    target = jax.lax.stop_gradient(target.astype(jnp.float32))
+    squared_error = jnp.mean(jnp.square(prediction - target), axis=(0, 2, 3))
+    target_power = jnp.mean(jnp.square(target), axis=(0, 2, 3))
+    normalized_mse = squared_error / jnp.maximum(target_power, 1e-8)
+    cosine = jnp.sum(_normalize_last_dim(prediction) * _normalize_last_dim(target), axis=-1)
+    return jnp.mean(normalized_mse), jnp.mean(cosine), jnp.mean(target_power)
+
+
 def _acpd_variance_loss(privileged_cue: at.Array, eps: float = 1e-4) -> tuple[at.Array, at.Array]:
     cue = _normalize_last_dim(privileged_cue.astype(jnp.float32))
     cue = cue * jnp.sqrt(jnp.asarray(cue.shape[-1], dtype=jnp.float32))
@@ -487,51 +514,70 @@ def compute_gradients(
         student_v_t, _, student_hiddens = model.compute_train_outputs(
             preprocess_rng, student_observation, x_t, time, train=True
         )
-        teacher_v_t, teacher_visual_tokens, teacher_hiddens = teacher_model.compute_train_outputs(
-            preprocess_rng, teacher_observation, x_t, time, train=True
-        )
+        if config.exact_contribution_fusion:
+            teacher_v_t, teacher_contributions, _, _ = teacher_model.compute_attention_contributions(
+                preprocess_rng, teacher_observation, x_t, time, train=True
+            )
+        else:
+            teacher_v_t, teacher_visual_tokens, teacher_hiddens = teacher_model.compute_train_outputs(
+                preprocess_rng, teacher_observation, x_t, time, train=True
+            )
         teacher_v_t = jax.lax.stop_gradient(teacher_v_t)
         supervised_loss = jnp.mean(jnp.square(student_v_t - target_v_t))
         action_corr_loss = _action_corr_loss(student_v_t, teacher_v_t)
         student_task_error = _per_sample_prediction_error(student_v_t[..., :7], target_v_t[..., :7])
         teacher_task_error = _per_sample_prediction_error(teacher_v_t[..., :7], target_v_t[..., :7])
 
-        layer_losses = []
-        prediction_losses = []
-        variance_losses = []
         per_layer = {}
-        for layer, student_hidden, teacher_hidden in zip(
-            model.align_layers,
-            student_hiddens,
-            teacher_hiddens,
-            strict=True,
-        ):
-            head = model.acpd_aux_heads[pi0_distill_acpd.layer_key(layer)]
-            predicted_cue, privileged_cue, attention = head(
-                student_hidden,
-                teacher_visual_tokens,
-                teacher_hidden,
-                detach_query=config.acpd_detach_query,
+        if config.exact_contribution_fusion:
+            predicted_contributions = model.exact_contribution_head.predict(student_hiddens[0])
+            acpd_loss, exact_cosine, target_power = _exact_contribution_loss(
+                predicted_contributions,
+                teacher_contributions[:, 0],
             )
-            prediction_loss, cosine = _acpd_prediction_loss(predicted_cue, privileged_cue)
-            variance_loss, feature_std = _acpd_variance_loss(privileged_cue)
-            layer_loss = prediction_loss + config.acpd_variance_loss_weight * variance_loss
-            diagnostics = _attention_diagnostics(attention, teacher_visual_tokens.shape[1])
-            key = pi0_distill_acpd.layer_key(layer)
-            per_layer[f"acpd_loss_{key}"] = layer_loss
-            per_layer[f"acpd_prediction_loss_{key}"] = prediction_loss
-            per_layer[f"acpd_variance_loss_{key}"] = variance_loss
-            per_layer[f"acpd_cosine_{key}"] = cosine
-            per_layer[f"acpd_feature_std_{key}"] = feature_std
-            for metric, value in diagnostics.items():
-                per_layer[f"acpd_{metric}_{key}"] = value
-            layer_losses.append(layer_loss)
-            prediction_losses.append(prediction_loss)
-            variance_losses.append(variance_loss)
+            acpd_prediction_loss = acpd_loss
+            acpd_variance_loss = jnp.asarray(0.0, dtype=jnp.float32)
+            per_layer = {
+                "exact_contribution_cosine": exact_cosine,
+                "exact_contribution_target_power": target_power,
+                "exact_contribution_gate": jnp.tanh(model.exact_contribution_head.gate.value),
+            }
+        else:
+            layer_losses = []
+            prediction_losses = []
+            variance_losses = []
+            for layer, student_hidden, teacher_hidden in zip(
+                model.align_layers,
+                student_hiddens,
+                teacher_hiddens,
+                strict=True,
+            ):
+                head = model.acpd_aux_heads[pi0_distill_acpd.layer_key(layer)]
+                predicted_cue, privileged_cue, attention = head(
+                    student_hidden,
+                    teacher_visual_tokens,
+                    teacher_hidden,
+                    detach_query=config.acpd_detach_query,
+                )
+                prediction_loss, cosine = _acpd_prediction_loss(predicted_cue, privileged_cue)
+                variance_loss, feature_std = _acpd_variance_loss(privileged_cue)
+                layer_loss = prediction_loss + config.acpd_variance_loss_weight * variance_loss
+                diagnostics = _attention_diagnostics(attention, teacher_visual_tokens.shape[1])
+                key = pi0_distill_acpd.layer_key(layer)
+                per_layer[f"acpd_loss_{key}"] = layer_loss
+                per_layer[f"acpd_prediction_loss_{key}"] = prediction_loss
+                per_layer[f"acpd_variance_loss_{key}"] = variance_loss
+                per_layer[f"acpd_cosine_{key}"] = cosine
+                per_layer[f"acpd_feature_std_{key}"] = feature_std
+                for metric, value in diagnostics.items():
+                    per_layer[f"acpd_{metric}_{key}"] = value
+                layer_losses.append(layer_loss)
+                prediction_losses.append(prediction_loss)
+                variance_losses.append(variance_loss)
 
-        acpd_loss = jnp.mean(jnp.stack(layer_losses))
-        acpd_prediction_loss = jnp.mean(jnp.stack(prediction_losses))
-        acpd_variance_loss = jnp.mean(jnp.stack(variance_losses))
+            acpd_loss = jnp.mean(jnp.stack(layer_losses))
+            acpd_prediction_loss = jnp.mean(jnp.stack(prediction_losses))
+            acpd_variance_loss = jnp.mean(jnp.stack(variance_losses))
         weighted_acpd_loss = config.acpd_loss_weight * acpd_loss
         loss = (
             config.supervised_loss_weight * supervised_loss
@@ -592,12 +638,16 @@ def apply_gradients(
             ".*acpd_aux_heads.*(visual_memory_projector|action_memory_projector|query_projector|key_projector|value_projector).*"
         )
     )
-    predictor_grads = grads.filter(nnx_utils.PathRegex(".*acpd_aux_heads.*privileged_predictor.*"))
+    predictor_grads = grads.filter(
+        nnx_utils.PathRegex(".*(acpd_aux_heads.*privileged_predictor|exact_contribution_head.*predictor).*"),
+    )
+    gate_grads = grads.filter(nnx_utils.PathRegex(".*exact_contribution_head.*gate.*"))
     lora_grads = grads.filter(nnx_utils.PathRegex(".*lora.*"))
     return new_state, {
         "grad_norm": optax.global_norm(grads),
         "selector_grad_norm": optax.global_norm(selector_grads),
         "predictor_grad_norm": optax.global_norm(predictor_grads),
+        "gate_grad_norm": optax.global_norm(gate_grads),
         "lora_grad_norm": optax.global_norm(lora_grads),
         "learning_rate": train_config.lr_schedule.create()(student_state.step),
         "gradient_accumulation_steps": jnp.asarray(config.gradient_accumulation_steps, dtype=jnp.float32),
@@ -633,7 +683,10 @@ def main(config: DistillTrainConfig):
     mesh = sharding.make_mesh(config.fsdp_devices)
     data_sharding = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec(sharding.DATA_AXIS))
     replicated_sharding = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec())
-    student_config = _make_student_train_config(config)
+    student_config = _make_student_train_config(
+        config,
+        create_acpd_heads=not config.exact_contribution_fusion,
+    )
     teacher_config = _make_teacher_train_config(config, student_config)
 
     checkpoint_manager, resuming = _checkpoints.initialize_checkpoint_dir(

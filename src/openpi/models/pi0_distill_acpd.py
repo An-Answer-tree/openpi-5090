@@ -88,12 +88,36 @@ class AcpdHead(nnx.Module):
         return predicted_cue, privileged_cue, attention
 
 
+class ExactContributionHead(nnx.Module):
+    """Predicts two teacher-view contributions and fuses them at inference."""
+
+    def __init__(self, hidden_dim: int, *, rngs: nnx.Rngs):
+        self.hidden_dim = hidden_dim
+        self.predictor = nnx.Linear(
+            hidden_dim,
+            2 * hidden_dim,
+            kernel_init=jax.nn.initializers.normal(0.01 * hidden_dim**-0.5),
+            rngs=rngs,
+        )
+        self.gate = nnx.Param(jnp.zeros((), dtype=jnp.float32))
+
+    def predict(self, student_hidden: at.Array) -> at.Array:
+        prediction = self.predictor(student_hidden.astype(jnp.float32))
+        return einops.rearrange(prediction, "b h (v d) -> b v h d", v=2, d=self.hidden_dim)
+
+    def fuse(self, final_hidden: at.Array, student_hidden: at.Array) -> at.Array:
+        predicted_residual = jnp.sum(self.predict(student_hidden), axis=1)
+        predicted_residual = jax.lax.stop_gradient(predicted_residual).astype(final_hidden.dtype)
+        return final_hidden + jnp.tanh(self.gate.value).astype(final_hidden.dtype) * predicted_residual
+
+
 @dataclasses.dataclass(frozen=True)
 class AcpdPi0Config(pi0_config.Pi0Config):
     align_layers: int | tuple[int, ...] = (6, 12)
     acpd_memory_dim: int = 1024
     acpd_projector_hidden_dim: int = 2048
     create_acpd_heads: bool = True
+    exact_contribution_fusion: bool = False
 
     @override
     def create(self, rng: at.KeyArrayLike) -> "AcpdPi0":
@@ -101,7 +125,7 @@ class AcpdPi0Config(pi0_config.Pi0Config):
 
 
 class AcpdPi0(pi0.Pi0):
-    """Pi0.5 with ACPD features and training-only auxiliary heads."""
+    """Pi0.5 exposing ACPD features and optional deployed cue fusion."""
 
     def __init__(self, config: AcpdPi0Config, rngs: nnx.Rngs):
         super().__init__(config, rngs=rngs)
@@ -110,6 +134,7 @@ class AcpdPi0(pi0.Pi0):
         action_expert_config = gemma.get_config(config.action_expert_variant)
         layers = config.align_layers
         self.align_layers = tuple(layers) if isinstance(layers, list | tuple) else (layers,)
+        self.exact_contribution_fusion = config.exact_contribution_fusion
         if config.create_acpd_heads:
             self.acpd_aux_heads = nnx.Dict(
                 {
@@ -123,6 +148,10 @@ class AcpdPi0(pi0.Pi0):
                     for layer in self.align_layers
                 }
             )
+        if self.exact_contribution_fusion:
+            if len(self.align_layers) != 1:
+                raise ValueError("Exact contribution fusion requires exactly one alignment layer.")
+            self.exact_contribution_head = ExactContributionHead(action_expert_config.width, rngs=rngs)
 
     @staticmethod
     def _layer_index(layer: int, depth: int) -> int:
@@ -163,8 +192,6 @@ class AcpdPi0(pi0.Pi0):
             method="forward_with_intermediates",
         )
         depth = action_intermediates.shape[0]
-        v_t = self.action_out_proj(suffix_out[:, -self.action_horizon :])
-
         hiddens = []
         for layer in self.align_layers:
             if layer == -1:
@@ -172,10 +199,48 @@ class AcpdPi0(pi0.Pi0):
             else:
                 hidden = action_intermediates[self._layer_index(layer, depth)][:, -self.action_horizon :]
                 hiddens.append(_prenorm(hidden))
+        final_hidden = suffix_out[:, -self.action_horizon :]
+        if self.exact_contribution_fusion:
+            final_hidden = self.exact_contribution_head.fuse(final_hidden, hiddens[0])
+        v_t = self.action_out_proj(final_hidden)
         privileged_visual_tokens = jnp.concatenate(
             [image_tokens["base_0_rgb"], image_tokens["left_wrist_0_rgb"]], axis=1
         )
         return v_t, privileged_visual_tokens, hiddens
+
+    @override
+    def _decode_action_velocity(
+        self,
+        suffix_tokens: at.Array,
+        full_attn_mask: at.Array,
+        positions: at.Array,
+        kv_cache: gemma.KVCache,
+        adarms_cond: at.Array | None,
+    ) -> at.Array:
+        if not self.exact_contribution_fusion:
+            return super()._decode_action_velocity(
+                suffix_tokens,
+                full_attn_mask,
+                positions,
+                kv_cache,
+                adarms_cond,
+            )
+        (prefix_out, suffix_out), _, action_intermediates = self.PaliGemma.llm(
+            [None, suffix_tokens],
+            mask=full_attn_mask,
+            positions=positions,
+            kv_cache=kv_cache,
+            adarms_cond=[None, adarms_cond],
+            method="forward_with_intermediates",
+        )
+        assert prefix_out is None
+        layer_index = self._layer_index(self.align_layers[0], action_intermediates.shape[0])
+        student_hidden = _prenorm(action_intermediates[layer_index][:, -self.action_horizon :])
+        final_hidden = self.exact_contribution_head.fuse(
+            suffix_out[:, -self.action_horizon :],
+            student_hidden,
+        )
+        return self.action_out_proj(final_hidden)
 
     @at.typecheck
     def compute_attention_contributions(

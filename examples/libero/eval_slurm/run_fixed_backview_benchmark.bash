@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# -ne 2 ]]; then
-  echo "Usage: $0 CHECKPOINT_DIR EVAL_DIR" >&2
+if [[ $# -lt 2 || $# -gt 3 ]]; then
+  echo "Usage: $0 CHECKPOINT_DIR EVAL_DIR [POLICY_CONFIG]" >&2
   exit 2
 fi
 
 checkpoint_dir=$1
 eval_dir=$2
+policy_config=${3:-pi05_libero_backview_lora}
 
 test -f "${checkpoint_dir}/_CHECKPOINT_METADATA"
 mkdir -p "${eval_dir}/logs"
@@ -38,7 +39,8 @@ start_suite() {
     "${gpu_id}" \
     "${port}" \
     "${suite_name}" \
-    50 >"${eval_dir}/logs/${output_name}.log" 2>&1 &
+    50 \
+    "${policy_config}" >"${eval_dir}/logs/${output_name}.log" 2>&1 &
   suite_pids+=("$!")
 }
 

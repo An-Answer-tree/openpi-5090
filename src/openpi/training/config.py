@@ -15,6 +15,7 @@ import tyro
 
 import openpi.models.model as _model
 import openpi.models.pi0_config as pi0_config
+import openpi.models.pi0_distill_acpd as pi0_distill_acpd
 import openpi.models.pi0_fast as pi0_fast
 import openpi.models.tokenizer as _tokenizer
 import openpi.policies.aloha_policy as aloha_policy
@@ -607,6 +608,24 @@ def _make_pi05_libero_lora_config(view_name: str) -> TrainConfig:
     )
 
 
+def _make_pi05_libero_acpd_v2_config() -> TrainConfig:
+    """Creates the deployed layer-9 exact-contribution policy config."""
+    base = _make_pi05_libero_lora_config("backview")
+    base_fields = {field.name: getattr(base.model, field.name) for field in dataclasses.fields(pi0_config.Pi0Config)}
+    model = pi0_distill_acpd.AcpdPi0Config(
+        **base_fields,
+        align_layers=(9,),
+        create_acpd_heads=False,
+        exact_contribution_fusion=True,
+    )
+    return dataclasses.replace(
+        base,
+        name="pi05_libero_backview_acpd_v2_lora",
+        model=model,
+        freeze_filter=model.get_freeze_filter(),
+    )
+
+
 # Use `get_config` if you need to get a config by name in your code.
 _CONFIGS = [
     #
@@ -813,6 +832,7 @@ _CONFIGS = [
         num_train_steps=30_000,
     ),
     _make_pi05_libero_lora_config("backview"),
+    _make_pi05_libero_acpd_v2_config(),
     _make_pi05_libero_lora_config("topview"),
     _make_pi05_libero_lora_config("leftview"),
     _make_pi05_libero_lora_config("rightview"),

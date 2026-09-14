@@ -5,10 +5,17 @@ import numpy as np
 import optax
 
 from openpi.models.pi0_distill_acpd import AcpdHead
+from openpi.models.pi0_distill_acpd import AcpdPi0Config
+from openpi.models.pi0_distill_acpd import ExactContributionHead
+from openpi.training import config as training_config
+from scripts.distillation_acpd.train_distill import DistillTrainConfig
 from scripts.distillation_acpd.train_distill import _acpd_prediction_loss
 from scripts.distillation_acpd.train_distill import _acpd_variance_loss
 from scripts.distillation_acpd.train_distill import _action_corr_loss
 from scripts.distillation_acpd.train_distill import _add_scaled_gradients
+from scripts.distillation_acpd.train_distill import _exact_contribution_loss
+from scripts.distillation_acpd.train_distill import _make_student_train_config
+from scripts.distillation_acpd.train_distill import _make_teacher_train_config
 from scripts.distillation_acpd.train_distill import _micro_step_train_rng
 from scripts.distillation_acpd.train_distill import _per_sample_prediction_error
 from scripts.distillation_acpd.train_distill import _scale_gradients
@@ -67,6 +74,64 @@ def test_acpd_head_trains_selector_and_predictor_but_detaches_teacher_inputs():
     assert float(jnp.linalg.norm(student_grad)) > 0.0
     np.testing.assert_allclose(visual_grad, 0.0, atol=1e-6)
     np.testing.assert_allclose(teacher_grad, 0.0, atol=1e-6)
+
+
+def test_exact_contribution_head_is_zero_gated_and_detaches_flow_gradient():
+    head = ExactContributionHead(4, rngs=nnx.Rngs(0))
+    student_hidden = jnp.ones((2, 3, 4), dtype=jnp.float32)
+    final_hidden = jnp.arange(24, dtype=jnp.float32).reshape(2, 3, 4)
+
+    assert head.predict(student_hidden).shape == (2, 2, 3, 4)
+    np.testing.assert_allclose(head.fuse(final_hidden, student_hidden), final_hidden)
+
+    head.predictor.kernel.value = jnp.ones_like(head.predictor.kernel.value)
+    head.predictor.bias.value = jnp.zeros_like(head.predictor.bias.value)
+
+    def flow_loss(model):
+        return jnp.mean(model.fuse(final_hidden, student_hidden))
+
+    _, gradients = nnx.value_and_grad(flow_loss)(head)
+    np.testing.assert_allclose(optax.global_norm(gradients["predictor"]), 0.0)
+    assert float(optax.global_norm(gradients["gate"])) > 0.0
+
+
+def test_exact_contribution_loss_is_zero_for_equal_targets():
+    target = jnp.arange(48, dtype=jnp.float32).reshape(2, 2, 3, 4) + 1.0
+
+    loss, cosine, target_power = _exact_contribution_loss(target, target)
+
+    np.testing.assert_allclose(loss, 0.0, atol=1e-6)
+    np.testing.assert_allclose(cosine, 1.0, atol=1e-6)
+    assert float(target_power) > 0.0
+
+
+def test_acpd_v2_policy_config_deploys_layer_9_head():
+    config = training_config.get_config("pi05_libero_backview_acpd_v2_lora")
+
+    assert isinstance(config.model, AcpdPi0Config)
+    assert config.model.align_layers == (9,)
+    assert config.model.exact_contribution_fusion
+    assert not config.model.create_acpd_heads
+
+
+def test_acpd_v2_train_and_eval_models_have_matching_parameter_trees():
+    distill_config = DistillTrainConfig(
+        student_init_params="base/params",
+        teacher_params="teacher/params",
+        assets_dir="assets",
+        checkpoint_base_dir="checkpoints",
+        align_layers=(9,),
+        exact_contribution_fusion=True,
+    )
+
+    student_config = _make_student_train_config(distill_config, create_acpd_heads=False)
+    teacher_config = _make_teacher_train_config(distill_config, student_config)
+    eval_config = training_config.get_config("pi05_libero_backview_acpd_v2_lora")
+
+    assert student_config.model == eval_config.model
+    assert isinstance(teacher_config.model, AcpdPi0Config)
+    assert not teacher_config.model.exact_contribution_fusion
+    assert not teacher_config.model.create_acpd_heads
 
 
 def test_action_corr_loss_matches_pearson_correlation():

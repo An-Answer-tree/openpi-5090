@@ -213,6 +213,24 @@ class Pi0(_model.BaseModel):
 
         return jnp.mean(jnp.square(v_t - u_t), axis=-1)
 
+    def _decode_action_velocity(
+        self,
+        suffix_tokens: at.Array,
+        full_attn_mask: at.Array,
+        positions: at.Array,
+        kv_cache: _gemma.KVCache,
+        adarms_cond: at.Array | None,
+    ) -> at.Array:
+        (prefix_out, suffix_out), _ = self.PaliGemma.llm(
+            [None, suffix_tokens],
+            mask=full_attn_mask,
+            positions=positions,
+            kv_cache=kv_cache,
+            adarms_cond=[None, adarms_cond],
+        )
+        assert prefix_out is None
+        return self.action_out_proj(suffix_out[:, -self.action_horizon :])
+
     @override
     def sample_actions(
         self,
@@ -258,15 +276,13 @@ class Pi0(_model.BaseModel):
             # `positions` is shape (b, suffix_len) indicating the positions of the suffix tokens
             positions = jnp.sum(prefix_mask, axis=-1)[:, None] + jnp.cumsum(suffix_mask, axis=-1) - 1
 
-            (prefix_out, suffix_out), _ = self.PaliGemma.llm(
-                [None, suffix_tokens],
-                mask=full_attn_mask,
-                positions=positions,
-                kv_cache=kv_cache,
-                adarms_cond=[None, adarms_cond],
+            v_t = self._decode_action_velocity(
+                suffix_tokens,
+                full_attn_mask,
+                positions,
+                kv_cache,
+                adarms_cond,
             )
-            assert prefix_out is None
-            v_t = self.action_out_proj(suffix_out[:, -self.action_horizon :])
 
             return x_t + dt * v_t, time + dt
 
