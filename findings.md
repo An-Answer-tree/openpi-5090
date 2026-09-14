@@ -97,3 +97,9 @@ H7 selected layer 9. The revised cue mechanism should predict the two fixed
 teacher-view contributions separately, sum them, and retain a zero-initialized
 gated residual in the deployed student. This avoids the original method's
 jointly learned target and training-only predictor.
+
+The selected H9 mechanism is implemented and submitted as job 128513. It uses
+the same ACL weight and effective batch size as H8, predicts agentview and wrist
+contributions separately from the student's layer-9 action tokens, and retains
+the gated residual during evaluation. Job 128514 will run the matched 2,000
+episode evaluation only after the H9 checkpoint is saved.

@@ -86,9 +86,10 @@
 
 | 实验 | 配置 | Job | 状态 |
 |---|---|---:|---|
-| H8 ACL-only | FSDP2，global BS32，5K，seed 42 | 128417 | 等待资源 |
+| H8 ACL-only | FSDP2，global BS32，5K，seed 42 | 128417 | 节点已分配，尚无训练输出 |
 | H8 四套验证 | 4 GPU，2,000 episodes，依赖 H8 | 128421 | 等待依赖 |
-| H9 ACPD-v2 | layer 9 exact contribution，FSDP4，effective BS32，5K | - | 待实现 |
+| H9 ACPD-v2 | layer 9 exact contribution，FSDP4，micro BS8 × accumulation4，effective BS32，5K | 128513 | 等待资源 |
+| H9 四套验证 | 4 GPU，2,000 episodes，依赖 H9 | 128514 | 等待依赖 |
 
 H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success 比 H8 高至少 `1.5` 个百分点，且配对 bootstrap 95% CI 下界大于 0。
 
@@ -124,6 +125,7 @@ H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success �
 | Full ACPD 6+12，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/layers_5k/pi05_libero_backview_acpd_lora_layers6_12/pi05_libero_backview_acpd_lora_fsdp2_layers6_12_bs32_5k/4999` |
 | Flow-only，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/task_success_5k/pi05_libero_backview_flow_only_5k/pi05_libero_backview_lora_fsdp2_bs32_5k/4999` |
 | H8 ACL-only，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/task_success_5k/pi05_libero_backview_acl_only_5k/pi05_libero_backview_acpd_lora_fsdp2_bs32_5k/4999` |
+| H9 ACPD-v2 layer 9，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/task_success_5k/pi05_libero_backview_acpd_v2_layer9/pi05_libero_backview_acpd_v2_lora_fsdp4_mbs8_acc4_bs32_5k/4999` |
 | H4 组件消融，2K | 按协议不保存 checkpoint |
 
 ## 验证结果路径检索
@@ -141,3 +143,4 @@ H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success �
 | Full ACPD 6+12，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/full-acpd-layers6-12/4999` | 完成，`6.50%` pooled |
 | Flow-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/flow-only/4999` | 完成，`4.45%` pooled |
 | H8 ACL-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/acl-only/4999` | 等待训练 |
+| H9 ACPD-v2 layer 9，5K | `/opt/liutong/openpi-5090-evals/acpd-v2-task-success-5k/layer9-exact-contribution/4999` | 等待训练 |
