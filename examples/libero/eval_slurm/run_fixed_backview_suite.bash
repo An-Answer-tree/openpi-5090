@@ -49,7 +49,7 @@ CUDA_VISIBLE_DEVICES="${gpu_id}" python scripts/serve_policy.py \
 server_pid=$!
 trap 'kill "${server_pid}" 2>/dev/null || true; wait "${server_pid}" 2>/dev/null || true' EXIT
 
-for _ in $(seq 1 360); do
+for ((elapsed = 0; elapsed < 5400; elapsed += 5)); do
   if curl --silent --fail --noproxy '*' "http://127.0.0.1:${port}/healthz" >/dev/null; then
     break
   fi
@@ -59,7 +59,10 @@ for _ in $(seq 1 360); do
   fi
   sleep 5
 done
-curl --silent --fail --noproxy '*' "http://127.0.0.1:${port}/healthz" >/dev/null
+if ! curl --silent --fail --noproxy '*' "http://127.0.0.1:${port}/healthz" >/dev/null; then
+  echo "Policy server for ${suite_name} was not ready after 5400 seconds." >&2
+  exit 1
+fi
 
 set +u
 conda activate openpi-libero
