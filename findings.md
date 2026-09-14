@@ -15,7 +15,7 @@ Two backview 5090 smoke runs completed successfully. Job 126759 used global micr
 
 The trainer-matched 2K component ablation does not support an early-convergence effect at the pre-registered 1% resolution. Relative to Flow-only, Cue-only changed the primary and final-window supervised losses by +0.80% and +0.98%, ACL-only by -0.31% and -0.63%, and Full ACPD by +0.11% and +0.16%. All four runs completed with physical batch 32 on two-device FSDP at about 31.4 GiB peak memory per card.
 
-The 5K layer ablation also does not support the dual-layer hypothesis. Layer 6, layer 12, and layers 6+12 have primary losses of 0.040565, 0.040882, and 0.040682, respectively. Layer 6 is also best in the final window at 0.032250, versus 0.032570 and 0.032370. The matched 5K Flow-only policy achieved 89/2,000 successes (4.45% pooled); Full ACPD evaluation is still running.
+The 5K layer ablation also does not support the dual-layer hypothesis. Layer 6, layer 12, and layers 6+12 have primary losses of 0.040565, 0.040882, and 0.040682, respectively. Layer 6 is also best in the final window at 0.032250, versus 0.032570 and 0.032370. The matched 5K Flow-only policy achieved 89/2,000 successes (4.45% pooled), while Full ACPD achieved 130/2,000 (6.50%). The +2.05-point difference meets the pre-registered effect threshold; its task-stratified paired-bootstrap 95% confidence interval is [+0.90, +3.25] points.
 
 ## Patterns and Insights
 
@@ -41,7 +41,12 @@ the complete target also changes its action-conditioned component. Job 127810
 was cancelled before its first batch after this design audit; no H6 result is
 claimed.
 
-The next branch replaces the learned or heuristic cue with the teacher's exact
+H5 shows that the full objective can improve task success even when supervised
+loss is insensitive. It does not isolate the source of the gain because Full
+ACPD contains both the cue loss and ACL. A matched ACL-only 5K run is therefore
+required before attributing the gain to privileged-cue transfer.
+
+The next cue branch replaces the learned or heuristic cue with the teacher's exact
 per-view attention residual: real Q/K/V projections, the full attention
 softmax, the action expert output projection, and the AdaRMS residual gate. A
 same-query control changes only one view's K/V tensors. This directly tests
@@ -66,7 +71,7 @@ the samples where the teacher has the largest flow-error advantage.
 
 - Does checkpoint writing remain the dominant wall-clock cost at the configured save interval?
 - Does the teacher's strong early flow-target advantage persist later in training?
-- Does Full ACPD improve task success over a trainer-matched Flow-only checkpoint even though their supervised losses are indistinguishable?
+- How much of H5's task-success gain is explained by ACL alone?
 - Can a backview-adapted student predict the teacher's exact agentview or wrist
   attention contribution on held-out episodes and on teacher-advantage samples?
 
@@ -76,4 +81,7 @@ The physical global batch 32 run is preferred because it uses the complete batch
 
 The dual-layer head is not justified by the completed early-loss comparison. Layer 6 is the preferred configuration for new experiments, while the existing layers 6+12 checkpoint remains the matched Full ACPD control for the pending task-success evaluation.
 
-H4 rules out supervised-loss weight tuning as the next step. The original four view-specific 30K ACPD runs are not justified by the controlled evidence and their unused launchers have been retired. First finish the matched 5K Flow-only versus Full ACPD policy comparison; only if Full ACPD passes the pre-registered task-success threshold should any component be promoted to a longer run.
+H4 rules out supervised-loss weight tuning as the next step. H5 passes its
+task-success threshold, so the next minimal policy run is a matched ACL-only 5K
+control. H7 runs in parallel to select one fixed, recoverable exact-attention
+target before testing a revised cue mechanism.

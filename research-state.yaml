@@ -14,7 +14,7 @@ literature:
   open_problems:
     - "Memory and throughput of a frozen full teacher plus a LoRA student on four 32 GB GPUs."
   evidence_gaps:
-    - "Full ACPD task success is still running; Flow-only reached 4.45% pooled at 5K."
+    - "The positive H5 result is a single-seed 5K screen; component attribution still requires an ACL-only control."
     - "The trainer-matched 2K component runs have no saved checkpoints, so unchanged supervised loss cannot determine task-success effects."
     - "The manuscript's Table 2 mixes gated and ungated V6 runs, confounding the claimed Cue, ACL, and wrist-view ablations."
 
@@ -45,7 +45,7 @@ hypotheses:
     priority: high
   - id: H5
     statement: "Full ACPD improves pooled four-suite backview success by at least 2 percentage points over trainer-matched Flow-only training at 5K steps."
-    status: active
+    status: supported
     motivation: "H4 shows active auxiliary gradients but indistinguishable supervised convergence, so task success is the next discriminating measurement. Promotion also requires the paired episode-bootstrap 95% confidence interval to exclude zero."
     parent: H4
     priority: high
@@ -86,9 +86,9 @@ experiments:
       status: completed
 
 outer_loop:
-  cycle: 8
-  last_direction: "finish the matched 5K policy comparison and exact-attention recoverability probe before any longer policy training"
-  last_reflection: "The layer and component ablations do not justify four view-specific 30K ACPD runs. Retire those unused launchers but preserve negative-result protocols, logs, and checkpoints as evidence."
+  cycle: 9
+  last_direction: "isolate ACL at 5K while H7 selects a recoverable exact-attention target for H9"
+  last_reflection: "H5 passed the task-success screen despite indistinguishable supervised loss. The next comparison must separate ACL from the cue mechanism before claiming ACPD-specific value."
 
 workspace:
   results: "EXPERIMENT_RESULTS.md"

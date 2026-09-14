@@ -13,7 +13,7 @@
 | 继续训练到 60K 是否更好 | 否。pooled success 从 `57.05%` 降至 `54.25%`。 |
 | ACPD 是否需要 6+12 层 | 不需要。layer 6 的 5K loss 最低，但层间差异均小于 1%。 |
 | Cue 或 ACL 是否加快收敛 | 没有可靠证据。2K 差异均未达到预设 1% 阈值。 |
-| Full ACPD 是否优于 Flow-only | 5K loss 基本相同；Flow-only 成功率为 `4.45%`，Full ACPD 正在验证。 |
+| Full ACPD 是否优于 Flow-only | 是。5K pooled success 为 `6.50%` 对 `4.45%`，提升 `2.05` 个百分点，配对 95% CI 为 `[0.90%, 3.25%]`。 |
 
 ## SFT 训练
 
@@ -68,12 +68,12 @@
 
 ## H5：Full ACPD 对照
 
-| 方法 | 100–4.9K loss | 4K–4.9K loss | Checkpoint | Benchmark |
-|---|---:|---:|---|---|
-| Flow-only | 0.040767 | 0.032500 | step 4999 | `4.45%` pooled（89/2000） |
-| Full ACPD 6+12 | 0.040682 | 0.032370 | step 4999 | 验证中 |
+| 方法 | 100–4.9K loss | 4K–4.9K loss | Spatial | Object | Goal | LIBERO-10 | Pooled |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Flow-only | 0.040767 | 0.032500 | 1.80% | 7.60% | 8.40% | 0.00% | 4.45%（89/2000） |
+| Full ACPD 6+12 | 0.040682 | 0.032370 | 2.80% | 10.80% | 12.20% | 0.20% | 6.50%（130/2000） |
 
-Flow-only 分项为 Spatial `1.80%`、Object `7.60%`、Goal `8.40%`、LIBERO-10 `0.00%`。Full ACPD 仅低 `0.21%/0.40%`，训练 loss 无法区分；其 pooled success 至少达到 `6.45%` 且配对 bootstrap 95% 置信区间下界大于 0，才认为 H5 通过。
+结论：H5 通过。Full ACPD 提升 `2.05` 个百分点，达到预设 2 点门槛；按任务分层的配对 bootstrap 95% CI 为 `[0.90%, 3.25%]`，下界大于 0。该结果只证明单 seed、5K 筛选有效，不替代重复 seed 和完整训练。
 
 ## H6/H7：特权视觉信息可恢复性
 
@@ -91,6 +91,7 @@ Flow-only 分项为 Spatial `1.80%`、Object `7.60%`、Goal `8.40%`、LIBERO-10 
 | H3 分析 | `experiments/acpd-layer-ablation-5k/analysis.md` |
 | H4 分析 | `experiments/acpd-component-ablation-2k/analysis.md` |
 | H5 协议 | `experiments/acpd-task-success-5k/protocol.md` |
+| H5 分析 | `experiments/acpd-task-success-5k/analysis.md` |
 | H7 协议 | `experiments/acpd-exact-attention-probe/protocol.md` |
 
 ## Checkpoint 路径检索
@@ -123,5 +124,5 @@ Flow-only 分项为 Spatial `1.80%`、Object `7.60%`、Goal `8.40%`、LIBERO-10 
 | SFT-cosine 40K | `/opt/liutong/openpi-5090-evals/pi05_libero_backview_lora_fsdp4_bs32_cosine_30k/40000` | 完成 |
 | SFT-cosine 50K | `/opt/liutong/openpi-5090-evals/pi05_libero_backview_lora_fsdp4_bs32_cosine_30k/50000` | 完成 |
 | SFT-cosine 60K | `/opt/liutong/openpi-5090-evals/pi05_libero_backview_lora_fsdp4_bs32_cosine_30k/59999` | 完成 |
-| Full ACPD 6+12，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/full-acpd-layers6-12/4999` | 验证中 |
+| Full ACPD 6+12，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/full-acpd-layers6-12/4999` | 完成，`6.50%` pooled |
 | Flow-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/flow-only/4999` | 完成，`4.45%` pooled |
