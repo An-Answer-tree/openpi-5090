@@ -80,7 +80,7 @@
 | 实验 | 状态 | 结论 |
 |---|---|---|
 | H6 启发式 visual-message probe | 终止 | target 近似全局视觉平均，shuffle 对照也不正确，未产生有效结果。 |
-| H7 精确 attention contribution probe | 运行中 | 使用真实 Q/K/V、同 query 的视觉 K/V shuffle 和 held-out episode；结果未完成前不下结论。 |
+| H7 精确 attention contribution probe | 完成 | layer 9 和 12 通过；layer 9 的 overall gap 为 `0.3417`、hard gap 为 `0.3194`、EV 为 `0.2822`，按协议选择 layer 9。 |
 
 ## H8/H9：ACPD-v2 筛选
 
@@ -88,7 +88,7 @@
 |---|---|---:|---|
 | H8 ACL-only | FSDP2，global BS32，5K，seed 42 | 128417 | 等待资源 |
 | H8 四套验证 | 4 GPU，2,000 episodes，依赖 H8 | 128421 | 等待依赖 |
-| H9 ACPD-v2 | H7 选层后确定唯一分支，FSDP4，effective BS32，5K | - | 等待 H7 |
+| H9 ACPD-v2 | layer 9 exact contribution，FSDP4，effective BS32，5K | - | 待实现 |
 
 H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success 比 H8 高至少 `1.5` 个百分点，且配对 bootstrap 95% CI 下界大于 0。
 
@@ -103,6 +103,7 @@ H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success �
 | H5 协议 | `experiments/acpd-task-success-5k/protocol.md` |
 | H5 分析 | `experiments/acpd-task-success-5k/analysis.md` |
 | H7 协议 | `experiments/acpd-exact-attention-probe/protocol.md` |
+| H7 分析 | `experiments/acpd-exact-attention-probe/analysis.md` |
 | H8 协议 | `experiments/acpd-acl-only-5k/protocol.md` |
 | H9 协议 | `experiments/acpd-v2-5k/protocol.md` |
 

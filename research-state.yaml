@@ -63,7 +63,7 @@ hypotheses:
     priority: high
   - id: H7
     statement: "An adapted backview student can predict the teacher's exact per-view attention contribution on held-out episodes, especially where the privileged teacher has the largest flow-error advantage."
-    status: active
+    status: supported
     motivation: "The old learned cue and H6 proxy admit shortcuts; exact Q/K/V attention contributions provide a fixed privileged target and a same-query shuffled-view control."
     parent: H6
     priority: high
@@ -75,7 +75,7 @@ hypotheses:
     priority: high
   - id: H9
     statement: "A recoverability-gated ACPD-v2 policy improves pooled 5K task success over ACL-only by at least 1.5 percentage points with a positive paired confidence bound."
-    status: planned
+    status: active
     motivation: "Use H7 to choose one fixed privileged target when it is recoverable; otherwise transfer privileged teacher advantage through sample weighting instead of forcing hidden-feature matching."
     parent: H7
     priority: high
@@ -99,8 +99,8 @@ experiments:
 
 outer_loop:
   cycle: 9
-  last_direction: "isolate ACL at 5K while H7 selects a recoverable exact-attention target for H9"
-  last_reflection: "H5 passed the task-success screen despite indistinguishable supervised loss. The next comparison must separate ACL from the cue mechanism before claiming ACPD-specific value."
+  last_direction: "run H8 ACL-only and H9 layer-9 exact-contribution ACPD-v2 as matched 5K policy screens"
+  last_reflection: "H7 supports recoverability at layers 9 and 12 and selects layer 9 by a pre-registered margin. H9 must retain the layer-9 predictor in the deployed policy so the fixed privileged target affects inference rather than only an auxiliary training loss."
 
 workspace:
   results: "EXPERIMENT_RESULTS.md"

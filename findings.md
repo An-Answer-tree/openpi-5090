@@ -53,6 +53,13 @@ same-query control changes only one view's K/V tensors. This directly tests
 whether privileged visual information is predictable from backview, including
 the samples where the teacher has the largest flow-error advantage.
 
+H7 validates this target on 256 episode-held-out samples. Layer 9 has an
+overall correct-minus-shuffled cosine gap of 0.3417 (95% CI [0.3095, 0.3756]),
+a teacher-advantage hard-subset gap of 0.3194 ([0.2717, 0.3875]), and explained
+variance of 0.2822. Layer 12 also passes, but its overall gap is 0.2367; the
+0.1050 margin exceeds the pre-registered 0.02 rule, so H9 uses only layer 9.
+Layer 6 fails because its explained variance is -0.1468.
+
 ## Lessons and Constraints
 
 - Train one student view per four-GPU job; do not place four teacher-student pairs in one allocation.
@@ -72,8 +79,8 @@ the samples where the teacher has the largest flow-error advantage.
 - Does checkpoint writing remain the dominant wall-clock cost at the configured save interval?
 - Does the teacher's strong early flow-target advantage persist later in training?
 - How much of H5's task-success gain is explained by ACL alone?
-- Can a backview-adapted student predict the teacher's exact agentview or wrist
-  attention contribution on held-out episodes and on teacher-advantage samples?
+- Does deploying the layer-9 exact-contribution predictor improve task success
+  beyond ACL-only at the same 5K budget?
 
 ## Optimization Trajectory
 
@@ -82,6 +89,11 @@ The physical global batch 32 run is preferred because it uses the complete batch
 The dual-layer head is not justified by the completed early-loss comparison. Layer 6 is the preferred configuration for new experiments, while the existing layers 6+12 checkpoint remains the matched Full ACPD control for the pending task-success evaluation.
 
 H4 rules out supervised-loss weight tuning as the next step. H5 passes its
-task-success threshold, so the next minimal policy run is a matched ACL-only 5K
-control. H7 runs in parallel to select one fixed, recoverable exact-attention
-target before testing a revised cue mechanism.
+task-success threshold, so a matched ACL-only 5K control is running. H7 has
+selected one fixed, recoverable exact-attention target for the revised cue
+mechanism.
+
+H7 selected layer 9. The revised cue mechanism should predict the two fixed
+teacher-view contributions separately, sum them, and retain a zero-initialized
+gated residual in the deployed student. This avoids the original method's
+jointly learned target and training-only predictor.
