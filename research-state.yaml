@@ -73,6 +73,12 @@ hypotheses:
     motivation: "H5 supports the full objective, but Cue and ACL were changed together. A matched saved ACL-only checkpoint isolates the strongest component from H4."
     parent: H5
     priority: high
+  - id: H9
+    statement: "A recoverability-gated ACPD-v2 policy improves pooled 5K task success over ACL-only by at least 1.5 percentage points with a positive paired confidence bound."
+    status: planned
+    motivation: "Use H7 to choose one fixed privileged target when it is recoverable; otherwise transfer privileged teacher advantage through sample weighting instead of forcing hidden-feature matching."
+    parent: H7
+    priority: high
 
 experiments:
   proxy_metric: "Two finite optimizer steps with nonzero selector gradients and peak GPU memory below 32 GB."
