@@ -1,8 +1,8 @@
 # 实验结果记录
 
-更新时间：2026-09-14
+更新时间：2026-09-15
 
-本文件是实验结果的长期中文索引。开始实验相关工作前读取；实验完成后更新。只记录已核实结果，原始日志和 checkpoint 保存在 `/opt/liutong`。
+本文件是唯一长期实验结果台账。开始实验相关工作前读取；实验状态变化或产生最终结果后立即更新。只记录实际运行的配置和已核实结果；未完成项不填写结论，原始日志和 checkpoint 保存在 `/opt/liutong`。
 
 ## 当前结论
 
@@ -14,6 +14,21 @@
 | ACPD 是否需要 6+12 层 | 不需要。layer 6 的 5K loss 最低，但层间差异均小于 1%。 |
 | Cue 或 ACL 是否加快收敛 | 没有可靠证据。2K 差异均未达到预设 1% 阈值。 |
 | Full ACPD 是否优于 Flow-only | 是。5K pooled success 为 `6.50%` 对 `4.45%`，提升 `2.05` 个百分点，配对 95% CI 为 `[0.90%, 3.25%]`。 |
+
+## ACPD 实验总表
+
+| ID | 目的或比较 | 关键配置 | 状态 | 已核实结论 |
+|---|---|---|---|---|
+| H1 | 梯度累积能否在 4×5090 上运行 ACPD LoRA | FSDP4，global micro BS8，accumulation 4，effective BS32，2 steps | 支持 | 训练正常，单卡峰值 `17,291 MiB`。 |
+| H2 | 物理 global BS32 能否直接运行 | FSDP4，global BS32，accumulation 1，2 steps | 支持 | 原始 ACPD 训练图正常，单卡峰值 `17,337 MiB`。 |
+| H3 | layer 6+12 是否优于单层 | FSDP2，global BS32，5K，seed 42 | 不支持 | layer 6 的训练 loss 最低；三组差异小于 1%，不能推断成功率。 |
+| H4 | Cue 或 ACL 是否改善早期收敛 | Flow、Cue、ACL、Full；FSDP2，global BS32，2K | 不支持 | 相对 Flow 的差异均未达到预设 1% 阈值。 |
+| H5 | Full ACPD 是否优于 Flow-only | 相同 5K 预算；四套共 2,000 episodes | 支持 | `6.50%` 对 `4.45%`，提升 `2.05` 点，配对 95% CI `[0.90, 3.25]` 点。 |
+| H6 | 启发式 visual-message 是否可恢复 | 原计划 500-step probe | 废弃 | target 近似全局视觉平均，shuffle 对照无效；任务在首批数据前取消，无实验结果。 |
+| H6.1 | 在无效 proxy 上比较 layer 6/9/12 | 原计划三层短实验 | 废弃 | 父实验设计无效，未运行，不产生层选择结论。 |
+| H7 | 精确 attention contribution 是否可恢复，并选择层 | 256 个 episode-held-out 样本，64 个 hard 样本，3 个 probe seeds | 支持 | layer 9 和 12 可恢复；layer 9 按预注册规则胜出，layer 6 不可用。 |
+| H8 | ACL-only 能否解释 H5 提升 | FSDP2，global BS32，5K，seed 42；2,000 episodes | 训练中 | Job 128417 已进入训练；尚无验证结果。 |
+| H9 | 部署式 ACPD-v2 是否优于 H8 | layer 9 exact contribution；FSDP4，micro BS8×accumulation 4，5K；2,000 episodes | 排队 | Job 128513 等待资源；尚无训练和验证结果。 |
 
 ## SFT 训练
 
@@ -79,14 +94,23 @@
 
 | 实验 | 状态 | 结论 |
 |---|---|---|
-| H6 启发式 visual-message probe | 终止 | target 近似全局视觉平均，shuffle 对照也不正确，未产生有效结果。 |
-| H7 精确 attention contribution probe | 完成 | layer 9 和 12 通过；layer 9 的 overall gap 为 `0.3417`、hard gap 为 `0.3194`、EV 为 `0.2822`，按协议选择 layer 9。 |
+| H6 启发式 visual-message probe | 废弃 | target 近似全局视觉平均，shuffle 对照也不正确，未产生有效结果。 |
+| H6.1 启发式 layer 6/9/12 scan | 废弃 | H6 proxy 无效，因此未运行三层比较，也没有层选择结果。 |
+| H7 精确 attention contribution probe | 完成 | layer 9 和 12 通过；layer 9 相对 layer 12 的 overall gap 优势为 `0.1050`，超过预注册 `0.02` 门槛，按协议选择 layer 9。 |
+
+H7 使用 teacher 的真实 Q/K/V、完整 attention softmax、action expert 输出投影和 AdaRMS residual gate。对照只打乱同一 query 对应的视觉 K/V。
+
+| Layer | Overall gap（95% CI） | Hard gap（95% CI） | Explained variance | 决策 |
+|---:|---:|---:|---:|---|
+| 6 | `0.0997`（`[0.0846, 0.1091]`） | `0.0706`（`[0.0497, 0.0884]`） | `-0.1468` | 不可用 |
+| **9** | **`0.3417`（`[0.3095, 0.3756]`）** | **`0.3194`（`[0.2717, 0.3875]`）** | **`0.2822`** | **通过并选中** |
+| 12 | `0.2367`（`[0.2127, 0.2546]`） | `0.2080`（`[0.1692, 0.2349]`） | `0.0903` | 通过 |
 
 ## H8/H9：ACPD-v2 筛选
 
 | 实验 | 配置 | Job | 状态 |
 |---|---|---:|---|
-| H8 ACL-only | FSDP2，global BS32，5K，seed 42 | 128417 | 节点已分配，尚无训练输出 |
+| H8 ACL-only | FSDP2，global BS32，5K，seed 42 | 128417 | 训练中；2026-09-15 00:16 到达约 1.19K/5K |
 | H8 四套验证 | 4 GPU，2,000 episodes，依赖 H8 | 128421 | 等待依赖 |
 | H9 ACPD-v2 | layer 9 exact contribution，FSDP4，micro BS8 × accumulation4，effective BS32，5K | 128513 | 等待资源 |
 | H9 四套验证 | 4 GPU，2,000 episodes，依赖 H9 | 128514 | 等待依赖 |
