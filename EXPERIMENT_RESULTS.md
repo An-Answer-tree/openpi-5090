@@ -1,6 +1,6 @@
 # 实验结果记录
 
-更新时间：2026-09-13
+更新时间：2026-09-14
 
 本文件是实验结果的长期中文索引。开始实验相关工作前读取；实验完成后更新。只记录已核实结果，原始日志和 checkpoint 保存在 `/opt/liutong`。
 
@@ -13,7 +13,7 @@
 | 继续训练到 60K 是否更好 | 否。pooled success 从 `57.05%` 降至 `54.25%`。 |
 | ACPD 是否需要 6+12 层 | 不需要。layer 6 的 5K loss 最低，但层间差异均小于 1%。 |
 | Cue 或 ACL 是否加快收敛 | 没有可靠证据。2K 差异均未达到预设 1% 阈值。 |
-| Full ACPD 是否优于 Flow-only | 5K loss 基本相同；任务成功率尚未验证。 |
+| Full ACPD 是否优于 Flow-only | 5K loss 基本相同；Flow-only 成功率为 `4.45%`，Full ACPD 正在验证。 |
 
 ## SFT 训练
 
@@ -70,10 +70,17 @@
 
 | 方法 | 100–4.9K loss | 4K–4.9K loss | Checkpoint | Benchmark |
 |---|---:|---:|---|---|
-| Flow-only | 0.040767 | 0.032500 | step 4999 | 待验证 |
-| Full ACPD 6+12 | 0.040682 | 0.032370 | step 4999 | 待验证 |
+| Flow-only | 0.040767 | 0.032500 | step 4999 | `4.45%` pooled（89/2000） |
+| Full ACPD 6+12 | 0.040682 | 0.032370 | step 4999 | 验证中 |
 
-结论：Full ACPD 仅低 `0.21%/0.40%`，训练 loss 无法区分。下一步只比较两者四套 pooled success；Full ACPD 至少提升 2 个百分点才继续组件实验。
+Flow-only 分项为 Spatial `1.80%`、Object `7.60%`、Goal `8.40%`、LIBERO-10 `0.00%`。Full ACPD 仅低 `0.21%/0.40%`，训练 loss 无法区分；其 pooled success 至少达到 `6.45%` 且配对 bootstrap 95% 置信区间下界大于 0，才认为 H5 通过。
+
+## H6/H7：特权视觉信息可恢复性
+
+| 实验 | 状态 | 结论 |
+|---|---|---|
+| H6 启发式 visual-message probe | 终止 | target 近似全局视觉平均，shuffle 对照也不正确，未产生有效结果。 |
+| H7 精确 attention contribution probe | 运行中 | 使用真实 Q/K/V、同 query 的视觉 K/V shuffle 和 held-out episode；结果未完成前不下结论。 |
 
 ## 证据
 
@@ -84,6 +91,7 @@
 | H3 分析 | `experiments/acpd-layer-ablation-5k/analysis.md` |
 | H4 分析 | `experiments/acpd-component-ablation-2k/analysis.md` |
 | H5 协议 | `experiments/acpd-task-success-5k/protocol.md` |
+| H7 协议 | `experiments/acpd-exact-attention-probe/protocol.md` |
 
 ## Checkpoint 路径检索
 
@@ -115,5 +123,5 @@
 | SFT-cosine 40K | `/opt/liutong/openpi-5090-evals/pi05_libero_backview_lora_fsdp4_bs32_cosine_30k/40000` | 完成 |
 | SFT-cosine 50K | `/opt/liutong/openpi-5090-evals/pi05_libero_backview_lora_fsdp4_bs32_cosine_30k/50000` | 完成 |
 | SFT-cosine 60K | `/opt/liutong/openpi-5090-evals/pi05_libero_backview_lora_fsdp4_bs32_cosine_30k/59999` | 完成 |
-| Full ACPD 6+12，5K | - | 待验证 |
-| Flow-only，5K | - | 待验证 |
+| Full ACPD 6+12，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/full-acpd-layers6-12/4999` | 验证中 |
+| Flow-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/flow-only/4999` | 完成，`4.45%` pooled |

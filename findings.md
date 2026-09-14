@@ -15,7 +15,7 @@ Two backview 5090 smoke runs completed successfully. Job 126759 used global micr
 
 The trainer-matched 2K component ablation does not support an early-convergence effect at the pre-registered 1% resolution. Relative to Flow-only, Cue-only changed the primary and final-window supervised losses by +0.80% and +0.98%, ACL-only by -0.31% and -0.63%, and Full ACPD by +0.11% and +0.16%. All four runs completed with physical batch 32 on two-device FSDP at about 31.4 GiB peak memory per card.
 
-The 5K layer ablation also does not support the dual-layer hypothesis. Layer 6, layer 12, and layers 6+12 have primary losses of 0.040565, 0.040882, and 0.040682, respectively. Layer 6 is also best in the final window at 0.032250, versus 0.032570 and 0.032370. The matched 5K Flow-only and Full ACPD checkpoints are now complete; their supervised-loss differences remain below 0.5%, so policy evaluation is the remaining discriminator.
+The 5K layer ablation also does not support the dual-layer hypothesis. Layer 6, layer 12, and layers 6+12 have primary losses of 0.040565, 0.040882, and 0.040682, respectively. Layer 6 is also best in the final window at 0.032250, versus 0.032570 and 0.032370. The matched 5K Flow-only policy achieved 89/2,000 successes (4.45% pooled); Full ACPD evaluation is still running.
 
 ## Patterns and Insights
 
@@ -64,7 +64,6 @@ the samples where the teacher has the largest flow-error advantage.
 
 ## Open Questions
 
-- Do the four 30K view-specific runs remain stable after the smoke configuration is promoted?
 - Does checkpoint writing remain the dominant wall-clock cost at the configured save interval?
 - Does the teacher's strong early flow-target advantage persist later in training?
 - Does Full ACPD improve task success over a trainer-matched Flow-only checkpoint even though their supervised losses are indistinguishable?
@@ -77,4 +76,4 @@ The physical global batch 32 run is preferred because it uses the complete batch
 
 The dual-layer head is not justified by the completed early-loss comparison. Layer 6 is the preferred configuration for new experiments, while the existing layers 6+12 checkpoint remains the matched Full ACPD control for the pending task-success evaluation.
 
-H4 rules out supervised-loss weight tuning as the next step. The efficient next branch is sequential: first compare saved 5K Flow-only and Full ACPD policies on backview benchmarks; only if Full ACPD improves task success should Cue-only and ACL-only be promoted to checkpoint-producing runs.
+H4 rules out supervised-loss weight tuning as the next step. The original four view-specific 30K ACPD runs are not justified by the controlled evidence and their unused launchers have been retired. First finish the matched 5K Flow-only versus Full ACPD policy comparison; only if Full ACPD passes the pre-registered task-success threshold should any component be promoted to a longer run.

@@ -14,7 +14,7 @@ literature:
   open_problems:
     - "Memory and throughput of a frozen full teacher plus a LoRA student on four 32 GB GPUs."
   evidence_gaps:
-    - "Long-run stability and final task success of the four view-specific students are not measured yet."
+    - "Full ACPD task success is still running; Flow-only reached 4.45% pooled at 5K."
     - "The trainer-matched 2K component runs have no saved checkpoints, so unchanged supervised loss cannot determine task-success effects."
     - "The manuscript's Table 2 mixes gated and ungated V6 runs, confounding the claimed Cue, ACL, and wrist-view ablations."
 
@@ -86,9 +86,9 @@ experiments:
       status: completed
 
 outer_loop:
-  cycle: 7
-  last_direction: "run the pre-registered 5K policy comparison while the exact attention probe waits for resources"
-  last_reflection: "H7 tests whether privileged targets are recoverable, while H5 directly tests whether the existing ACPD objective changed policy success. Matching episodes and a paired confidence interval make the low-cost H5 screen more informative than another training-loss comparison."
+  cycle: 8
+  last_direction: "finish the matched 5K policy comparison and exact-attention recoverability probe before any longer policy training"
+  last_reflection: "The layer and component ablations do not justify four view-specific 30K ACPD runs. Retire those unused launchers but preserve negative-result protocols, logs, and checkpoints as evidence."
 
 workspace:
   results: "EXPERIMENT_RESULTS.md"
