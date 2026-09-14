@@ -67,6 +67,12 @@ hypotheses:
     motivation: "The old learned cue and H6 proxy admit shortcuts; exact Q/K/V attention contributions provide a fixed privileged target and a same-query shuffled-view control."
     parent: H6
     priority: high
+  - id: H8
+    statement: "ACL-only explains less than the complete +2.05-point H5 task-success gain at 5K steps."
+    status: active
+    motivation: "H5 supports the full objective, but Cue and ACL were changed together. A matched saved ACL-only checkpoint isolates the strongest component from H4."
+    parent: H5
+    priority: high
 
 experiments:
   proxy_metric: "Two finite optimizer steps with nonzero selector gradients and peak GPU memory below 32 GB."
