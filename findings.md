@@ -99,10 +99,11 @@ teacher-view contributions separately, sum them, and retain a zero-initialized
 gated residual in the deployed student. This avoids the original method's
 jointly learned target and training-only predictor.
 
-The selected H9 mechanism is implemented and submitted as job 128513. It uses
-the same ACL weight and effective batch size as H8, predicts agentview and wrist
-contributions separately from the student's layer-9 action tokens, and retains
-the gated residual during evaluation. Job 128514 will run the matched 2,000
-episode evaluation only after the H9 checkpoint is saved. As of 2026-09-15
-11:07 CST, both H8 evaluation and H9 training are waiting for ordinary batch
-resources; neither is failing.
+The selected H9 mechanism uses the same ACL weight and effective batch size as
+H8, predicts agentview and wrist contributions separately from the student's
+layer-9 action tokens, and retains the gated residual during evaluation. Its
+first submission, job 128513, reached data initialization and base-weight
+restore but failed before step 0: the model graph containing the new exact
+contribution head did not match the FSDP output-sharding graph metadata. This
+is an implementation failure, not an OOM or method result. Dependent evaluation
+job 128514 cannot run until a corrected training job completes.

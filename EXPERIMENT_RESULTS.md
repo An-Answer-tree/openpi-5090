@@ -28,7 +28,7 @@
 | H6.1 | 在无效 proxy 上比较 layer 6/9/12 | 原计划三层短实验 | 废弃 | 父实验设计无效，未运行，不产生层选择结论。 |
 | H7 | 精确 attention contribution 是否可恢复，并选择层 | 256 个 episode-held-out 样本，64 个 hard 样本，3 个 probe seeds | 支持 | layer 9 和 12 可恢复；layer 9 按预注册规则胜出，layer 6 不可用。 |
 | H8 | ACL-only 能否解释 H5 提升 | FSDP2，global BS32，5K，seed 42；2,000 episodes | 训练完成，验证排队 | Job 128417 已保存 4999 checkpoint；尚无验证结果。 |
-| H9 | 部署式 ACPD-v2 是否优于 H8 | layer 9 exact contribution；FSDP4，micro BS8×accumulation 4，5K；2,000 episodes | 排队 | Job 128513 等待资源；尚无训练和验证结果。 |
+| H9 | 部署式 ACPD-v2 是否优于 H8 | layer 9 exact contribution；FSDP4，micro BS8×accumulation 4，5K；2,000 episodes | 初始化失败 | Job 128513 在 step 0 前因 NNX pytree metadata 与 FSDP sharding 不一致退出；不是 OOM，无训练结果。 |
 
 ## SFT 训练
 
@@ -98,7 +98,20 @@
 | H6.1 启发式 layer 6/9/12 scan | 废弃 | H6 proxy 无效，因此未运行三层比较，也没有层选择结果。 |
 | H7 精确 attention contribution probe | 完成 | layer 9 和 12 通过；layer 9 相对 layer 12 的 overall gap 优势为 `0.1050`，超过预注册 `0.02` 门槛，按协议选择 layer 9。 |
 
-H7 使用 teacher 的真实 Q/K/V、完整 attention softmax、action expert 输出投影和 AdaRMS residual gate。对照只打乱同一 query 对应的视觉 K/V。
+### H7 设计
+
+| 项目 | 设置 |
+|---|---|
+| Teacher | 冻结的 agentview+wrist SFT step 29,999 |
+| Student | 冻结的 backview Flow-only step 4,999 |
+| 数据划分 | episode seed 42；1,800 train episodes，200 validation episodes |
+| Probe | layer 6/9/12；每层、每个 teacher 视角独立线性 probe；seeds 11/29/47 |
+| 优化 | 500 steps；global micro BS8；accumulation 4；effective BS32；Adam `1e-3` |
+| 验证 | 32 个固定 batch，共 256 个 held-out 样本；teacher advantage 最高的 64 个样本为 hard subset |
+
+Teacher target 是每个视角对 action attention 的真实残差贡献：使用真实 Q/K/V、对全部有效 image/language/action key 的完整 softmax、action expert 输出投影和 AdaRMS residual gate。agentview 和 wrist 分开预测。负对照仅将目标视角的 K/V 在 batch 内错配一位，保持 action query、噪声动作、flow time 和其他 key 不变。重建单元测试的相对误差小于 `1e-3`。
+
+指标定义：`gap = correct cosine - shuffled cosine`；explained variance 使用 validation target 均值作为基线。可用层必须同时满足 overall gap `>=0.10` 且 95% CI 下界大于 0、hard gap `>=0.05` 且 CI 下界大于 0、explained variance 大于 0。最佳层还需领先次优层至少 `0.02`。
 
 | Layer | Overall gap（95% CI） | Hard gap（95% CI） | Explained variance | 决策 |
 |---:|---:|---:|---:|---|
@@ -106,14 +119,25 @@ H7 使用 teacher 的真实 Q/K/V、完整 attention softmax、action expert 输
 | **9** | **`0.3417`（`[0.3095, 0.3756]`）** | **`0.3194`（`[0.2717, 0.3875]`）** | **`0.2822`** | **通过并选中** |
 | 12 | `0.2367`（`[0.2127, 0.2546]`） | `0.2080`（`[0.1692, 0.2349]`） | `0.0903` | 通过 |
 
+| Layer / view | Correct cosine | Shuffled cosine | Gap | Hard gap | Explained variance |
+|---|---:|---:|---:|---:|---:|
+| 6 / agentview | `0.6674` | `0.5918` | `0.0756` | `0.0503` | `-0.5292` |
+| 6 / wrist | `0.8169` | `0.6932` | `0.1237` | `0.0910` | `0.2357` |
+| 9 / agentview | `0.5021` | `0.2391` | `0.2630` | `0.2629` | `0.2477` |
+| 9 / wrist | `0.6377` | `0.2174` | `0.4203` | `0.3758` | `0.3167` |
+| 12 / agentview | `0.5567` | `0.3540` | `0.2026` | `0.1919` | `0.0699` |
+| 12 / wrist | `0.4593` | `0.1887` | `0.2707` | `0.2241` | `0.1107` |
+
+结论：H7 证明冻结 backview student 能从 layer 9 和 12 action hidden 中恢复与正确 teacher 视角配对有关的真实 attention contribution；按预注册规则选择 layer 9。该实验只在 layer 6/9/12 中进行粗粒度选择，不能证明 layer 9 是全部 18 层的全局最优层，也没有测量部署后的任务成功率。
+
 ## H8/H9：ACPD-v2 筛选
 
 | 实验 | 配置 | Job | 状态 |
 |---|---|---:|---|
 | H8 ACL-only | FSDP2，global BS32，5K，seed 42 | 128417 | 完成；step 4900 supervised loss `0.0316`，4999 checkpoint 已完整保存 |
-| H8 四套验证 | 4 GPU，2,000 episodes，依赖 H8 | 128421 | 训练依赖已满足，等待资源 |
-| H9 ACPD-v2 | layer 9 exact contribution，FSDP4，micro BS8 × accumulation4，effective BS32，5K | 128513 | 等待资源 |
-| H9 四套验证 | 4 GPU，2,000 episodes，依赖 H9 | 128514 | 等待依赖 |
+| H8 四套验证 | 4 GPU，2,000 episodes，依赖 H8 | 128421 | gpu04 运行中 |
+| H9 ACPD-v2 | layer 9 exact contribution，FSDP4，micro BS8 × accumulation4，effective BS32，5K | 128513 | step 0 前初始化失败；NNX pytree metadata 与 FSDP sharding 不一致；不是 OOM |
+| H9 四套验证 | 4 GPU，2,000 episodes，依赖 H9 | 128514 | `DependencyNeverSatisfied`，未运行 |
 
 H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success 比 H8 高至少 `1.5` 个百分点，且配对 bootstrap 95% CI 下界大于 0。
 
@@ -129,8 +153,11 @@ H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success �
 | H5 分析 | `experiments/acpd-task-success-5k/analysis.md` |
 | H7 协议 | `experiments/acpd-exact-attention-probe/protocol.md` |
 | H7 分析 | `experiments/acpd-exact-attention-probe/analysis.md` |
+| H7 原始指标 | `/opt/liutong/openpi-5090-research/acpd-exact-attention-probe/results/metrics_128248.json` |
+| H7 Slurm 日志 | `/opt/liutong/openpi-5090-research/acpd-exact-attention-probe/slurm-log/pi05-bv-exact-attn_128248.out` |
 | H8 协议 | `experiments/acpd-acl-only-5k/protocol.md` |
 | H9 协议 | `experiments/acpd-v2-5k/protocol.md` |
+| H9 首次初始化失败日志 | `slurm-log/pi05-bv-acpdv2-l9_128513.out` |
 
 ## Checkpoint 路径检索
 
@@ -149,7 +176,7 @@ H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success �
 | Full ACPD 6+12，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/layers_5k/pi05_libero_backview_acpd_lora_layers6_12/pi05_libero_backview_acpd_lora_fsdp2_layers6_12_bs32_5k/4999` |
 | Flow-only，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/task_success_5k/pi05_libero_backview_flow_only_5k/pi05_libero_backview_lora_fsdp2_bs32_5k/4999` |
 | H8 ACL-only，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/task_success_5k/pi05_libero_backview_acl_only_5k/pi05_libero_backview_acpd_lora_fsdp2_bs32_5k/4999` |
-| H9 ACPD-v2 layer 9，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/task_success_5k/pi05_libero_backview_acpd_v2_layer9/pi05_libero_backview_acpd_v2_lora_fsdp4_mbs8_acc4_bs32_5k/4999` |
+| H9 ACPD-v2 layer 9，5K（预期，尚未生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/task_success_5k/pi05_libero_backview_acpd_v2_layer9/pi05_libero_backview_acpd_v2_lora_fsdp4_mbs8_acc4_bs32_5k/4999` |
 | H4 组件消融，2K | 按协议不保存 checkpoint |
 
 ## 验证结果路径检索
@@ -166,5 +193,5 @@ H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success �
 | SFT-cosine 60K | `/opt/liutong/openpi-5090-evals/pi05_libero_backview_lora_fsdp4_bs32_cosine_30k/59999` | 完成 |
 | Full ACPD 6+12，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/full-acpd-layers6-12/4999` | 完成，`6.50%` pooled |
 | Flow-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/flow-only/4999` | 完成，`4.45%` pooled |
-| H8 ACL-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/acl-only/4999` | 等待验证资源 |
-| H9 ACPD-v2 layer 9，5K | `/opt/liutong/openpi-5090-evals/acpd-v2-task-success-5k/layer9-exact-contribution/4999` | 等待训练 |
+| H8 ACL-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/acl-only/4999` | 验证运行中 |
+| H9 ACPD-v2 layer 9，5K | `/opt/liutong/openpi-5090-evals/acpd-v2-task-success-5k/layer9-exact-contribution/4999` | 训练初始化失败，尚无验证 |
