@@ -97,6 +97,13 @@ experiments:
       peak_gpu_memory_mib: 17337
       status: completed
 
+current_execution:
+  checked_at: "2026-09-15 11:07 CST"
+  h8_training: "job 128417 completed; step-4999 params and assets saved"
+  h8_evaluation: "job 128421 pending for priority; dependency satisfied"
+  h9_training: "job 128513 pending for priority"
+  h9_evaluation: "job 128514 pending for job 128513"
+
 outer_loop:
   cycle: 9
   last_direction: "run H8 ACL-only and H9 layer-9 exact-contribution ACPD-v2 as matched 5K policy screens"

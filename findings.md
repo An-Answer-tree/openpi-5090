@@ -89,9 +89,10 @@ The physical global batch 32 run is preferred because it uses the complete batch
 The dual-layer head is not justified by the completed early-loss comparison. Layer 6 is the preferred configuration for new experiments, while the existing layers 6+12 checkpoint remains the matched Full ACPD control for the pending task-success evaluation.
 
 H4 rules out supervised-loss weight tuning as the next step. H5 passes its
-task-success threshold, so a matched ACL-only 5K control is running. H7 has
-selected one fixed, recoverable exact-attention target for the revised cue
-mechanism.
+task-success threshold. The matched ACL-only H8 control completed 5K steps and
+saved checkpoint 4999; its 2,000-episode evaluation is queued, so no component
+attribution is claimed yet. H7 selected one fixed, recoverable exact-attention
+target for the revised cue mechanism.
 
 H7 selected layer 9. The revised cue mechanism should predict the two fixed
 teacher-view contributions separately, sum them, and retain a zero-initialized
@@ -102,4 +103,6 @@ The selected H9 mechanism is implemented and submitted as job 128513. It uses
 the same ACL weight and effective batch size as H8, predicts agentview and wrist
 contributions separately from the student's layer-9 action tokens, and retains
 the gated residual during evaluation. Job 128514 will run the matched 2,000
-episode evaluation only after the H9 checkpoint is saved.
+episode evaluation only after the H9 checkpoint is saved. As of 2026-09-15
+11:07 CST, both H8 evaluation and H9 training are waiting for ordinary batch
+resources; neither is failing.

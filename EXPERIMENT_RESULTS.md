@@ -27,7 +27,7 @@
 | H6 | 启发式 visual-message 是否可恢复 | 原计划 500-step probe | 废弃 | target 近似全局视觉平均，shuffle 对照无效；任务在首批数据前取消，无实验结果。 |
 | H6.1 | 在无效 proxy 上比较 layer 6/9/12 | 原计划三层短实验 | 废弃 | 父实验设计无效，未运行，不产生层选择结论。 |
 | H7 | 精确 attention contribution 是否可恢复，并选择层 | 256 个 episode-held-out 样本，64 个 hard 样本，3 个 probe seeds | 支持 | layer 9 和 12 可恢复；layer 9 按预注册规则胜出，layer 6 不可用。 |
-| H8 | ACL-only 能否解释 H5 提升 | FSDP2，global BS32，5K，seed 42；2,000 episodes | 训练中 | Job 128417 已进入训练；尚无验证结果。 |
+| H8 | ACL-only 能否解释 H5 提升 | FSDP2，global BS32，5K，seed 42；2,000 episodes | 训练完成，验证排队 | Job 128417 已保存 4999 checkpoint；尚无验证结果。 |
 | H9 | 部署式 ACPD-v2 是否优于 H8 | layer 9 exact contribution；FSDP4，micro BS8×accumulation 4，5K；2,000 episodes | 排队 | Job 128513 等待资源；尚无训练和验证结果。 |
 
 ## SFT 训练
@@ -110,8 +110,8 @@ H7 使用 teacher 的真实 Q/K/V、完整 attention softmax、action expert 输
 
 | 实验 | 配置 | Job | 状态 |
 |---|---|---:|---|
-| H8 ACL-only | FSDP2，global BS32，5K，seed 42 | 128417 | 训练中；2026-09-15 00:16 到达约 1.19K/5K |
-| H8 四套验证 | 4 GPU，2,000 episodes，依赖 H8 | 128421 | 等待依赖 |
+| H8 ACL-only | FSDP2，global BS32，5K，seed 42 | 128417 | 完成；step 4900 supervised loss `0.0316`，4999 checkpoint 已完整保存 |
+| H8 四套验证 | 4 GPU，2,000 episodes，依赖 H8 | 128421 | 训练依赖已满足，等待资源 |
 | H9 ACPD-v2 | layer 9 exact contribution，FSDP4，micro BS8 × accumulation4，effective BS32，5K | 128513 | 等待资源 |
 | H9 四套验证 | 4 GPU，2,000 episodes，依赖 H9 | 128514 | 等待依赖 |
 
@@ -166,5 +166,5 @@ H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success �
 | SFT-cosine 60K | `/opt/liutong/openpi-5090-evals/pi05_libero_backview_lora_fsdp4_bs32_cosine_30k/59999` | 完成 |
 | Full ACPD 6+12，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/full-acpd-layers6-12/4999` | 完成，`6.50%` pooled |
 | Flow-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/flow-only/4999` | 完成，`4.45%` pooled |
-| H8 ACL-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/acl-only/4999` | 等待训练 |
+| H8 ACL-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/acl-only/4999` | 等待验证资源 |
 | H9 ACPD-v2 layer 9，5K | `/opt/liutong/openpi-5090-evals/acpd-v2-task-success-5k/layer9-exact-contribution/4999` | 等待训练 |
