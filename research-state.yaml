@@ -81,7 +81,7 @@ hypotheses:
     priority: high
   - id: H7.1
     statement: "Layer 9 remains the best recoverable layer when every action-expert layer from 6 through 12 is compared under the fixed H7 protocol."
-    status: planned
+    status: active
     motivation: "The coarse H7 scan cannot distinguish a robust middle-layer optimum from an isolated result; adding layers 7, 8, 10, and 11 completes the local comparison without another policy run."
     parent: H7
     priority: medium
@@ -109,7 +109,7 @@ current_execution:
   h8_evaluation: "job 128421 running on gpu04"
   h9_training: "two-GPU debug smoke job 128780 completed two finite optimizer steps; job 128769 released to the normal queue for continuous 30K training"
   h9_evaluation: "watcher job 128770 waits for job 128769 to start and will submit the 5K evaluation after checkpoint 4999 finalizes"
-  h7_layer_scan: "H7.1 protocol locked for layers 7, 8, 10, and 11; not submitted yet"
+  h7_layer_scan: "job 128789 queued on the normal batch partition for layers 7, 8, 10, and 11 with two GPUs, 16 CPUs, and 48 GB host memory"
 
 outer_loop:
   cycle: 9

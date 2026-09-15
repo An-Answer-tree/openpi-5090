@@ -19,7 +19,8 @@ negative control, probe architecture, optimization, or evaluation:
   batch 32, Adam at `1e-3`.
 - Evaluation: 32 fixed episode-held-out batches and the same top-25% teacher-
   advantage hard subset.
-- Runtime: two-device FSDP on the normal `batch` partition; no model checkpoint.
+- Runtime: two-device FSDP, 16 CPU, and 48 GB host memory on the normal `batch`
+  partition; no model checkpoint.
 
 ## Metrics And Decision
 

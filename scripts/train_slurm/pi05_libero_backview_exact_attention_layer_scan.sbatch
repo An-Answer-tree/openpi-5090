@@ -5,7 +5,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
-#SBATCH --mem=64G
+#SBATCH --mem=48G
 #SBATCH --gres=gpu:2
 #SBATCH --time=12:00:00
 #SBATCH --output=/opt/liutong/openpi-5090-research/acpd-exact-attention-probe/slurm-log/%x_%j.out
