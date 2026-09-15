@@ -105,5 +105,9 @@ layer-9 action tokens, and retains the gated residual during evaluation. Its
 first submission, job 128513, reached data initialization and base-weight
 restore but failed before step 0: the model graph containing the new exact
 contribution head did not match the FSDP output-sharding graph metadata. This
-is an implementation failure, not an OOM or method result. Dependent evaluation
-job 128514 cannot run until a corrected training job completes.
+is an implementation failure, not an OOM or method result. The mismatch was
+isolated to a freshly created kernel-initializer closure in NNX graph metadata;
+the initializer now has stable identity and the regression suite passes. Job
+128769 will train one continuous 30K run, while CPU-only watcher job 128770 will
+submit the pre-registered 5K evaluation after checkpoint 4,999 is finalized.
+Neither job has produced a scientific result yet.

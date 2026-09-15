@@ -98,11 +98,11 @@ experiments:
       status: completed
 
 current_execution:
-  checked_at: "2026-09-15 15:38 CST"
+  checked_at: "2026-09-15 16:01 CST"
   h8_training: "job 128417 completed; step-4999 params and assets saved"
   h8_evaluation: "job 128421 running on gpu04"
-  h9_training: "job 128513 failed before step 0 during student TrainState initialization; NNX pytree metadata did not match FSDP out_shardings"
-  h9_evaluation: "job 128514 pending with DependencyNeverSatisfied; no evaluation started"
+  h9_training: "job 128769 pending for resources; continuous 30K run with checkpoints every 5K; no successful step yet"
+  h9_evaluation: "watcher job 128770 waits for job 128769 to start and will submit the 5K evaluation after checkpoint 4999 finalizes"
 
 outer_loop:
   cycle: 9

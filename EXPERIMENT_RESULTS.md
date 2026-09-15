@@ -28,7 +28,7 @@
 | H6.1 | 在无效 proxy 上比较 layer 6/9/12 | 原计划三层短实验 | 废弃 | 父实验设计无效，未运行，不产生层选择结论。 |
 | H7 | 精确 attention contribution 是否可恢复，并选择层 | 256 个 episode-held-out 样本，64 个 hard 样本，3 个 probe seeds | 支持 | layer 9 和 12 可恢复；layer 9 按预注册规则胜出，layer 6 不可用。 |
 | H8 | ACL-only 能否解释 H5 提升 | FSDP2，global BS32，5K，seed 42；2,000 episodes | 训练完成，验证排队 | Job 128417 已保存 4999 checkpoint；尚无验证结果。 |
-| H9 | 部署式 ACPD-v2 是否优于 H8 | layer 9 exact contribution；FSDP4，micro BS8×accumulation 4，5K；2,000 episodes | 初始化失败 | Job 128513 在 step 0 前因 NNX pytree metadata 与 FSDP sharding 不一致退出；不是 OOM，无训练结果。 |
+| H9 | 部署式 ACPD-v2 是否优于 H8 | layer 9 exact contribution；FSDP4，micro BS8×accumulation 4；连续训练 30K，先评估 5K | 修复后排队 | Job 128513 在 step 0 前初始化失败；修复通过测试，新 Job 128769 等待资源，尚无训练结果。 |
 
 ## SFT 训练
 
@@ -136,8 +136,10 @@ Teacher target 是每个视角对 action attention 的真实残差贡献：使�
 |---|---|---:|---|
 | H8 ACL-only | FSDP2，global BS32，5K，seed 42 | 128417 | 完成；step 4900 supervised loss `0.0316`，4999 checkpoint 已完整保存 |
 | H8 四套验证 | 4 GPU，2,000 episodes，依赖 H8 | 128421 | gpu04 运行中 |
-| H9 ACPD-v2 | layer 9 exact contribution，FSDP4，micro BS8 × accumulation4，effective BS32，5K | 128513 | step 0 前初始化失败；NNX pytree metadata 与 FSDP sharding 不一致；不是 OOM |
-| H9 四套验证 | 4 GPU，2,000 episodes，依赖 H9 | 128514 | `DependencyNeverSatisfied`，未运行 |
+| H9 首次提交 | layer 9 exact contribution，FSDP4，micro BS8 × accumulation4，effective BS32，原计划 5K | 128513 | step 0 前初始化失败；NNX pytree metadata 与 FSDP sharding 不一致；不是 OOM |
+| H9 连续训练 | 相同 5K 前缀；连续训练 30K，每 5K 保存 | 128769 | 修复通过 12 个定向测试；等待普通资源，尚未完成真实训练 step |
+| H9 5K 验证 watcher | 1 CPU，1 GB；等待完整 checkpoint 4,999 后提交四卡验证 | 128770 | 等待 Job 128769 启动；不占用 GPU |
+| H9 首次四套验证 | 4 GPU，2,000 episodes，依赖失败的 Job 128513 | 128514 | 已取消，未运行 |
 
 H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success 比 H8 高至少 `1.5` 个百分点，且配对 bootstrap 95% CI 下界大于 0。
 
@@ -158,6 +160,7 @@ H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success �
 | H8 协议 | `experiments/acpd-acl-only-5k/protocol.md` |
 | H9 协议 | `experiments/acpd-v2-5k/protocol.md` |
 | H9 首次初始化失败日志 | `slurm-log/pi05-bv-acpdv2-l9_128513.out` |
+| H9 30K 训练日志 | `slurm-log/pi05-bv-acpdv2-l9-30k_128769.out`（等待生成） |
 
 ## Checkpoint 路径检索
 
@@ -176,7 +179,8 @@ H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success �
 | Full ACPD 6+12，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/layers_5k/pi05_libero_backview_acpd_lora_layers6_12/pi05_libero_backview_acpd_lora_fsdp2_layers6_12_bs32_5k/4999` |
 | Flow-only，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/task_success_5k/pi05_libero_backview_flow_only_5k/pi05_libero_backview_lora_fsdp2_bs32_5k/4999` |
 | H8 ACL-only，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/task_success_5k/pi05_libero_backview_acl_only_5k/pi05_libero_backview_acpd_lora_fsdp2_bs32_5k/4999` |
-| H9 ACPD-v2 layer 9，5K（预期，尚未生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/task_success_5k/pi05_libero_backview_acpd_v2_layer9/pi05_libero_backview_acpd_v2_lora_fsdp4_mbs8_acc4_bs32_5k/4999` |
+| H9 ACPD-v2 layer 9，5K（预期，尚未生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/task_success_30k/pi05_libero_backview_acpd_v2_layer9/pi05_libero_backview_acpd_v2_lora_fsdp4_mbs8_acc4_bs32_30k/4999` |
+| H9 ACPD-v2 layer 9，30K（预期，尚未生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/task_success_30k/pi05_libero_backview_acpd_v2_layer9/pi05_libero_backview_acpd_v2_lora_fsdp4_mbs8_acc4_bs32_30k/29999` |
 | H4 组件消融，2K | 按协议不保存 checkpoint |
 
 ## 验证结果路径检索
@@ -194,4 +198,4 @@ H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success �
 | Full ACPD 6+12，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/full-acpd-layers6-12/4999` | 完成，`6.50%` pooled |
 | Flow-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/flow-only/4999` | 完成，`4.45%` pooled |
 | H8 ACL-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/acl-only/4999` | 验证运行中 |
-| H9 ACPD-v2 layer 9，5K | `/opt/liutong/openpi-5090-evals/acpd-v2-task-success-5k/layer9-exact-contribution/4999` | 训练初始化失败，尚无验证 |
+| H9 ACPD-v2 layer 9，5K | `/opt/liutong/openpi-5090-evals/acpd-v2-task-success-5k/layer9-exact-contribution/4999` | watcher 已排队；等待 checkpoint 4,999 |
