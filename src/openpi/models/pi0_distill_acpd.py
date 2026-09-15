@@ -22,6 +22,10 @@ def _prenorm(x: at.Array, eps: float = 1e-6) -> at.Array:
     return x * jax.lax.rsqrt(jnp.mean(jnp.square(x), axis=-1, keepdims=True) + eps)
 
 
+def _exact_contribution_kernel_init(key, shape, dtype=jnp.float32):
+    return jax.random.normal(key, shape, dtype) * (0.01 * shape[0] ** -0.5)
+
+
 def layer_key(layer: int) -> str:
     """Returns a stable dictionary key for an action-expert layer."""
     return f"l{layer}".replace("-", "m")
@@ -96,7 +100,7 @@ class ExactContributionHead(nnx.Module):
         self.predictor = nnx.Linear(
             hidden_dim,
             2 * hidden_dim,
-            kernel_init=jax.nn.initializers.normal(0.01 * hidden_dim**-0.5),
+            kernel_init=_exact_contribution_kernel_init,
             rngs=rngs,
         )
         self.gate = nnx.Param(jnp.zeros((), dtype=jnp.float32))

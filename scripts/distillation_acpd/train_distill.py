@@ -785,7 +785,7 @@ def main(config: DistillTrainConfig):
             infos = []
         batch = next(data_iter)
 
-        periodic_save = step % config.save_interval == 0 and step > start_step
+        periodic_save = (step + 1) % config.save_interval == 0
         final_save = config.save_final_checkpoint and step == config.num_train_steps - 1
         if periodic_save or final_save:
             _checkpoints.save_state(checkpoint_manager, student_state, data_loader, step)

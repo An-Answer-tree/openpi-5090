@@ -95,6 +95,13 @@ def test_exact_contribution_head_is_zero_gated_and_detaches_flow_gradient():
     assert float(optax.global_norm(gradients["gate"])) > 0.0
 
 
+def test_exact_contribution_head_has_stable_graph_metadata():
+    first = nnx.graphdef(ExactContributionHead(4, rngs=nnx.Rngs(0)))
+    second = nnx.graphdef(ExactContributionHead(4, rngs=nnx.Rngs(1)))
+
+    assert jax.tree_util.tree_structure(first) == jax.tree_util.tree_structure(second)
+
+
 def test_exact_contribution_loss_is_zero_for_equal_targets():
     target = jnp.arange(48, dtype=jnp.float32).reshape(2, 2, 3, 4) + 1.0
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=pi05-bv-acpdv2-l9
+#SBATCH --job-name=pi05-bv-acpdv2-l9-30k
 #SBATCH --partition=batch
 #SBATCH --exclude=gpu03
 #SBATCH --nodes=1
@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=96G
 #SBATCH --gres=gpu:4
-#SBATCH --time=5-00:00:00
+#SBATCH --time=7-00:00:00
 #SBATCH --output=/home/liutong/Projects/openpi-5090/slurm-log/%x_%j.out
 
 set -euo pipefail
@@ -33,19 +33,20 @@ export XLA_PYTHON_CLIENT_MEM_FRACTION=0.95
 export XLA_PYTHON_CLIENT_PREALLOCATE=false
 
 mkdir -p /home/liutong/Projects/openpi-5090/slurm-log
-mkdir -p /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/task_success_5k
+mkdir -p /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/task_success_30k
 mkdir -p "${TMPDIR}"
 
 nvidia-smi \
   --query-gpu=timestamp,index,uuid,memory.used,utilization.gpu \
   --format=csv,noheader,nounits \
   --loop=5 > "/home/liutong/Projects/openpi-5090/slurm-log/${SLURM_JOB_NAME}_${SLURM_JOB_ID}_gpu.csv" &
-trap 'kill $! 2>/dev/null || true' EXIT
+gpu_monitor_pid=$!
+trap 'kill "${gpu_monitor_pid}" 2>/dev/null || true' EXIT
 
 cd /home/liutong/Projects/openpi-5090
 python -m scripts.distillation_acpd.train_distill \
   --name=pi05_libero_backview_acpd_v2_layer9 \
-  --exp-name=pi05_libero_backview_acpd_v2_lora_fsdp4_mbs8_acc4_bs32_5k \
+  --exp-name=pi05_libero_backview_acpd_v2_lora_fsdp4_mbs8_acc4_bs32_30k \
   --student-config-name=pi05_libero_backview_lora \
   --student-init-params=/home/liutong/.cache/openpi-5090/pi05_base/params \
   --teacher-params=/opt/liutong/openpi_checkpoints/fixed_dataset/sft/agentview_wrist/29999/params \
@@ -61,18 +62,18 @@ python -m scripts.distillation_acpd.train_distill \
   --exact-contribution-fusion \
   --assets-dir=/home/liutong/Projects/openpi/assets/pi05_libero_agentview_wrist \
   --asset-id=libero_multiview \
-  --checkpoint-base-dir=/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/task_success_5k \
+  --checkpoint-base-dir=/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/task_success_30k \
   --seed=42 \
   --batch-size=8 \
   --gradient-accumulation-steps=4 \
   --num-workers=0 \
-  --num-train-steps=5000 \
+  --num-train-steps=30000 \
   --warmup-steps=1000 \
   --peak-lr=2.5e-5 \
   --decay-steps=30000 \
   --decay-lr=2.5e-6 \
   --log-interval=100 \
   --save-interval=5000 \
-  --keep-period=5000 \
+  --keep-period=1 \
   --fsdp-devices=4 \
   --no-wandb-enabled
