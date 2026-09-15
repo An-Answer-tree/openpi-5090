@@ -1,4 +1,4 @@
-# H9 Protocol: Recoverability-gated ACPD-v2 at 5K Steps
+# H9 Protocol: Recoverability-gated ACPD-v2 5K Screen
 
 ## Question
 
@@ -56,12 +56,27 @@ student model without the teacher.
 - Student view: backview.
 - Teacher: agentview+wrist step 29,999.
 - Dataset: `libero_multiview_tuned_6view_lerobot` at its original path.
-- Seed: 42; optimizer steps: 5,000.
+- Seed: 42; optimizer steps: 30,000 in one continuous run.
 - Effective global batch: 32.
 - Schedule: 1K warmup, cosine `2.5e-5` to `2.5e-6` over 30K steps.
 - Hardware: four-device FSDP. The exact branch may use physical batch 8 with
   four accumulation steps; the weighted branch uses physical batch 32.
-- Save only step 4,999. Do not copy data or checkpoints.
+- Save every 5,000 steps and keep all six checkpoints through step 29,999. Do
+  not copy data or checkpoints.
+
+## Execution Amendment
+
+This amendment was locked after job 128513 failed before step 0 and before any
+successful H9 training result existed. The first 5,000 steps remain identical
+to the original H9 screen. Training continues to 30,000 steps in the same job
+to avoid a later resume queue. A one-CPU watcher submits the existing four-GPU
+evaluation only after checkpoint 4,999 contains finalized `params`, `assets`,
+and `_CHECKPOINT_METADATA`; it does not reserve evaluation GPUs while waiting.
+
+The pre-registered H9 decision is still made only at step 4,999 against the
+matched 5K H8 checkpoint. Later checkpoints are a pre-planned exploratory
+continuation and require a duration-matched baseline before any claim about
+ACPD efficacy at 30K.
 
 ## Evaluation and Decision
 
