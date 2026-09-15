@@ -79,6 +79,12 @@ hypotheses:
     motivation: "Use H7 to choose one fixed privileged target when it is recoverable; otherwise transfer privileged teacher advantage through sample weighting instead of forcing hidden-feature matching."
     parent: H7
     priority: high
+  - id: H7.1
+    statement: "Layer 9 remains the best recoverable layer when every action-expert layer from 6 through 12 is compared under the fixed H7 protocol."
+    status: planned
+    motivation: "The coarse H7 scan cannot distinguish a robust middle-layer optimum from an isolated result; adding layers 7, 8, 10, and 11 completes the local comparison without another policy run."
+    parent: H7
+    priority: medium
 
 experiments:
   proxy_metric: "Two finite optimizer steps with nonzero selector gradients and peak GPU memory below 32 GB."
@@ -98,11 +104,12 @@ experiments:
       status: completed
 
 current_execution:
-  checked_at: "2026-09-15 16:01 CST"
+  checked_at: "2026-09-15 17:14 CST"
   h8_training: "job 128417 completed; step-4999 params and assets saved"
   h8_evaluation: "job 128421 running on gpu04"
-  h9_training: "job 128769 pending for resources; continuous 30K run with checkpoints every 5K; no successful step yet"
+  h9_training: "two-GPU debug smoke job 128780 completed two finite optimizer steps; job 128769 released to the normal queue for continuous 30K training"
   h9_evaluation: "watcher job 128770 waits for job 128769 to start and will submit the 5K evaluation after checkpoint 4999 finalizes"
+  h7_layer_scan: "H7.1 protocol locked for layers 7, 8, 10, and 11; not submitted yet"
 
 outer_loop:
   cycle: 9

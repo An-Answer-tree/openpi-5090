@@ -29,6 +29,7 @@
 | H7 | 精确 attention contribution 是否可恢复，并选择层 | 256 个 episode-held-out 样本，64 个 hard 样本，3 个 probe seeds | 支持 | layer 9 和 12 可恢复；layer 9 按预注册规则胜出，layer 6 不可用。 |
 | H8 | ACL-only 能否解释 H5 提升 | FSDP2，global BS32，5K，seed 42；2,000 episodes | 训练完成，验证排队 | Job 128417 已保存 4999 checkpoint；尚无验证结果。 |
 | H9 | 部署式 ACPD-v2 是否优于 H8 | layer 9 exact contribution；FSDP4，micro BS8×accumulation 4；连续训练 30K，先评估 5K | 修复后排队 | Job 128513 在 step 0 前初始化失败；修复通过测试，新 Job 128769 等待资源，尚无训练结果。 |
+| H7.1 | layer 9 是否为稳定的局部最优层 | 固定 H7 协议，补测 layer 7/8/10/11，与已有 6/9/12 合并 | 协议已锁定，待提交 | 尚无结果；只测恢复性，不推断任务成功率。 |
 
 ## SFT 训练
 
@@ -137,7 +138,7 @@ Teacher target 是每个视角对 action attention 的真实残差贡献：使�
 | H8 ACL-only | FSDP2，global BS32，5K，seed 42 | 128417 | 完成；step 4900 supervised loss `0.0316`，4999 checkpoint 已完整保存 |
 | H8 四套验证 | 4 GPU，2,000 episodes，依赖 H8 | 128421 | gpu04 运行中 |
 | H9 首次提交 | layer 9 exact contribution，FSDP4，micro BS8 × accumulation4，effective BS32，原计划 5K | 128513 | step 0 前初始化失败；NNX pytree metadata 与 FSDP sharding 不一致；不是 OOM |
-| H9 连续训练 | 相同 5K 前缀；连续训练 30K，每 5K 保存 | 128769 | 修复通过 12 个定向测试；等待普通资源，尚未完成真实训练 step |
+| H9 连续训练 | 相同 5K 前缀；连续训练 30K，每 5K 保存 | 128769 | 2 GPU debug smoke 已完成两个真实 optimizer step；正式任务等待普通资源 |
 | H9 5K 验证 watcher | 1 CPU，1 GB；等待完整 checkpoint 4,999 后提交四卡验证 | 128770 | 等待 Job 128769 启动；不占用 GPU |
 | H9 首次四套验证 | 4 GPU，2,000 episodes，依赖失败的 Job 128513 | 128514 | 已取消，未运行 |
 
