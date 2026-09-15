@@ -2,7 +2,16 @@
 
 更新时间：2026-09-15
 
-本文件是唯一长期实验结果台账。开始实验相关工作前读取；实验状态变化或产生最终结果后立即更新。只记录实际运行的配置和已核实结果；未完成项不填写结论，原始日志和 checkpoint 保存在 `/opt/liutong`。
+本文件是唯一长期实验结果台账。开始实验相关工作前读取；实验状态变化或产生最终结果后立即更新。只记录实际运行的配置和已核实结果；未完成项标记“尚无结论”，原始日志和 checkpoint 保存在 `/opt/liutong`。
+
+## 记录规则
+
+| 内容 | 要求 |
+|---|---|
+| 实验目的 | 说明实验要回答的单一问题。 |
+| 实验做法 | 只写实际运行的关键变量、对照和资源。 |
+| 实验结论 | 只依据已核实指标；未完成或未验证时写“尚无结论”。 |
+| 证据 | 详细协议和分析放在 `experiments/`；台账只保留日志、checkpoint 和验证结果路径。 |
 
 ## 当前结论
 
@@ -17,19 +26,19 @@
 
 ## ACPD 实验总表
 
-| ID | 目的或比较 | 关键配置 | 状态 | 已核实结论 |
+| ID | 实验目的 | 实验做法 | 状态 | 实验结论 |
 |---|---|---|---|---|
-| H1 | 梯度累积能否在 4×5090 上运行 ACPD LoRA | FSDP4，global micro BS8，accumulation 4，effective BS32，2 steps | 支持 | 训练正常，单卡峰值 `17,291 MiB`。 |
-| H2 | 物理 global BS32 能否直接运行 | FSDP4，global BS32，accumulation 1，2 steps | 支持 | 原始 ACPD 训练图正常，单卡峰值 `17,337 MiB`。 |
-| H3 | layer 6+12 是否优于单层 | FSDP2，global BS32，5K，seed 42 | 不支持 | layer 6 的训练 loss 最低；三组差异小于 1%，不能推断成功率。 |
-| H4 | Cue 或 ACL 是否改善早期收敛 | Flow、Cue、ACL、Full；FSDP2，global BS32，2K | 不支持 | 相对 Flow 的差异均未达到预设 1% 阈值。 |
-| H5 | Full ACPD 是否优于 Flow-only | 相同 5K 预算；四套共 2,000 episodes | 支持 | `6.50%` 对 `4.45%`，提升 `2.05` 点，配对 95% CI `[0.90, 3.25]` 点。 |
-| H6 | 启发式 visual-message 是否可恢复 | 原计划 500-step probe | 废弃 | target 近似全局视觉平均，shuffle 对照无效；任务在首批数据前取消，无实验结果。 |
-| H6.1 | 在无效 proxy 上比较 layer 6/9/12 | 原计划三层短实验 | 废弃 | 父实验设计无效，未运行，不产生层选择结论。 |
-| H7 | 精确 attention contribution 是否可恢复，并选择层 | 256 个 episode-held-out 样本，64 个 hard 样本，3 个 probe seeds | 支持 | layer 9 和 12 可恢复；layer 9 按预注册规则胜出，layer 6 不可用。 |
-| H8 | ACL-only 能否解释 H5 提升 | FSDP2，global BS32，5K，seed 42；2,000 episodes | 训练完成，验证排队 | Job 128417 已保存 4999 checkpoint；尚无验证结果。 |
-| H9 | 部署式 ACPD-v2 是否优于 H8 | layer 9 exact contribution；FSDP4，micro BS8×accumulation 4；连续训练 30K，先评估 5K | 修复后排队 | Job 128513 在 step 0 前初始化失败；修复通过测试，新 Job 128769 等待资源，尚无训练结果。 |
-| H7.1 | layer 9 是否为稳定的局部最优层 | 固定 H7 协议，补测 layer 7/8/10/11，与已有 6/9/12 合并 | Job 128789 排队 | 2 GPU、16 CPU、48 GB；尚无结果，只测恢复性。 |
+| H1 | 梯度累积能否在 4×5090 上运行 ACPD LoRA | FSDP4，global micro BS8，accumulation 4，effective BS32，2 steps | 完成 | 支持。训练正常，单卡峰值 `17,291 MiB`。 |
+| H2 | 物理 global BS32 能否直接运行 | FSDP4，global BS32，accumulation 1，2 steps | 完成 | 支持。原始 ACPD 训练图正常，单卡峰值 `17,337 MiB`。 |
+| H3 | layer 6+12 是否优于单层 | FSDP2，global BS32，5K，seed 42 | 完成 | 不支持。layer 6 的训练 loss 最低；三组差异小于 1%，不能推断成功率。 |
+| H4 | Cue 或 ACL 是否改善早期收敛 | Flow、Cue、ACL、Full；FSDP2，global BS32，2K | 完成 | 不支持。相对 Flow 的差异均未达到预设 1% 阈值。 |
+| H5 | Full ACPD 是否优于 Flow-only | 相同 5K 预算；四套共 2,000 episodes | 完成 | 支持。`6.50%` 对 `4.45%`，提升 `2.05` 点，配对 95% CI `[0.90, 3.25]` 点。 |
+| H6 | 启发式 visual-message 是否可恢复 | 原计划 500-step probe | 已取消 | target 近似全局视觉平均，shuffle 对照无效；任务在首批数据前取消，无实验结果。 |
+| H6.1 | 在无效 proxy 上比较 layer 6/9/12 | 原计划三层短实验 | 未运行 | 父实验设计无效，不产生层选择结论。 |
+| H7 | 精确 attention contribution 是否可恢复，并选择层 | 256 个 episode-held-out 样本，64 个 hard 样本，3 个 probe seeds | 完成 | 支持。layer 9 和 12 可恢复；layer 9 按预注册规则胜出，layer 6 不可用。 |
+| H8 | ACL-only 能否解释 H5 提升 | FSDP2，global BS32，5K，seed 42；2,000 episodes | 训练完成，验证排队 | 尚无结论。 |
+| H9 | 部署式 ACPD-v2 是否优于 H8 | layer 9 exact contribution；FSDP4，micro BS8×accumulation 4；连续训练 30K，先评估 5K | 修复后排队 | 尚无结论。 |
+| H7.1 | layer 9 是否为稳定的局部最优层 | 固定 H7 协议；layer 7/8/10/11；2 GPU、16 CPU、48 GB | 排队 | 尚无结论；该实验只测恢复性。 |
 
 ## SFT 训练
 
