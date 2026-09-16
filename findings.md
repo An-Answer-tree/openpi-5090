@@ -42,9 +42,9 @@ was cancelled before its first batch after this design audit; no H6 result is
 claimed.
 
 H5 shows that the full objective can improve task success even when supervised
-loss is insensitive. It does not isolate the source of the gain because Full
-ACPD contains both the cue loss and ACL. A matched ACL-only 5K run is therefore
-required before attributing the gain to privileged-cue transfer.
+loss is insensitive. H8 isolates this gain: ACL-only is statistically better
+than Flow-only and indistinguishable from Full ACPD under the locked screening
+rule. The H5 result therefore does not provide evidence for the old Cue branch.
 
 The next cue branch replaces the learned or heuristic cue with the teacher's exact
 per-view attention residual: real Q/K/V projections, the full attention
@@ -59,6 +59,21 @@ a teacher-advantage hard-subset gap of 0.3194 ([0.2717, 0.3875]), and explained
 variance of 0.2822. Layer 12 also passes, but its overall gap is 0.2367; the
 0.1050 margin exceeds the pre-registered 0.02 rule, so H9 uses only layer 9.
 Layer 6 fails because its explained variance is -0.1468.
+
+H8 completed the missing component attribution. ACL-only reached 127/2,000
+successes (6.35%), compared with 89/2,000 (4.45%) for Flow-only and 130/2,000
+(6.50%) for Full ACPD. ACL-only improves over Flow-only by 1.90 points with a
+paired 95% CI of [+0.75, +3.10]. Full ACPD improves over ACL-only by only 0.15
+points with CI [-1.15, +1.40]. Under the locked 0.5-point rule, ACL explains
+the H5 gain at this screening resolution; the old Cue has no detected
+incremental pooled benefit.
+
+H7.1 completed the local layer scan under the unchanged H7 protocol. Layers
+7, 8, 10, and 11 all pass the recoverability gates. Layer 10 has the largest
+overall gap at 0.3992 (95% CI [0.3524, 0.4312]), hard gap 0.3779, and explained
+variance 0.3556. It exceeds runner-up layer 11 by 0.0485, so the combined
+layer-6-through-12 scan selects layer 10. This refutes layer 9 as the stable
+local recoverability optimum but does not measure policy success.
 
 ## Lessons and Constraints
 
@@ -78,9 +93,10 @@ Layer 6 fails because its explained variance is -0.1468.
 
 - Does checkpoint writing remain the dominant wall-clock cost at the configured save interval?
 - Does the teacher's strong early flow-target advantage persist later in training?
-- How much of H5's task-success gain is explained by ACL alone?
 - Does deploying the layer-9 exact-contribution predictor improve task success
   beyond ACL-only at the same 5K budget?
+- If H9 is positive, does changing only the deployed target from layer 9 to
+  the better-recovered layer 10 produce a further policy gain?
 
 ## Optimization Trajectory
 
@@ -89,15 +105,14 @@ The physical global batch 32 run is preferred because it uses the complete batch
 The dual-layer head is not justified by the completed early-loss comparison. Layer 6 is the preferred configuration for new experiments, while the existing layers 6+12 checkpoint remains the matched Full ACPD control for the pending task-success evaluation.
 
 H4 rules out supervised-loss weight tuning as the next step. H5 passes its
-task-success threshold. The matched ACL-only H8 control completed 5K steps and
-saved checkpoint 4999; its 2,000-episode evaluation is queued, so no component
-attribution is claimed yet. H7 selected one fixed, recoverable exact-attention
-target for the revised cue mechanism.
+task-success threshold. The matched H8 evaluation attributes that gain to ACL
+at the locked screening resolution; the old Cue should not be promoted without
+new evidence.
 
-H7 selected layer 9. The revised cue mechanism should predict the two fixed
-teacher-view contributions separately, sum them, and retain a zero-initialized
-gated residual in the deployed student. This avoids the original method's
-jointly learned target and training-only predictor.
+The coarse H7 scan selected layer 9 and locked H9 before H7.1 ran. H7.1 later
+selected layer 10 across layers 6 through 12. The current H9 remains a valid
+pre-registered layer-9 test; layer 10 is the preferred target only for a future
+matched experiment if the deployed mechanism first demonstrates task value.
 
 The selected H9 mechanism uses the same ACL weight and effective batch size as
 H8, predicts agentview and wrist contributions separately from the student's
@@ -108,6 +123,7 @@ contribution head did not match the FSDP output-sharding graph metadata. This
 is an implementation failure, not an OOM or method result. The mismatch was
 isolated to a freshly created kernel-initializer closure in NNX graph metadata;
 the initializer now has stable identity and the regression suite passes. Job
-128769 will train one continuous 30K run, while CPU-only watcher job 128770 will
-submit the pre-registered 5K evaluation after checkpoint 4,999 is finalized.
-Neither job has produced a scientific result yet.
+128769 is training one continuous 30K run, while CPU-only watcher job 128770
+will submit the pre-registered 5K evaluation after checkpoint 4,999 is
+finalized. The run reached about step 1,800 by 2026-09-16 12:00. It has no
+task-success result yet.

@@ -14,7 +14,7 @@ literature:
   open_problems:
     - "Memory and throughput of a frozen full teacher plus a LoRA student on four 32 GB GPUs."
   evidence_gaps:
-    - "The positive H5 result is a single-seed 5K screen; component attribution still requires an ACL-only control."
+    - "H8 attributes the single-seed 5K H5 gain to ACL, but repeated seeds and longer training are still missing."
     - "The trainer-matched 2K component runs have no saved checkpoints, so unchanged supervised loss cannot determine task-success effects."
     - "The manuscript's Table 2 mixes gated and ungated V6 runs, confounding the claimed Cue, ACL, and wrist-view ablations."
 
@@ -69,7 +69,7 @@ hypotheses:
     priority: high
   - id: H8
     statement: "ACL-only explains less than the complete +2.05-point H5 task-success gain at 5K steps."
-    status: active
+    status: not_supported
     motivation: "H5 supports the full objective, but Cue and ACL were changed together. A matched saved ACL-only checkpoint isolates the strongest component from H4."
     parent: H5
     priority: high
@@ -81,7 +81,7 @@ hypotheses:
     priority: high
   - id: H7.1
     statement: "Layer 9 remains the best recoverable layer when every action-expert layer from 6 through 12 is compared under the fixed H7 protocol."
-    status: active
+    status: not_supported
     motivation: "The coarse H7 scan cannot distinguish a robust middle-layer optimum from an isolated result; adding layers 7, 8, 10, and 11 completes the local comparison without another policy run."
     parent: H7
     priority: medium
@@ -104,17 +104,17 @@ experiments:
       status: completed
 
 current_execution:
-  checked_at: "2026-09-15 17:14 CST"
+  checked_at: "2026-09-16 12:08 CST"
   h8_training: "job 128417 completed; step-4999 params and assets saved"
-  h8_evaluation: "job 128421 running on gpu04"
-  h9_training: "two-GPU debug smoke job 128780 completed two finite optimizer steps; job 128769 released to the normal queue for continuous 30K training"
-  h9_evaluation: "watcher job 128770 waits for job 128769 to start and will submit the 5K evaluation after checkpoint 4999 finalizes"
-  h7_layer_scan: "job 128789 queued on the normal batch partition for layers 7, 8, 10, and 11 with two GPUs, 16 CPUs, and 48 GB host memory"
+  h8_evaluation: "job 128421 completed 2,000 episodes; pooled success 6.35%; ACL-only is within 0.15 points of Full ACPD"
+  h9_training: "job 128769 is running on four GPUs; approximately step 1,800 at 2026-09-16 12:00; no task-success result"
+  h9_evaluation: "watcher job 128770 is running and waits for checkpoint 4999 before submitting the fixed 5K evaluation"
+  h7_layer_scan: "job 128789 completed; layer 10 selected over runner-up layer 11 by 0.0485 overall cosine gap"
 
 outer_loop:
-  cycle: 9
-  last_direction: "run H8 ACL-only and H9 layer-9 exact-contribution ACPD-v2 as matched 5K policy screens"
-  last_reflection: "H7 supports recoverability at layers 9 and 12 and selects layer 9 by a pre-registered margin. H9 must retain the layer-9 predictor in the deployed policy so the fixed privileged target affects inference rather than only an auxiliary training loss."
+  cycle: 10
+  last_direction: "finish the locked layer-9 H9 5K policy screen before deciding whether layer 10 merits a separate policy run"
+  last_reflection: "H8 shows that ACL explains the H5 gain at the pre-registered 5K resolution; the old Cue adds no detected pooled benefit. H7.1 selects layer 10 rather than layer 9 for recoverability, but this does not alter the already running H9 protocol or establish task success."
 
 workspace:
   results: "EXPERIMENT_RESULTS.md"
