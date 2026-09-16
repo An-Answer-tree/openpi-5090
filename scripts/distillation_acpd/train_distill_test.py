@@ -112,33 +112,41 @@ def test_exact_contribution_loss_is_zero_for_equal_targets():
     assert float(target_power) > 0.0
 
 
-def test_acpd_v2_policy_config_deploys_layer_9_head():
-    config = training_config.get_config("pi05_libero_backview_acpd_v2_lora")
+def test_acpd_v2_policy_configs_deploy_selected_layer():
+    for config_name, layer in (
+        ("pi05_libero_backview_acpd_v2_lora", 9),
+        ("pi05_libero_backview_acpd_v2_layer10_lora", 10),
+    ):
+        config = training_config.get_config(config_name)
 
-    assert isinstance(config.model, AcpdPi0Config)
-    assert config.model.align_layers == (9,)
-    assert config.model.exact_contribution_fusion
-    assert not config.model.create_acpd_heads
+        assert isinstance(config.model, AcpdPi0Config)
+        assert config.model.align_layers == (layer,)
+        assert config.model.exact_contribution_fusion
+        assert not config.model.create_acpd_heads
 
 
 def test_acpd_v2_train_and_eval_models_have_matching_parameter_trees():
-    distill_config = DistillTrainConfig(
-        student_init_params="base/params",
-        teacher_params="teacher/params",
-        assets_dir="assets",
-        checkpoint_base_dir="checkpoints",
-        align_layers=(9,),
-        exact_contribution_fusion=True,
-    )
+    for config_name, layer in (
+        ("pi05_libero_backview_acpd_v2_lora", 9),
+        ("pi05_libero_backview_acpd_v2_layer10_lora", 10),
+    ):
+        distill_config = DistillTrainConfig(
+            student_init_params="base/params",
+            teacher_params="teacher/params",
+            assets_dir="assets",
+            checkpoint_base_dir="checkpoints",
+            align_layers=(layer,),
+            exact_contribution_fusion=True,
+        )
 
-    student_config = _make_student_train_config(distill_config, create_acpd_heads=False)
-    teacher_config = _make_teacher_train_config(distill_config, student_config)
-    eval_config = training_config.get_config("pi05_libero_backview_acpd_v2_lora")
+        student_config = _make_student_train_config(distill_config, create_acpd_heads=False)
+        teacher_config = _make_teacher_train_config(distill_config, student_config)
+        eval_config = training_config.get_config(config_name)
 
-    assert student_config.model == eval_config.model
-    assert isinstance(teacher_config.model, AcpdPi0Config)
-    assert not teacher_config.model.exact_contribution_fusion
-    assert not teacher_config.model.create_acpd_heads
+        assert student_config.model == eval_config.model
+        assert isinstance(teacher_config.model, AcpdPi0Config)
+        assert not teacher_config.model.exact_contribution_fusion
+        assert not teacher_config.model.create_acpd_heads
 
 
 def test_action_corr_loss_matches_pearson_correlation():

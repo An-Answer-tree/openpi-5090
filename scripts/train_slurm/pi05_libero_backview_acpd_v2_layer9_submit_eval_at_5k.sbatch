@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=watch-bv-acpdv2-5k
+#SBATCH --job-name=finish-bv-acpdv2-l9-5k
 #SBATCH --partition=batch
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -18,4 +18,6 @@ until [[ -f "/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/
   sleep 60
 done
 
-sbatch /home/liutong/Projects/openpi-5090/examples/libero/eval_slurm/pi05_libero_backview_acpd_v2_layer9_fsdp4_bs32_5k.sbatch
+evaluation_job_id=$(sbatch --parsable /home/liutong/Projects/openpi-5090/examples/libero/eval_slurm/pi05_libero_backview_acpd_v2_layer9_fsdp4_bs32_5k.sbatch)
+echo "Submitted layer-9 evaluation job ${evaluation_job_id}; stopping training job 128769."
+scancel 128769

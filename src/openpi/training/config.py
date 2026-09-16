@@ -608,19 +608,20 @@ def _make_pi05_libero_lora_config(view_name: str) -> TrainConfig:
     )
 
 
-def _make_pi05_libero_acpd_v2_config() -> TrainConfig:
-    """Creates the deployed layer-9 exact-contribution policy config."""
+def _make_pi05_libero_acpd_v2_config(layer: int = 9) -> TrainConfig:
+    """Creates a deployed exact-contribution policy config."""
     base = _make_pi05_libero_lora_config("backview")
     base_fields = {field.name: getattr(base.model, field.name) for field in dataclasses.fields(pi0_config.Pi0Config)}
     model = pi0_distill_acpd.AcpdPi0Config(
         **base_fields,
-        align_layers=(9,),
+        align_layers=(layer,),
         create_acpd_heads=False,
         exact_contribution_fusion=True,
     )
+    name = "pi05_libero_backview_acpd_v2_lora" if layer == 9 else f"pi05_libero_backview_acpd_v2_layer{layer}_lora"
     return dataclasses.replace(
         base,
-        name="pi05_libero_backview_acpd_v2_lora",
+        name=name,
         model=model,
         freeze_filter=model.get_freeze_filter(),
     )
@@ -833,6 +834,7 @@ _CONFIGS = [
     ),
     _make_pi05_libero_lora_config("backview"),
     _make_pi05_libero_acpd_v2_config(),
+    _make_pi05_libero_acpd_v2_config(layer=10),
     _make_pi05_libero_lora_config("topview"),
     _make_pi05_libero_lora_config("leftview"),
     _make_pi05_libero_lora_config("rightview"),
