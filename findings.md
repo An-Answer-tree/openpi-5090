@@ -95,8 +95,8 @@ local recoverability optimum but does not measure policy success.
 - Does the teacher's strong early flow-target advantage persist later in training?
 - Does deploying the layer-9 exact-contribution predictor improve task success
   beyond ACL-only at the same 5K budget?
-- If H9 is positive, does changing only the deployed target from layer 9 to
-  the better-recovered layer 10 produce a further policy gain?
+- Does changing only the deployed target from layer 9 to the better-recovered
+  layer 10 improve 5K policy success?
 
 ## Optimization Trajectory
 
@@ -123,7 +123,8 @@ contribution head did not match the FSDP output-sharding graph metadata. This
 is an implementation failure, not an OOM or method result. The mismatch was
 isolated to a freshly created kernel-initializer closure in NNX graph metadata;
 the initializer now has stable identity and the regression suite passes. Job
-128769 is training one continuous 30K run, while CPU-only watcher job 128770
-will submit the pre-registered 5K evaluation after checkpoint 4,999 is
-finalized. The run reached about step 1,800 by 2026-09-16 12:00. It has no
-task-success result yet.
+128769 retains its unchanged first 5K updates, but the exploratory continuation
+to 30K has been removed after H7.1 and before any H9 task-success result. It
+will stop after checkpoint 4,999 finalizes. H9.1 changes only the deployed
+exact-contribution layer from 9 to 10 and uses the same 5K training and
+evaluation protocol.

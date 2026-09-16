@@ -39,7 +39,8 @@
 | H6.1 | 在无效 proxy 上比较 layer 6/9/12 | 原计划三层短实验 | 未运行 | 父实验设计无效，不产生层选择结论。 |
 | H7 | 精确 attention contribution 是否可恢复，并进行粗粒度选层 | layer 6/9/12；256 个 held-out 样本；3 个 probe seeds | 完成 | 支持可恢复性；粗粒度扫描选择 layer 9。 |
 | H8 | ACL-only 能否解释 H5 提升 | FSDP2，global BS32，5K，seed 42；2,000 episodes | 完成 | 支持。ACL-only 为 `6.35%`，与 Full 的 `6.50%` 相差 `0.15` 点，配对 95% CI `[-1.15, 1.40]`。 |
-| H9 | 部署式 ACPD-v2 是否优于 H8 | layer 9 exact contribution；FSDP4，micro BS8×accumulation 4；连续训练 30K，先评估 5K | 运行中 | 尚无结论；截至 2026-09-16 12:00 约为 step 1,800。 |
+| H9 | 部署式 ACPD-v2 是否优于 H8 | layer 9 exact contribution；FSDP4，micro BS8×accumulation 4；5K | 运行中 | 尚无结论；checkpoint 4,999 完整保存后停止。 |
+| H9.1 | 更易恢复的 layer 10 是否优于 layer 9 | 与 H9 相同，只把 exact-contribution layer 改为 10；5K | 协议锁定 | 尚无结论。 |
 | H7.1 | layer 9 是否为稳定的局部最优层 | 固定 H7 协议；补测 layer 7/8/10/11；2 GPU | 完成 | 不支持。layer 10 的 overall gap 为 `0.3992`，按预注册规则改选 layer 10。 |
 
 ## SFT 训练
@@ -145,7 +146,7 @@ Teacher target 是每个视角对 action attention 的真实残差贡献：使�
 | H8 ACL-only | FSDP2，global BS32，5K，seed 42 | 128417 | 完成；step 4900 supervised loss `0.0316`，4999 checkpoint 已完整保存 |
 | H8 四套验证 | 4 GPU，2,000 episodes | 128421 | 完成；`127/2,000`，pooled `6.35%` |
 | H9 首次提交 | layer 9 exact contribution，FSDP4，micro BS8 × accumulation4，effective BS32，原计划 5K | 128513 | step 0 前初始化失败；NNX pytree metadata 与 FSDP sharding 不一致；不是 OOM |
-| H9 连续训练 | 相同 5K 前缀；连续训练 30K，每 5K 保存 | 128769 | 4 GPU；运行中；截至 2026-09-16 12:00 约 step 1,800 |
+| H9 训练 | 原 30K 作业；保留相同 5K 前缀并在 checkpoint 4,999 完整保存后停止 | 128769 | 4 GPU；运行中 |
 | H9 5K 验证 watcher | 1 CPU，1 GB；等待完整 checkpoint 4,999 后提交四卡验证 | 128770 | 运行中；等待 checkpoint，不占用 GPU |
 | H9 首次四套验证 | 4 GPU，2,000 episodes，依赖失败的 Job 128513 | 128514 | 已取消，未运行 |
 

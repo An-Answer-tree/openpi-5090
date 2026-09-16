@@ -78,6 +78,14 @@ matched 5K H8 checkpoint. Later checkpoints are a pre-planned exploratory
 continuation and require a duration-matched baseline before any claim about
 ACPD efficacy at 30K.
 
+## 5K Termination Amendment
+
+This amendment was locked after H7.1 selected layer 10 and before H9 produced
+checkpoint 4,999 or any task-success result. The exploratory 30K continuation
+is no longer required. Job 128769 will stop only after checkpoint 4,999 has
+finalized `params`, `assets`, and `_CHECKPOINT_METADATA`. Its first 5K updates
+and the pre-registered H9 decision remain unchanged.
+
 ## Evaluation and Decision
 
 Evaluate the selected H9 checkpoint on the same fixed backview camera, four

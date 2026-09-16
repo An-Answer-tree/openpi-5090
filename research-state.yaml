@@ -79,6 +79,12 @@ hypotheses:
     motivation: "Use H7 to choose one fixed privileged target when it is recoverable; otherwise transfer privileged teacher advantage through sample weighting instead of forcing hidden-feature matching."
     parent: H7
     priority: high
+  - id: H9.1
+    statement: "Layer-10 exact-contribution ACPD-v2 improves pooled 5K task success over layer 9 under a matched policy-training protocol."
+    status: active
+    motivation: "H7.1 selects layer 10 over layer 9 by the pre-registered recoverability margin; a matched policy run tests whether that representation result transfers to task success."
+    parent: H9
+    priority: high
   - id: H7.1
     statement: "Layer 9 remains the best recoverable layer when every action-expert layer from 6 through 12 is compared under the fixed H7 protocol."
     status: not_supported
@@ -113,8 +119,8 @@ current_execution:
 
 outer_loop:
   cycle: 10
-  last_direction: "finish the locked layer-9 H9 5K policy screen before deciding whether layer 10 merits a separate policy run"
-  last_reflection: "H8 shows that ACL explains the H5 gain at the pre-registered 5K resolution; the old Cue adds no detected pooled benefit. H7.1 selects layer 10 rather than layer 9 for recoverability, but this does not alter the already running H9 protocol or establish task success."
+  last_direction: "stop H9 after its locked 5K screen and run a matched 5K layer-10 H9.1 comparison"
+  last_reflection: "H8 shows that ACL explains the old H5 gain. H7.1 selects layer 10 for recoverability, so H9 and H9.1 now isolate whether deployed exact-contribution transfer works and whether the recoverability ranking predicts policy success."
 
 workspace:
   results: "EXPERIMENT_RESULTS.md"
