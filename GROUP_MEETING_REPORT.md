@@ -17,7 +17,7 @@
 
 共同设置：4 卡 FSDP LoRA、global BS32、cosine 学习率。每个 checkpoint 在四套 LIBERO benchmark 上共验证 2,000 episodes。
 
-| Checkpoint | Pooled success |
+| Checkpoint | 平均成功率 |
 |---:|---:|
 | 30K | 46.20% |
 | 40K | 49.20% |
@@ -41,7 +41,7 @@
 
 共同设置：backview student、BS32、5K、四套 LIBERO 共 2,000 episodes。
 
-| 方法 | Pooled success | 结论 |
+| 方法 | 平均成功率 | 结论 |
 |---|---:|---|
 | Flow-only | 4.45% | 基线 |
 | ACL-only | 6.35% | 比 Flow 高 1.90 点，95% CI `[0.75, 3.10]`。 |
@@ -169,6 +169,6 @@ Layer 10 的 overall gap 比次优 layer 11 高 0.0485，超过预设的 0.02 �
 ## 6. 阶段性结论
 
 1. 5090 已能稳定完成 pi0.5 LoRA SFT 和 ACPD 蒸馏，BS32 足够使用。
-2. cosine SFT 的最佳 checkpoint 是 50K，pooled success 为 57.05%。
+2. cosine SFT 的最佳 checkpoint 是 50K，平均成功率为 57.05%。
 3. 原始 ACPD 的 5K 提升主要来自 ACL。
 4. layer 10 的特权 attention contribution 最容易恢复，其任务效果仍在验证。
