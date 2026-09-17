@@ -76,15 +76,19 @@ ACPD-v2 的目标是让只观察 backview 的 student 恢复 teacher 从 agentvi
 
 ### 3.2 Teacher 提供什么监督
 
-pi0.5 的 action expert 使用 action token 从图像、语言和动作 token 中读取信息。ACPD-v2 在候选 action-expert 层中，将 attention 输出按图像来源拆成 agentview 和 wrist 两部分。
+Teacher 仍按原始 pi0.5 完成前向计算，不改变 action expert 的结构。在一个 action-expert 层中，action token 会从不同输入 token 读取信息。我们只对这些信息按来源记账：来自 agentview 图像 token 的内容汇总为一个向量，来自 wrist 图像 token 的内容汇总为另一个向量。
 
-每一部分都保留原模型的 attention 权重、value、输出投影和 AdaRMS gate。因此，提取结果不是 attention 分数，而是该视角在 teacher 前向计算中实际加入 action token 的信息向量。Teacher 参数冻结，这两个向量就是 student 的固定监督目标。
+这两个向量与 action token 的 hidden state 维度相同，分别表示该层最终写入 action token 的 agentview 信息和 wrist 信息，而不是两张 attention 权重图。Teacher 参数冻结，student 只看 backview，并学习预测这两个固定向量。
 
-### 3.3 Student 如何学习和使用
+### 3.3 Student 如何预测并注入
 
-Student 从同一 action-expert 层的 action hidden state 出发，通过线性 predictor 分别预测 agentview 和 wrist 的贡献。两个视角分别计算归一化 MSE，避免某个视角仅因向量幅值较大而主导训练。
+数据流：layer 10 action hidden state → predictor → agentview 和 wrist 两份贡献 → 求和并经过 gate → 最终 action hidden state → `action_out_proj`。
 
-预测出的两个贡献相加后，通过从 0 初始化的标量 gate 加入 student 最终的 action representation。Policy loss 只决定是否以及多大程度使用这项信息，不反向改变 predictor 的目标。推理时移除 teacher，student 只依赖 backview、贡献预测器和 gate。
+Student 取 layer 10 的 action hidden state，形状为 `[batch, action horizon, hidden dim]`。一个线性 predictor 为每个 action token 输出两份同形状向量，分别预测 agentview 和 wrist 的贡献。两个视角分别计算归一化 MSE，避免某个视角仅因向量幅值较大而主导训练。
+
+注入发生在 action expert 最后一层之后、`action_out_proj` 之前：先将两份预测贡献相加，再乘以一个可学习的标量 gate，最后加到 student 的最终 action hidden state。`action_out_proj` 随后将合并后的 hidden state 转换为动作流预测。
+
+Gate 从 0 初始化，因此训练开始时模型与原 student 完全相同。Flow matching 和 ACL 通过动作预测学习 gate 应该使用多大强度；stop-gradient 阻止这两项损失通过注入分支修改 predictor，predictor 只由 contribution loss 监督。推理时移除 teacher，保留 student、predictor 和 gate。
 
 ### 3.4 训练损失
 
