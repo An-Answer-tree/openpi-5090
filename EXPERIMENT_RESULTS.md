@@ -1,6 +1,6 @@
 # 实验结果记录
 
-更新时间：2026-09-16
+更新时间：2026-09-17
 
 本文件是唯一长期实验结果台账。开始实验相关工作前读取；实验状态变化或产生最终结果后立即更新。只记录实际运行的配置和已核实结果；未完成项标记“尚无结论”，原始日志和 checkpoint 保存在 `/opt/liutong`。
 
@@ -12,6 +12,7 @@
 | 实验做法 | 只写实际运行的关键变量、对照和资源。 |
 | 实验结论 | 只依据已核实指标；未完成或未验证时写“尚无结论”。 |
 | 证据 | 详细协议和分析放在 `experiments/`；台账只保留日志、checkpoint 和验证结果路径。 |
+| 工程故障 | 不写入本表，不作为实验结果；仅保留当前有效任务状态。 |
 
 ## 当前结论
 
@@ -40,7 +41,7 @@
 | H7 | 精确 attention contribution 是否可恢复，并进行粗粒度选层 | layer 6/9/12；256 个 held-out 样本；3 个 probe seeds | 完成 | 支持可恢复性；粗粒度扫描选择 layer 9。 |
 | H8 | ACL-only 能否解释 H5 提升 | FSDP2，global BS32，5K，seed 42；2,000 episodes | 完成 | 支持。ACL-only 为 `6.35%`，与 Full 的 `6.50%` 相差 `0.15` 点，配对 95% CI `[-1.15, 1.40]`。 |
 | H9 | 部署式 ACPD-v2 是否优于 H8 | layer 9 exact contribution；FSDP4，micro BS8×accumulation 4；5K | 运行中 | 尚无结论；checkpoint 4,999 完整保存后停止。 |
-| H9.1 | 更易恢复的 layer 10 是否优于 layer 9 | 与 H9 相同，只把 exact-contribution layer 改为 10；5K | 已提交 | 尚无结论。 |
+| H9.1 | 更易恢复的 layer 10 是否优于 layer 9 | 与 H9 相同，只把 exact-contribution layer 改为 10；5K | 运行中 | 尚无结论。 |
 | H7.1 | layer 9 是否为稳定的局部最优层 | 固定 H7 协议；补测 layer 7/8/10/11；2 GPU | 完成 | 不支持。layer 10 的 overall gap 为 `0.3992`，按预注册规则改选 layer 10。 |
 
 ## SFT 训练
@@ -145,12 +146,10 @@ Teacher target 是每个视角对 action attention 的真实残差贡献：使�
 |---|---|---:|---|
 | H8 ACL-only | FSDP2，global BS32，5K，seed 42 | 128417 | 完成；step 4900 supervised loss `0.0316`，4999 checkpoint 已完整保存 |
 | H8 四套验证 | 4 GPU，2,000 episodes | 128421 | 完成；`127/2,000`，pooled `6.35%` |
-| H9 首次提交 | layer 9 exact contribution，FSDP4，micro BS8 × accumulation4，effective BS32，原计划 5K | 128513 | step 0 前初始化失败；NNX pytree metadata 与 FSDP sharding 不一致；不是 OOM |
-| H9 训练 | 原 30K 作业；保留相同 5K 前缀并在 checkpoint 4,999 完整保存后停止 | 128769 | 4 GPU；运行中 |
-| H9 完成 watcher | 1 CPU，1 GB；checkpoint 4,999 完整后提交验证并停止训练 | 128942 | 运行中；不占用 GPU |
-| H9 首次四套验证 | 4 GPU，2,000 episodes，依赖失败的 Job 128513 | 128514 | 已取消，未运行 |
-| H9.1 layer-10 训练 | 与 H9 前 5K 相同，仅 `align_layers=10` | 128943 | 4 GPU；排队，原因 `Priority` |
-| H9.1 layer-10 验证 | 4 GPU，2,000 episodes，依赖 H9.1 训练成功 | 128944 | 等待依赖 |
+| H9 layer-9 训练 | 保留 30K 学习率轨迹的相同 5K 前缀；checkpoint 4,999 完整保存后停止 | 129524 | 4 GPU；运行中 |
+| H9 layer-9 完成 watcher | 1 CPU，1 GB；checkpoint 4,999 完整后提交验证并停止训练 | 129525 | 运行中；不占用 GPU |
+| H9.1 layer-10 训练 | 与 H9 前 5K 相同，仅 `align_layers=10` | 129526 | 4 GPU；运行中 |
+| H9.1 layer-10 验证 | 4 GPU，2,000 episodes，依赖 H9.1 训练成功 | 129527 | 等待依赖 |
 
 H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success 比 H8 高至少 `1.5` 个百分点，且配对 bootstrap 95% CI 下界大于 0。
 
@@ -191,8 +190,8 @@ H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success �
 | H8 Full/ACL 配对分析 | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/full_vs_acl_paired_analysis.json` |
 | H9 协议 | `experiments/acpd-v2-5k/protocol.md` |
 | H9.1 协议 | `experiments/acpd-v2-layer10-5k/protocol.md` |
-| H9 首次初始化失败日志 | `slurm-log/pi05-bv-acpdv2-l9_128513.out` |
-| H9 30K 训练日志 | `slurm-log/pi05-bv-acpdv2-l9-30k_128769.out`（运行中） |
+| H9 layer-9 训练日志 | `slurm-log/pi05-bv-acpdv2-l9-30k_129524.out`（运行中） |
+| H9.1 layer-10 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-5k_129526.out`（运行中） |
 
 ## Checkpoint 路径检索
 
@@ -230,5 +229,5 @@ H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success �
 | Full ACPD 6+12，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/full-acpd-layers6-12/4999` | 完成，`6.50%` pooled |
 | Flow-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/flow-only/4999` | 完成，`4.45%` pooled |
 | H8 ACL-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/acl-only/4999` | 完成，`6.35%` pooled |
-| H9 ACPD-v2 layer 9，5K | `/opt/liutong/openpi-5090-evals/acpd-v2-task-success-5k/layer9-exact-contribution/4999` | watcher 运行中；等待 checkpoint 4,999 |
-| H9.1 ACPD-v2 layer 10，5K | `/opt/liutong/openpi-5090-evals/acpd-v2-task-success-5k/layer10-exact-contribution/4999` | Job 128944 等待训练完成 |
+| H9 ACPD-v2 layer 9，5K | `/opt/liutong/openpi-5090-evals/acpd-v2-task-success-5k/layer9-exact-contribution/4999` | Job 129525 等待 checkpoint 4,999 后提交验证 |
+| H9.1 ACPD-v2 layer 10，5K | `/opt/liutong/openpi-5090-evals/acpd-v2-task-success-5k/layer10-exact-contribution/4999` | Job 129527 等待训练完成 |
