@@ -14,9 +14,8 @@ literature:
   open_problems:
     - "Memory and throughput of a frozen full teacher plus a LoRA student on four 32 GB GPUs."
   evidence_gaps:
-    - "H8 attributes the single-seed 5K H5 gain to ACL, but repeated seeds and longer training are still missing."
-    - "The trainer-matched 2K component runs have no saved checkpoints, so unchanged supervised loss cannot determine task-success effects."
-    - "The manuscript's Table 2 mixes gated and ungated V6 runs, confounding the claimed Cue, ACL, and wrist-view ablations."
+    - "H9 and H11 task-success evaluations are pending."
+    - "The positive 5K ACL result has one seed and one student view."
 
 hypotheses:
   - id: H1
@@ -87,37 +86,20 @@ hypotheses:
     priority: medium
   - id: H11
     statement: "Injecting the predicted layer-10 contribution after layer-10 attention and before its FFN improves 5K task success over final-hidden injection."
-    status: planned
+    status: queued
     motivation: "A contribution produced at layer 10 may be more useful when the remaining transformer computation can integrate it."
     parent: H9
     priority: high
 
-experiments:
-  proxy_metric: "Two finite optimizer steps with nonzero selector gradients and peak GPU memory below 32 GB."
-  baseline_value: null
-  best_value: null
-  total_runs: 2
-  trajectory:
-    - run_id: acpd-lora-5090-smoke-126759
-      batch_size: 8
-      gradient_accumulation_steps: 4
-      peak_gpu_memory_mib: 17291
-      status: completed
-    - run_id: acpd-lora-5090-physical-bs32-126936
-      batch_size: 32
-      gradient_accumulation_steps: 1
-      peak_gpu_memory_mib: 17337
-      status: completed
-
 current_execution:
-  checked_at: "2026-09-17 13:14 CST"
+  checked_at: "2026-09-17 14:49 CST"
   h8_training: "job 128417 completed; step-4999 params and assets saved"
   h8_evaluation: "job 128421 completed 2,000 episodes; pooled success 6.35%; ACL-only is within 0.15 points of Full ACPD"
-  h9_training: "layer-10 physical-BS32 job 129710 passed four finite optimizer steps on four GPUs without OOM; peak sampled memory 17,402 MiB/card; no task-success result"
+  h9_training: "layer-10 physical-BS32 job 129710 is running at step 872; no task-success result"
   h9_evaluation: "job 129711 waits on afterok:129710 and will evaluate 2,000 paired episodes"
-  h9_scale_b: "four-device physical-BS64 job 129728 reached step 100 at about 6.0 seconds/step and 31,464 MiB/card; no task-success result"
+  h9_scale_b: "four-device physical-BS64 job 129728 is running at step 436; no task-success result"
   h7_layer_scan: "job 128789 completed; layer 10 selected over runner-up layer 11 by 0.0485 overall cosine gap"
-  h11: "protocol locked; implementation and smoke test pending"
+  h11: "four-device BS64 smoke job 129807 waits for resources; formal job 129808 depends on smoke success"
 
 outer_loop:
   cycle: 13

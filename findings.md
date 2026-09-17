@@ -1,120 +1,49 @@
 # Research Findings
 
-## Research Question
+## 研究问题
 
-How can privileged `agentview+wrist` information train a stronger weak-view
-pi0.5 student?
+如何利用 teacher 的 `agentview+wrist` 特权视觉信息，提高只看 backview 的
+pi0.5 student？
 
-## Current Understanding
+## 当前结论
 
-The student can use the repository's existing pi0.5 LoRA variants. LoRA reduces student gradient and optimizer memory, but the frozen full teacher and ACPD auxiliary heads remain resident. The stable configuration combines FSDP4, rematerialization, no EMA, and a physical global batch of 32.
+| 问题 | 证据 | 结论 |
+|---|---|---|
+| 原始 ACPD 是否需要 layer 6+12 | H3，单层 6 的 5K loss 最低，层间差异小于 1% | 不需要双层；loss 不能代表成功率。 |
+| Cue 或 ACL 是否加快早期收敛 | H4，2K supervised loss 差异均小于 1% | 没有可靠证据。 |
+| Full ACPD 是否优于 Flow-only | H5，`6.50%` 对 `4.45%`，差值 `+2.05` 点，95% CI `[0.90, 3.25]` | 单 seed、5K 筛选为正。 |
+| H5 增益来自哪里 | H8，ACL-only `6.35%`；Full 比 ACL-only 仅 `+0.15` 点，95% CI `[-1.15, 1.40]` | 当前证据支持 ACL，不支持旧 Cue 的额外收益。 |
+| exact contribution 能否从 backview 恢复 | H7/H7.1，layer 10 gap `0.3992`、hard gap `0.3779`、EV `0.3556` | 可以；layer 10 是 6--12 层中的最佳层。 |
 
-The layer-10 ACPD-v2 policy also passes the physical-global-batch-32 runtime
-gate on four RTX 5090 GPUs without gradient accumulation. Its first four
-optimizer steps are finite with nonzero LoRA, predictor, and residual-gate
-gradients; peak sampled memory is 17,402 MiB per card. This establishes runtime
-feasibility, not task-success efficacy.
+## 方法判断
 
-The H9 scaling branches established the practical runtime trade-off. The
-two-GPU BS32 run remained healthy through step 83 at 12.0--12.6 seconds per
-step and 31,388 MiB/card, then was stopped by operator decision without a
-checkpoint. The four-GPU BS32 reference was 8.1--8.6 seconds per step. The
-four-GPU BS64 run reached step 100 at about 6.0 seconds per step and 31,464
-MiB/card. These are engineering measurements rather than task-success
-evidence; the BS64 30K run processes twice as many samples as BS32 30K.
+旧 Cue 同时使用 teacher visual 和 action memory，容易依靠共享 noisy action 与
+flow time，而不是真正转移特权视觉信息。ACPD-v2 改为固定目标：teacher 每个
+视角通过真实 Q/K/V、完整 attention softmax、输出投影和 AdaRMS gate 对 action
+token 产生的残差贡献。agentview 与 wrist 分开预测，注入时相加。
 
-## Key Results
+H7/H7.1 只证明目标可恢复，不证明能提高任务成功率。H9 正在检验最终 hidden
+注入；H11 只改变部署位置，在 layer 10 attention 后、FFN 前注入，使后续网络
+继续处理预测 contribution。H11 的主要判据是相对同为 4 GPU、BS64 的 H9-scale-b
+在 step 4,999 提升至少 `1.5` 个 pooled 百分点，且配对 bootstrap 95% CI 下界
+大于 0。训练 loss、cosine 和 gate 只用于健康检查。
 
-Two backview 5090 smoke runs completed successfully. Job 126759 used global micro-batch 8 with four accumulation steps; job 126936 used physical global batch 32 with no accumulation. Both completed two optimizer steps with finite losses and nonzero selector, predictor, and LoRA gradients. Peak sampled GPU memory was 17,291 MiB/card and 17,337 MiB/card, respectively.
+## 工程约束
 
-The trainer-matched 2K component ablation does not support an early-convergence effect at the pre-registered 1% resolution. Relative to Flow-only, Cue-only changed the primary and final-window supervised losses by +0.80% and +0.98%, ACL-only by -0.31% and -0.63%, and Full ACPD by +0.11% and +0.16%. All four runs completed with physical batch 32 on two-device FSDP at about 31.4 GiB peak memory per card.
+- 训练一个 student view；不要在一个任务中放四组 teacher-student。
+- teacher 特征依赖 noisy action 和 flow time，不能预计算而不改变方法。
+- 4 GPU、physical BS64、accumulation 1 已运行，峰值 `31,464 MiB/卡`，显存余量很小。
+- H11 必须保持单次 student forward，不移动或复制 dataset、teacher、checkpoint。
+- 早期 supervised loss 不能筛选 ACPD 组件；最终决策使用同状态 benchmark 成功率。
 
-The 5K layer ablation also does not support the dual-layer hypothesis. Layer 6, layer 12, and layers 6+12 have primary losses of 0.040565, 0.040882, and 0.040682, respectively. Layer 6 is also best in the final window at 0.032250, versus 0.032570 and 0.032370. The matched 5K Flow-only policy achieved 89/2,000 successes (4.45% pooled), while Full ACPD achieved 130/2,000 (6.50%). The +2.05-point difference meets the pre-registered effect threshold; its task-stratified paired-bootstrap 95% confidence interval is [+0.90, +3.25] points.
+## 当前任务
 
-## Patterns and Insights
+| 实验 | Job | 状态 | 结论 |
+|---|---:|---|---|
+| H9 BS32 5K，最终 hidden 注入 | 129710 | 运行中 | 尚无结论。 |
+| H9-scale-b BS64 30K，最终 hidden 注入 | 129728 | 运行中 | 尚无结论。 |
+| H11 BS64 smoke，同层注入 | 129807 | 等待资源 | 尚无结论。 |
+| H11 BS64 30K，同层注入 | 129808 | 等待 smoke 成功 | 尚无结论。 |
 
-The paper method requires gradients through the cue selector while stopping gradients only through the student query and teacher features. Historical V6.4 is not paper-faithful because it stops gradients through the selected cue and omits the variance term.
-
-The exact Table 1 ACPD scores are reproduced by the old V6.3 `historical_sg` logs. That implementation deliberately stops the selected cue and omits the variance regularizer, unlike Equations 2-5 in the manuscript. The exact SFT scores come from the corresponding old full-parameter `libero_multiview` runs, not the current fixed dataset.
-
-Table 2 uses the joint-selector V6 implementation, but it is not a controlled ablation. The reported Cue-only A row is ungated, Cue+ACL A is gated, and Cue+ACL A+W is ungated. The manuscript does not define or disclose the teacher-reliability gate. Consequently, Table 2 is evidence that some V6 configurations performed above SFT, but its row differences cannot isolate the effects of ACL or the wrist view.
-
-The manuscript's learning-rate description also differs from the old launchers. Both SFT and ACPD inherit a 10K warmup to `5e-5`, followed by a schedule whose peak and final rates are both `5e-5`; it is constant after warmup rather than cosine-decayed. The current LoRA experiment uses a true 1K-warmup, 30K cosine decay from `2.5e-5` to `2.5e-6`. This is a deliberate LoRA engineering choice, not a reproduction of the manuscript schedule, and has not yet been tuned for ACPD.
-
-At 5K LoRA steps, single layer 6 has the lowest primary and final-window supervised losses. Layers 6+12 are 0.29% and 0.37% worse in those windows, so the extra head is not justified by early convergence. The cue prediction also becomes easy rapidly: its weighted loss falls from more than twice the flow loss at initialization to about 2% of the flow loss by step 4,900. This is compatible with either successful representation alignment or selector-predictor co-adaptation; loss values alone cannot distinguish them.
-
-The component test confirms that both auxiliary branches are active without establishing an optimization advantage. Cue-only retains nonzero selector and predictor gradients and reaches 0.996 cue cosine without variance collapse by step 1,900. ACL nearly doubles the mean LoRA gradient norm and slightly lowers action-correlation loss. Despite these changes, Full ACPD is nearly indistinguishable from Flow-only on supervised convergence. This is consistent with either weak opposing component effects or auxiliary changes that are not visible in the training-loss proxy.
-
-The teacher is better than the student on about 99.9% of sampled task-dimension flow targets during the 2K runs, with a primary-window MSE of 0.01595 versus about 0.229 for the student. Teacher reliability is therefore not the immediate bottleneck, and the historical reliability gate is not justified by this diagnostic. The next useful discriminator is task success from matched saved checkpoints, not a sweep over Cue and ACL weights.
-
-H5 shows that the full objective can improve task success even when supervised
-loss is insensitive. H8 isolates this gain: ACL-only is statistically better
-than Flow-only and indistinguishable from Full ACPD under the locked screening
-rule. The H5 result therefore does not provide evidence for the old Cue branch.
-
-The next cue branch replaces the learned or heuristic cue with the teacher's exact
-per-view attention residual: real Q/K/V projections, the full attention
-softmax, the action expert output projection, and the AdaRMS residual gate. A
-same-query control changes only one view's K/V tensors. This directly tests
-whether privileged visual information is predictable from backview, including
-the samples where the teacher has the largest flow-error advantage.
-
-H7 validates this target on 256 episode-held-out samples. Layer 9 has an
-overall correct-minus-shuffled cosine gap of 0.3417 (95% CI [0.3095, 0.3756]),
-a teacher-advantage hard-subset gap of 0.3194 ([0.2717, 0.3875]), and explained
-variance of 0.2822. Layer 12 also passes, but its overall gap is 0.2367; the
-0.1050 margin exceeds the pre-registered 0.02 rule, so H9 uses only layer 9.
-Layer 6 fails because its explained variance is -0.1468.
-
-H8 completed the missing component attribution. ACL-only reached 127/2,000
-successes (6.35%), compared with 89/2,000 (4.45%) for Flow-only and 130/2,000
-(6.50%) for Full ACPD. ACL-only improves over Flow-only by 1.90 points with a
-paired 95% CI of [+0.75, +3.10]. Full ACPD improves over ACL-only by only 0.15
-points with CI [-1.15, +1.40]. Under the locked 0.5-point rule, ACL explains
-the H5 gain at this screening resolution; the old Cue has no detected
-incremental pooled benefit.
-
-H7.1 completed the local layer scan under the unchanged H7 protocol. Layers
-7, 8, 10, and 11 all pass the recoverability gates. Layer 10 has the largest
-overall gap at 0.3992 (95% CI [0.3524, 0.4312]), hard gap 0.3779, and explained
-variance 0.3556. It exceeds runner-up layer 11 by 0.0485, so the combined
-layer-6-through-12 scan selects layer 10. This refutes layer 9 as the stable
-local recoverability optimum but does not measure policy success.
-
-## Lessons and Constraints
-
-- Train one student view per four-GPU job; do not place four teacher-student pairs in one allocation.
-- Effective batch size is `global micro-batch * gradient accumulation steps`.
-- Teacher visual and action features depend on the noisy action and flow time, so they cannot be fully precomputed without changing the method.
-- Main-table provenance must be corrected or rerun: V6.3 historical stop-gradient results cannot be described as the joint-selector, variance-regularized method.
-- Table 2 must use one gate policy across every row, or explicitly include the gate as an ablation factor.
-- The paper must report the schedule that produced its tables or rerun with the stated cosine schedule.
-- Early supervised-loss convergence is too insensitive to select ACPD components; use it for sanity checks and use benchmark success for method decisions.
-- A privileged target must be fixed independently of the predictor and compared
-  with a control that preserves noisy action and timestep; otherwise shared
-  action inputs can masquerade as transferred visual information.
-
-## Open Questions
-
-- Does checkpoint writing remain the dominant wall-clock cost at the configured save interval?
-- Does the teacher's strong early flow-target advantage persist later in training?
-- Does deploying the layer-10 exact-contribution predictor improve task success
-  beyond ACL-only at the same 5K budget?
-- Do the H9 scaling rates remain stable across checkpoint writes?
-
-## Optimization Trajectory
-
-The physical global batch 32 run is preferred because it uses the complete batch for the variance statistic and removes unnecessary accumulation steps. The sampled peak was about 16.9 GiB/card, leaving about 15.1 GiB before the nominal 32 GiB device limit.
-
-The dual-layer head is not justified by the completed early-loss comparison. Layer 6 is the preferred configuration for new experiments, while the existing layers 6+12 checkpoint remains the matched Full ACPD control for the pending task-success evaluation.
-
-H4 rules out supervised-loss weight tuning as the next step. H5 passes its
-task-success threshold. The matched H8 evaluation attributes that gain to ACL
-at the locked screening resolution; the old Cue should not be promoted without
-new evidence.
-
-The coarse H7 scan selected layer 9 before H7.1 selected layer 10 across layers
-6 through 12. H9 therefore tests only the best recoverable layer. It uses the
-H8 ACL weight, physical global batch 32 without accumulation, separate
-agentview and wrist contribution prediction, and a deployed gated residual.
-Task-success results are pending.
+H10 的 loss 权重校准保留，但在 H9/H11 选定注入结构后再做，避免同时改变结构和
+权重。
