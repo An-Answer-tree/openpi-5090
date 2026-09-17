@@ -88,15 +88,14 @@ Student 使用 layer 10 的 action hidden state。一个线性 predictor 为每�
 
 ### 3.4 两种注入位置
 
-| 项目 | H9：最终层后注入 | H11：layer 10 内注入 |
+| 项目 | 原方法：最终层后注入 | 新方法：layer 10 内注入 |
 |---|---|---|
 | Predictor 输入 | layer 10 action hidden state | layer 10 attention 之后、注入之前的 action hidden state |
-| 注入位置 | action expert 最后一层之后、`action_out_proj` 之前 | layer 10 attention 之后、FFN 之前 |
-| 后续计算 | 注入后直接由 `action_out_proj` 生成动作流 | 注入后继续经过 layer 10 FFN 和后续 action-expert 层 |
+| 注入位置 | action expert 最后一层之后、`action_out_proj` 之前 | layer 10 attention 之后、前馈网络（FFN）之前 |
+| 后续计算 | 注入后直接由 `action_out_proj` 生成动作流 | 注入后继续经过 layer 10 前馈网络和后续 action-expert 层 |
 | 设计目的 | 用最直接的方式将预测贡献加入最终动作表示 | 让后续网络继续整合在 layer 10 产生的特权信息 |
-| 实验角色 | H9-scale-b 控制组 | H11 实验组 |
 
-两种方法的 teacher target、predictor 结构、零初始化 gate、stop-gradient、FSDP4、physical BS64、seed、学习率和训练预算保持一致。H11 与新注入位置配套，改用 layer 10 attention 后的同层状态作为 predictor 输入。H11 目前已锁定实验协议，尚无实验结果。
+两种方法的 teacher target、predictor 结构、零初始化 gate、stop-gradient、FSDP4、physical BS64、seed、学习率和训练预算保持一致。新方法与注入位置配套，改用 layer 10 attention 后的同层状态作为 predictor 输入。目前已完成实验设计，尚无实验结果。
 
 ### 3.5 训练损失
 
