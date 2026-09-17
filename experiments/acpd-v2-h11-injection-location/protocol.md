@@ -2,8 +2,9 @@
 
 ## 问题
 
-ACPD-v2 当前在 action expert 最终 hidden 上加入预测的 teacher attention
-contribution。H11 检验：在产生目标的第 10 层内部注入，是否比最终层注入更有效。
+ACPD-v2 当前用第 10 层 block 输出预测 teacher attention contribution，再加到
+action expert 最终 hidden。H11 检验：在第 10 层 attention 输出上完成预测并立即
+注入，是否比最终层融合更有效。
 
 ## 假设
 
@@ -16,14 +17,16 @@ contribution。H11 检验：在产生目标的第 10 层内部注入，是否比
 |---|---|---|
 | Teacher target | layer 10 agentview、wrist exact contribution | 相同 |
 | Predictor | 两路独立预测后求和 | 相同 |
+| Predictor query | layer 10 block 输出 | layer 10 attention 输出、注入之前 |
 | 注入 | 最终 hidden、action head 之前 | layer 10 attention 后、FFN 前 |
 | Gate | 单个零初始化标量，`tanh` | 相同 |
 | 训练 | FSDP4，physical global BS64，accumulation 1 | 相同 |
 | 优化 | seed 42；1K warmup；`2.5e-5` 到 `2.5e-6` cosine | 相同 |
 | 预算 | 30K steps；每 5K 保存 | 相同 |
 
-H11 的 predictor query 使用第 10 层 attention 残差之后、注入之前的 action
-hidden。该位置是注入时能取得的同层状态，避免第二次 student forward。
+H11 同时前移 predictor query 和注入位置。该 query 是注入时能取得的同层状态；
+若继续使用 layer 10 block 输出，就必须先完成 FFN 再回到 FFN 前注入，形成因果
+循环或需要第二次 student forward。
 
 ## 实现约束
 
@@ -49,4 +52,3 @@ hidden。该位置是注入时能取得的同层状态，避免第二次 student
 
 不满足则不支持 H11。supervised loss、contribution cosine、gate 和显存只用于
 训练健康与机制分析，不替代任务成功率结论。
-

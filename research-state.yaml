@@ -85,7 +85,7 @@ hypotheses:
     parent: H9
     priority: medium
   - id: H11
-    statement: "Injecting the predicted layer-10 contribution after layer-10 attention and before its FFN improves 5K task success over final-hidden injection."
+    statement: "Predicting and injecting the contribution after layer-10 attention improves 5K task success over final-hidden fusion."
     status: queued
     motivation: "A contribution produced at layer 10 may be more useful when the remaining transformer computation can integrate it."
     parent: H9

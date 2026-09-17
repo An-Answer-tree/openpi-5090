@@ -22,9 +22,10 @@ flow time，而不是真正转移特权视觉信息。ACPD-v2 改为固定目标
 视角通过真实 Q/K/V、完整 attention softmax、输出投影和 AdaRMS gate 对 action
 token 产生的残差贡献。agentview 与 wrist 分开预测，注入时相加。
 
-H7/H7.1 只证明目标可恢复，不证明能提高任务成功率。H9 正在检验最终 hidden
-注入；H11 只改变部署位置，在 layer 10 attention 后、FFN 前注入，使后续网络
-继续处理预测 contribution。H11 的主要判据是相对同为 4 GPU、BS64 的 H9-scale-b
+H7/H7.1 只证明目标可恢复，不证明能提高任务成功率。H9 使用 layer 10 block
+输出预测，并在最终 hidden 注入。H11 将 query 和注入共同前移：使用 layer 10
+attention 输出预测，在该层 FFN 前注入，使后续网络继续处理 contribution。H11
+的主要判据是相对同为 4 GPU、BS64 的 H9-scale-b
 在 step 4,999 提升至少 `1.5` 个 pooled 百分点，且配对 bootstrap 95% CI 下界
 大于 0。训练 loss、cosine 和 gate 只用于健康检查。
 
