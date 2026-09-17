@@ -49,11 +49,11 @@
 
 结论：Full ACPD 优于 Flow-only，但提升主要由 ACL 解释。
 
-## 3. ACPD-v2 方法
+## 3. ACPD-v2 训练目标
 
-原 ACPD 的 cue 由 selector 和 predictor 共同学习，并且 selector 可以读取与 student 共享带噪动作和 flow time 的 teacher action tokens。ACPD-v2 将这一目标替换为 teacher attention 中可直接计算的固定视觉贡献。
+ACPD-v2 的训练目标是：让只观察 backview 的 student 恢复 teacher 中 agentview 和 wrist 对动作计算的视觉贡献，并利用这些贡献改善动作生成。
 
-### 3.1 问题定义
+### 3.1 Flow Matching 目标
 
 Teacher 使用特权视角 `agentview+wrist`，student 只使用 `backview`。两者接收相同的语言、机器人状态、带噪动作 $x_t$ 和 flow time $t$。Teacher 参数冻结，student 使用 LoRA 训练。
 
@@ -69,18 +69,20 @@ $$
 \mathcal{L}_{\mathrm{FM}}=\mathbb{E}\left[\lVert v_S(x_t,t)-u_t\rVert_2^2\right].
 $$
 
-### 3.2 提取 Teacher 的特权视觉贡献
+### 3.2 特权视觉贡献目标
 
-在 action expert 的第 $l$ 层，对每个 action query，分别提取 agentview 和 wrist 对 attention residual 的贡献：
+在 action expert 的第 $l$ 层，每个 action token 都会通过 attention 从图像 token 中读取信息。对于一个视角，将 action token 分配给该视角各图像 token 的 attention 权重乘以对应的 value 并求和，再经过该层原有的输出投影和门控，就得到这个视角实际加到 action token 上的信息向量。本文将该向量定义为该视角的视觉贡献：
 
 $$
 C_{l,i}^v=G_{l,i}\odot W_l^O\left(\sum_{j\in v}P_l(i,j)V_l(j)\right),
 \qquad v\in\{\mathrm{agent},\mathrm{wrist}\}.
 $$
 
-$i$ 表示 action token。$P_l$ 是 teacher 对全部有效 image、language 和 action key 计算的完整 softmax；视角内部不重新归一化。$W_l^O$ 和 $G_l$ 分别是 action expert 原有的 attention output projection 和 AdaRMS residual gate。因此，$C_l^v$ 是该视角在 teacher 原始 attention 计算中产生的真实加性 residual，而不是额外学习出的 cue。
+$i$ 表示第 $i$ 个 action token，$j$ 表示图像 token。$P_l(i,j)$ 是 action token $i$ 对图像 token $j$ 的 attention 权重，$V_l(j)$ 是图像 token $j$ 携带的信息。求和项表示 action token 从视角 $v$ 读取到的信息；$W_l^O$ 将其映射到 action hidden state 的空间，$G_{l,i}$ 决定该信息实际加入 action token 的强度。
 
-### 3.3 Student 预测并使用特权贡献
+因此，$C_{l,i}^v$ 不是 attention 分数，而是与 action hidden state 同维度、在 teacher 前向计算中实际加入 action token 的向量。训练 student 恢复该向量，就是让 student 根据 backview 推断 teacher 从 agentview 和 wrist 获得的动作相关信息。$P_l$ 仍由全部有效 token 共同计算 softmax，只在求和时按视角拆分，因此两个视角的贡献可以相加并还原其在原 attention 输出中的对应部分。
+
+### 3.3 特权贡献预测与注入
 
 Student 在同一层得到 backview action hidden state $h_l^S$。线性 predictor 分别预测两个不可见视角的贡献：
 
@@ -121,8 +123,6 @@ $$
 +0.2\mathcal{L}_{\mathrm{contrib}}
 +0.5\mathcal{L}_{\mathrm{ACL}}.
 $$
-
-ACPD-v2 不再学习原来的 teacher cue selector，也不再使用原 Cue 的 variance regularizer。
 
 ## 4. 蒸馏层选择
 
