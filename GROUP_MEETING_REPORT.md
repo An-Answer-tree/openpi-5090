@@ -7,7 +7,7 @@
 | 训练类型 | 最少可运行 GPU | 4 卡无梯度累积的已验证 BS | 实测依据 |
 |---|---:|---:|---|
 | SFT | 1 | 32 | LoRA 单卡可运行；4 卡 BS32 已稳定完成 60K steps。 |
-| 原始 ACPD 蒸馏 | 2 | 32 | 2 卡 BS32 已完成多组 2K/5K 实验；4 卡 BS32 峰值约 17.3 GiB/卡。 |
+| 原始 ACPD 蒸馏 | 2 | 32 | 2 卡 BS32 已完成多组 2K/5K 实验；4 卡 BS32 已通过训练测试。 |
 
 当前 ACPD-v2 比原始 ACPD 多计算真实 attention contribution。为降低单次计算压力，采用 4 卡、micro BS8、梯度累积 4 次，effective BS 仍为 32。
 
