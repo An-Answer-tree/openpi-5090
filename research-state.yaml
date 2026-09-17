@@ -49,23 +49,11 @@ hypotheses:
     motivation: "H4 shows active auxiliary gradients but indistinguishable supervised convergence, so task success is the next discriminating measurement. Promotion also requires the paired episode-bootstrap 95% confidence interval to exclude zero."
     parent: H4
     priority: high
-  - id: H6
-    statement: "A frozen backview student can predict teacher visual attention messages without teacher action-token shortcuts."
-    status: abandoned
-    motivation: "The current cue loss is solved through teacher action memory; a visual-only probe tests whether privileged visual information is recoverable before a new policy run."
-    parent: H5
-    priority: high
-  - id: H6.1
-    statement: "Layer 9 gives a larger correct-minus-shuffled cosine gap than layers 6 and 12 for the existing visual-message proxy."
-    status: abandoned
-    motivation: "The 18-layer action expert has no designated fusion layer, so a matched short scan tests whether middle-layer action semantics improve proxy recoverability."
-    parent: H6
-    priority: high
   - id: H7
     statement: "An adapted backview student can predict the teacher's exact per-view attention contribution on held-out episodes, especially where the privileged teacher has the largest flow-error advantage."
     status: supported
-    motivation: "The old learned cue and H6 proxy admit shortcuts; exact Q/K/V attention contributions provide a fixed privileged target and a same-query shuffled-view control."
-    parent: H6
+    motivation: "The old learned cue and heuristic visual proxy admit shortcuts; exact Q/K/V attention contributions provide a fixed privileged target and a same-query shuffled-view control."
+    parent: H5
     priority: high
   - id: H8
     statement: "ACL-only explains less than the complete +2.05-point H5 task-success gain at 5K steps."
@@ -79,12 +67,6 @@ hypotheses:
     motivation: "Deploy the layer-10 target selected by H7.1 using physical global batch 32, then compare its task success with the matched ACL-only baseline."
     parent: H7
     priority: high
-  - id: H9-scale-a
-    statement: "Layer-10 ACPD-v2 can train for 30K steps on two RTX 5090 GPUs with physical global batch 32 and no gradient accumulation."
-    status: stopped
-    motivation: "Measure the minimum practical GPU allocation for the H9 method without changing its effective batch size."
-    parent: H9
-    priority: medium
   - id: H9-scale-b
     statement: "Layer-10 ACPD-v2 can increase throughput on four RTX 5090 GPUs by using physical global batch 64 without gradient accumulation."
     status: active
@@ -97,6 +79,18 @@ hypotheses:
     motivation: "The coarse H7 scan cannot distinguish a robust middle-layer optimum from an isolated result; adding layers 7, 8, 10, and 11 completes the local comparison without another policy run."
     parent: H7
     priority: medium
+  - id: H10
+    statement: "Calibrate ACPD-v2 auxiliary-loss weights after selecting the injection structure."
+    status: deferred
+    motivation: "Weight comparisons are interpretable only after the deployed contribution path is fixed."
+    parent: H9
+    priority: medium
+  - id: H11
+    statement: "Injecting the predicted layer-10 contribution after layer-10 attention and before its FFN improves 5K task success over final-hidden injection."
+    status: planned
+    motivation: "A contribution produced at layer 10 may be more useful when the remaining transformer computation can integrate it."
+    parent: H9
+    priority: high
 
 experiments:
   proxy_metric: "Two finite optimizer steps with nonzero selector gradients and peak GPU memory below 32 GB."
@@ -121,14 +115,14 @@ current_execution:
   h8_evaluation: "job 128421 completed 2,000 episodes; pooled success 6.35%; ACL-only is within 0.15 points of Full ACPD"
   h9_training: "layer-10 physical-BS32 job 129710 passed four finite optimizer steps on four GPUs without OOM; peak sampled memory 17,402 MiB/card; no task-success result"
   h9_evaluation: "job 129711 waits on afterok:129710 and will evaluate 2,000 paired episodes"
-  h9_scale_a: "two-device physical-BS32 job 129727 was healthy through step 83 at 12.0--12.6 seconds/step and 31,388 MiB/card, then stopped by operator decision; no checkpoint or task-success result"
   h9_scale_b: "four-device physical-BS64 job 129728 reached step 100 at about 6.0 seconds/step and 31,464 MiB/card; no task-success result"
   h7_layer_scan: "job 128789 completed; layer 10 selected over runner-up layer 11 by 0.0485 overall cosine gap"
+  h11: "protocol locked; implementation and smoke test pending"
 
 outer_loop:
-  cycle: 12
-  last_direction: "continue the 5K H9 efficacy screen and the four-device BS64 throughput run; retire the slower two-device BS32 run"
-  last_reflection: "Two-device BS32 is feasible but about 1.45 times slower per optimizer step than four-device BS32. Four-device BS64 is the fastest measured configuration, but its 30K sample budget is twice that of BS32."
+  cycle: 13
+  last_direction: "test whether matched layer-10 injection improves ACPD-v2 over final-hidden injection under the same four-device BS64 protocol"
+  last_reflection: "H7.1 identifies a recoverable layer-10 target, but H9 injects it only at the final hidden state. H11 isolates whether allowing the remaining transformer computation to integrate the predicted contribution improves policy success."
 
 workspace:
   results: "EXPERIMENT_RESULTS.md"
