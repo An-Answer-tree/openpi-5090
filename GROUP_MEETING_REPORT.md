@@ -21,6 +21,8 @@
 
 ### 1.3 SFT 训练步数对比
 
+基于 1.2 的训练结果，后续 SFT 统一采用 cosine 学习率设置。
+
 共同设置：4 卡 FSDP LoRA、global BS32、cosine 学习率。每个 checkpoint 在四套 LIBERO benchmark 上共验证 2,000 episodes。
 
 | Checkpoint | 平均成功率 |
