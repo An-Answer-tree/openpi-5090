@@ -13,7 +13,13 @@
 
 实测训练时间：SFT 4 卡 BS32 训练 30K 约 16 小时；ACPD 蒸馏 2 卡 BS32 训练 5K 约 4.5 至 9 小时。
 
-### 1.2 SFT 训练步数对比
+### 1.2 SFT 训练 Loss 对比
+
+![pi0.5 backview LoRA 训练 Loss 对比](artifacts/pi05_backview_lora_loss.png)
+
+左图按优化步数比较，右图按已处理样本数比较。4 卡 BS32 使用 cosine 学习率时收敛更快，30K loss 为 0.0222，低于相同 BS 的默认学习率 0.0261；按样本数对齐后仍保持最低，说明差异不只是每步处理样本更多。训练 loss 只反映优化过程，模型效果仍以任务成功率为准。
+
+### 1.3 SFT 训练步数对比
 
 共同设置：4 卡 FSDP LoRA、global BS32、cosine 学习率。每个 checkpoint 在四套 LIBERO benchmark 上共验证 2,000 episodes。
 
