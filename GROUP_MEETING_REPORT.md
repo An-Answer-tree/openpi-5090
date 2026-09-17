@@ -1,6 +1,8 @@
-# 5090 训练基础设施与 SFT 基线
+# ACPD 蒸馏实验组会报告
 
-## 训练能力
+## 5090 训练基础设施与 SFT 基线
+
+### 训练能力
 
 以下均为 pi0.5 LoRA 的实测配置。BS 表示全局 batch size。
 
@@ -11,7 +13,7 @@
 
 实测训练时间：SFT 4 卡 BS32 训练 30K 约 16 小时；ACPD 蒸馏 2 卡 BS32 训练 5K 约 4.5 至 9 小时。
 
-## BS32 的 SFT 结果
+### BS32 的 SFT 结果
 
 共同设置：4 卡 FSDP LoRA、global BS32、cosine 学习率。每个 checkpoint 在四套 LIBERO benchmark 上共验证 2,000 episodes。
 
