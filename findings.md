@@ -9,6 +9,12 @@ pi0.5 student?
 
 The student can use the repository's existing pi0.5 LoRA variants. LoRA reduces student gradient and optimizer memory, but the frozen full teacher and ACPD auxiliary heads remain resident. The stable configuration combines FSDP4, rematerialization, no EMA, and a physical global batch of 32.
 
+The layer-10 ACPD-v2 policy also passes the physical-global-batch-32 runtime
+gate on four RTX 5090 GPUs without gradient accumulation. Its first four
+optimizer steps are finite with nonzero LoRA, predictor, and residual-gate
+gradients; peak sampled memory is 17,402 MiB per card. This establishes runtime
+feasibility, not task-success efficacy.
+
 ## Key Results
 
 Two backview 5090 smoke runs completed successfully. Job 126759 used global micro-batch 8 with four accumulation steps; job 126936 used physical global batch 32 with no accumulation. Both completed two optimizer steps with finite losses and nonzero selector, predictor, and LoRA gradients. Peak sampled GPU memory was 17,291 MiB/card and 17,337 MiB/card, respectively.
@@ -84,10 +90,8 @@ local recoverability optimum but does not measure policy success.
 
 - Does checkpoint writing remain the dominant wall-clock cost at the configured save interval?
 - Does the teacher's strong early flow-target advantage persist later in training?
-- Does deploying the layer-9 exact-contribution predictor improve task success
+- Does deploying the layer-10 exact-contribution predictor improve task success
   beyond ACL-only at the same 5K budget?
-- Does changing only the deployed target from layer 9 to the better-recovered
-  layer 10 improve 5K policy success?
 
 ## Optimization Trajectory
 
@@ -101,7 +105,7 @@ at the locked screening resolution; the old Cue should not be promoted without
 new evidence.
 
 The coarse H7 scan selected layer 9 before H7.1 selected layer 10 across layers
-6 through 12. H9 and H9.1 therefore run a matched 5K policy comparison: both
-use the H8 ACL weight, effective batch size 32, separate agentview and wrist
-contribution prediction, and a deployed gated residual; only the selected
-action-expert layer changes from 9 to 10. Task-success results are pending.
+6 through 12. H9 therefore tests only the best recoverable layer. It uses the
+H8 ACL weight, physical global batch 32 without accumulation, separate
+agentview and wrist contribution prediction, and a deployed gated residual.
+Task-success results are pending.

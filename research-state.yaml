@@ -76,14 +76,8 @@ hypotheses:
   - id: H9
     statement: "A recoverability-gated ACPD-v2 policy improves pooled 5K task success over ACL-only by at least 1.5 percentage points with a positive paired confidence bound."
     status: active
-    motivation: "Use H7 to choose one fixed privileged target when it is recoverable; otherwise transfer privileged teacher advantage through sample weighting instead of forcing hidden-feature matching."
+    motivation: "Deploy the layer-10 target selected by H7.1 using physical global batch 32, then compare its task success with the matched ACL-only baseline."
     parent: H7
-    priority: high
-  - id: H9.1
-    statement: "Layer-10 exact-contribution ACPD-v2 improves pooled 5K task success over layer 9 under a matched policy-training protocol."
-    status: active
-    motivation: "H7.1 selects layer 10 over layer 9 by the pre-registered recoverability margin; a matched policy run tests whether that representation result transfers to task success."
-    parent: H9
     priority: high
   - id: H7.1
     statement: "Layer 9 remains the best recoverable layer when every action-expert layer from 6 through 12 is compared under the fixed H7 protocol."
@@ -110,19 +104,17 @@ experiments:
       status: completed
 
 current_execution:
-  checked_at: "2026-09-17 10:42 CST"
+  checked_at: "2026-09-17 12:12 CST"
   h8_training: "job 128417 completed; step-4999 params and assets saved"
   h8_evaluation: "job 128421 completed 2,000 episodes; pooled success 6.35%; ACL-only is within 0.15 points of Full ACPD"
-  h9_training: "job 129524 is healthy near step 196 on four GPUs; finish watcher 129525 will submit evaluation and stop training after checkpoint 4999 finalizes"
-  h9_evaluation: "finish watcher job 129525 is running without a GPU allocation; no task-success result"
-  h9_1_training: "layer-10 job 129526 is healthy near step 196 on four GPUs; configuration matches H9 except align layer and 5K termination"
-  h9_1_evaluation: "job 129527 waits on afterok:129526 and will evaluate 2,000 paired episodes"
+  h9_training: "layer-10 physical-BS32 job 129710 passed four finite optimizer steps on four GPUs without OOM; peak sampled memory 17,402 MiB/card; no task-success result"
+  h9_evaluation: "job 129711 waits on afterok:129710 and will evaluate 2,000 paired episodes"
   h7_layer_scan: "job 128789 completed; layer 10 selected over runner-up layer 11 by 0.0485 overall cosine gap"
 
 outer_loop:
-  cycle: 10
-  last_direction: "stop H9 after its locked 5K screen and run a matched 5K layer-10 H9.1 comparison"
-  last_reflection: "H8 shows that ACL explains the old H5 gain. H7.1 selects layer 10 for recoverability, so H9 and H9.1 now isolate whether deployed exact-contribution transfer works and whether the recoverability ranking predicts policy success."
+  cycle: 11
+  last_direction: "test only the H7.1-selected layer 10 with physical global batch 32 and no gradient accumulation"
+  last_reflection: "The micro-batch-8 runs made each optimizer update execute four teacher/student micro-steps. H9 now preserves effective batch 32 while using one physical batch and tests the selected layer directly against ACL-only."
 
 workspace:
   results: "EXPERIMENT_RESULTS.md"

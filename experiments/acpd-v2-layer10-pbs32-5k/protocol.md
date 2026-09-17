@@ -1,4 +1,4 @@
-# H10 Protocol: Layer-10 ACPD-v2 Physical-BS32 Screen
+# H9 Protocol: Layer-10 ACPD-v2 Physical-BS32 Screen
 
 ## Question
 
@@ -37,6 +37,6 @@ task-stratified bootstrap samples.
 
 ## Decision
 
-H10 passes only if pooled success exceeds H8 ACL-only by at least 1.5
+H9 passes only if pooled success exceeds H8 ACL-only by at least 1.5
 percentage points and the paired 95% confidence interval excludes zero. This is
 a single-seed 5K screen; a positive result requires repeated-seed confirmation.
