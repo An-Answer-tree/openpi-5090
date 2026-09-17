@@ -30,12 +30,16 @@ configuration unsupported and do not infer task success.
 
 ## Time Estimate
 
-The current four-device BS32 H9 run is about 8--10 seconds per optimizer step
-after compilation. Both scaling runs use local BS16, so the initial estimate is
-12--16 seconds per step:
+The four-device BS64 run reached step 100 at about 6.0 seconds per optimizer
+step and 31,464 MiB peak sampled memory per card. This gives about 10.7
+samples/second and an initial 30K estimate of 50 hours plus checkpoint writes.
+The four-device BS32 reference was 8.1--8.6 seconds per step before the BS64
+job started on the same node, or about 3.8 samples/second.
 
-- H9-scale-a: about 100--135 hours (4.2--5.6 days), plus checkpoint overhead;
-- H9-scale-b: about 100--145 hours (4.2--6.0 days), with more FSDP communication
-  but twice the samples per step.
+H9-scale-a is preliminary at step 42: 12.1--12.8 seconds per step and 31,388
+MiB peak sampled memory per card. Its synchronized step-100 measurement is
+still pending.
 
-These are estimates. Measurements after the first 100 steps replace them.
+At 30K optimizer steps, BS64 processes 1.92 million samples while BS32
+processes 0.96 million. For an equal 0.96-million-sample budget, BS64 would use
+15K steps and take about 25 hours before checkpoint overhead.

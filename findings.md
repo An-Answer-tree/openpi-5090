@@ -15,6 +15,14 @@ optimizer steps are finite with nonzero LoRA, predictor, and residual-gate
 gradients; peak sampled memory is 17,402 MiB per card. This establishes runtime
 feasibility, not task-success efficacy.
 
+The H9 scaling branches also pass their first optimizer step. H9-scale-a uses
+two GPUs with physical global batch 32; H9-scale-b uses four GPUs with physical
+global batch 64. Their local batch is 16 per GPU. H9-scale-b reached step 100
+at about 6.0 seconds per step and 31,464 MiB peak sampled memory per card. The
+four-GPU BS32 reference was 8.1--8.6 seconds per step before the concurrent
+BS64 job started. This is an engineering measurement rather than task-success
+evidence; the two 30K scaling runs process different numbers of samples.
+
 ## Key Results
 
 Two backview 5090 smoke runs completed successfully. Job 126759 used global micro-batch 8 with four accumulation steps; job 126936 used physical global batch 32 with no accumulation. Both completed two optimizer steps with finite losses and nonzero selector, predictor, and LoRA gradients. Peak sampled GPU memory was 17,291 MiB/card and 17,337 MiB/card, respectively.
@@ -92,6 +100,7 @@ local recoverability optimum but does not measure policy success.
 - Does the teacher's strong early flow-target advantage persist later in training?
 - Does deploying the layer-10 exact-contribution predictor improve task success
   beyond ACL-only at the same 5K budget?
+- Do the H9 scaling rates remain stable across checkpoint writes?
 
 ## Optimization Trajectory
 

@@ -39,6 +39,8 @@
 | H7 | 精确 attention contribution 是否可恢复，并进行粗粒度选层 | layer 6/9/12；256 个 held-out 样本；3 个 probe seeds | 完成 | 支持可恢复性；粗粒度扫描选择 layer 9。 |
 | H8 | ACL-only 能否解释 H5 提升 | FSDP2，global BS32，5K，seed 42；2,000 episodes | 完成 | 支持。ACL-only 为 `6.35%`，与 Full 的 `6.50%` 相差 `0.15` 点，配对 95% CI `[-1.15, 1.40]`。 |
 | H9 | 部署式 ACPD-v2 是否优于 H8 | layer 10 exact contribution；FSDP4，physical global BS32，无梯度累积；5K | 运行中 | 尚无结论。 |
+| H9-scale-a | 2 卡能否用 physical BS32 训练 ACPD-v2 | layer 10；FSDP2，physical global BS32，无梯度累积；30K | 运行中 | 已通过首步运行门槛；尚无结论。 |
+| H9-scale-b | 4 卡 BS64 能否提高 ACPD-v2 吞吐 | layer 10；FSDP4，physical global BS64，无梯度累积；30K | 运行中 | 已通过首步运行门槛；尚无结论。 |
 | H7.1 | layer 9 是否为稳定的局部最优层 | 固定 H7 协议；补测 layer 7/8/10/11；2 GPU | 完成 | 不支持。layer 10 的 overall gap 为 `0.3992`，按预注册规则改选 layer 10。 |
 
 ## SFT 训练
@@ -143,8 +145,10 @@ Teacher target 是每个视角对 action attention 的真实残差贡献：使�
 | H8 四套验证 | 4 GPU，2,000 episodes | 128421 | 完成；`127/2,000`，pooled `6.35%` |
 | H9 layer-10 训练 | FSDP4，physical global BS32，无梯度累积，5K | 129710 | 运行中；已通过运行门槛，尚无任务成功率结论 |
 | H9 layer-10 验证 | 4 GPU，2,000 episodes，依赖 H9 训练成功 | 129711 | 等待依赖 |
+| H9-scale-a | FSDP2，physical global BS32，无梯度累积，30K | 129727 | 运行中；已通过首步运行门槛，尚无任务成功率结论 |
+| H9-scale-b | FSDP4，physical global BS64，无梯度累积，30K | 129728 | 运行中；step 100 约 `6.0 s/step`，峰值 `31,464 MiB/卡`；尚无任务成功率结论 |
 
-H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success 比 H8 高至少 `1.5` 个百分点，且配对 bootstrap 95% CI 下界大于 0。
+H9 的 5K 筛选不包含重复 seed 或其他学生视角。通过标准为 pooled success 比 H8 高至少 `1.5` 个百分点，且配对 bootstrap 95% CI 下界大于 0。H9-scale-a/b 只测运行效率；两者 30K 的样本预算不同，不能作为受控效果比较。
 
 ### H8 结果
 
@@ -183,6 +187,9 @@ H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success �
 | H8 Full/ACL 配对分析 | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/full_vs_acl_paired_analysis.json` |
 | H9 协议 | `experiments/acpd-v2-layer10-pbs32-5k/protocol.md` |
 | H9 layer-10 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-pbs32-5k_129710.out`（运行中） |
+| H9 batch-scaling 协议 | `experiments/acpd-v2-h9-batch-scaling-30k/protocol.md` |
+| H9-scale-a 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-fsdp2-bs32-30k_129727.out`（运行中） |
+| H9-scale-b 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-fsdp4-bs64-30k_129728.out`（运行中） |
 
 ## Checkpoint 路径检索
 
@@ -204,6 +211,8 @@ H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success �
 | Flow-only，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/task_success_5k/pi05_libero_backview_flow_only_5k/pi05_libero_backview_lora_fsdp2_bs32_5k/4999` |
 | H8 ACL-only，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/task_success_5k/pi05_libero_backview_acl_only_5k/pi05_libero_backview_acpd_lora_fsdp2_bs32_5k/4999` |
 | H9 ACPD-v2 layer 10，5K（预期，尚未生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/task_success_5k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_pbs32_5k/4999` |
+| H9-scale-a，2 卡 BS32 30K（预期，尚未生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_lora_fsdp2_bs32_30k/29999` |
+| H9-scale-b，4 卡 BS64 30K（预期，尚未生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/29999` |
 | H4 组件消融，2K | 按协议不保存 checkpoint |
 
 ## 验证结果路径检索
