@@ -80,17 +80,25 @@ Teacher 仍按原始 pi0.5 完成前向计算，不改变 action expert 的结�
 
 这两个向量与 action token 的 hidden state 维度相同，分别表示该层最终写入 action token 的 agentview 信息和 wrist 信息，而不是两张 attention 权重图。Teacher 参数冻结，student 只看 backview，并学习预测这两个固定向量。
 
-### 3.3 Student 如何预测并注入
+### 3.3 Student 如何预测贡献
 
-数据流：layer 10 action hidden state → predictor → agentview 和 wrist 两份贡献 → 求和并经过 gate → 最终 action hidden state → `action_out_proj`。
+Student 使用 layer 10 的 action hidden state。一个线性 predictor 为每个 action token 输出两份同形状向量，分别预测 agentview 和 wrist 的贡献。两个视角分别计算归一化 MSE，避免某个视角仅因向量幅值较大而主导训练。
 
-Student 取 layer 10 的 action hidden state，形状为 `[batch, action horizon, hidden dim]`。一个线性 predictor 为每个 action token 输出两份同形状向量，分别预测 agentview 和 wrist 的贡献。两个视角分别计算归一化 MSE，避免某个视角仅因向量幅值较大而主导训练。
+两份预测贡献相加后，经过一个从 0 初始化的标量 gate。Contribution 在注入路径上使用 stop-gradient，因此 predictor 只由 contribution loss 监督；Flow matching 和 ACL 通过动作预测学习 gate 应该使用多大强度。推理时移除 teacher，保留 student、predictor 和 gate。
 
-注入发生在 action expert 最后一层之后、`action_out_proj` 之前：先将两份预测贡献相加，再乘以一个可学习的标量 gate，最后加到 student 的最终 action hidden state。`action_out_proj` 随后将合并后的 hidden state 转换为动作流预测。
+### 3.4 两种注入位置
 
-Gate 从 0 初始化，因此训练开始时模型与原 student 完全相同。Flow matching 和 ACL 通过动作预测学习 gate 应该使用多大强度；stop-gradient 阻止这两项损失通过注入分支修改 predictor，predictor 只由 contribution loss 监督。推理时移除 teacher，保留 student、predictor 和 gate。
+| 项目 | H9：最终层后注入 | H11：layer 10 内注入 |
+|---|---|---|
+| Predictor 输入 | layer 10 action hidden state | layer 10 attention 之后、注入之前的 action hidden state |
+| 注入位置 | action expert 最后一层之后、`action_out_proj` 之前 | layer 10 attention 之后、FFN 之前 |
+| 后续计算 | 注入后直接由 `action_out_proj` 生成动作流 | 注入后继续经过 layer 10 FFN 和后续 action-expert 层 |
+| 设计目的 | 用最直接的方式将预测贡献加入最终动作表示 | 让后续网络继续整合在 layer 10 产生的特权信息 |
+| 实验角色 | H9-scale-b 控制组 | H11 实验组 |
 
-### 3.4 训练损失
+两种方法的 teacher target、predictor 结构、零初始化 gate、stop-gradient、FSDP4、physical BS64、seed、学习率和训练预算保持一致。H11 与新注入位置配套，改用 layer 10 attention 后的同层状态作为 predictor 输入。H11 目前已锁定实验协议，尚无实验结果。
+
+### 3.5 训练损失
 
 | 损失 | 权重 | 作用 |
 |---|---:|---|
