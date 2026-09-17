@@ -75,5 +75,6 @@ python -m scripts.distillation_acpd.train_distill \
   --log-interval=100 \
   --save-interval=5000 \
   --keep-period=1 \
+  --resume \
   --fsdp-devices=4 \
   --no-wandb-enabled

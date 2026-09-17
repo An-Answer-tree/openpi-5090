@@ -10,6 +10,8 @@
 
 set -euo pipefail
 
+training_job_id="${1:?Usage: sbatch $0 TRAINING_JOB_ID}"
+
 mkdir -p /home/liutong/Projects/openpi-5090/slurm-log
 
 until [[ -f "/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/task_success_30k/pi05_libero_backview_acpd_v2_layer9/pi05_libero_backview_acpd_v2_lora_fsdp4_mbs8_acc4_bs32_30k/4999/_CHECKPOINT_METADATA" && \
@@ -19,5 +21,5 @@ until [[ -f "/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/
 done
 
 evaluation_job_id=$(sbatch --parsable /home/liutong/Projects/openpi-5090/examples/libero/eval_slurm/pi05_libero_backview_acpd_v2_layer9_fsdp4_bs32_5k.sbatch)
-echo "Submitted layer-9 evaluation job ${evaluation_job_id}; stopping training job 128769."
-scancel 128769
+echo "Submitted layer-9 evaluation job ${evaluation_job_id}; stopping training job ${training_job_id}."
+scancel "${training_job_id}"
