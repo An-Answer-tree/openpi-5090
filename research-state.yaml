@@ -110,12 +110,12 @@ experiments:
       status: completed
 
 current_execution:
-  checked_at: "2026-09-17 09:56 CST"
+  checked_at: "2026-09-17 10:42 CST"
   h8_training: "job 128417 completed; step-4999 params and assets saved"
   h8_evaluation: "job 128421 completed 2,000 episodes; pooled success 6.35%; ACL-only is within 0.15 points of Full ACPD"
-  h9_training: "job 129524 is running on four GPUs; finish watcher 129525 will submit evaluation and stop training after checkpoint 4999 finalizes"
+  h9_training: "job 129524 is healthy near step 196 on four GPUs; finish watcher 129525 will submit evaluation and stop training after checkpoint 4999 finalizes"
   h9_evaluation: "finish watcher job 129525 is running without a GPU allocation; no task-success result"
-  h9_1_training: "layer-10 job 129526 is running on four GPUs; configuration matches H9 except align layer and 5K termination"
+  h9_1_training: "layer-10 job 129526 is healthy near step 196 on four GPUs; configuration matches H9 except align layer and 5K termination"
   h9_1_evaluation: "job 129527 waits on afterok:129526 and will evaluate 2,000 paired episodes"
   h7_layer_scan: "job 128789 completed; layer 10 selected over runner-up layer 11 by 0.0485 overall cosine gap"
 

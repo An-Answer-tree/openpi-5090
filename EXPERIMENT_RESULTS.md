@@ -36,8 +36,6 @@
 | H3 | layer 6+12 是否优于单层 | FSDP2，global BS32，5K，seed 42 | 完成 | 不支持。layer 6 的训练 loss 最低；三组差异小于 1%，不能推断成功率。 |
 | H4 | Cue 或 ACL 是否改善早期收敛 | Flow、Cue、ACL、Full；FSDP2，global BS32，2K | 完成 | 不支持。相对 Flow 的差异均未达到预设 1% 阈值。 |
 | H5 | Full ACPD 是否优于 Flow-only | 相同 5K 预算；四套共 2,000 episodes | 完成 | 支持。`6.50%` 对 `4.45%`，提升 `2.05` 点，配对 95% CI `[0.90, 3.25]` 点。 |
-| H6 | 启发式 visual-message 是否可恢复 | 原计划 500-step probe | 已取消 | target 近似全局视觉平均，shuffle 对照无效；任务在首批数据前取消，无实验结果。 |
-| H6.1 | 在无效 proxy 上比较 layer 6/9/12 | 原计划三层短实验 | 未运行 | 父实验设计无效，不产生层选择结论。 |
 | H7 | 精确 attention contribution 是否可恢复，并进行粗粒度选层 | layer 6/9/12；256 个 held-out 样本；3 个 probe seeds | 完成 | 支持可恢复性；粗粒度扫描选择 layer 9。 |
 | H8 | ACL-only 能否解释 H5 提升 | FSDP2，global BS32，5K，seed 42；2,000 episodes | 完成 | 支持。ACL-only 为 `6.35%`，与 Full 的 `6.50%` 相差 `0.15` 点，配对 95% CI `[-1.15, 1.40]`。 |
 | H9 | 部署式 ACPD-v2 是否优于 H8 | layer 9 exact contribution；FSDP4，micro BS8×accumulation 4；5K | 运行中 | 尚无结论；checkpoint 4,999 完整保存后停止。 |
@@ -104,12 +102,10 @@
 
 结论：H5 通过。Full ACPD 提升 `2.05` 个百分点，达到预设 2 点门槛；按任务分层的配对 bootstrap 95% CI 为 `[0.90%, 3.25%]`，下界大于 0。该结果只证明单 seed、5K 筛选有效，不替代重复 seed 和完整训练。
 
-## H6/H7：特权视觉信息可恢复性
+## H7：特权视觉信息可恢复性
 
 | 实验 | 状态 | 结论 |
 |---|---|---|
-| H6 启发式 visual-message probe | 废弃 | target 近似全局视觉平均，shuffle 对照也不正确，未产生有效结果。 |
-| H6.1 启发式 layer 6/9/12 scan | 废弃 | H6 proxy 无效，因此未运行三层比较，也没有层选择结果。 |
 | H7 精确 attention contribution probe | 完成 | layer 9 和 12 通过；layer 9 相对 layer 12 的 overall gap 优势为 `0.1050`，超过预注册 `0.02` 门槛，按协议选择 layer 9。 |
 | H7.1 layer 7/8/10/11 补充扫描 | 完成 | layer 10 在 layer 6–12 中最高，并以 `0.0485` 优势超过次优 layer 11，按协议改选 layer 10。 |
 
@@ -194,6 +190,8 @@ H9 不包含重复 seed 或其他学生视角。通过标准为 pooled success �
 | H9.1 layer-10 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-5k_129526.out`（运行中） |
 
 ## Checkpoint 路径检索
+
+保留全部完整 SFT checkpoint 和 ACPD checkpoint。下表只列已验证模型、当前研究对照和在途实验的关键检索点；未列出的 SFT 中间 checkpoint 仍保留在原目录。
 
 | 模型 | Checkpoint 路径 |
 |---|---|

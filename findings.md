@@ -33,14 +33,6 @@ The component test confirms that both auxiliary branches are active without esta
 
 The teacher is better than the student on about 99.9% of sampled task-dimension flow targets during the 2K runs, with a primary-window MSE of 0.01595 versus about 0.229 for the student. Teacher reliability is therefore not the immediate bottleneck, and the historical reliability gate is not justified by this diagnostic. The next useful discriminator is task success from matched saved checkpoints, not a sweep over Cue and ACL weights.
 
-The H6 visual-message proxy is not a valid transformer attention contribution.
-It compares teacher action hidden states with unprojected SigLIP tokens, then
-divides already normalized dot products by `sqrt(1024)`. The resulting softmax
-is nearly uniform, so the target is close to a global visual average. Rolling
-the complete target also changes its action-conditioned component. Job 127810
-was cancelled before its first batch after this design audit; no H6 result is
-claimed.
-
 H5 shows that the full objective can improve task success even when supervised
 loss is insensitive. H8 isolates this gain: ACL-only is statistically better
 than Flow-only and indistinguishable from Full ACPD under the locked screening
@@ -83,7 +75,6 @@ local recoverability optimum but does not measure policy success.
 - Main-table provenance must be corrected or rerun: V6.3 historical stop-gradient results cannot be described as the joint-selector, variance-regularized method.
 - Table 2 must use one gate policy across every row, or explicitly include the gate as an ablation factor.
 - The paper must report the schedule that produced its tables or rerun with the stated cosine schedule.
-- gpu03 has a lost physical GPU and unreliable GPU isolation; ACPD jobs must exclude that node. This is an infrastructure failure, not evidence about the method or batch-size feasibility.
 - Early supervised-loss convergence is too insensitive to select ACPD components; use it for sanity checks and use benchmark success for method decisions.
 - A privileged target must be fixed independently of the predictor and compared
   with a control that preserves noisy action and timestep; otherwise shared
@@ -109,22 +100,8 @@ task-success threshold. The matched H8 evaluation attributes that gain to ACL
 at the locked screening resolution; the old Cue should not be promoted without
 new evidence.
 
-The coarse H7 scan selected layer 9 and locked H9 before H7.1 ran. H7.1 later
-selected layer 10 across layers 6 through 12. The current H9 remains a valid
-pre-registered layer-9 test; layer 10 is the preferred target only for a future
-matched experiment if the deployed mechanism first demonstrates task value.
-
-The selected H9 mechanism uses the same ACL weight and effective batch size as
-H8, predicts agentview and wrist contributions separately from the student's
-layer-9 action tokens, and retains the gated residual during evaluation. Its
-first submission, job 128513, reached data initialization and base-weight
-restore but failed before step 0: the model graph containing the new exact
-contribution head did not match the FSDP output-sharding graph metadata. This
-is an implementation failure, not an OOM or method result. The mismatch was
-isolated to a freshly created kernel-initializer closure in NNX graph metadata;
-the initializer now has stable identity and the regression suite passes. Job
-128769 retains its unchanged first 5K updates, but the exploratory continuation
-to 30K has been removed after H7.1 and before any H9 task-success result. It
-will stop after checkpoint 4,999 finalizes. H9.1 changes only the deployed
-exact-contribution layer from 9 to 10 and uses the same 5K training and
-evaluation protocol.
+The coarse H7 scan selected layer 9 before H7.1 selected layer 10 across layers
+6 through 12. H9 and H9.1 therefore run a matched 5K policy comparison: both
+use the H8 ACL weight, effective batch size 32, separate agentview and wrist
+contribution prediction, and a deployed gated residual; only the selected
+action-expert layer changes from 9 to 10. Task-success results are pending.
