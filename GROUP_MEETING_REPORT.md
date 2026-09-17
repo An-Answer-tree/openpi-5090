@@ -47,7 +47,7 @@
 | ACL-only | 6.35% | 比 Flow 高 1.90 点，95% CI `[0.75, 3.10]`。 |
 | Full ACPD | 6.50% | 比 ACL-only 高 0.15 点，95% CI `[-1.15, 1.40]`。 |
 
-结论：Full ACPD 优于 Flow-only，但提升主要由 ACL 解释；没有检测到原 Cue 的额外收益。
+结论：Full ACPD 优于 Flow-only，但提升主要由 ACL 解释。
 
 ## 3. 特权 Cue 改进
 
@@ -77,5 +77,5 @@
 
 1. 5090 已能稳定完成 pi0.5 LoRA SFT 和 ACPD 蒸馏，BS32 足够使用。
 2. cosine SFT 的最佳 checkpoint 是 50K，pooled success 为 57.05%。
-3. 原始 ACPD 的 5K 提升主要来自 ACL，没有证据支持原 Cue。
+3. 原始 ACPD 的 5K 提升主要来自 ACL。
 4. layer 10 的特权 attention contribution 最容易恢复，其任务效果仍在验证。
