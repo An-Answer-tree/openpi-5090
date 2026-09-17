@@ -15,13 +15,13 @@ optimizer steps are finite with nonzero LoRA, predictor, and residual-gate
 gradients; peak sampled memory is 17,402 MiB per card. This establishes runtime
 feasibility, not task-success efficacy.
 
-The H9 scaling branches also pass their first optimizer step. H9-scale-a uses
-two GPUs with physical global batch 32; H9-scale-b uses four GPUs with physical
-global batch 64. Their local batch is 16 per GPU. H9-scale-b reached step 100
-at about 6.0 seconds per step and 31,464 MiB peak sampled memory per card. The
-four-GPU BS32 reference was 8.1--8.6 seconds per step before the concurrent
-BS64 job started. This is an engineering measurement rather than task-success
-evidence; the two 30K scaling runs process different numbers of samples.
+The H9 scaling branches established the practical runtime trade-off. The
+two-GPU BS32 run remained healthy through step 83 at 12.0--12.6 seconds per
+step and 31,388 MiB/card, then was stopped by operator decision without a
+checkpoint. The four-GPU BS32 reference was 8.1--8.6 seconds per step. The
+four-GPU BS64 run reached step 100 at about 6.0 seconds per step and 31,464
+MiB/card. These are engineering measurements rather than task-success
+evidence; the BS64 30K run processes twice as many samples as BS32 30K.
 
 ## Key Results
 

@@ -81,7 +81,7 @@ hypotheses:
     priority: high
   - id: H9-scale-a
     statement: "Layer-10 ACPD-v2 can train for 30K steps on two RTX 5090 GPUs with physical global batch 32 and no gradient accumulation."
-    status: active
+    status: stopped
     motivation: "Measure the minimum practical GPU allocation for the H9 method without changing its effective batch size."
     parent: H9
     priority: medium
@@ -116,19 +116,19 @@ experiments:
       status: completed
 
 current_execution:
-  checked_at: "2026-09-17 13:05 CST"
+  checked_at: "2026-09-17 13:14 CST"
   h8_training: "job 128417 completed; step-4999 params and assets saved"
   h8_evaluation: "job 128421 completed 2,000 episodes; pooled success 6.35%; ACL-only is within 0.15 points of Full ACPD"
   h9_training: "layer-10 physical-BS32 job 129710 passed four finite optimizer steps on four GPUs without OOM; peak sampled memory 17,402 MiB/card; no task-success result"
   h9_evaluation: "job 129711 waits on afterok:129710 and will evaluate 2,000 paired episodes"
-  h9_scale_a: "two-device physical-BS32 job 129727 passed its first finite optimizer step without OOM; no task-success result"
+  h9_scale_a: "two-device physical-BS32 job 129727 was healthy through step 83 at 12.0--12.6 seconds/step and 31,388 MiB/card, then stopped by operator decision; no checkpoint or task-success result"
   h9_scale_b: "four-device physical-BS64 job 129728 reached step 100 at about 6.0 seconds/step and 31,464 MiB/card; no task-success result"
   h7_layer_scan: "job 128789 completed; layer 10 selected over runner-up layer 11 by 0.0485 overall cosine gap"
 
 outer_loop:
   cycle: 12
-  last_direction: "keep the 5K H9 efficacy screen and measure 2-GPU BS32 versus 4-GPU BS64 runtime as H9 scaling branches"
-  last_reflection: "The H9 scaling jobs match local batch 16 per GPU. Their 30K sample budgets differ, so runtime and memory are comparable but task success is not a controlled batch-size comparison."
+  last_direction: "continue the 5K H9 efficacy screen and the four-device BS64 throughput run; retire the slower two-device BS32 run"
+  last_reflection: "Two-device BS32 is feasible but about 1.45 times slower per optimizer step than four-device BS32. Four-device BS64 is the fastest measured configuration, but its 30K sample budget is twice that of BS32."
 
 workspace:
   results: "EXPERIMENT_RESULTS.md"

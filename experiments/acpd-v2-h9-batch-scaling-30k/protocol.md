@@ -36,10 +36,14 @@ samples/second and an initial 30K estimate of 50 hours plus checkpoint writes.
 The four-device BS32 reference was 8.1--8.6 seconds per step before the BS64
 job started on the same node, or about 3.8 samples/second.
 
-H9-scale-a is preliminary at step 42: 12.1--12.8 seconds per step and 31,388
-MiB peak sampled memory per card. Its synchronized step-100 measurement is
-still pending.
+H9-scale-a remained finite through step 83 at 12.0--12.6 seconds per step and
+31,388 MiB peak sampled memory per card. It was then stopped by operator
+decision because the four-device configurations provide lower wall time. It
+did not reach the first checkpoint save.
 
 At 30K optimizer steps, BS64 processes 1.92 million samples while BS32
 processes 0.96 million. For an equal 0.96-million-sample budget, BS64 would use
 15K steps and take about 25 hours before checkpoint overhead.
+
+Detailed measurements and the interpretation boundary are recorded in
+`analysis.md`.
