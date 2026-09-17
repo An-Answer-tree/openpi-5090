@@ -102,11 +102,13 @@ Gate 从 0 初始化，因此训练开始时模型与原 student 完全相同。
 
 ## 4. 蒸馏层选择
 
-### 4.1 实验设计
+### 4.1 用线性 Probe 选择蒸馏层
 
-固定 teacher 和 Flow-only student，在 episode 级 held-out 数据上测试 layer 6--12。每层、每个 teacher 视角训练独立线性 probe，将 student 的 action hidden state 映射为 teacher 的视觉贡献。每个 probe 使用 3 个初始化 seed、500 steps；验证集包含 256 个样本。
+Probe 是一个只包含单层线性映射的小型测试模型。实验冻结 teacher 和 Flow-only student，只训练 probe，不更新 policy。
 
-该实验只回答“student 是否能从 backview 恢复该层的特权贡献”，不训练 policy，也不测任务成功率。
+对 action expert 的 layer 6--12 逐层测试：将 student 在该层的 action hidden state 输入 probe，让它预测 teacher 在同一层从 agentview 或 wrist 得到的视觉贡献。两个 teacher 视角分别训练 probe，不共享参数。如果 probe 能在未参与训练的 episode 上准确预测，说明 student 该层已经包含可用于恢复特权视觉信息的线索，更适合作为后续蒸馏层。
+
+每个 layer 和视角组合使用 3 个初始化 seed，训练 500 steps，并在固定的 256 个 held-out 样本上评价。该实验只用于低成本选层，不训练完整 policy，也不评价任务成功率。
 
 ### 4.2 指标计算
 
