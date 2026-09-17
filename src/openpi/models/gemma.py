@@ -269,9 +269,7 @@ class Attention(nn.Module):
             )
 
             source_encoded = einops.rearrange(source_encoded, "V B T K G H -> V B T (K G) H")
-            shuffled_source_encoded = einops.rearrange(
-                shuffled_source_encoded, "V B T K G H -> V B T (K G) H"
-            )
+            shuffled_source_encoded = einops.rearrange(shuffled_source_encoded, "V B T K G H -> V B T (K G) H")
             diagnostic_encoded = einops.rearrange(diagnostic_encoded, "B T K G H -> B T (K G) H")
 
         out = []
@@ -291,9 +289,7 @@ class Attention(nn.Module):
                 if i == 1 and source_masks is not None:
                     attention_diagnostics = (
                         out_einsum("VBTNH,NHD->VBTD", source_encoded[:, :, start:end].astype(jnp.float32)),
-                        out_einsum(
-                            "VBTNH,NHD->VBTD", shuffled_source_encoded[:, :, start:end].astype(jnp.float32)
-                        ),
+                        out_einsum("VBTNH,NHD->VBTD", shuffled_source_encoded[:, :, start:end].astype(jnp.float32)),
                         out_einsum("BTNH,NHD->BTD", diagnostic_encoded[:, start:end].astype(jnp.float32)),
                     )
                 start = end
@@ -353,6 +349,12 @@ class Block(nn.Module):
         adarms_cond,
         source_masks,
         deterministic=True,  # noqa: FBT002
+        layer_index=None,
+        fusion_layer=None,
+        fusion_token_mask=None,
+        contribution_kernel=None,
+        contribution_bias=None,
+        contribution_gate=None,
     ):
         xs = sharding.activation_sharding_constraint(xs)
         drop = nn.Dropout(self.dropout, self.dropout_bdims) if self.dropout else lambda x, _: x
@@ -368,13 +370,29 @@ class Block(nn.Module):
             gates.append(gate if x is not None else None)
 
         pre_attn = sharding.activation_sharding_constraint(pre_attn)
-        post_attn, kv_cache, attention_diagnostics = attn(
-            pre_attn, positions, attn_mask, kv_cache, source_masks
-        )
+        post_attn, kv_cache, attention_diagnostics = attn(pre_attn, positions, attn_mask, kv_cache, source_masks)
         post_attn = jax.tree.map(lambda x: drop(x, deterministic), post_attn)
         post_attn = sharding.activation_sharding_constraint(post_attn)
         xs = [_gated_residual(x, y, gate) for x, y, gate in zip(xs, post_attn, gates, strict=True)]
         xs = sharding.activation_sharding_constraint(xs)
+
+        action_attention_hidden = None
+        if xs[1] is not None:
+            action_attention_hidden = _parameter_free_layer_norm(xs[1])
+            if contribution_kernel is not None:
+                xs[1] = jax.lax.cond(
+                    layer_index == fusion_layer,
+                    lambda x: _fuse_exact_contribution(
+                        x,
+                        action_attention_hidden,
+                        fusion_token_mask,
+                        contribution_kernel,
+                        contribution_bias,
+                        contribution_gate,
+                    ),
+                    lambda x: x,
+                    xs[1],
+                )
 
         if attention_diagnostics is not None:
             source_contributions, shuffled_source_contributions, total_attention = attention_diagnostics
@@ -404,7 +422,7 @@ class Block(nn.Module):
         xs = [_gated_residual(x, y, gate) for x, y, gate in zip(xs, out, gates, strict=True)]
         xs = sharding.activation_sharding_constraint(xs)
 
-        return xs, (kv_cache, xs[1], attention_diagnostics)
+        return xs, (kv_cache, xs[1], attention_diagnostics, action_attention_hidden)
 
 
 KVCache: TypeAlias = tuple[at.Float[at.Array, "l b _t _k _h"], at.Float[at.Array, "l b _t _v _h"]]
@@ -441,6 +459,12 @@ class Module(nn.Module):
             variable_axes={"params": 0},
             split_rngs={"params": True, "dropout": True},
             in_axes=(
+                0,
+                nn.broadcast,
+                nn.broadcast,
+                nn.broadcast,
+                nn.broadcast,
+                nn.broadcast,
                 0,
                 nn.broadcast,
                 nn.broadcast,
@@ -498,7 +522,7 @@ class Module(nn.Module):
         if adarms_cond is None:
             adarms_cond = [None] * len(self.configs)
 
-        embedded, (kv_cache, action_intermediates, _) = self.layers(
+        embedded, (kv_cache, action_intermediates, _, _) = self.layers(
             embedded,
             kv_cache,
             positions,
@@ -506,6 +530,12 @@ class Module(nn.Module):
             adarms_cond,
             None,
             deterministic,
+            jnp.arange(self.configs[0].depth),
+            None,
+            None,
+            None,
+            None,
+            None,
         )
 
         assert all(e.dtype == jnp.dtype(self.embed_dtype) for e in embedded if e is not None)
@@ -532,7 +562,7 @@ class Module(nn.Module):
         if adarms_cond is None:
             adarms_cond = [None] * len(self.configs)
 
-        embedded, (kv_cache, action_intermediates, attention_diagnostics) = self.layers(
+        embedded, (kv_cache, action_intermediates, attention_diagnostics, _) = self.layers(
             embedded,
             None,
             positions,
@@ -540,11 +570,58 @@ class Module(nn.Module):
             adarms_cond,
             source_masks,
             deterministic,
+            jnp.arange(self.configs[0].depth),
+            None,
+            None,
+            None,
+            None,
+            None,
         )
         outputs = [
             f(e, a)[0] if e is not None else e for f, e, a in zip(self.final_norms, embedded, adarms_cond, strict=True)
         ]
         return outputs, kv_cache, action_intermediates, attention_diagnostics
+
+    @at.typecheck
+    def forward_with_exact_contribution_fusion(
+        self,
+        embedded: Sequence[at.Float[at.Array, "b _t _d"] | None],
+        positions: at.Int[at.Array, "b t"],
+        mask: at.Bool[at.Array, "b t s"],
+        adarms_cond: Sequence[at.Float[at.Array, "b _d"] | None],
+        contribution_kernel: at.Array,
+        contribution_bias: at.Array,
+        contribution_gate: at.Array,
+        fusion_layer: int,
+        action_token_count: int,
+        *,
+        kv_cache: KVCache | None = None,
+        deterministic: bool = True,
+    ):
+        """Fuses a predicted attention contribution inside one action block."""
+        embedded = jax.tree.map(lambda e: e.astype(self.embed_dtype), embedded)
+        mask = jnp.asarray(mask)[:, None, :, :]
+        fusion_token_mask = jnp.arange(embedded[1].shape[1]) >= embedded[1].shape[1] - action_token_count
+
+        embedded, (kv_cache, action_intermediates, _, attention_intermediates) = self.layers(
+            embedded,
+            kv_cache,
+            positions,
+            mask,
+            adarms_cond,
+            None,
+            deterministic,
+            jnp.arange(self.configs[0].depth),
+            fusion_layer,
+            fusion_token_mask,
+            contribution_kernel,
+            contribution_bias,
+            contribution_gate,
+        )
+        outputs = [
+            f(e, a)[0] if e is not None else e for f, e, a in zip(self.final_norms, embedded, adarms_cond, strict=True)
+        ]
+        return outputs, kv_cache, action_intermediates, attention_intermediates
 
     def init(self, use_adarms: Sequence[bool]):
         """Convenience method for initializing all parameters, necessary due to the quirks of linen."""
@@ -593,3 +670,17 @@ def _gated_residual(x, y, gate):
     if gate is None:
         return x + y
     return x + y * gate
+
+
+def _parameter_free_layer_norm(x, eps: float = 1e-6):
+    x = x.astype(jnp.float32)
+    x = x - jnp.mean(x, axis=-1, keepdims=True)
+    return x * jax.lax.rsqrt(jnp.mean(jnp.square(x), axis=-1, keepdims=True) + eps)
+
+
+def _fuse_exact_contribution(x, normalized_x, token_mask, kernel, bias, gate):
+    prediction = normalized_x @ kernel + bias
+    prediction = prediction.reshape(*prediction.shape[:-1], 2, x.shape[-1])
+    residual = jax.lax.stop_gradient(jnp.sum(prediction, axis=-2)).astype(x.dtype)
+    residual = residual * token_mask[None, :, None]
+    return x + jnp.tanh(gate).astype(x.dtype) * residual

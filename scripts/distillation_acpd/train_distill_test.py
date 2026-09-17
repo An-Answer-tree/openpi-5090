@@ -113,22 +113,25 @@ def test_exact_contribution_loss_is_zero_for_equal_targets():
 
 
 def test_acpd_v2_policy_configs_deploy_selected_layer():
-    for config_name, layer in (
-        ("pi05_libero_backview_acpd_v2_lora", 9),
-        ("pi05_libero_backview_acpd_v2_layer10_lora", 10),
+    for config_name, layer, fusion_location in (
+        ("pi05_libero_backview_acpd_v2_lora", 9, "final"),
+        ("pi05_libero_backview_acpd_v2_layer10_lora", 10, "final"),
+        ("pi05_libero_backview_acpd_v2_layer10_aligned_lora", 10, "aligned_attention"),
     ):
         config = training_config.get_config(config_name)
 
         assert isinstance(config.model, AcpdPi0Config)
         assert config.model.align_layers == (layer,)
         assert config.model.exact_contribution_fusion
+        assert config.model.exact_contribution_fusion_location == fusion_location
         assert not config.model.create_acpd_heads
 
 
 def test_acpd_v2_train_and_eval_models_have_matching_parameter_trees():
-    for config_name, layer in (
-        ("pi05_libero_backview_acpd_v2_lora", 9),
-        ("pi05_libero_backview_acpd_v2_layer10_lora", 10),
+    for config_name, layer, fusion_location in (
+        ("pi05_libero_backview_acpd_v2_lora", 9, "final"),
+        ("pi05_libero_backview_acpd_v2_layer10_lora", 10, "final"),
+        ("pi05_libero_backview_acpd_v2_layer10_aligned_lora", 10, "aligned_attention"),
     ):
         distill_config = DistillTrainConfig(
             student_init_params="base/params",
@@ -137,6 +140,7 @@ def test_acpd_v2_train_and_eval_models_have_matching_parameter_trees():
             checkpoint_base_dir="checkpoints",
             align_layers=(layer,),
             exact_contribution_fusion=True,
+            exact_contribution_fusion_location=fusion_location,
         )
 
         student_config = _make_student_train_config(distill_config, create_acpd_heads=False)

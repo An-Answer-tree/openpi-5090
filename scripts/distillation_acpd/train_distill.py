@@ -6,7 +6,7 @@ import functools
 import logging
 import pathlib
 import platform
-from typing import Any
+from typing import Any, Literal
 
 import etils.epath as epath
 from flax import struct
@@ -69,6 +69,7 @@ class DistillTrainConfig:
     acpd_projector_hidden_dim: int = 2048
     acpd_detach_query: bool = True
     exact_contribution_fusion: bool = False
+    exact_contribution_fusion_location: Literal["final", "aligned_attention"] = "final"
 
     assets_dir: str = tyro.MISSING
     asset_id: str = "libero_multiview"
@@ -247,6 +248,7 @@ def _make_distill_model_config(
         acpd_projector_hidden_dim=config.acpd_projector_hidden_dim,
         create_acpd_heads=create_acpd_heads,
         exact_contribution_fusion=exact_contribution_fusion,
+        exact_contribution_fusion_location=config.exact_contribution_fusion_location,
     )
 
 

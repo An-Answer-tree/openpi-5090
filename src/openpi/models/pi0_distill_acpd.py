@@ -1,6 +1,7 @@
 """Pi0.5 model exposing training-only features for ACPD distillation."""
 
 import dataclasses
+from typing import Literal
 
 import einops
 import flax.nnx as nnx
@@ -122,6 +123,7 @@ class AcpdPi0Config(pi0_config.Pi0Config):
     acpd_projector_hidden_dim: int = 2048
     create_acpd_heads: bool = True
     exact_contribution_fusion: bool = False
+    exact_contribution_fusion_location: Literal["final", "aligned_attention"] = "final"
 
     @override
     def create(self, rng: at.KeyArrayLike) -> "AcpdPi0":
@@ -138,7 +140,9 @@ class AcpdPi0(pi0.Pi0):
         action_expert_config = gemma.get_config(config.action_expert_variant)
         layers = config.align_layers
         self.align_layers = tuple(layers) if isinstance(layers, list | tuple) else (layers,)
+        self.action_expert_depth = action_expert_config.depth
         self.exact_contribution_fusion = config.exact_contribution_fusion
+        self.exact_contribution_fusion_location = config.exact_contribution_fusion_location
         if config.create_acpd_heads:
             self.acpd_aux_heads = nnx.Dict(
                 {
@@ -188,23 +192,39 @@ class AcpdPi0(pi0.Pi0):
         ar_mask = jnp.concatenate([prefix_ar_mask, suffix_ar_mask], axis=0)
         attn_mask = pi0.make_attn_mask(input_mask, ar_mask)
         positions = jnp.cumsum(input_mask, axis=1) - 1
-        (_, suffix_out), _, action_intermediates = self.PaliGemma.llm(
-            [prefix_tokens, suffix_tokens],
-            mask=attn_mask,
-            positions=positions,
-            adarms_cond=[None, adarms_cond],
-            method="forward_with_intermediates",
-        )
+        attention_intermediates = None
+        if self.exact_contribution_fusion and self.exact_contribution_fusion_location == "aligned_attention":
+            (_, suffix_out), _, action_intermediates, attention_intermediates = self.PaliGemma.llm(
+                [prefix_tokens, suffix_tokens],
+                positions,
+                attn_mask,
+                [None, adarms_cond],
+                self.exact_contribution_head.predictor.kernel.value,
+                self.exact_contribution_head.predictor.bias.value,
+                self.exact_contribution_head.gate.value,
+                self._layer_index(self.align_layers[0], self.action_expert_depth),
+                self.action_horizon,
+                method="forward_with_exact_contribution_fusion",
+            )
+        else:
+            (_, suffix_out), _, action_intermediates = self.PaliGemma.llm(
+                [prefix_tokens, suffix_tokens],
+                mask=attn_mask,
+                positions=positions,
+                adarms_cond=[None, adarms_cond],
+                method="forward_with_intermediates",
+            )
         depth = action_intermediates.shape[0]
+        hidden_intermediates = attention_intermediates if attention_intermediates is not None else action_intermediates
         hiddens = []
         for layer in self.align_layers:
             if layer == -1:
                 hiddens.append(suffix_out[:, -self.action_horizon :])
             else:
-                hidden = action_intermediates[self._layer_index(layer, depth)][:, -self.action_horizon :]
-                hiddens.append(_prenorm(hidden))
+                hidden = hidden_intermediates[self._layer_index(layer, depth)][:, -self.action_horizon :]
+                hiddens.append(hidden if attention_intermediates is not None else _prenorm(hidden))
         final_hidden = suffix_out[:, -self.action_horizon :]
-        if self.exact_contribution_fusion:
+        if self.exact_contribution_fusion and self.exact_contribution_fusion_location == "final":
             final_hidden = self.exact_contribution_head.fuse(final_hidden, hiddens[0])
         v_t = self.action_out_proj(final_hidden)
         privileged_visual_tokens = jnp.concatenate(
@@ -229,6 +249,23 @@ class AcpdPi0(pi0.Pi0):
                 kv_cache,
                 adarms_cond,
             )
+        if self.exact_contribution_fusion_location == "aligned_attention":
+            (prefix_out, suffix_out), _, _, _ = self.PaliGemma.llm(
+                [None, suffix_tokens],
+                positions,
+                full_attn_mask,
+                [None, adarms_cond],
+                self.exact_contribution_head.predictor.kernel.value,
+                self.exact_contribution_head.predictor.bias.value,
+                self.exact_contribution_head.gate.value,
+                self._layer_index(self.align_layers[0], self.action_expert_depth),
+                self.action_horizon,
+                kv_cache=kv_cache,
+                method="forward_with_exact_contribution_fusion",
+            )
+            assert prefix_out is None
+            return self.action_out_proj(suffix_out[:, -self.action_horizon :])
+
         (prefix_out, suffix_out), _, action_intermediates = self.PaliGemma.llm(
             [None, suffix_tokens],
             mask=full_attn_mask,
@@ -258,9 +295,7 @@ class AcpdPi0(pi0.Pi0):
     ):
         """Returns exact agentview and wrist contributions to action attention."""
         observation = _model.preprocess_observation(rng, observation, train=train)
-        prefix_tokens, prefix_mask, prefix_ar_mask, _, image_slices = self._embed_prefix_with_image_tokens(
-            observation
-        )
+        prefix_tokens, prefix_mask, prefix_ar_mask, _, image_slices = self._embed_prefix_with_image_tokens(observation)
         suffix_tokens, suffix_mask, suffix_ar_mask, adarms_cond = self.embed_suffix(
             observation, noisy_actions, timestep
         )
@@ -290,9 +325,7 @@ class AcpdPi0(pi0.Pi0):
 
         v_t = self.action_out_proj(suffix_out[:, -self.action_horizon :])
         contributions = jnp.transpose(contributions[:, :, :, -self.action_horizon :], (2, 0, 1, 3, 4))
-        shuffled_contributions = jnp.transpose(
-            shuffled_contributions[:, :, :, -self.action_horizon :], (2, 0, 1, 3, 4)
-        )
+        shuffled_contributions = jnp.transpose(shuffled_contributions[:, :, :, -self.action_horizon :], (2, 0, 1, 3, 4))
         total_attention = jnp.transpose(total_attention[:, :, -self.action_horizon :], (1, 0, 2, 3))
         return v_t, contributions, shuffled_contributions, total_attention
 
