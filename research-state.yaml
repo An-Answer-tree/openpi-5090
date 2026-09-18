@@ -15,6 +15,7 @@ literature:
     - "Memory and throughput of a frozen full teacher plus a LoRA student on four 32 GB GPUs."
   evidence_gaps:
     - "H11 task-success evaluation is pending."
+    - "The matched physical-BS64 backview-only SFT baseline is pending."
     - "The positive H8 and H9 5K results each have one seed and one student view."
 
 hypotheses:
@@ -90,9 +91,15 @@ hypotheses:
     motivation: "A contribution produced at layer 10 may be more useful when the remaining transformer computation can integrate it."
     parent: H9
     priority: high
+  - id: H12
+    statement: "Layer-10 ACPD-v2 improves pooled 5K task success over standard backview-only SFT under matched four-device physical batch size 64."
+    status: active
+    motivation: "The 23.15% H9-scale-b result needs a baseline with the same batch size, optimizer steps, seed, initialization, and learning-rate schedule."
+    parent: H9-scale-b
+    priority: high
 
 current_execution:
-  checked_at: "2026-09-18 10:47 CST"
+  checked_at: "2026-09-18 12:09 CST"
   h8_training: "job 128417 completed; step-4999 params and assets saved"
   h8_evaluation: "job 128421 completed 2,000 episodes; pooled success 6.35%; ACL-only is within 0.15 points of Full ACPD"
   h9_training: "layer-10 physical-BS32 job 129710 completed and saved checkpoint 4999"
@@ -100,6 +107,7 @@ current_execution:
   h9_scale_b: "four-device physical-BS64 job 129728 is running near step 8,490; checkpoint 4999 evaluated at 23.15% pooled"
   h7_layer_scan: "job 128789 completed; layer 10 selected over runner-up layer 11 by 0.0485 overall cosine gap"
   h11: "four-device BS64 smoke job 129807 completed; formal job 129808 is running near step 1,460 on gpu05"
+  h12: "four-device physical-BS64 backview-only SFT job 130285 is pending for resources"
 
 outer_loop:
   cycle: 14
