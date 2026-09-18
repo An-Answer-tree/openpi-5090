@@ -14,6 +14,7 @@ pi0.5 student？
 | Full ACPD 是否优于 Flow-only | H5，`6.50%` 对 `4.45%`，差值 `+2.05` 点，95% CI `[0.90, 3.25]` | 单 seed、5K 筛选为正。 |
 | H5 增益来自哪里 | H8，ACL-only `6.35%`；Full 比 ACL-only 仅 `+0.15` 点，95% CI `[-1.15, 1.40]` | 当前证据支持 ACL，不支持旧 Cue 的额外收益。 |
 | exact contribution 能否从 backview 恢复 | H7/H7.1，layer 10 gap `0.3992`、hard gap `0.3779`、EV `0.3556` | 可以；layer 10 是 6--12 层中的最佳层。 |
+| exact contribution 能否提高任务成功率 | H9，`11.35%` 对 H8 的 `6.35%`，差值 `+5.00` 点，95% CI `[+3.60, +6.45]` | 单 seed、5K 筛选支持 ACPD-v2。 |
 
 ## 方法判断
 
@@ -22,8 +23,8 @@ flow time，而不是真正转移特权视觉信息。ACPD-v2 改为固定目标
 视角通过真实 Q/K/V、完整 attention softmax、输出投影和 AdaRMS gate 对 action
 token 产生的残差贡献。agentview 与 wrist 分开预测，注入时相加。
 
-H7/H7.1 只证明目标可恢复，不证明能提高任务成功率。H9 使用 layer 10 block
-输出预测，并在最终 hidden 注入。H11 将 query 和注入共同前移：使用 layer 10
+H7/H7.1 证明目标可恢复，H9 进一步证明最终 hidden 注入在 5K 筛选中优于
+ACL-only。H9 使用 layer 10 block 输出预测，并在最终 hidden 注入。H11 将 query 和注入共同前移：使用 layer 10
 attention 输出预测，在该层 FFN 前注入，使后续网络继续处理 contribution。H11
 的主要判据是相对同为 4 GPU、BS64 的 H9-scale-b
 在 step 4,999 提升至少 `1.5` 个 pooled 百分点，且配对 bootstrap 95% CI 下界
@@ -41,10 +42,10 @@ attention 输出预测，在该层 FFN 前注入，使后续网络继续处理 c
 
 | 实验 | Job | 状态 | 结论 |
 |---|---:|---|---|
-| H9 BS32 5K，最终 hidden 注入 | 129710 | 运行中 | 尚无结论。 |
-| H9-scale-b BS64 30K，最终 hidden 注入 | 129728 | 运行中 | 尚无结论。 |
-| H11 BS64 smoke，同层注入 | 129807 | 等待资源 | 尚无结论。 |
-| H11 BS64 30K，同层注入 | 129808 | 等待 smoke 成功 | 尚无结论。 |
+| H9 BS32 5K，最终 hidden 注入 | 129710/129711 | 完成 | `11.35%`；相对 H8 `+5.00` 点，95% CI `[+3.60, +6.45]`。 |
+| H9-scale-b BS64 30K，最终 hidden 注入 | 129728 | 运行中，约 step 8,280 | 5K checkpoint 为 `23.15%`；不同样本预算，不与 H9 作 batch 因果比较。 |
+| H11 BS64 smoke，同层注入 | 129807 | 完成 | 运行门槛通过。 |
+| H11 BS64 30K，同层注入 | 129808 | 运行中，约 step 1,320 | 尚无任务成功率结论。 |
 
 H10 的 loss 权重校准保留，但在 H9/H11 选定注入结构后再做，避免同时改变结构和
 权重。

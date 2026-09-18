@@ -14,8 +14,8 @@ literature:
   open_problems:
     - "Memory and throughput of a frozen full teacher plus a LoRA student on four 32 GB GPUs."
   evidence_gaps:
-    - "H9 and H11 task-success evaluations are pending."
-    - "The positive 5K ACL result has one seed and one student view."
+    - "H11 task-success evaluation is pending."
+    - "The positive H8 and H9 5K results each have one seed and one student view."
 
 hypotheses:
   - id: H1
@@ -62,7 +62,7 @@ hypotheses:
     priority: high
   - id: H9
     statement: "A recoverability-gated ACPD-v2 policy improves pooled 5K task success over ACL-only by at least 1.5 percentage points with a positive paired confidence bound."
-    status: active
+    status: supported
     motivation: "Deploy the layer-10 target selected by H7.1 using physical global batch 32, then compare its task success with the matched ACL-only baseline."
     parent: H7
     priority: high
@@ -86,25 +86,25 @@ hypotheses:
     priority: medium
   - id: H11
     statement: "Predicting and injecting the contribution after layer-10 attention improves 5K task success over final-hidden fusion."
-    status: queued
+    status: active
     motivation: "A contribution produced at layer 10 may be more useful when the remaining transformer computation can integrate it."
     parent: H9
     priority: high
 
 current_execution:
-  checked_at: "2026-09-17 14:49 CST"
+  checked_at: "2026-09-18 10:11 CST"
   h8_training: "job 128417 completed; step-4999 params and assets saved"
   h8_evaluation: "job 128421 completed 2,000 episodes; pooled success 6.35%; ACL-only is within 0.15 points of Full ACPD"
-  h9_training: "layer-10 physical-BS32 job 129710 is running at step 872; no task-success result"
-  h9_evaluation: "job 129711 waits on afterok:129710 and will evaluate 2,000 paired episodes"
-  h9_scale_b: "four-device physical-BS64 job 129728 is running at step 436; no task-success result"
+  h9_training: "layer-10 physical-BS32 job 129710 completed and saved checkpoint 4999"
+  h9_evaluation: "job 129711 completed 2,000 episodes; pooled success 11.35% versus H8 6.35%, paired 95% CI for the +5.00-point difference is [+3.60, +6.45]"
+  h9_scale_b: "four-device physical-BS64 job 129728 is running near step 8,280; checkpoint 4999 evaluated at 23.15% pooled"
   h7_layer_scan: "job 128789 completed; layer 10 selected over runner-up layer 11 by 0.0485 overall cosine gap"
-  h11: "four-device BS64 smoke job 129807 waits for resources; formal job 129808 depends on smoke success"
+  h11: "four-device BS64 smoke job 129807 completed; formal job 129808 is running near step 1,320 on gpu05"
 
 outer_loop:
-  cycle: 13
+  cycle: 14
   last_direction: "test whether matched layer-10 injection improves ACPD-v2 over final-hidden injection under the same four-device BS64 protocol"
-  last_reflection: "H7.1 identifies a recoverable layer-10 target, but H9 injects it only at the final hidden state. H11 isolates whether allowing the remaining transformer computation to integrate the predicted contribution improves policy success."
+  last_reflection: "H9 validates that the recoverable layer-10 target improves 5K task success over ACL-only. H11 now isolates whether matched same-layer injection improves over the 23.15% BS64 final-hidden control."
 
 workspace:
   results: "EXPERIMENT_RESULTS.md"

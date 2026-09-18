@@ -1,6 +1,6 @@
 # 实验结果记录
 
-更新时间：2026-09-17
+更新时间：2026-09-18
 
 本文件是唯一长期实验结果台账。开始实验相关工作前读取；实验状态变化或产生最终结果后立即更新。只记录实际运行的配置和已核实结果；未完成项标记“尚无结论”，原始日志和 checkpoint 保存在 `/opt/liutong`。
 
@@ -26,6 +26,7 @@
 | Full ACPD 是否优于 Flow-only | 是。5K pooled success 为 `6.50%` 对 `4.45%`，提升 `2.05` 个百分点，配对 95% CI 为 `[0.90%, 3.25%]`。 |
 | H5 的 5K 增益由什么解释 | ACL-only 为 `6.35%`，相对 Flow-only 提升 `1.90` 点；Full 仅比 ACL-only 高 `0.15` 点，95% CI 为 `[-1.15, 1.40]`。按预注册规则，该增益由 ACL 解释。 |
 | 哪层 exact contribution 最可恢复 | layer 10。其 overall gap 为 `0.3992`，比次优 layer 11 高 `0.0485`，超过预注册 `0.02` 选择门槛。 |
+| layer-10 ACPD-v2 是否提高 5K 成功率 | 是。H9 为 `11.35%`，H8 ACL-only 为 `6.35%`；差值 `+5.00` 点，配对 95% CI `[+3.60, +6.45]`。 |
 
 ## ACPD 实验总表
 
@@ -38,9 +39,9 @@
 | H5 | Full ACPD 是否优于 Flow-only | 相同 5K 预算；四套共 2,000 episodes | 完成 | 支持。`6.50%` 对 `4.45%`，提升 `2.05` 点，配对 95% CI `[0.90, 3.25]` 点。 |
 | H7/H7.1 | 精确 attention contribution 是否可恢复并选层 | layer 6--12；256 个 held-out 样本；3 个 probe seeds | 完成 | 支持可恢复性；layer 10 的 overall gap 最高，为 `0.3992`。 |
 | H8 | ACL-only 能否解释 H5 提升 | FSDP2，global BS32，5K，seed 42；2,000 episodes | 完成 | 支持。ACL-only 为 `6.35%`，与 Full 的 `6.50%` 相差 `0.15` 点，配对 95% CI `[-1.15, 1.40]`。 |
-| H9 | 部署式 ACPD-v2 是否优于 H8 | layer 10 exact contribution；FSDP4，physical global BS32，无梯度累积；5K | 运行中 | 尚无结论。 |
-| H9-scale-b | 4 卡 BS64 能否提高 ACPD-v2 吞吐 | layer 10；FSDP4，physical global BS64，无梯度累积；30K | 运行中 | 已通过首步运行门槛；尚无结论。 |
-| H11 | 同层预测与注入是否优于最终层融合 | layer 10 attention hidden 作 query 并在 FFN 前注入；FSDP4，physical BS64，30K | 已提交 | Job 129807 smoke 等待资源；Job 129808 依赖 smoke 成功。尚无结论。 |
+| H9 | 部署式 ACPD-v2 是否优于 H8 | layer 10 exact contribution；FSDP4，physical global BS32，无梯度累积；5K | 完成 | 支持。`11.35%` 对 `6.35%`，提升 `5.00` 点，配对 95% CI `[+3.60, +6.45]`。 |
+| H9-scale-b | 4 卡 BS64 能否提高 ACPD-v2 吞吐 | layer 10；FSDP4，physical global BS64，无梯度累积；30K | 运行中 | 5K checkpoint 为 `23.15%`；因样本预算与 H9 不同，不作受控 batch 效果结论。 |
+| H11 | 同层预测与注入是否优于最终层融合 | layer 10 attention hidden 作 query 并在 FFN 前注入；FSDP4，physical BS64，30K | 运行中 | smoke 已通过，正式训练正常；尚无任务成功率结论。 |
 
 ## SFT 训练
 
@@ -142,11 +143,11 @@ Teacher target 是每个视角对 action attention 的真实残差贡献：使�
 |---|---|---:|---|
 | H8 ACL-only | FSDP2，global BS32，5K，seed 42 | 128417 | 完成；step 4900 supervised loss `0.0316`，4999 checkpoint 已完整保存 |
 | H8 四套验证 | 4 GPU，2,000 episodes | 128421 | 完成；`127/2,000`，pooled `6.35%` |
-| H9 layer-10 训练 | FSDP4，physical global BS32，无梯度累积，5K | 129710 | 运行中；已通过运行门槛，尚无任务成功率结论 |
-| H9 layer-10 验证 | 4 GPU，2,000 episodes，依赖 H9 训练成功 | 129711 | 等待依赖 |
-| H9-scale-b | 最终 hidden 注入；FSDP4，physical global BS64，无梯度累积，30K | 129728 | 运行中；峰值 `31,464 MiB/卡`；尚无任务成功率结论 |
-| H11 smoke | layer 10 attention hidden 作 query 并在 FFN 前注入；FSDP4，physical global BS64，2 steps | 129807 | 等待资源；尚无结论 |
-| H11 正式训练 | 与 H9-scale-b 相同训练设置；query 与注入共同对齐到 layer 10 attention 后；30K | 129808 | 等待 Job 129807 成功；尚无结论 |
+| H9 layer-10 训练 | FSDP4，physical global BS32，无梯度累积，5K | 129710 | 完成；4999 checkpoint 已完整保存 |
+| H9 layer-10 验证 | 4 GPU，2,000 episodes | 129711 | 完成；`227/2,000`，pooled `11.35%` |
+| H9-scale-b | 最终 hidden 注入；FSDP4，physical global BS64，无梯度累积，30K | 129728 | 运行中；约 step 8,280；4999 checkpoint 验证为 `463/2,000`、`23.15%` |
+| H11 smoke | layer 10 attention hidden 作 query 并在 FFN 前注入；FSDP4，physical global BS64，2 steps | 129807 | 完成；有限 loss、非零目标梯度且无 OOM |
+| H11 正式训练 | 与 H9-scale-b 相同训练设置；query 与注入共同对齐到 layer 10 attention 后；30K | 129808 | 运行中；约 step 1,320，尚无任务成功率结论 |
 
 H9 的 BS32 5K 筛选与 H8 比较。H11 与 H9-scale-b 都使用 BS64，step 4,999
 checkpoint 构成严格注入位置对照；通过标准为 H11 pooled success 提升至少 `1.5`
@@ -166,6 +167,19 @@ checkpoint 构成严格注入位置对照；通过标准为 H11 pooled success �
 | Full ACPD - ACL-only | `+0.15` 点 | `[-1.15, +1.40]` | 未检测到 Cue 的额外收益。 |
 
 结论：ACL-only 距 Full ACPD 仅 `0.15` 点，小于预注册的 `0.5` 点等效范围，因此 H5 的 5K 增益按协议由 ACL 解释。该结论仅适用于单 seed、5K 筛选；不同 suite 的变化方向不一致。
+
+### H9/H9-scale-b 5K 结果
+
+| 方法 | Spatial | Object | Goal | LIBERO-10 | Pooled |
+|---|---:|---:|---:|---:|---:|
+| H8 ACL-only，BS32 | 2.00% | 15.40% | 7.60% | 0.40% | 6.35% |
+| H9 ACPD-v2，BS32 | 5.20% | 24.20% | 15.60% | 0.40% | 11.35% |
+| H9-scale-b，BS64 | 25.40% | 32.40% | 30.00% | 4.80% | 23.15% |
+
+H9 相对 H8 提升 `5.00` 个百分点，task-stratified paired bootstrap 95% CI
+为 `[+3.60, +6.45]`，通过预注册门槛。H9-scale-b 的 5K 成绩只作为 H11 的
+同 BS64、同注入目标对照；它在 5K steps 处理的样本数是 BS32 的两倍，不能据此
+推断 batch size 本身提高了成功率。
 
 ## 证据
 
@@ -188,13 +202,15 @@ checkpoint 构成严格注入位置对照；通过标准为 H11 pooled success �
 | H8 ACL/Flow 配对分析 | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/acl_vs_flow_paired_analysis.json` |
 | H8 Full/ACL 配对分析 | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/full_vs_acl_paired_analysis.json` |
 | H9 协议 | `experiments/acpd-v2-layer10-pbs32-5k/protocol.md` |
-| H9 layer-10 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-pbs32-5k_129710.out`（运行中） |
+| H9 分析 | `experiments/acpd-v2-layer10-pbs32-5k/analysis.md` |
+| H9 配对分析 | `experiments/acpd-v2-layer10-pbs32-5k/results/h9_vs_h8_paired_analysis.json` |
+| H9 layer-10 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-pbs32-5k_129710.out`（完成） |
 | H9 batch-scaling 协议 | `experiments/acpd-v2-h9-batch-scaling-30k/protocol.md` |
 | H9 batch-scaling 分析 | `experiments/acpd-v2-h9-batch-scaling-30k/analysis.md` |
 | H9-scale-b 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-fsdp4-bs64-30k_129728.out`（运行中） |
 | H11 协议 | `experiments/acpd-v2-h11-injection-location/protocol.md` |
-| H11 smoke 日志 | `slurm-log/smoke-bv-h11-l10-aligned-bs64_129807.out`（等待资源） |
-| H11 正式训练日志 | `slurm-log/pi05-bv-h11-l10-aligned-bs64-30k_129808.out`（等待依赖） |
+| H11 smoke 日志 | `slurm-log/smoke-bv-h11-l10-aligned-bs64_129807.out`（完成） |
+| H11 正式训练日志 | `slurm-log/pi05-bv-h11-l10-aligned-bs64-30k_129808.out`（运行中） |
 
 ## Checkpoint 路径检索
 
@@ -215,7 +231,8 @@ checkpoint 构成严格注入位置对照；通过标准为 H11 pooled success �
 | Full ACPD 6+12，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/layers_5k/pi05_libero_backview_acpd_lora_layers6_12/pi05_libero_backview_acpd_lora_fsdp2_layers6_12_bs32_5k/4999` |
 | Flow-only，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/task_success_5k/pi05_libero_backview_flow_only_5k/pi05_libero_backview_lora_fsdp2_bs32_5k/4999` |
 | H8 ACL-only，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/task_success_5k/pi05_libero_backview_acl_only_5k/pi05_libero_backview_acpd_lora_fsdp2_bs32_5k/4999` |
-| H9 ACPD-v2 layer 10，5K（预期，尚未生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/task_success_5k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_pbs32_5k/4999` |
+| H9 ACPD-v2 layer 10，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/task_success_5k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_pbs32_5k/4999` |
+| H9-scale-b，4 卡 BS64 5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/4999` |
 | H9-scale-b，4 卡 BS64 30K（预期，尚未生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/29999` |
 | H11，4 卡 BS64 5K（预期，尚未生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/injection_location_30k/pi05_libero_backview_acpd_v2_h11_layer10_aligned/pi05_libero_backview_acpd_v2_h11_layer10_aligned_lora_fsdp4_bs64_30k/4999` |
 | H4 组件消融，2K | 按协议不保存 checkpoint |
@@ -235,6 +252,6 @@ checkpoint 构成严格注入位置对照；通过标准为 H11 pooled success �
 | Full ACPD 6+12，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/full-acpd-layers6-12/4999` | 完成，`6.50%` pooled |
 | Flow-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/flow-only/4999` | 完成，`4.45%` pooled |
 | H8 ACL-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/acl-only/4999` | 完成，`6.35%` pooled |
-| H9 ACPD-v2 layer 10，5K | `/opt/liutong/openpi-5090-evals/acpd-v2-task-success-5k/layer10-exact-contribution-pbs32/4999` | Job 129711 等待训练完成 |
-| H9-scale-b 最终 hidden，BS64 5K | `/opt/liutong/openpi-5090-evals/acpd-v2-injection-location-5k/final-hidden/4999` | 尚未验证 |
+| H9 ACPD-v2 layer 10，5K | `/opt/liutong/openpi-5090-evals/acpd-v2-task-success-5k/layer10-exact-contribution-pbs32/4999` | 完成，`11.35%` pooled |
+| H9-scale-b 最终 hidden，BS64 5K | `/opt/liutong/openpi-5090-evals/acpd-v2-injection-location-5k/final-hidden/4999` | 完成，`23.15%` pooled |
 | H11 同层注入，BS64 5K | `/opt/liutong/openpi-5090-evals/acpd-v2-injection-location-5k/aligned-attention/4999` | 尚未验证 |
