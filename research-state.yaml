@@ -92,14 +92,14 @@ hypotheses:
     priority: high
 
 current_execution:
-  checked_at: "2026-09-18 10:11 CST"
+  checked_at: "2026-09-18 10:47 CST"
   h8_training: "job 128417 completed; step-4999 params and assets saved"
   h8_evaluation: "job 128421 completed 2,000 episodes; pooled success 6.35%; ACL-only is within 0.15 points of Full ACPD"
   h9_training: "layer-10 physical-BS32 job 129710 completed and saved checkpoint 4999"
   h9_evaluation: "job 129711 completed 2,000 episodes; pooled success 11.35% versus H8 6.35%, paired 95% CI for the +5.00-point difference is [+3.60, +6.45]"
-  h9_scale_b: "four-device physical-BS64 job 129728 is running near step 8,280; checkpoint 4999 evaluated at 23.15% pooled"
+  h9_scale_b: "four-device physical-BS64 job 129728 is running near step 8,490; checkpoint 4999 evaluated at 23.15% pooled"
   h7_layer_scan: "job 128789 completed; layer 10 selected over runner-up layer 11 by 0.0485 overall cosine gap"
-  h11: "four-device BS64 smoke job 129807 completed; formal job 129808 is running near step 1,320 on gpu05"
+  h11: "four-device BS64 smoke job 129807 completed; formal job 129808 is running near step 1,460 on gpu05"
 
 outer_loop:
   cycle: 14

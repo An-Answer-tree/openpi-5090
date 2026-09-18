@@ -1,6 +1,6 @@
 # 实验结果记录
 
-更新时间：2026-09-18
+更新时间：2026-09-18（10:47 CST）
 
 本文件是唯一长期实验结果台账。开始实验相关工作前读取；实验状态变化或产生最终结果后立即更新。只记录实际运行的配置和已核实结果；未完成项标记“尚无结论”，原始日志和 checkpoint 保存在 `/opt/liutong`。
 
@@ -40,8 +40,8 @@
 | H7/H7.1 | 精确 attention contribution 是否可恢复并选层 | layer 6--12；256 个 held-out 样本；3 个 probe seeds | 完成 | 支持可恢复性；layer 10 的 overall gap 最高，为 `0.3992`。 |
 | H8 | ACL-only 能否解释 H5 提升 | FSDP2，global BS32，5K，seed 42；2,000 episodes | 完成 | 支持。ACL-only 为 `6.35%`，与 Full 的 `6.50%` 相差 `0.15` 点，配对 95% CI `[-1.15, 1.40]`。 |
 | H9 | 部署式 ACPD-v2 是否优于 H8 | layer 10 exact contribution；FSDP4，physical global BS32，无梯度累积；5K | 完成 | 支持。`11.35%` 对 `6.35%`，提升 `5.00` 点，配对 95% CI `[+3.60, +6.45]`。 |
-| H9-scale-b | 4 卡 BS64 能否提高 ACPD-v2 吞吐 | layer 10；FSDP4，physical global BS64，无梯度累积；30K | 运行中 | 5K checkpoint 为 `23.15%`；因样本预算与 H9 不同，不作受控 batch 效果结论。 |
-| H11 | 同层预测与注入是否优于最终层融合 | layer 10 attention hidden 作 query 并在 FFN 前注入；FSDP4，physical BS64，30K | 运行中 | smoke 已通过，正式训练正常；尚无任务成功率结论。 |
+| H9-scale-b | 4 卡 BS64 能否提高 ACPD-v2 吞吐 | layer 10；FSDP4，physical global BS64，无梯度累积；30K | 运行中 | 约 step `8.49K`；5K checkpoint 为 `23.15%`；因样本预算与 H9 不同，不作受控 batch 效果结论。 |
+| H11 | 同层预测与注入是否优于最终层融合 | layer 10 attention hidden 作 query 并在 FFN 前注入；FSDP4，physical BS64，30K | 运行中 | smoke 已通过，正式训练约 step `1.46K`；尚无任务成功率结论。 |
 
 ## SFT 训练
 
@@ -145,9 +145,9 @@ Teacher target 是每个视角对 action attention 的真实残差贡献：使�
 | H8 四套验证 | 4 GPU，2,000 episodes | 128421 | 完成；`127/2,000`，pooled `6.35%` |
 | H9 layer-10 训练 | FSDP4，physical global BS32，无梯度累积，5K | 129710 | 完成；4999 checkpoint 已完整保存 |
 | H9 layer-10 验证 | 4 GPU，2,000 episodes | 129711 | 完成；`227/2,000`，pooled `11.35%` |
-| H9-scale-b | 最终 hidden 注入；FSDP4，physical global BS64，无梯度累积，30K | 129728 | 运行中；约 step 8,280；4999 checkpoint 验证为 `463/2,000`、`23.15%` |
+| H9-scale-b | 最终 hidden 注入；FSDP4，physical global BS64，无梯度累积，30K | 129728 | 运行中；约 step 8,490；4999 checkpoint 验证为 `463/2,000`、`23.15%` |
 | H11 smoke | layer 10 attention hidden 作 query 并在 FFN 前注入；FSDP4，physical global BS64，2 steps | 129807 | 完成；有限 loss、非零目标梯度且无 OOM |
-| H11 正式训练 | 与 H9-scale-b 相同训练设置；query 与注入共同对齐到 layer 10 attention 后；30K | 129808 | 运行中；约 step 1,320，尚无任务成功率结论 |
+| H11 正式训练 | 与 H9-scale-b 相同训练设置；query 与注入共同对齐到 layer 10 attention 后；30K | 129808 | 运行中；约 step 1,460，尚无任务成功率结论 |
 
 H9 的 BS32 5K 筛选与 H8 比较。H11 与 H9-scale-b 都使用 BS64，step 4,999
 checkpoint 构成严格注入位置对照；通过标准为 H11 pooled success 提升至少 `1.5`
