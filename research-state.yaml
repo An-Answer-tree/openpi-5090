@@ -102,6 +102,12 @@ hypotheses:
     motivation: "H9 combines an auxiliary contribution target with gated residual injection, so a matched loss-only run is required to identify whether injection itself matters."
     parent: H9-scale-b
     priority: high
+  - id: H14
+    statement: "Matched BS64 30K SFT baselines across topview, leftview, and rightview provide controls for extending ACPD-v2 beyond backview."
+    status: planned
+    motivation: "View-specific ACPD gains require SFT controls with identical initialization, batch size, seed, schedule, and training budget."
+    parent: H12
+    priority: high
 
 current_execution:
   checked_at: "2026-09-19 19:04 CST"

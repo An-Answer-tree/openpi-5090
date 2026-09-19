@@ -19,3 +19,4 @@
 | 2026-09-19 | 结果 | H11 同层注入为 21.20%，H9-scale-b 最终 hidden 注入为 23.15%；差值 -1.95 点，95% CI `[-4.10, +0.20]`，不支持前移注入。 |
 | 2026-09-19 | 结果 | H12 匹配 BS64 SFT 为 13.85%，H9-scale-b 为 23.15%；差值 +9.30 点，95% CI `[+7.30, +11.35]`，支持 ACPD-v2 组合方案。 |
 | 2026-09-19 | 方法 | H13 仅关闭 contribution residual injection，保留 contribution loss、ACL、batch、seed 和 schedule，用于判断 H9 是否需要显式注入。 |
+| 2026-09-19 | 方法 | H14 锁定 topview、leftview、rightview 的匹配 SFT baseline：FSDP4、physical BS64、seed 42、cosine 30K，每 5K 保留 checkpoint。 |
