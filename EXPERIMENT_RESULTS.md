@@ -1,6 +1,6 @@
 # 实验结果记录
 
-更新时间：2026-09-18（12:09 CST）
+更新时间：2026-09-19（10:27 CST）
 
 本文件是唯一长期实验结果台账。开始实验相关工作前读取；实验状态变化或产生最终结果后立即更新。只记录实际运行的配置和已核实结果；未完成项标记“尚无结论”，原始日志和 checkpoint 保存在 `/opt/liutong`。
 
@@ -40,9 +40,9 @@
 | H7/H7.1 | 精确 attention contribution 是否可恢复并选层 | layer 6--12；256 个 held-out 样本；3 个 probe seeds | 完成 | 支持可恢复性；layer 10 的 overall gap 最高，为 `0.3992`。 |
 | H8 | ACL-only 能否解释 H5 提升 | FSDP2，global BS32，5K，seed 42；2,000 episodes | 完成 | 支持。ACL-only 为 `6.35%`，与 Full 的 `6.50%` 相差 `0.15` 点，配对 95% CI `[-1.15, 1.40]`。 |
 | H9 | 部署式 ACPD-v2 是否优于 H8 | layer 10 exact contribution；FSDP4，physical global BS32，无梯度累积；5K | 完成 | 支持。`11.35%` 对 `6.35%`，提升 `5.00` 点，配对 95% CI `[+3.60, +6.45]`。 |
-| H9-scale-b | 4 卡 BS64 能否提高 ACPD-v2 吞吐 | layer 10；FSDP4，physical global BS64，无梯度累积；30K | 运行中 | 约 step `8.49K`；5K checkpoint 为 `23.15%`；因样本预算与 H9 不同，不作受控 batch 效果结论。 |
-| H11 | 同层预测与注入是否优于最终层融合 | layer 10 attention hidden 作 query 并在 FFN 前注入；FSDP4，physical BS64，30K | 运行中 | smoke 已通过，正式训练约 step `1.46K`；尚无任务成功率结论。 |
-| H12 | ACPD-v2 是否优于同 BS64 的单视角 SFT | backview-only SFT；FSDP4，physical global BS64，无梯度累积；5K | 排队中 | Job `130285` 等待资源；尚无结论。 |
+| H9-scale-b | 4 卡 BS64 能否提高 ACPD-v2 吞吐 | layer 10；FSDP4，physical global BS64，无梯度累积；30K | 运行中 | 约 step `18.8K`；5K checkpoint 为 `23.15%`；因样本预算与 H9 不同，不作受控 batch 效果结论。 |
+| H11 | 同层预测与注入是否优于最终层融合 | layer 10 attention hidden 作 query 并在 FFN 前注入；FSDP4，physical BS64，30K | 运行中 | 约 step `8.09K`；4999 checkpoint 已生成，尚未验证。 |
+| H12 | ACPD-v2 是否优于同 BS64 的单视角 SFT | backview-only SFT；FSDP4，physical global BS64，无梯度累积；5K | 运行中 | 约 step `3.58K`；尚无任务成功率结论。 |
 
 ## SFT 训练
 
@@ -54,7 +54,7 @@
 | SFT-4GPU | 4 / 32 | 默认 | 30K | 0.0261 | 125794 | 完成 |
 | SFT-cosine-30K | 4 / 32 | 1K warmup，`2.5e-5`→`2.5e-6` | 30K | 0.0222 | 126023 | 完成 |
 | SFT-cosine-60K | 4 / 32 | 30K 后保持 `2.5e-6` | 60K | 0.0197 | 126409 | 完成 |
-| SFT-BS64-5K | 4 / 64 | 1K warmup，`2.5e-5`→`2.5e-6` | 5K | - | 130285 | 排队中 |
+| SFT-BS64-5K | 4 / 64 | 1K warmup，`2.5e-5`→`2.5e-6` | 5K | 0.0308（step 3500） | 130285 | 运行中 |
 
 ## SFT 验证
 
@@ -214,7 +214,7 @@ H9 相对 H8 提升 `5.00` 个百分点，task-stratified paired bootstrap 95% C
 | H11 smoke 日志 | `slurm-log/smoke-bv-h11-l10-aligned-bs64_129807.out`（完成） |
 | H11 正式训练日志 | `slurm-log/pi05-bv-h11-l10-aligned-bs64-30k_129808.out`（运行中） |
 | H12 协议 | `experiments/sft-backview-bs64-5k/protocol.md` |
-| H12 SFT-BS64 训练日志 | `slurm-log/pi05-bv-sft-bs64-5k_130285.out`（排队中） |
+| H12 SFT-BS64 训练日志 | `slurm-log/pi05-bv-sft-bs64-5k_130285.out`（运行中） |
 
 ## Checkpoint 路径检索
 
@@ -236,9 +236,9 @@ H9 相对 H8 提升 `5.00` 个百分点，task-stratified paired bootstrap 95% C
 | Flow-only，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/task_success_5k/pi05_libero_backview_flow_only_5k/pi05_libero_backview_lora_fsdp2_bs32_5k/4999` |
 | H8 ACL-only，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/task_success_5k/pi05_libero_backview_acl_only_5k/pi05_libero_backview_acpd_lora_fsdp2_bs32_5k/4999` |
 | H9 ACPD-v2 layer 10，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/task_success_5k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_pbs32_5k/4999` |
-| H9-scale-b，4 卡 BS64 5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/4999` |
+| H9-scale-b，4 卡 BS64 当前训练点 | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/14999` |
 | H9-scale-b，4 卡 BS64 30K（预期，尚未生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/29999` |
-| H11，4 卡 BS64 5K（预期，尚未生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/injection_location_30k/pi05_libero_backview_acpd_v2_h11_layer10_aligned/pi05_libero_backview_acpd_v2_h11_layer10_aligned_lora_fsdp4_bs64_30k/4999` |
+| H11，4 卡 BS64 5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/injection_location_30k/pi05_libero_backview_acpd_v2_h11_layer10_aligned/pi05_libero_backview_acpd_v2_h11_layer10_aligned_lora_fsdp4_bs64_30k/4999` |
 | H12 backview SFT，4 卡 BS64 5K（预期，尚未生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/sft/backview_bs64_5k/pi05_libero_backview_lora/pi05_libero_backview_lora_fsdp4_bs64_5k/4999` |
 | H4 组件消融，2K | 按协议不保存 checkpoint |
 
