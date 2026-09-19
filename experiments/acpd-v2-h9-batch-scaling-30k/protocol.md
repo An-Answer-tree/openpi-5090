@@ -47,3 +47,14 @@ processes 0.96 million. For an equal 0.96-million-sample budget, BS64 would use
 
 Detailed measurements and the interpretation boundary are recorded in
 `analysis.md`.
+
+## Exploratory 20K Evaluation
+
+Evaluate H9-scale-b checkpoint 19,999 after the checkpoint was requested for
+inspection. Use the same four LIBERO suites, initial states, backview camera,
+policy config, and 500 episodes per suite as the completed 5K evaluation.
+
+Report each suite success rate, pooled success over 2,000 episodes, and the
+pooled change from the same run's 5K result of 23.15%. This is an exploratory
+training-trajectory measurement with no pass threshold. Without a matched
+BS64 SFT checkpoint at 20K, it does not establish an ACPD-v2 method advantage.

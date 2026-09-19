@@ -20,3 +20,4 @@
 | 2026-09-19 | 结果 | H12 匹配 BS64 SFT 为 13.85%，H9-scale-b 为 23.15%；差值 +9.30 点，95% CI `[+7.30, +11.35]`，支持 ACPD-v2 组合方案。 |
 | 2026-09-19 | 方法 | H13 仅关闭 contribution residual injection，保留 contribution loss、ACL、batch、seed 和 schedule，用于判断 H9 是否需要显式注入。 |
 | 2026-09-19 | 方法 | H14 锁定 topview、leftview、rightview 的匹配 SFT baseline：FSDP4、physical BS64、seed 42、cosine 30K，每 5K 保留 checkpoint。 |
+| 2026-09-19 | 方法 | H9-scale-b 增加探索性 20K checkpoint 验证；使用与 5K 相同的 2,000 episodes，仅报告训练轨迹变化，不作 ACPD-v2 对 SFT 的方法结论。 |
