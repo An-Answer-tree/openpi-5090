@@ -97,6 +97,12 @@ hypotheses:
     motivation: "The 23.15% H9-scale-b result needs a baseline with the same batch size, optimizer steps, seed, initialization, and learning-rate schedule."
     parent: H9-scale-b
     priority: high
+  - id: H13
+    statement: "Explicit exact-contribution injection improves pooled 5K task success beyond exact-contribution distillation loss alone."
+    status: protocol_locked
+    motivation: "H9 combines an auxiliary contribution target with gated residual injection, so a matched loss-only run is required to identify whether injection itself matters."
+    parent: H9-scale-b
+    priority: high
 
 current_execution:
   checked_at: "2026-09-19 14:46 CST"
@@ -112,9 +118,9 @@ current_execution:
   h12_evaluation: "job 130491 is running on gpu05 with the BS64 SFT launcher"
 
 outer_loop:
-  cycle: 14
-  last_direction: "test whether matched layer-10 injection improves ACPD-v2 over final-hidden injection under the same four-device BS64 protocol"
-  last_reflection: "H9 validates that the recoverable layer-10 target improves 5K task success over ACL-only. H11 now isolates whether matched same-layer injection improves over the 23.15% BS64 final-hidden control."
+  cycle: 15
+  last_direction: "isolate explicit residual injection from the exact-contribution distillation loss under the H9-scale-b protocol"
+  last_reflection: "H9 validates the combined ACPD-v2 objective and deployment path, but its small learned gate does not identify whether explicit injection or auxiliary supervision causes the gain. H13 changes only the injection path."
 
 workspace:
   results: "EXPERIMENT_RESULTS.md"
