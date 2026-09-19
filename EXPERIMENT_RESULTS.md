@@ -1,6 +1,6 @@
 # 实验结果记录
 
-更新时间：2026-09-19（11:17 CST）
+更新时间：2026-09-19（11:25 CST）
 
 本文件是唯一长期实验结果台账。开始实验相关工作前读取；实验状态变化或产生最终结果后立即更新。只记录实际运行的配置和已核实结果；未完成项标记“尚无结论”，原始日志和 checkpoint 保存在 `/opt/liutong`。
 
@@ -41,8 +41,8 @@
 | H8 | ACL-only 能否解释 H5 提升 | FSDP2，global BS32，5K，seed 42；2,000 episodes | 完成 | 支持。ACL-only 为 `6.35%`，与 Full 的 `6.50%` 相差 `0.15` 点，配对 95% CI `[-1.15, 1.40]`。 |
 | H9 | 部署式 ACPD-v2 是否优于 H8 | layer 10 exact contribution；FSDP4，physical global BS32，无梯度累积；5K | 完成 | 支持。`11.35%` 对 `6.35%`，提升 `5.00` 点，配对 95% CI `[+3.60, +6.45]`；gate 末步为 `0.0048`，直接注入机制仍需 H11 对照。 |
 | H9-scale-b | 4 卡 BS64 能否提高 ACPD-v2 吞吐 | layer 10；FSDP4，physical global BS64，无梯度累积；30K | 运行中 | 约 step `19.3K`；5K checkpoint 为 `23.15%`；因样本预算与 H9 不同，不作受控 batch 效果结论。 |
-| H11 | 同层预测与注入是否优于最终层融合 | layer 10 attention hidden 作 query 并在 FFN 前注入；FSDP4，physical BS64，30K | 运行中 | 约 step `8.3K`；4999 checkpoint 已生成，尚未验证。 |
-| H12 | ACPD-v2 是否优于同 BS64 的单视角 SFT | backview-only SFT；FSDP4，physical global BS64，无梯度累积；5K | 运行中 | 约 step `4.8K`；尚无任务成功率结论。 |
+| H11 | 同层预测与注入是否优于最终层融合 | layer 10 attention hidden 作 query 并在 FFN 前注入；FSDP4，physical BS64，30K | 验证排队 | 训练约 step `8.3K`；4999 checkpoint 已生成；验证 job `130490` 尚未开始。 |
+| H12 | ACPD-v2 是否优于同 BS64 的单视角 SFT | backview-only SFT；FSDP4，physical global BS64，无梯度累积；5K | 训练完成，验证排队 | step 4900 loss `0.0290`；4999 checkpoint 已完整保存；验证 job `130491` 尚未开始。 |
 
 ## SFT 训练
 
@@ -54,7 +54,7 @@
 | SFT-4GPU | 4 / 32 | 默认 | 30K | 0.0261 | 125794 | 完成 |
 | SFT-cosine-30K | 4 / 32 | 1K warmup，`2.5e-5`→`2.5e-6` | 30K | 0.0222 | 126023 | 完成 |
 | SFT-cosine-60K | 4 / 32 | 30K 后保持 `2.5e-6` | 60K | 0.0197 | 126409 | 完成 |
-| SFT-BS64-5K | 4 / 64 | 1K warmup，`2.5e-5`→`2.5e-6` | 5K | 0.0308（step 3500） | 130285 | 运行中 |
+| SFT-BS64-5K | 4 / 64 | 1K warmup，`2.5e-5`→`2.5e-6` | 5K | 0.0290（step 4900） | 130285 | 完成 |
 
 ## SFT 验证
 
@@ -214,8 +214,10 @@ H9 相对 H8 提升 `5.00` 个百分点，task-stratified paired bootstrap 95% C
 | H11 协议 | `experiments/acpd-v2-h11-injection-location/protocol.md` |
 | H11 smoke 日志 | `slurm-log/smoke-bv-h11-l10-aligned-bs64_129807.out`（完成） |
 | H11 正式训练日志 | `slurm-log/pi05-bv-h11-l10-aligned-bs64-30k_129808.out`（运行中，约 step 8.3K） |
+| H11 验证任务 | `examples/libero/eval_slurm/pi05_libero_backview_acpd_v2_h11_aligned_fsdp4_bs64_5k.sbatch`，job `130490`（排队） |
 | H12 协议 | `experiments/sft-backview-bs64-5k/protocol.md` |
-| H12 SFT-BS64 训练日志 | `slurm-log/pi05-bv-sft-bs64-5k_130285.out`（运行中，约 step 4.8K） |
+| H12 SFT-BS64 训练日志 | `slurm-log/pi05-bv-sft-bs64-5k_130285.out`（完成，step 4900 loss 0.0290） |
+| H12 验证任务 | `examples/libero/eval_slurm/pi05_libero_backview_lora_fsdp4_bs64_5k.sbatch`，job `130491`（排队） |
 
 ## Checkpoint 路径检索
 

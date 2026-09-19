@@ -52,8 +52,8 @@ contribution loss 均下降，预测 cosine 上升，LoRA 与 predictor 梯度�
 | H9 BS32 5K，最终 hidden 注入 | 129710/129711 | 完成 | `11.35%`；相对 H8 `+5.00` 点，95% CI `[+3.60, +6.45]`。 |
 | H9-scale-b BS64 30K，最终 hidden 注入 | 129728 | 运行中，约 step 19,300 | 5K checkpoint 为 `23.15%`；不同样本预算，不与 H9 作 batch 因果比较。 |
 | H11 BS64 smoke，同层注入 | 129807 | 完成 | 运行门槛通过。 |
-| H11 BS64 30K，同层注入 | 129808 | 运行中，约 step 8,300 | 4999 checkpoint 已生成，尚无任务成功率结论。 |
-| H12 backview SFT BS64 5K | 130285 | 运行中，约 step 4,800 | 与 H9-scale-b 匹配的无蒸馏 baseline；尚无结论。 |
+| H11 BS64 30K，同层注入 | 129808/130490 | 训练运行中，验证排队 | 训练约 step 8,300；4999 checkpoint 已生成，尚无任务成功率结论。 |
+| H12 backview SFT BS64 5K | 130285/130491 | 训练完成，验证排队 | step 4900 loss `0.0290`；与 H9-scale-b 匹配的无蒸馏 baseline，尚无成功率结论。 |
 
 H10 的 loss 权重校准保留，但在 H9/H11 选定注入结构后再做，避免同时改变结构和
 权重。
