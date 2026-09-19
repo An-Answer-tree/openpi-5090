@@ -99,17 +99,17 @@ hypotheses:
     priority: high
 
 current_execution:
-  checked_at: "2026-09-19 11:25 CST"
+  checked_at: "2026-09-19 13:25 CST"
   h8_training: "job 128417 completed; step-4999 params and assets saved"
   h8_evaluation: "job 128421 completed 2,000 episodes; pooled success 6.35%; ACL-only is within 0.15 points of Full ACPD"
   h9_training: "layer-10 physical-BS32 job 129710 completed and saved checkpoint 4999"
   h9_evaluation: "job 129711 completed 2,000 episodes; pooled success 11.35% versus H8 6.35%, paired 95% CI for the +5.00-point difference is [+3.60, +6.45]"
-  h9_scale_b: "four-device physical-BS64 job 129728 is running near step 19,300; checkpoint 4999 evaluated at 23.15% pooled; current retained checkpoint 14999"
+  h9_scale_b: "four-device physical-BS64 job 129728 is running near step 20,300; checkpoint 4999 evaluated at 23.15% pooled; current retained checkpoint 19999"
   h7_layer_scan: "job 128789 completed; layer 10 selected over runner-up layer 11 by 0.0485 overall cosine gap"
-  h11: "four-device BS64 smoke job 129807 completed; formal job 129808 is running near step 8,300 on gpu05; checkpoint 4999 is available; evaluation job 130490 is pending resources"
-  h11_evaluation: "job 130490 submitted with the aligned-attention launcher; pending resources"
+  h11: "four-device BS64 smoke job 129807 completed; formal job 129808 is running near step 9,000 on gpu05; checkpoint 4999 is under evaluation"
+  h11_evaluation: "job 130490 is running on gpu01; all four suites entered episode execution without traceback, CUDA, OOM, or startup failure; no final result yet"
   h12: "four-device physical-BS64 backview-only SFT job 130285 completed at step 4999; step 4900 loss 0.0290; checkpoint 4999 is complete"
-  h12_evaluation: "job 130491 submitted with the BS64 SFT launcher; pending priority"
+  h12_evaluation: "job 130491 submitted with the BS64 SFT launcher; pending resources"
 
 outer_loop:
   cycle: 14
