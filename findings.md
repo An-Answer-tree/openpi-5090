@@ -56,6 +56,7 @@ contribution loss 均下降，预测 cosine 上升，LoRA 与 predictor 梯度�
 | H11 BS64，同层注入 | 129808/130490 | 完成 | `21.20%`；相对 H9-scale-b `-1.95` 点，95% CI `[-4.10, +0.20]`，不支持前移注入。 |
 | H12 backview SFT BS64 5K | 130285/130491 | 完成 | `13.85%`；H9-scale-b 相对提升 `9.30` 点，95% CI `[+7.30, +11.35]`。 |
 | H13 loss-only BS64 5K | 130599/130600 | 训练中，验证依赖训练 | 保留 contribution loss 和 ACL，只关闭训练与推理注入；尚无结论。 |
+| H14 top/left/right SFT BS64 30K | 130669/130670/130671 | 排队 | 匹配多视角 baseline；尚无结论。 |
 
 H10 的 loss 权重校准保留，但在 H9/H11 选定注入结构后再做，避免同时改变结构和
 权重。

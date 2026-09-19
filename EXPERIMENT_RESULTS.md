@@ -1,6 +1,6 @@
 # 实验结果记录
 
-更新时间：2026-09-19（19:04 CST）
+更新时间：2026-09-19（19:25 CST）
 
 本文件是唯一长期实验结果台账。开始实验相关工作前读取；实验状态变化或产生最终结果后立即更新。只记录实际运行的配置和已核实结果；未完成项标记“尚无结论”，原始日志和 checkpoint 保存在 `/opt/liutong`。
 
@@ -49,7 +49,7 @@
 
 ## SFT 训练
 
-数据：`libero_multiview_tuned_6view_lerobot`；学生视角：backview；LoRA：PaliGemma rank 16、action expert rank 32。
+数据：`libero_multiview_tuned_6view_lerobot`；固定单视角 student；LoRA：PaliGemma rank 16、action expert rank 32。
 
 | ID | GPU / global BS | 学习率 | 步数 | 最后记录 loss | Job | 状态 |
 |---|---:|---|---:|---:|---:|---|
@@ -58,6 +58,9 @@
 | SFT-cosine-30K | 4 / 32 | 1K warmup，`2.5e-5`→`2.5e-6` | 30K | 0.0222 | 126023 | 完成 |
 | SFT-cosine-60K | 4 / 32 | 30K 后保持 `2.5e-6` | 60K | 0.0197 | 126409 | 完成 |
 | SFT-BS64-5K | 4 / 64 | 1K warmup，`2.5e-5`→`2.5e-6` | 5K | 0.0290（step 4900） | 130285 | 完成 |
+| SFT-topview-BS64-30K | 4 / 64 | 1K warmup，`2.5e-5`→`2.5e-6` | 30K | - | 130669 | 排队；尚无结论 |
+| SFT-leftview-BS64-30K | 4 / 64 | 1K warmup，`2.5e-5`→`2.5e-6` | 30K | - | 130670 | 排队；尚无结论 |
+| SFT-rightview-BS64-30K | 4 / 64 | 1K warmup，`2.5e-5`→`2.5e-6` | 30K | - | 130671 | 排队；尚无结论 |
 
 ## SFT 验证
 
@@ -199,6 +202,8 @@ H9 相对 H8 提升 `5.00` 个百分点，task-stratified paired bootstrap 95% C
 |---|---|
 | SFT 训练日志 | `slurm-log/pi05-bv-lora*.out` |
 | SFT 验证 summary | `/opt/liutong/openpi-5090-evals/*/*/summary.txt` |
+| H14 多视角 SFT 协议 | `experiments/sft-multiview-bs64-30k/protocol.md` |
+| H14 训练脚本 | `scripts/train_slurm/pi05_libero_{topview,leftview,rightview}_lora_fsdp4_bs64_30k.sbatch` |
 | H1/H2 分析 | `experiments/acpd-lora-5090/analysis.md` |
 | H3 分析 | `experiments/acpd-layer-ablation-5k/analysis.md` |
 | H4 分析 | `experiments/acpd-component-ablation-2k/analysis.md` |
