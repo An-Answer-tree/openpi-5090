@@ -113,25 +113,28 @@ def test_exact_contribution_loss_is_zero_for_equal_targets():
 
 
 def test_acpd_v2_policy_configs_deploy_selected_layer():
-    for config_name, layer, fusion_location in (
-        ("pi05_libero_backview_acpd_v2_lora", 9, "final"),
-        ("pi05_libero_backview_acpd_v2_layer10_lora", 10, "final"),
-        ("pi05_libero_backview_acpd_v2_layer10_aligned_lora", 10, "aligned_attention"),
+    for config_name, layer, fusion_location, injection in (
+        ("pi05_libero_backview_acpd_v2_lora", 9, "final", True),
+        ("pi05_libero_backview_acpd_v2_layer10_lora", 10, "final", True),
+        ("pi05_libero_backview_acpd_v2_layer10_aligned_lora", 10, "aligned_attention", True),
+        ("pi05_libero_backview_acpd_v2_layer10_loss_only_lora", 10, "final", False),
     ):
         config = training_config.get_config(config_name)
 
         assert isinstance(config.model, AcpdPi0Config)
         assert config.model.align_layers == (layer,)
         assert config.model.exact_contribution_fusion
+        assert config.model.exact_contribution_injection == injection
         assert config.model.exact_contribution_fusion_location == fusion_location
         assert not config.model.create_acpd_heads
 
 
 def test_acpd_v2_train_and_eval_models_have_matching_parameter_trees():
-    for config_name, layer, fusion_location in (
-        ("pi05_libero_backview_acpd_v2_lora", 9, "final"),
-        ("pi05_libero_backview_acpd_v2_layer10_lora", 10, "final"),
-        ("pi05_libero_backview_acpd_v2_layer10_aligned_lora", 10, "aligned_attention"),
+    for config_name, layer, fusion_location, injection in (
+        ("pi05_libero_backview_acpd_v2_lora", 9, "final", True),
+        ("pi05_libero_backview_acpd_v2_layer10_lora", 10, "final", True),
+        ("pi05_libero_backview_acpd_v2_layer10_aligned_lora", 10, "aligned_attention", True),
+        ("pi05_libero_backview_acpd_v2_layer10_loss_only_lora", 10, "final", False),
     ):
         distill_config = DistillTrainConfig(
             student_init_params="base/params",
@@ -140,6 +143,7 @@ def test_acpd_v2_train_and_eval_models_have_matching_parameter_trees():
             checkpoint_base_dir="checkpoints",
             align_layers=(layer,),
             exact_contribution_fusion=True,
+            exact_contribution_injection=injection,
             exact_contribution_fusion_location=fusion_location,
         )
 

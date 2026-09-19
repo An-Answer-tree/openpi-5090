@@ -123,6 +123,7 @@ class AcpdPi0Config(pi0_config.Pi0Config):
     acpd_projector_hidden_dim: int = 2048
     create_acpd_heads: bool = True
     exact_contribution_fusion: bool = False
+    exact_contribution_injection: bool = True
     exact_contribution_fusion_location: Literal["final", "aligned_attention"] = "final"
 
     @override
@@ -142,6 +143,7 @@ class AcpdPi0(pi0.Pi0):
         self.align_layers = tuple(layers) if isinstance(layers, list | tuple) else (layers,)
         self.action_expert_depth = action_expert_config.depth
         self.exact_contribution_fusion = config.exact_contribution_fusion
+        self.exact_contribution_injection = config.exact_contribution_injection
         self.exact_contribution_fusion_location = config.exact_contribution_fusion_location
         if config.create_acpd_heads:
             self.acpd_aux_heads = nnx.Dict(
@@ -193,7 +195,11 @@ class AcpdPi0(pi0.Pi0):
         attn_mask = pi0.make_attn_mask(input_mask, ar_mask)
         positions = jnp.cumsum(input_mask, axis=1) - 1
         attention_intermediates = None
-        if self.exact_contribution_fusion and self.exact_contribution_fusion_location == "aligned_attention":
+        if (
+            self.exact_contribution_fusion
+            and self.exact_contribution_injection
+            and self.exact_contribution_fusion_location == "aligned_attention"
+        ):
             (_, suffix_out), _, action_intermediates, attention_intermediates = self.PaliGemma.llm(
                 [prefix_tokens, suffix_tokens],
                 positions,
@@ -224,7 +230,11 @@ class AcpdPi0(pi0.Pi0):
                 hidden = hidden_intermediates[self._layer_index(layer, depth)][:, -self.action_horizon :]
                 hiddens.append(hidden if attention_intermediates is not None else _prenorm(hidden))
         final_hidden = suffix_out[:, -self.action_horizon :]
-        if self.exact_contribution_fusion and self.exact_contribution_fusion_location == "final":
+        if (
+            self.exact_contribution_fusion
+            and self.exact_contribution_injection
+            and self.exact_contribution_fusion_location == "final"
+        ):
             final_hidden = self.exact_contribution_head.fuse(final_hidden, hiddens[0])
         v_t = self.action_out_proj(final_hidden)
         privileged_visual_tokens = jnp.concatenate(
@@ -241,7 +251,7 @@ class AcpdPi0(pi0.Pi0):
         kv_cache: gemma.KVCache,
         adarms_cond: at.Array | None,
     ) -> at.Array:
-        if not self.exact_contribution_fusion:
+        if not self.exact_contribution_fusion or not self.exact_contribution_injection:
             return super()._decode_action_velocity(
                 suffix_tokens,
                 full_attn_mask,
