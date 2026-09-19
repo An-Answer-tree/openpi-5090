@@ -39,7 +39,7 @@
 | H5 | Full ACPD 是否优于 Flow-only | 相同 5K 预算；四套共 2,000 episodes | 完成 | 支持。`6.50%` 对 `4.45%`，提升 `2.05` 点，配对 95% CI `[0.90, 3.25]` 点。 |
 | H7/H7.1 | 精确 attention contribution 是否可恢复并选层 | layer 6--12；256 个 held-out 样本；3 个 probe seeds | 完成 | 支持可恢复性；layer 10 的 overall gap 最高，为 `0.3992`。 |
 | H8 | ACL-only 能否解释 H5 提升 | FSDP2，global BS32，5K，seed 42；2,000 episodes | 完成 | 支持。ACL-only 为 `6.35%`，与 Full 的 `6.50%` 相差 `0.15` 点，配对 95% CI `[-1.15, 1.40]`。 |
-| H9 | 部署式 ACPD-v2 是否优于 H8 | layer 10 exact contribution；FSDP4，physical global BS32，无梯度累积；5K | 完成 | 支持。`11.35%` 对 `6.35%`，提升 `5.00` 点，配对 95% CI `[+3.60, +6.45]`。 |
+| H9 | 部署式 ACPD-v2 是否优于 H8 | layer 10 exact contribution；FSDP4，physical global BS32，无梯度累积；5K | 完成 | 支持。`11.35%` 对 `6.35%`，提升 `5.00` 点，配对 95% CI `[+3.60, +6.45]`；gate 末步为 `0.0048`，直接注入机制仍需 H11 对照。 |
 | H9-scale-b | 4 卡 BS64 能否提高 ACPD-v2 吞吐 | layer 10；FSDP4，physical global BS64，无梯度累积；30K | 运行中 | 约 step `18.8K`；5K checkpoint 为 `23.15%`；因样本预算与 H9 不同，不作受控 batch 效果结论。 |
 | H11 | 同层预测与注入是否优于最终层融合 | layer 10 attention hidden 作 query 并在 FFN 前注入；FSDP4，physical BS64，30K | 运行中 | 约 step `8.09K`；4999 checkpoint 已生成，尚未验证。 |
 | H12 | ACPD-v2 是否优于同 BS64 的单视角 SFT | backview-only SFT；FSDP4，physical global BS64，无梯度累积；5K | 运行中 | 约 step `3.58K`；尚无任务成功率结论。 |

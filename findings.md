@@ -15,6 +15,8 @@ pi0.5 student？
 | H5 增益来自哪里 | H8，ACL-only `6.35%`；Full 比 ACL-only 仅 `+0.15` 点，95% CI `[-1.15, 1.40]` | 当前证据支持 ACL，不支持旧 Cue 的额外收益。 |
 | exact contribution 能否从 backview 恢复 | H7/H7.1，layer 10 gap `0.3992`、hard gap `0.3779`、EV `0.3556` | 可以；layer 10 是 6--12 层中的最佳层。 |
 | exact contribution 能否提高任务成功率 | H9，`11.35%` 对 H8 的 `6.35%`，差值 `+5.00` 点，95% CI `[+3.60, +6.45]` | 单 seed、5K 筛选支持 ACPD-v2。 |
+| H9 的训练图是否稳定且目标可学 | H9 step 0--4,900：supervised loss `0.0892→0.0311`，exact contribution cosine `0.0057→0.6980`，单卡峰值 `17,406 MiB` | 训练实现稳定，layer-10 exact contribution 能被 student 学习。 |
+| H9 是否已证明直接注入机制 | gate 末步仅 `0.0048`，融合预测 stop-gradient；H9 只比较最终任务成功率 | 尚未完全证明；增益可能包含辅助损失的表征约束，需要 H11 和 gate 对照。 |
 
 ## 方法判断
 
@@ -29,6 +31,11 @@ attention 输出预测，在该层 FFN 前注入，使后续网络继续处理 c
 的主要判据是相对同为 4 GPU、BS64 的 H9-scale-b
 在 step 4,999 提升至少 `1.5` 个 pooled 百分点，且配对 bootstrap 95% CI 下界
 大于 0。训练 loss、cosine 和 gate 只用于健康检查。
+
+H9 训练过程本身没有数值或资源异常：supervised/student task loss 和 exact
+contribution loss 均下降，预测 cosine 上升，LoRA 与 predictor 梯度持续非零。由于
+最终 gate 很小，H9 的正向成功率只能说明 ACPD-v2 整体训练目标和部署组合有效，不能
+单独证明推理时残差注入是唯一原因。
 
 ## 工程约束
 
