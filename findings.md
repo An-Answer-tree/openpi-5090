@@ -44,6 +44,8 @@ contribution loss 均下降，预测 cosine 上升，LoRA 与 predictor 梯度�
 - 训练一个 student view；不要在一个任务中放四组 teacher-student。
 - teacher 特征依赖 noisy action 和 flow time，不能预计算而不改变方法。
 - 4 GPU、physical BS64、accumulation 1 已运行，峰值 `31,464 MiB/卡`，显存余量很小。
+- 蒸馏保存目录使用零起始 step；每 5K 保存且需要全部保留时必须设置
+  `keep_period=1`。
 - H11 必须保持单次 student forward，不移动或复制 dataset、teacher、checkpoint。
 - 早期 supervised loss 不能筛选 ACPD 组件；最终决策使用同状态 benchmark 成功率。
 
@@ -52,7 +54,8 @@ contribution loss 均下降，预测 cosine 上升，LoRA 与 predictor 梯度�
 | 实验 | Job | 状态 | 结论 |
 |---|---:|---|---|
 | H9 BS32 5K，最终 hidden 注入 | 129710/129711 | 完成 | `11.35%`；相对 H8 `+5.00` 点，95% CI `[+3.60, +6.45]`。 |
-| H9-scale-b BS64 30K，最终 hidden 注入 | 129728/130674 | 训练运行中；20K 验证排队 | 5K checkpoint 为 `23.15%`；20K 和 30K 尚无结论；不同样本预算，不与 H9 作 batch 因果比较。 |
+| H9-scale-b BS64 30K，最终 hidden 注入 | 129728/130703 | 原任务约 25.4K；25K 已保护；完成后恢复 25K 与 30K | 5K 历史验证为 `23.15%`；30K 尚无结论。 |
+| H9-scale-b 20K 轨迹恢复 | 130704 | 排队；保留 5K/10K/15K/20K | 与原任务训练设置相同，仅恢复阶段 checkpoint；尚无新结论。 |
 | H11 BS64，同层注入 | 129808/130490 | 完成 | `21.20%`；相对 H9-scale-b `-1.95` 点，95% CI `[-4.10, +0.20]`，不支持前移注入。 |
 | H12 backview SFT BS64 5K | 130285/130491 | 完成 | `13.85%`；H9-scale-b 相对提升 `9.30` 点，95% CI `[+7.30, +11.35]`。 |
 | H13 loss-only BS64 5K | 130599/130600 | 训练中，验证依赖训练 | 保留 contribution loss 和 ACL，只关闭训练与推理注入；尚无结论。 |
