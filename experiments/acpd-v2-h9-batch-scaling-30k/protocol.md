@@ -58,3 +58,22 @@ Report each suite success rate, pooled success over 2,000 episodes, and the
 pooled change from the same run's 5K result of 23.15%. This is an exploratory
 training-trajectory measurement with no pass threshold. Without a matched
 BS64 SFT checkpoint at 20K, it does not establish an ACPD-v2 method advantage.
+
+## Checkpoint Trajectory Recovery
+
+The original H9-scale-b run saved zero-indexed checkpoint directories
+`4999`, `9999`, and so on. Orbax `keep_period=5000` therefore did not protect
+them from `max_to_keep=1`, and each new save removed the preceding checkpoint.
+
+Before the original run reaches 30K, preserve its complete checkpoint `24999`
+outside the managed run directory with same-filesystem hard links. After job
+`129728` completes successfully and writes `29999`, restore the protected
+`24999` directory into the original run directory. The protected files are
+immutable completed checkpoint files; Orbax only removes the original path.
+
+Run one fresh trajectory-recovery job with the same model, data, seed, physical
+BS64, loss weights, optimizer, and 30K learning-rate schedule as H9-scale-b.
+Stop at 20K and use `save_interval=5000`, `keep_period=1`, so directories
+`4999`, `9999`, `14999`, and `19999` all remain. This repeats training only to
+recover missing trajectory checkpoints and does not define a new method
+hypothesis or replace the completed 5K benchmark result.

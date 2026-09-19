@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-#SBATCH --job-name=pi05-bv-acpdv2-l10-fsdp4-bs64-30k
+#SBATCH --job-name=pi05-bv-acpdv2-l10-bs64-20k-all
 #SBATCH --partition=batch
 #SBATCH --exclude=gpu03
 #SBATCH --nodes=1
@@ -33,7 +33,7 @@ export XLA_PYTHON_CLIENT_MEM_FRACTION=0.95
 export XLA_PYTHON_CLIENT_PREALLOCATE=false
 
 mkdir -p /home/liutong/Projects/openpi-5090/slurm-log
-mkdir -p /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k
+mkdir -p /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/trajectory_recovery_20k
 mkdir -p "${TMPDIR}"
 
 nvidia-smi \
@@ -46,7 +46,7 @@ trap 'kill "${gpu_monitor_pid}" 2>/dev/null || true' EXIT
 cd /home/liutong/Projects/openpi-5090
 python -m scripts.distillation_acpd.train_distill \
   --name=pi05_libero_backview_acpd_v2_layer10 \
-  --exp-name=pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k \
+  --exp-name=pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_20k_keep_all \
   --student-config-name=pi05_libero_backview_lora \
   --student-init-params=/home/liutong/.cache/openpi-5090/pi05_base/params \
   --teacher-params=/opt/liutong/openpi_checkpoints/fixed_dataset/sft/agentview_wrist/29999/params \
@@ -62,12 +62,12 @@ python -m scripts.distillation_acpd.train_distill \
   --exact-contribution-fusion \
   --assets-dir=/home/liutong/Projects/openpi/assets/pi05_libero_agentview_wrist \
   --asset-id=libero_multiview \
-  --checkpoint-base-dir=/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k \
+  --checkpoint-base-dir=/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/trajectory_recovery_20k \
   --seed=42 \
   --batch-size=64 \
   --gradient-accumulation-steps=1 \
   --num-workers=0 \
-  --num-train-steps=30000 \
+  --num-train-steps=20000 \
   --warmup-steps=1000 \
   --peak-lr=2.5e-5 \
   --decay-steps=30000 \
