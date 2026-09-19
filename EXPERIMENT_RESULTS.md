@@ -1,6 +1,6 @@
 # 实验结果记录
 
-更新时间：2026-09-19（19:25 CST）
+更新时间：2026-09-19（19:40 CST）
 
 本文件是唯一长期实验结果台账。开始实验相关工作前读取；实验状态变化或产生最终结果后立即更新。只记录实际运行的配置和已核实结果；未完成项标记“尚无结论”，原始日志和 checkpoint 保存在 `/opt/liutong`。
 
@@ -154,7 +154,7 @@ Teacher target 是每个视角对 action attention 的真实残差贡献：使�
 | H8 四套验证 | 4 GPU，2,000 episodes | 128421 | 完成；`127/2,000`，pooled `6.35%` |
 | H9 layer-10 训练 | FSDP4，physical global BS32，无梯度累积，5K | 129710 | 完成；4999 checkpoint 已完整保存 |
 | H9 layer-10 验证 | 4 GPU，2,000 episodes | 129711 | 完成；`227/2,000`，pooled `11.35%` |
-| H9-scale-b | 最终 hidden 注入；FSDP4，physical global BS64，无梯度累积，30K | 129728 | 运行中；4999 checkpoint 验证为 `463/2,000`、`23.15%`；30K 尚无结论 |
+| H9-scale-b | 最终 hidden 注入；FSDP4，physical global BS64，无梯度累积，30K | 129728/130674 | 训练运行中；4999 checkpoint 验证为 `463/2,000`、`23.15%`；19999 checkpoint 验证排队；30K 尚无结论 |
 | H11 正式训练与验证 | 与 H9-scale-b 相同训练设置；query 与注入共同对齐到 layer 10 attention 后 | 129808/130490 | step 4,999 pooled `21.20%`，相对 H9-scale-b `-1.95` 点，配对 95% CI `[-4.10, +0.20]`；H11 不支持 |
 | H12 匹配 SFT | backview-only；FSDP4，physical global BS64，5K | 130285/130491 | 完成；`277/2,000`，pooled `13.85%`；H9 相对提升 `9.30` 点，95% CI `[+7.30, +11.35]` |
 | H13 loss-only | 与 H9-scale-b 相同，但训练和推理均关闭 residual 注入；FSDP4，physical global BS64，5K | 130599/130600 | 训练中；验证依赖训练完成；尚无结论 |
@@ -229,6 +229,7 @@ H9 相对 H8 提升 `5.00` 个百分点，task-stratified paired bootstrap 95% C
 | H9 batch-scaling 协议 | `experiments/acpd-v2-h9-batch-scaling-30k/protocol.md` |
 | H9 batch-scaling 分析 | `experiments/acpd-v2-h9-batch-scaling-30k/analysis.md` |
 | H9-scale-b 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-fsdp4-bs64-30k_129728.out`（运行中） |
+| H9-scale-b 20K 验证任务 | `examples/libero/eval_slurm/pi05_libero_backview_acpd_v2_h9_final_fsdp4_bs64_20k.sbatch`，job `130674`（排队） |
 | H11 协议 | `experiments/acpd-v2-h11-injection-location/protocol.md` |
 | H11 分析 | `experiments/acpd-v2-h11-injection-location/analysis.md` |
 | H11 配对分析 | `experiments/acpd-v2-h11-injection-location/results/h11_vs_h9_paired_analysis.json` |
@@ -264,6 +265,7 @@ H9 相对 H8 提升 `5.00` 个百分点，task-stratified paired bootstrap 95% C
 | H8 ACL-only，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/task_success_5k/pi05_libero_backview_acl_only_5k/pi05_libero_backview_acpd_lora_fsdp2_bs32_5k/4999` |
 | H9 ACPD-v2 layer 10，5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/task_success_5k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_pbs32_5k/4999` |
 | H9-scale-b，4 卡 BS64 运行目录 | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k` |
+| H9-scale-b，4 卡 BS64 20K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/19999` |
 | H9-scale-b，4 卡 BS64 30K（预期，尚未生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/29999` |
 | H11，4 卡 BS64 5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/injection_location_30k/pi05_libero_backview_acpd_v2_h11_layer10_aligned/pi05_libero_backview_acpd_v2_h11_layer10_aligned_lora_fsdp4_bs64_30k/4999` |
 | H12 backview SFT，4 卡 BS64 5K | `/opt/liutong/openpi_checkpoints/fixed_dataset/sft/backview_bs64_5k/pi05_libero_backview_lora/pi05_libero_backview_lora_fsdp4_bs64_5k/4999` |
@@ -287,6 +289,7 @@ H9 相对 H8 提升 `5.00` 个百分点，task-stratified paired bootstrap 95% C
 | H8 ACL-only，5K | `/opt/liutong/openpi-5090-evals/acpd-task-success-5k/acl-only/4999` | 完成，`6.35%` pooled |
 | H9 ACPD-v2 layer 10，5K | `/opt/liutong/openpi-5090-evals/acpd-v2-task-success-5k/layer10-exact-contribution-pbs32/4999` | 完成，`11.35%` pooled |
 | H9-scale-b 最终 hidden，BS64 5K | `/opt/liutong/openpi-5090-evals/acpd-v2-injection-location-5k/final-hidden/4999` | 完成，`23.15%` pooled |
+| H9-scale-b 最终 hidden，BS64 20K | `/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/19999` | job `130674` 排队；尚未验证 |
 | H11 同层注入，BS64 5K | `/opt/liutong/openpi-5090-evals/acpd-v2-injection-location-5k/aligned-attention/4999` | 完成，`21.20%` pooled |
 | H12 匹配 SFT，BS64 5K | `/opt/liutong/openpi-5090-evals/sft-backview-bs64-5k/4999` | 完成，`13.85%` pooled |
 | H13 loss-only，BS64 5K | `/opt/liutong/openpi-5090-evals/acpd-v2-injection-ablation-5k/loss-only/4999` | 尚未验证 |

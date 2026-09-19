@@ -110,8 +110,8 @@ hypotheses:
     priority: high
 
 current_execution:
-  checked_at: "2026-09-19 19:25 CST"
-  h9_scale_b: "four-device physical-BS64 job 129728 is running; checkpoint 4999 evaluated at 23.15% pooled; 30K has no result yet"
+  checked_at: "2026-09-19 19:40 CST"
+  h9_scale_b: "four-device physical-BS64 job 129728 is running; checkpoint 4999 evaluated at 23.15% pooled; exploratory checkpoint-19999 evaluation job 130674 is pending priority; 30K has no result yet"
   h11: "checkpoint 4999 evaluated at 21.20% pooled; same-layer injection is not supported relative to H9-scale-b"
   h12: "matched physical-BS64 SFT checkpoint 4999 evaluated at 13.85% pooled; H9-scale-b leads by 9.30 points"
   h13: "four-device physical-BS64 loss-only job 130599 is running; no result yet"
