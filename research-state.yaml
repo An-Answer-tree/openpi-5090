@@ -104,18 +104,11 @@ hypotheses:
     priority: high
 
 current_execution:
-  checked_at: "2026-09-19 18:06 CST"
-  h8_training: "job 128417 completed; step-4999 params and assets saved"
-  h8_evaluation: "job 128421 completed 2,000 episodes; pooled success 6.35%; ACL-only is within 0.15 points of Full ACPD"
-  h9_training: "layer-10 physical-BS32 job 129710 completed and saved checkpoint 4999"
-  h9_evaluation: "job 129711 completed 2,000 episodes; pooled success 11.35% versus H8 6.35%, paired 95% CI for the +5.00-point difference is [+3.60, +6.45]"
-  h9_scale_b: "four-device physical-BS64 job 129728 is running near step 22,700; checkpoint 4999 evaluated at 23.15% pooled"
-  h7_layer_scan: "job 128789 completed; layer 10 selected over runner-up layer 11 by 0.0485 overall cosine gap"
-  h11: "four-device BS64 smoke job 129807 completed; formal job 129808 was stopped by operator decision at logged step 9,500; only checkpoint 4999 is retained and remains under evaluation"
-  h11_evaluation: "job 130490 completed 2,000 episodes; pooled success 21.20% versus H9-scale-b 23.15%; H11-H9 paired 95% CI is [-4.10, +0.20] points"
-  h12: "four-device physical-BS64 backview-only SFT job 130285 completed at step 4999; step 4900 loss 0.0290; checkpoint 4999 is complete"
-  h12_evaluation: "job 130491 completed 2,000 episodes; SFT pooled success is 13.85% versus H9-scale-b 23.15%; H9-H12 paired 95% CI is [+7.30, +11.35] points"
-  h13: "four-device physical-BS64 loss-only job 130599 is running on gpu01 near step 1,000; local tests passed and the operator skipped the queued four-device smoke"
+  checked_at: "2026-09-19 19:04 CST"
+  h9_scale_b: "four-device physical-BS64 job 129728 is running; checkpoint 4999 evaluated at 23.15% pooled; 30K has no result yet"
+  h11: "checkpoint 4999 evaluated at 21.20% pooled; same-layer injection is not supported relative to H9-scale-b"
+  h12: "matched physical-BS64 SFT checkpoint 4999 evaluated at 13.85% pooled; H9-scale-b leads by 9.30 points"
+  h13: "four-device physical-BS64 loss-only job 130599 is running; no result yet"
   h13_evaluation: "job 130600 has an afterok dependency on H13 training job 130599"
 
 outer_loop:
