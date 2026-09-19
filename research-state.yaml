@@ -3,133 +3,80 @@ project:
   question: "How can privileged agentview+wrist information train a stronger weak-view pi0.5 student?"
   status: active
   started: "2026-09-11"
-  domain: "robot policy distillation"
-
-literature:
-  key_papers:
-    - id: acpd2027
-      title: "AAAI 2027 ACPD manuscript"
-      source: "AAAI_2027_ACPD.pdf"
-      relevance: "Defines the privileged-cue selector, variance regularizer, ACL, and training objective."
-  open_problems:
-    - "Memory and throughput of a frozen full teacher plus a LoRA student on four 32 GB GPUs."
-  evidence_gaps:
-    - "H13 must isolate explicit exact-contribution injection from loss-only distillation."
-    - "The positive H8 and H9 5K results each have one seed and one student view."
-
-hypotheses:
-  - id: H1
-    statement: "FSDP4 with global micro-batch 8 and four accumulation steps can run ACPD LoRA with effective batch size 32 without OOM."
-    status: supported
-    motivation: "LoRA removes most student optimizer state while FSDP shards both model states and rematerialization limits activations."
-    parent: null
-    priority: high
-  - id: H2
-    statement: "FSDP4 can increase the physical global batch to 32 without gradient accumulation or OOM."
-    status: supported
-    motivation: "H1 left enough memory headroom to test the complete batch in one optimizer step."
-    parent: H1
-    priority: high
-  - id: H3
-    statement: "ACPD at layers 6 and 12 converges faster during the first 5K backview steps than ACPD at either layer alone."
-    status: not_supported
-    motivation: "The paper selects both layers without reporting a layer ablation; a controlled short run can test whether the additional head improves early optimization."
-    parent: H2
-    priority: high
-  - id: H4
-    statement: "Under an otherwise identical LoRA training graph, Cue or ACL changes early supervised-loss convergence relative to flow-only training."
-    status: not_supported
-    motivation: "The layer comparison cannot establish ACPD efficacy, and the historical SFT log uses a different RNG split. A component ablation inside the same distillation trainer isolates the optimization effect."
-    parent: H2
-    priority: high
-  - id: H5
-    statement: "Full ACPD improves pooled four-suite backview success by at least 2 percentage points over trainer-matched Flow-only training at 5K steps."
-    status: supported
-    motivation: "H4 shows active auxiliary gradients but indistinguishable supervised convergence, so task success is the next discriminating measurement. Promotion also requires the paired episode-bootstrap 95% confidence interval to exclude zero."
-    parent: H4
-    priority: high
-  - id: H7
-    statement: "An adapted backview student can predict the teacher's exact per-view attention contribution on held-out episodes, especially where the privileged teacher has the largest flow-error advantage."
-    status: supported
-    motivation: "The old learned cue and heuristic visual proxy admit shortcuts; exact Q/K/V attention contributions provide a fixed privileged target and a same-query shuffled-view control."
-    parent: H5
-    priority: high
-  - id: H8
-    statement: "ACL-only explains less than the complete +2.05-point H5 task-success gain at 5K steps."
-    status: not_supported
-    motivation: "H5 supports the full objective, but Cue and ACL were changed together. A matched saved ACL-only checkpoint isolates the strongest component from H4."
-    parent: H5
-    priority: high
-  - id: H9
-    statement: "A recoverability-gated ACPD-v2 policy improves pooled 5K task success over ACL-only by at least 1.5 percentage points with a positive paired confidence bound."
-    status: supported
-    motivation: "Deploy the layer-10 target selected by H7.1 using physical global batch 32, then compare its task success with the matched ACL-only baseline."
-    parent: H7
-    priority: high
-  - id: H9-scale-b
-    statement: "Layer-10 ACPD-v2 can increase throughput on four RTX 5090 GPUs by using physical global batch 64 without gradient accumulation."
-    status: active
-    motivation: "Use the memory headroom observed at BS32 to test a higher-throughput H9 training configuration."
-    parent: H9
-    priority: medium
-  - id: H7.1
-    statement: "Layer 9 remains the best recoverable layer when every action-expert layer from 6 through 12 is compared under the fixed H7 protocol."
-    status: not_supported
-    motivation: "The coarse H7 scan cannot distinguish a robust middle-layer optimum from an isolated result; adding layers 7, 8, 10, and 11 completes the local comparison without another policy run."
-    parent: H7
-    priority: medium
-  - id: H10
-    statement: "Calibrate ACPD-v2 auxiliary-loss weights after selecting the injection structure."
-    status: deferred
-    motivation: "Weight comparisons are interpretable only after the deployed contribution path is fixed."
-    parent: H9
-    priority: medium
-  - id: H11
-    statement: "Predicting and injecting the contribution after layer-10 attention improves 5K task success over final-hidden fusion."
-    status: not_supported
-    motivation: "A contribution produced at layer 10 may be more useful when the remaining transformer computation can integrate it."
-    parent: H9
-    priority: high
-  - id: H12
-    statement: "Layer-10 ACPD-v2 improves pooled 5K task success over standard backview-only SFT under matched four-device physical batch size 64."
-    status: supported
-    motivation: "The 23.15% H9-scale-b result needs a baseline with the same batch size, optimizer steps, seed, initialization, and learning-rate schedule."
-    parent: H9-scale-b
-    priority: high
-  - id: H13
-    statement: "Explicit exact-contribution injection improves pooled 5K task success beyond exact-contribution distillation loss alone."
-    status: active
-    motivation: "H9 combines an auxiliary contribution target with gated residual injection, so a matched loss-only run is required to identify whether injection itself matters."
-    parent: H9-scale-b
-    priority: high
-  - id: H14
-    statement: "Matched BS64 30K SFT baselines across topview, leftview, and rightview provide controls for extending ACPD-v2 beyond backview."
-    status: active
-    motivation: "View-specific ACPD gains require SFT controls with identical initialization, batch size, seed, schedule, and training budget."
-    parent: H12
-    priority: high
 
 current_execution:
-  checked_at: "2026-09-19 23:26 CST"
-  h9_scale_b: "four-device physical-BS64 job 129728 is running near step 25.4K; checkpoint 24999 is protected by same-filesystem hard links; CPU job 130703 restores it beside 29999 after successful completion; checkpoint 4999 was evaluated at 23.15% pooled; 30K has no result yet"
-  h9_trajectory_recovery: "job 130704 is pending; it repeats the H9-scale-b trajectory through 20K with keep_period=1 and will retain checkpoints 4999, 9999, 14999, and 19999"
-  h11: "checkpoint 4999 evaluated at 21.20% pooled; same-layer injection is not supported relative to H9-scale-b"
-  h12: "matched physical-BS64 SFT checkpoint 4999 evaluated at 13.85% pooled; H9-scale-b leads by 9.30 points"
-  h13: "four-device physical-BS64 loss-only job 130599 is running; no result yet"
-  h13_evaluation: "job 130600 has an afterok dependency on H13 training job 130599"
-  h14: "topview job 130669, leftview job 130670, and rightview job 130671 are pending priority; each uses FSDP4 physical BS64 for 30K steps"
+  checked_at: "2026-09-20 CST"
+  jobs:
+    - id: 129728
+      experiment: h9_scale_b_student_30k
+      state: running
+      output: student/backview_acpdv2_layer10_bs64
+    - id: 130703
+      experiment: h9_restore_25k
+      state: dependency
+      depends_on: 129728
+    - id: 130704
+      experiment: h9_recover_5k_to_20k
+      state: pending
+    - id: 130599
+      experiment: h13_loss_only_5k
+      state: running
+      output: ablation/backview_loss_only_bs64
+    - id: 130600
+      experiment: h13_loss_only_eval
+      state: dependency
+      depends_on: 130599
+    - id: 130669
+      experiment: topview_sft_bs64_30k
+      state: pending
+    - id: 130670
+      experiment: leftview_sft_bs64_30k
+      state: pending
+    - id: 130671
+      experiment: rightview_sft_bs64_30k
+      state: pending
 
-outer_loop:
-  cycle: 15
-  last_direction: "isolate explicit residual injection from the exact-contribution distillation loss under the H9-scale-b protocol"
-  last_reflection: "H9 validates the combined ACPD-v2 objective and deployment path, but its small learned gate does not identify whether explicit injection or auxiliary supervision causes the gain. H13 changes only the injection path."
+formal_matrix:
+  teacher:
+    agentview_wrist:
+      checkpoints: [29999]
+      status: complete
+  baseline:
+    backview_bs64:
+      checkpoints: [4999]
+      missing: [10k, 15k, 20k, 25k, 30k]
+    topview_bs64:
+      status: pending
+    leftview_bs64:
+      status: pending
+    rightview_bs64:
+      status: pending
+  student:
+    backview_acpdv2_layer10_bs64:
+      checkpoints: [24999]
+      status: running_and_recovering
+  ablation:
+    backview_loss_only_bs64:
+      status: running_5k
+      target: 30k
+    backview_acl_only_bs64:
+      status: not_started
+      target: 30k
+
+evidence_gaps:
+  - "H13 must isolate explicit residual injection from loss-only distillation."
+  - "Final claims require BS64 checkpoints and validation through 30K."
+  - "ACL-only must be rerun at BS64 for the final fair ablation."
+
+constraints:
+  - "Do not move or delete datasets or checkpoints."
+  - "Do not modify paths used by running, pending, or dependency jobs."
+  - "Curate only completed checkpoints with same-filesystem hard links."
+  - "Use save_interval=5000 and keep_period=1 for future 30K distillation runs."
+  - "Do not recursively scan large checkpoint, log, dataset, or video trees."
 
 workspace:
   results: "EXPERIMENT_RESULTS.md"
-  instructions: "AGENTS.md"
   findings: "findings.md"
-  log: "research-log.md"
-  literature_dir: "literature/"
-  experiments_dir: "experiments/"
-  to_human_dir: "to_human/"
-  paper_dir: "paper/"
+  experiments: "experiments/README.md"
+  checkpoint_root: "/opt/liutong/openpi_checkpoints/fixed_dataset/curated"

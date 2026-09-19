@@ -22,3 +22,4 @@
 | 2026-09-19 | 方法 | H14 锁定 topview、leftview、rightview 的匹配 SFT baseline：FSDP4、physical BS64、seed 42、cosine 30K，每 5K 保留 checkpoint。 |
 | 2026-09-19 | 方法 | H9-scale-b 增加探索性 20K checkpoint 验证；使用与 5K 相同的 2,000 episodes，仅报告训练轨迹变化，不作 ACPD-v2 对 SFT 的方法结论。 |
 | 2026-09-19 | 方法 | H9-scale-b 完整 25K checkpoint 使用同文件系统硬链接保护；job 130703 在原训练完成后恢复 25K，job 130704 按相同训练设置重跑至 20K 并保留 5K/10K/15K/20K。 |
+| 2026-09-20 | 管理 | 正式 checkpoint 按 `teacher`、`baseline`、`student`、`ablation` 建立同文件系统硬链接索引；不移动或删除源 checkpoint，不纳入 H11，正式学生与消融实验统一以 BS64、每 5K 保存为准。 |
