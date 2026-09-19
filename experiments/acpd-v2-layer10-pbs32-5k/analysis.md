@@ -51,3 +51,5 @@ pooled 提升 5.00 个百分点，95% CI 为 [+3.60, +6.45]；Spatial、Object�
 H11 的同层注入对照、同 BS64 的 SFT 对照以及重复 seed，才能分离这两种解释并检验长期
 任务效果。`weighted_acpd_loss / supervised_loss` 在末步约为 2.68，说明权重 0.2
 在当前损失尺度下并不等价于“弱约束”，后续权重校准应在注入结构固定后进行。
+
+训练曲线：`artifacts/pi05_acpdv2_h9_loss.png`（PDF 版本同名）。

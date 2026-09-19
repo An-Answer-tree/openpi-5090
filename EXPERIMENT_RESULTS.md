@@ -207,6 +207,7 @@ H9 相对 H8 提升 `5.00` 个百分点，task-stratified paired bootstrap 95% C
 | H9 分析 | `experiments/acpd-v2-layer10-pbs32-5k/analysis.md` |
 | H9 配对分析 | `experiments/acpd-v2-layer10-pbs32-5k/results/h9_vs_h8_paired_analysis.json` |
 | H9 layer-10 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-pbs32-5k_129710.out`（完成） |
+| H9 loss 曲线 | `artifacts/pi05_acpdv2_h9_loss.png` / `.pdf` |
 | H9 batch-scaling 协议 | `experiments/acpd-v2-h9-batch-scaling-30k/protocol.md` |
 | H9 batch-scaling 分析 | `experiments/acpd-v2-h9-batch-scaling-30k/analysis.md` |
 | H9-scale-b 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-fsdp4-bs64-30k_129728.out`（运行中） |
