@@ -54,6 +54,7 @@ contribution loss 均下降，预测 cosine 上升，LoRA 与 predictor 梯度�
 | H11 BS64 smoke，同层注入 | 129807 | 完成 | 运行门槛通过。 |
 | H11 BS64，同层注入 | 129808/130490 | 训练停止，5K 验证运行中 | 训练主动停止于 step 9,500；保留 4999 checkpoint，尚无最终任务成功率结论。 |
 | H12 backview SFT BS64 5K | 130285/130491 | 训练完成，验证运行中 | step 4900 loss `0.0290`；验证已启动，尚无成功率结论。 |
+| H13 loss-only BS64 5K | 130599/130600 | 训练排队，验证依赖训练 | 保留 contribution loss 和 ACL，只关闭训练与推理注入；尚无结论。 |
 
 H10 的 loss 权重校准保留，但在 H9/H11 选定注入结构后再做，避免同时改变结构和
 权重。
