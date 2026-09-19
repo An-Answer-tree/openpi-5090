@@ -16,7 +16,8 @@ pi0.5 student？
 | exact contribution 能否从 backview 恢复 | H7/H7.1，layer 10 gap `0.3992`、hard gap `0.3779`、EV `0.3556` | 可以；layer 10 是 6--12 层中的最佳层。 |
 | exact contribution 能否提高任务成功率 | H9，`11.35%` 对 H8 的 `6.35%`，差值 `+5.00` 点，95% CI `[+3.60, +6.45]` | 单 seed、5K 筛选支持 ACPD-v2。 |
 | H9 的训练图是否稳定且目标可学 | H9 step 0--4,900：supervised loss `0.0892→0.0311`，exact contribution cosine `0.0057→0.6980`，单卡峰值 `17,406 MiB` | 训练实现稳定，layer-10 exact contribution 能被 student 学习。 |
-| H9 是否已证明直接注入机制 | gate 末步仅 `0.0048`，融合预测 stop-gradient；H9 只比较最终任务成功率 | 尚未完全证明；增益可能包含辅助损失的表征约束，需要 H11 和 gate 对照。 |
+| H9 是否已证明直接注入机制 | gate 末步仅 `0.0048`，融合预测 stop-gradient；H9 只比较最终任务成功率 | 尚未完全证明；增益可能包含辅助损失的表征约束，需要 H13 loss-only 对照。 |
+| 同层注入是否优于最终 hidden 注入 | H11 `21.20%` 对 H9-scale-b `23.15%`；差值 `-1.95` 点，95% CI `[-4.10, +0.20]` | 不支持 H11；保留 H9 的最终 hidden 注入作为当前结构。 |
 
 ## 方法判断
 
@@ -52,9 +53,9 @@ contribution loss 均下降，预测 cosine 上升，LoRA 与 predictor 梯度�
 | H9 BS32 5K，最终 hidden 注入 | 129710/129711 | 完成 | `11.35%`；相对 H8 `+5.00` 点，95% CI `[+3.60, +6.45]`。 |
 | H9-scale-b BS64 30K，最终 hidden 注入 | 129728 | 运行中，约 step 20,900 | 5K checkpoint 为 `23.15%`；不同样本预算，不与 H9 作 batch 因果比较。 |
 | H11 BS64 smoke，同层注入 | 129807 | 完成 | 运行门槛通过。 |
-| H11 BS64，同层注入 | 129808/130490 | 训练停止，5K 验证运行中 | 训练主动停止于 step 9,500；保留 4999 checkpoint，尚无最终任务成功率结论。 |
+| H11 BS64，同层注入 | 129808/130490 | 完成 | `21.20%`；相对 H9-scale-b `-1.95` 点，95% CI `[-4.10, +0.20]`，不支持前移注入。 |
 | H12 backview SFT BS64 5K | 130285/130491 | 训练完成，验证运行中 | step 4900 loss `0.0290`；验证已启动，尚无成功率结论。 |
-| H13 loss-only BS64 5K | 130599/130600 | 训练排队，验证依赖训练 | 保留 contribution loss 和 ACL，只关闭训练与推理注入；尚无结论。 |
+| H13 loss-only BS64 5K | 130599/130600 | 训练运行中，验证依赖训练 | 保留 contribution loss 和 ACL，只关闭训练与推理注入；尚无结论。 |
 
 H10 的 loss 权重校准保留，但在 H9/H11 选定注入结构后再做，避免同时改变结构和
 权重。

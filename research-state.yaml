@@ -14,7 +14,6 @@ literature:
   open_problems:
     - "Memory and throughput of a frozen full teacher plus a LoRA student on four 32 GB GPUs."
   evidence_gaps:
-    - "H11 task-success evaluation is pending."
     - "The matched physical-BS64 backview-only SFT baseline needs task-success evaluation."
     - "H13 must isolate explicit exact-contribution injection from loss-only distillation."
     - "The positive H8 and H9 5K results each have one seed and one student view."
@@ -88,7 +87,7 @@ hypotheses:
     priority: medium
   - id: H11
     statement: "Predicting and injecting the contribution after layer-10 attention improves 5K task success over final-hidden fusion."
-    status: active
+    status: not_supported
     motivation: "A contribution produced at layer 10 may be more useful when the remaining transformer computation can integrate it."
     parent: H9
     priority: high
@@ -106,7 +105,7 @@ hypotheses:
     priority: high
 
 current_execution:
-  checked_at: "2026-09-19 16:02 CST"
+  checked_at: "2026-09-19 16:09 CST"
   h8_training: "job 128417 completed; step-4999 params and assets saved"
   h8_evaluation: "job 128421 completed 2,000 episodes; pooled success 6.35%; ACL-only is within 0.15 points of Full ACPD"
   h9_training: "layer-10 physical-BS32 job 129710 completed and saved checkpoint 4999"
@@ -114,10 +113,10 @@ current_execution:
   h9_scale_b: "four-device physical-BS64 job 129728 is running near step 20,900; checkpoint 4999 evaluated at 23.15% pooled; current retained checkpoint 19999"
   h7_layer_scan: "job 128789 completed; layer 10 selected over runner-up layer 11 by 0.0485 overall cosine gap"
   h11: "four-device BS64 smoke job 129807 completed; formal job 129808 was stopped by operator decision at logged step 9,500; only checkpoint 4999 is retained and remains under evaluation"
-  h11_evaluation: "job 130490 is running on gpu01; all four suites entered episode execution without traceback, CUDA, OOM, or startup failure; no final result yet"
+  h11_evaluation: "job 130490 completed 2,000 episodes; pooled success 21.20% versus H9-scale-b 23.15%; H11-H9 paired 95% CI is [-4.10, +0.20] points"
   h12: "four-device physical-BS64 backview-only SFT job 130285 completed at step 4999; step 4900 loss 0.0290; checkpoint 4999 is complete"
   h12_evaluation: "job 130491 is running on gpu05 with the BS64 SFT launcher"
-  h13: "four-device physical-BS64 loss-only job 130599 is pending resources; local tests passed and the operator skipped the queued four-device smoke"
+  h13: "four-device physical-BS64 loss-only job 130599 is running on gpu01; local tests passed and the operator skipped the queued four-device smoke"
   h13_evaluation: "job 130600 has an afterok dependency on H13 training job 130599"
 
 outer_loop:
