@@ -46,3 +46,9 @@ H9-scale-b 同时使用 exact contribution 蒸馏损失和推理时 residual 注
 - 其余情况：证据不足；不根据训练 loss、contribution cosine 或 gate 下结论。
 
 四个 benchmark 的成功率同时报告，用于判断 pooled 差异是否由单一 suite 驱动。
+
+## 验证资源
+
+验证使用 2 GPU，每张 GPU 串行运行两个 benchmark。每套仍使用固定初始状态、
+seed 7 和每任务 50 次，共 500 episodes；四套合计 2,000 episodes。该设置只减少
+并行度，不改变 H9 与 H13 的比较协议。

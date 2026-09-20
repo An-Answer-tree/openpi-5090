@@ -77,3 +77,10 @@ Stop at 20K and use `save_interval=5000`, `keep_period=1`, so directories
 `4999`, `9999`, `14999`, and `19999` all remain. This repeats training only to
 recover missing trajectory checkpoints and does not define a new method
 hypothesis or replace the completed 5K benchmark result.
+
+## Exploratory 30K Evaluation
+
+Evaluate checkpoint 29,999 with the same four suites, 500 episodes per suite,
+seed 7, backview camera, and policy configuration as the 5K evaluation. Use two
+GPUs for scheduling: each GPU evaluates two suites sequentially. This changes
+only wall-clock parallelism, not the 2,000-episode evaluation protocol.
