@@ -23,10 +23,10 @@
 | ID | 目的 | 实际配置 | Job | 状态 | 结果 |
 |---|---|---|---:|---|---|
 | Teacher | 提供 agentview+wrist 特权信息 | 全量 SFT，30K | 历史任务 | 完成 | checkpoint `29999` |
-| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762 | 5K 完成；30K 排队 | 5K pooled `13.85%`；30K 尚无结论 |
-| H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669 | 运行中，约 4.5K | 尚无结论 |
-| H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670 | 运行中，约 1.8K | 尚无结论 |
-| H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671 | 运行中，约 0.1K | 尚无结论 |
+| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762/130889 | 30K 训练中；验证等待训练 | 5K pooled `13.85%`；30K 尚无结论 |
+| H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669/130890 | 训练中；验证等待训练 | 尚无结论 |
+| H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 训练中；验证等待训练 | 尚无结论 |
+| H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 训练中；验证等待训练 | 尚无结论 |
 | H9-scale-b | backview ACPD-v2 主 student | layer 10，BS64，30K | 129728/130773 | 训练完成；30K 验证排队 | 5K pooled `23.15%`；30K checkpoint `29999` 已完成，尚无成功率结论 |
 | H9-recovery | 恢复 H9 中间 checkpoint | 与 H9-scale-b 相同，训练至 20K | 130704 | 排队 | 尚无新结论 |
 | H13 | 判断 contribution 注入是否必要 | H9 去除 residual 注入，BS64，5K | 130599/130774 | 训练完成；2 GPU 验证排队 | checkpoint `4999` 已完成；尚无成功率结论 |

@@ -35,6 +35,26 @@ current_execution:
       state: running
       step: 19500
       output: baseline/backview_bs64
+    - id: 130889
+      experiment: backview_sft_bs64_30k_eval
+      state: dependency
+      depends_on: 130762
+      resources: 2gpu_16cpu_48g
+    - id: 130890
+      experiment: topview_sft_bs64_30k_eval
+      state: dependency
+      depends_on: 130669
+      resources: 2gpu_16cpu_48g
+    - id: 130891
+      experiment: leftview_sft_bs64_30k_eval
+      state: dependency
+      depends_on: 130670
+      resources: 2gpu_16cpu_48g
+    - id: 130892
+      experiment: rightview_sft_bs64_30k_eval
+      state: dependency
+      depends_on: 130671
+      resources: 2gpu_16cpu_48g
   recently_completed:
     - id: 129728
       experiment: h9_scale_b_student_30k
@@ -56,16 +76,20 @@ formal_matrix:
       checkpoints: [4999, 10000, 15000]
       status: running
       job: 130762
+      eval_job: 130889
       missing: [20k, 25k, 30k]
     topview_bs64:
       status: running
       checkpoints: [5000, 10000, 15000, 20000]
+      eval_job: 130890
     leftview_bs64:
       status: running
       checkpoints: [5000, 10000, 15000, 20000]
+      eval_job: 130891
     rightview_bs64:
       status: running
       checkpoints: [5000, 10000, 15000]
+      eval_job: 130892
   student:
     backview_acpdv2_layer10_bs64:
       checkpoints: [24999, 29999]
