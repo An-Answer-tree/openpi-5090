@@ -716,7 +716,7 @@ def main(config: DistillTrainConfig):
     )
     jax.block_until_ready(student_state)
     if resuming:
-        student_state = _checkpoints.restore_state(checkpoint_manager, student_state, data_loader)
+        student_state = _checkpoints.restore_state(checkpoint_manager, student_state)
 
     teacher_state, teacher_state_sharding = _init_frozen_model_state(
         teacher_config,

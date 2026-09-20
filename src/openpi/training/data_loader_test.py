@@ -2,11 +2,27 @@ import dataclasses
 import types
 
 import jax
+import pytest
 import torch
 
 from openpi.models import pi0_config
 from openpi.training import config as _config
 from openpi.training import data_loader as _data_loader
+
+
+class _IndexDataset:
+    """Small dataset that exposes the sampled indices."""
+
+    def __init__(self, size: int):
+        self._size = size
+        self.num_reads = 0
+
+    def __getitem__(self, index: int) -> torch.Tensor:
+        self.num_reads += 1
+        return torch.tensor(index)
+
+    def __len__(self) -> int:
+        return self._size
 
 
 def test_torch_data_loader():
@@ -79,6 +95,53 @@ def test_torch_data_loader_parallel():
 
     for batch in batches:
         assert all(x.shape[0] == 4 for x in jax.tree.leaves(batch))
+
+
+@pytest.mark.parametrize("num_workers", [0, 2])
+def test_torch_data_loader_resumes_shuffle_order(num_workers: int):
+    dataset = _IndexDataset(11)
+    loader = _data_loader.TorchDataLoader(
+        dataset,
+        local_batch_size=4,
+        shuffle=True,
+        num_batches=9,
+        num_workers=num_workers,
+        seed=42,
+        framework="pytorch",
+    )
+    expected = [batch.tolist() for batch in loader]
+
+    resumed_dataset = _IndexDataset(11)
+    resumed_loader = _data_loader.TorchDataLoader(
+        resumed_dataset,
+        local_batch_size=4,
+        shuffle=True,
+        num_batches=4,
+        num_workers=num_workers,
+        seed=42,
+        framework="pytorch",
+        start_batch=5,
+    )
+    actual = [batch.tolist() for batch in resumed_loader]
+
+    assert actual == expected[5:9]
+
+
+def test_torch_data_loader_resume_does_not_read_skipped_samples():
+    dataset = _IndexDataset(11)
+    loader = _data_loader.TorchDataLoader(
+        dataset,
+        local_batch_size=4,
+        shuffle=True,
+        num_batches=1,
+        seed=42,
+        framework="pytorch",
+        start_batch=5,
+    )
+
+    list(loader)
+
+    assert dataset.num_reads == 4
 
 
 def test_with_fake_dataset():

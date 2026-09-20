@@ -1,4 +1,6 @@
+from collections import deque
 from collections.abc import Iterator, Sequence
+import itertools
 import logging
 import multiprocessing
 import os
@@ -242,6 +244,7 @@ def create_data_loader(
     num_batches: int | None = None,
     skip_norm_stats: bool = False,
     framework: Literal["jax", "pytorch"] = "jax",
+    start_batch: int = 0,
 ) -> DataLoader[tuple[_model.Observation, _model.Actions]]:
     """Create a data loader for training.
 
@@ -252,11 +255,14 @@ def create_data_loader(
         num_batches: Determines the number of batches to return.
         skip_norm_stats: Whether to skip data normalization.
         framework: The framework to use ("jax" or "pytorch").
+        start_batch: Number of deterministic shuffled batches already consumed.
     """
     data_config = config.data.create(config.assets_dirs, config.model)
     logging.info(f"data_config: {data_config}")
 
     if data_config.rlds_data_dir is not None:
+        if start_batch:
+            raise NotImplementedError("Resuming the RLDS data order is not supported.")
         return create_rlds_data_loader(
             data_config,
             action_horizon=config.model.action_horizon,
@@ -279,6 +285,7 @@ def create_data_loader(
         seed=config.seed,
         skip_norm_stats=skip_norm_stats,
         framework=framework,
+        start_batch=start_batch,
     )
 
 
@@ -295,6 +302,7 @@ def create_torch_data_loader(
     num_workers: int = 0,
     seed: int = 0,
     framework: str = "jax",
+    start_batch: int = 0,
 ) -> DataLoader[tuple[_model.Observation, _model.Actions]]:
     """Create a data loader for training.
 
@@ -312,6 +320,7 @@ def create_torch_data_loader(
         num_workers: The number of worker processes to use. If zero, the data loader will
             execute in the main process.
         seed: The seed to use for shuffling the data.
+        start_batch: Number of deterministic shuffled batches already consumed.
     """
     dataset = create_torch_dataset(data_config, action_horizon, model_config)
     dataset = transform_dataset(dataset, data_config, skip_norm_stats=skip_norm_stats)
@@ -346,6 +355,7 @@ def create_torch_data_loader(
         num_workers=num_workers,
         seed=seed,
         framework=framework,
+        start_batch=start_batch,
     )
 
     return DataLoaderImpl(data_config, data_loader)
@@ -407,6 +417,7 @@ class TorchDataLoader:
         num_workers: int = 0,
         seed: int = 0,
         framework: str = "jax",
+        start_batch: int = 0,
     ):
         """Create a PyTorch data loader.
 
@@ -422,6 +433,7 @@ class TorchDataLoader:
             num_workers: The number of worker processes to use. If zero, the data loader will
                 execute in the main process.
             seed: The seed to use for shuffling the data.
+            start_batch: Number of deterministic shuffled batches already consumed.
         """
         if jax.process_count() > 1:
             raise NotImplementedError("Data loading with multiple processes is not supported.")
@@ -445,6 +457,16 @@ class TorchDataLoader:
 
         generator = torch.Generator()
         generator.manual_seed(seed)
+        if start_batch:
+            if sampler is not None or not shuffle:
+                raise ValueError("start_batch requires the default shuffled sampler.")
+            sampler = _ResumedRandomSampler(
+                dataset,
+                batch_size=local_batch_size,
+                seed=seed,
+                start_batch=start_batch,
+                persistent_workers=num_workers > 0,
+            )
         self._data_loader = torch.utils.data.DataLoader(
             typing.cast(torch.utils.data.Dataset, dataset),
             batch_size=local_batch_size,
@@ -480,6 +502,57 @@ class TorchDataLoader:
                     yield jax.tree.map(lambda x: jax.make_array_from_process_local_data(self._sharding, x), batch)
                 else:
                     yield jax.tree.map(torch.as_tensor, batch)
+
+
+class _ResumedRandomSampler(torch.utils.data.Sampler[int]):
+    """Reconstructs RandomSampler state without loading skipped samples."""
+
+    def __init__(
+        self,
+        dataset,
+        *,
+        batch_size: int,
+        seed: int,
+        start_batch: int,
+        persistent_workers: bool,
+    ):
+        batches_per_epoch = len(dataset) // batch_size
+        completed_epochs, batch_offset = divmod(start_batch, batches_per_epoch)
+        logging.info(
+            "Resuming shuffled data order at batch %d (epoch %d, batch %d).",
+            start_batch,
+            completed_epochs,
+            batch_offset,
+        )
+
+        self._dataset = dataset
+        self._generator = torch.Generator()
+        self._generator.manual_seed(seed)
+        self._persistent_workers = persistent_workers
+        self._sample_offset = batch_offset * batch_size
+
+        for epoch in range(completed_epochs + 1):
+            if epoch == 0 or not persistent_workers:
+                self._consume_worker_seed()
+            if epoch < completed_epochs:
+                self._consume_epoch()
+
+    def __iter__(self):
+        sampler = torch.utils.data.RandomSampler(self._dataset, generator=self._generator)
+        yield from itertools.islice(sampler, self._sample_offset, None)
+        self._sample_offset = 0
+        if not self._persistent_workers:
+            self._consume_worker_seed()
+
+    def __len__(self) -> int:
+        return len(self._dataset) - self._sample_offset
+
+    def _consume_epoch(self) -> None:
+        sampler = torch.utils.data.RandomSampler(self._dataset, generator=self._generator)
+        deque(sampler, maxlen=0)
+
+    def _consume_worker_seed(self) -> None:
+        torch.empty((), dtype=torch.int64).random_(generator=self._generator)
 
 
 def _collate_fn(items):

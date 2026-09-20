@@ -522,6 +522,8 @@ class TrainConfig:
     overwrite: bool = False
     # If true, will resume training from the last checkpoint.
     resume: bool = False
+    # If true, resume the deterministic data order from the restored optimizer step.
+    resume_data_loader: bool = False
 
     # If true, will enable wandb logging.
     wandb_enabled: bool = True

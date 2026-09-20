@@ -39,3 +39,12 @@ The ACPD-v2 result is supported if its pooled success exceeds this SFT baseline
 by at least 1.5 percentage points and the paired 95% confidence interval lower
 bound is greater than zero. Training loss is used only as a health check.
 
+## 30K Continuation
+
+Resume the same run from checkpoint `4999`, whose restored optimizer step is
+5,000, and train to 30,000 steps. Keep the seed, physical global batch size,
+FSDP topology, optimizer state, and original 30K cosine schedule unchanged.
+
+Reconstruct the shuffled sampler at logical batch 5,000 by advancing only its
+random-number state. Do not read the skipped images. Save every 5,000 steps and
+retain all checkpoints so the 10K--30K learning curve can be evaluated.
