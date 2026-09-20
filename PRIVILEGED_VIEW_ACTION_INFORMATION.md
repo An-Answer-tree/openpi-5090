@@ -32,28 +32,23 @@
 注意力由 \(H\) 个并行分支计算，每个分支称为一个注意力头。在教师模型第 \(\ell\) 层，
 注意力头 \(h\) 将动作 token \(i\) 转换为查询向量
 \(\mathbf{q}_{\ell,h,i}\)，并将输入 token \(j\) 转换为键向量
-\(\mathbf{k}_{\ell,h,j}\) 和值向量 \(\mathbf{v}_{\ell,h,j}\)。动作 token 对输入
-token 的注意力权重为
+\(\mathbf{k}_{\ell,h,j}\) 和值向量 \(\mathbf{v}_{\ell,h,j}\)。先计算查询向量与每个
+键向量的匹配分数，再对所有可读取 token 的分数计算 softmax：
 
 $$
-p_{\ell,h,i,j}
+s_{\ell,h,i,j}
 =
-\frac{
-\exp\!\left(
-\mathbf{q}_{\ell,h,i}^{\mathsf{T}}
-\mathbf{k}_{\ell,h,j}/\sqrt{d_h}
-\right)
-}{
-\sum_{r\in\mathcal{S}_i}
-\exp\!\left(
-\mathbf{q}_{\ell,h,i}^{\mathsf{T}}
-\mathbf{k}_{\ell,h,r}/\sqrt{d_h}
-\right)
-}.
+\frac{\mathbf{q}_{\ell,h,i}^{\mathsf{T}}\mathbf{k}_{\ell,h,j}}{\sqrt{d_h}},
+\qquad
+\left(p_{\ell,h,i,j}\right)_{j\in\mathcal{S}_i}
+=
+\operatorname{softmax}\!\left(
+\left(s_{\ell,h,i,j}\right)_{j\in\mathcal{S}_i}
+\right).
 $$
 
-\(\mathcal{S}_i\) 是注意力掩码允许动作 token \(i\) 读取的全部输入 token。分母同时
-包含图像、语言和动作 token，因此每个视角的权重是在完整输入上计算的。
+\(\mathcal{S}_i\) 是注意力掩码允许动作 token \(i\) 读取的全部输入 token，包括图像、
+语言和动作 token。softmax 在这些 token 上统一归一化，所得权重之和为 1。
 
 设 \(\mathcal{T}_v\) 是视角 \(v\) 的图像 token 集合。该视角写入动作 token \(i\)
 的向量为
