@@ -23,7 +23,7 @@
 | ID | 目的 | 实际配置 | Job | 状态 | 结果 |
 |---|---|---|---:|---|---|
 | Teacher | 提供 agentview+wrist 特权信息 | 全量 SFT，30K | 历史任务 | 完成 | checkpoint `29999` |
-| H12 | backview 单视角 baseline | LoRA，BS64，5K | 130285/130491 | 完成 | pooled `13.85%` |
+| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762 | 5K 完成；30K 排队 | 5K pooled `13.85%`；30K 尚无结论 |
 | H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669 | 排队 | 尚无结论 |
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670 | 排队 | 尚无结论 |
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671 | 排队 | 尚无结论 |
@@ -73,7 +73,7 @@
 | 分类 | 模型 | 已归档 | 状态 |
 |---|---|---|---|
 | teacher | agentview+wrist | `29999` | 完整 |
-| baseline | backview BS64 | `4999` | 10K-30K 待后续 resume |
+| baseline | backview BS64 | `4999` | job 130762 已提交，确定性续训至 30K |
 | baseline | topview BS64 | - | job 130669 排队 |
 | baseline | leftview BS64 | - | job 130670 排队 |
 | baseline | rightview BS64 | - | job 130671 排队 |

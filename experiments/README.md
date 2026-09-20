@@ -19,7 +19,7 @@
 
 | 类别 | 实验 | 协议/分析 | 状态 |
 |---|---|---|---|
-| baseline | backview BS64 5K | `baseline/sft-backview-bs64-5k/` | 完成并验证 |
+| baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 5K 完成并验证；30K 排队 |
 | baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 排队 |
 | student | H9-scale-b ACPD-v2 BS64 | `student/acpd-v2-h9-batch-scaling-30k/` | 训练与恢复中 |
 | ablation | H13 loss-only BS64 | `ablation/acpd-v2-h13-injection-ablation/` | 训练中 |
@@ -36,7 +36,7 @@ H11 已归档，不进入正式 checkpoint 集合，也不继续训练。
 | 模型 | 5K | 10K | 15K | 20K | 25K | 30K |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
 | teacher/agentview_wrist | - | - | - | - | - | Y |
-| baseline/backview_bs64 | Y | P | P | P | P | P |
+| baseline/backview_bs64 | Y | Q | Q | Q | Q | Q |
 | baseline/topview_bs64 | Q | Q | Q | Q | Q | Q |
 | baseline/leftview_bs64 | Q | Q | Q | Q | Q | Q |
 | baseline/rightview_bs64 | Q | Q | Q | Q | Q | Q |

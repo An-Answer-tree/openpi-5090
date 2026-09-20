@@ -35,6 +35,10 @@ current_execution:
     - id: 130671
       experiment: rightview_sft_bs64_30k
       state: pending
+    - id: 130762
+      experiment: backview_sft_bs64_resume_30k
+      state: pending
+      output: baseline/backview_bs64
 
 formal_matrix:
   teacher:
@@ -44,6 +48,8 @@ formal_matrix:
   baseline:
     backview_bs64:
       checkpoints: [4999]
+      status: resume_30k_pending
+      job: 130762
       missing: [10k, 15k, 20k, 25k, 30k]
     topview_bs64:
       status: pending
