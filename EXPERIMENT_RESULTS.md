@@ -14,7 +14,7 @@
 | 原始 ACPD 的 Cue 是否有效 | 没有可靠证据。Full 仅比 ACL-only 高 `0.15` 点，95% CI `[-1.15, 1.40]`。 | H5、H8 |
 | 哪层 exact contribution 最可恢复 | layer 10；overall gap `0.3992`，比次优 layer 11 高 `0.0485`。 | H7/H7.1 |
 | ACPD-v2 是否优于匹配 BS64 SFT | 5K 时为 `23.15%` 对 `13.85%`，提升 `9.30` 点，95% CI `[7.30, 11.35]`。 | H9-scale-b、H12 |
-| 显式 contribution 注入是否必要 | 尚无结论。H13 loss-only 正在训练，最终以相同 BS64、5K 成功率比较。 | H13 |
+| 显式 contribution 注入是否必要 | 尚无结论。H13 loss-only 已完成 5K，验证排队，最终以相同 BS64、5K 成功率比较。 | H13 |
 
 ## 正式 BS64 实验
 
@@ -24,12 +24,12 @@
 |---|---|---|---:|---|---|
 | Teacher | 提供 agentview+wrist 特权信息 | 全量 SFT，30K | 历史任务 | 完成 | checkpoint `29999` |
 | H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762 | 5K 完成；30K 排队 | 5K pooled `13.85%`；30K 尚无结论 |
-| H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669 | 排队 | 尚无结论 |
-| H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670 | 排队 | 尚无结论 |
-| H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671 | 排队 | 尚无结论 |
-| H9-scale-b | backview ACPD-v2 主 student | layer 10，BS64，30K | 129728 | 运行中 | 5K pooled `23.15%`；30K 尚无结论 |
+| H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669 | 运行中，约 4.5K | 尚无结论 |
+| H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670 | 运行中，约 1.8K | 尚无结论 |
+| H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671 | 运行中，约 0.1K | 尚无结论 |
+| H9-scale-b | backview ACPD-v2 主 student | layer 10，BS64，30K | 129728 | 训练完成 | 5K pooled `23.15%`；30K checkpoint `29999` 已完成，尚未验证 |
 | H9-recovery | 恢复 H9 中间 checkpoint | 与 H9-scale-b 相同，训练至 20K | 130704 | 排队 | 尚无新结论 |
-| H13 | 判断 contribution 注入是否必要 | H9 去除 residual 注入，BS64，5K | 130599/130600 | 训练中/依赖 | 尚无结论 |
+| H13 | 判断 contribution 注入是否必要 | H9 去除 residual 注入，BS64，5K | 130599/130600 | 训练完成；验证排队 | checkpoint `4999` 已完成；尚无成功率结论 |
 
 ## 前期筛选结果
 
@@ -74,11 +74,11 @@
 |---|---|---|---|
 | teacher | agentview+wrist | `29999` | 完整 |
 | baseline | backview BS64 | `4999` | job 130762 已提交，确定性续训至 30K |
-| baseline | topview BS64 | - | job 130669 排队 |
-| baseline | leftview BS64 | - | job 130670 排队 |
-| baseline | rightview BS64 | - | job 130671 排队 |
-| student | backview ACPD-v2 layer 10 BS64 | `24999` | 5K-20K 等待 job 130704；30K 等待 job 129728 |
-| ablation | backview loss-only BS64 | - | 5K 等待 job 130599；之后补至 30K |
+| baseline | topview BS64 | - | job 130669 运行中 |
+| baseline | leftview BS64 | - | job 130670 运行中 |
+| baseline | rightview BS64 | - | job 130671 运行中 |
+| student | backview ACPD-v2 layer 10 BS64 | `24999` | 30K checkpoint `29999` 已完成；5K-20K 等待 job 130704 |
+| ablation | backview loss-only BS64 | - | 5K checkpoint `4999` 已完成，job 130600 验证排队；之后补至 30K |
 | ablation | backview ACL-only BS64 | - | 尚未运行 |
 
 H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，也不进入正式索引。

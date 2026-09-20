@@ -5,40 +5,40 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-20 CST"
+  checked_at: "2026-09-20 10:58 CST"
   jobs:
-    - id: 129728
-      experiment: h9_scale_b_student_30k
-      state: running
-      output: student/backview_acpdv2_layer10_bs64
-    - id: 130703
-      experiment: h9_restore_25k
-      state: dependency
-      depends_on: 129728
     - id: 130704
       experiment: h9_recover_5k_to_20k
       state: pending
-    - id: 130599
-      experiment: h13_loss_only_5k
-      state: running
-      output: ablation/backview_loss_only_bs64
     - id: 130600
       experiment: h13_loss_only_eval
-      state: dependency
-      depends_on: 130599
+      state: pending
     - id: 130669
       experiment: topview_sft_bs64_30k
-      state: pending
+      state: running
+      step: 4540
     - id: 130670
       experiment: leftview_sft_bs64_30k
-      state: pending
+      state: running
+      step: 1800
     - id: 130671
       experiment: rightview_sft_bs64_30k
-      state: pending
+      state: running
+      step: 77
     - id: 130762
       experiment: backview_sft_bs64_resume_30k
       state: pending
       output: baseline/backview_bs64
+  recently_completed:
+    - id: 129728
+      experiment: h9_scale_b_student_30k
+      checkpoint: 29999
+    - id: 130703
+      experiment: h9_restore_25k
+      checkpoint: curated/student/backview_acpdv2_layer10_bs64/24999
+    - id: 130599
+      experiment: h13_loss_only_5k
+      checkpoint: 4999
 
 formal_matrix:
   teacher:
@@ -52,18 +52,19 @@ formal_matrix:
       job: 130762
       missing: [10k, 15k, 20k, 25k, 30k]
     topview_bs64:
-      status: pending
+      status: running
     leftview_bs64:
-      status: pending
+      status: running
     rightview_bs64:
-      status: pending
+      status: running
   student:
     backview_acpdv2_layer10_bs64:
-      checkpoints: [24999]
-      status: running_and_recovering
+      checkpoints: [24999, 29999]
+      status: 30k_complete_recovery_pending
   ablation:
     backview_loss_only_bs64:
-      status: running_5k
+      checkpoints: [4999]
+      status: 5k_complete_eval_pending
       target: 30k
     backview_acl_only_bs64:
       status: not_started

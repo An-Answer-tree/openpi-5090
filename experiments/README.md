@@ -20,9 +20,9 @@
 | 类别 | 实验 | 协议/分析 | 状态 |
 |---|---|---|---|
 | baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 5K 完成并验证；30K 排队 |
-| baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 排队 |
-| student | H9-scale-b ACPD-v2 BS64 | `student/acpd-v2-h9-batch-scaling-30k/` | 训练与恢复中 |
-| ablation | H13 loss-only BS64 | `ablation/acpd-v2-h13-injection-ablation/` | 训练中 |
+| baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 训练中 |
+| student | H9-scale-b ACPD-v2 BS64 | `student/acpd-v2-h9-batch-scaling-30k/` | 30K 完成；中间 checkpoint 恢复排队 |
+| ablation | H13 loss-only BS64 | `ablation/acpd-v2-h13-injection-ablation/` | 5K 完成；验证排队 |
 | ablation | ACL-only BS64 | 尚未创建协议 | 待运行 |
 
 H11 已归档，不进入正式 checkpoint 集合，也不继续训练。
@@ -31,17 +31,17 @@ H11 已归档，不进入正式 checkpoint 集合，也不继续训练。
 
 根目录：`/opt/liutong/openpi_checkpoints/fixed_dataset/curated`
 
-符号说明：`Y` 已硬链接归档，`R` 正在运行或恢复，`Q` 已提交排队，`P` 待后续补训，`-` 不适用。
+符号说明：`Y` 已硬链接归档，`C` 已完成但未归档，`R` 正在运行或恢复，`Q` 已提交排队，`P` 待后续补训，`-` 不适用。
 
 | 模型 | 5K | 10K | 15K | 20K | 25K | 30K |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
 | teacher/agentview_wrist | - | - | - | - | - | Y |
 | baseline/backview_bs64 | Y | Q | Q | Q | Q | Q |
-| baseline/topview_bs64 | Q | Q | Q | Q | Q | Q |
-| baseline/leftview_bs64 | Q | Q | Q | Q | Q | Q |
-| baseline/rightview_bs64 | Q | Q | Q | Q | Q | Q |
-| student/backview_acpdv2_layer10_bs64 | R | R | R | R | Y | R |
-| ablation/backview_loss_only_bs64 | R | P | P | P | P | P |
+| baseline/topview_bs64 | R | R | R | R | R | R |
+| baseline/leftview_bs64 | R | R | R | R | R | R |
+| baseline/rightview_bs64 | R | R | R | R | R | R |
+| student/backview_acpdv2_layer10_bs64 | Q | Q | Q | Q | Y | C |
+| ablation/backview_loss_only_bs64 | C | P | P | P | P | P |
 | ablation/backview_acl_only_bs64 | P | P | P | P | P | P |
 
 原目录中的 checkpoint 本次不移动、不删除。旧 BS16/BS32 checkpoint 不进入该表，仍保留在原路径。
