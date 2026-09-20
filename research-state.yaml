@@ -10,9 +10,14 @@ current_execution:
     - id: 130704
       experiment: h9_recover_5k_to_20k
       state: pending
-    - id: 130600
+    - id: 130774
       experiment: h13_loss_only_eval
       state: pending
+      resources: 2gpu_16cpu_48g
+    - id: 130773
+      experiment: h9_scale_b_30k_eval
+      state: pending
+      resources: 2gpu_16cpu_48g
     - id: 130669
       experiment: topview_sft_bs64_30k
       state: running
@@ -61,10 +66,12 @@ formal_matrix:
     backview_acpdv2_layer10_bs64:
       checkpoints: [24999, 29999]
       status: 30k_complete_recovery_pending
+      eval_30k_job: 130773
   ablation:
     backview_loss_only_bs64:
       checkpoints: [4999]
       status: 5k_complete_eval_pending
+      eval_job: 130774
       target: 30k
     backview_acl_only_bs64:
       status: not_started

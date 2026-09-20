@@ -27,9 +27,9 @@
 | H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669 | 运行中，约 4.5K | 尚无结论 |
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670 | 运行中，约 1.8K | 尚无结论 |
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671 | 运行中，约 0.1K | 尚无结论 |
-| H9-scale-b | backview ACPD-v2 主 student | layer 10，BS64，30K | 129728 | 训练完成 | 5K pooled `23.15%`；30K checkpoint `29999` 已完成，尚未验证 |
+| H9-scale-b | backview ACPD-v2 主 student | layer 10，BS64，30K | 129728/130773 | 训练完成；30K 验证排队 | 5K pooled `23.15%`；30K checkpoint `29999` 已完成，尚无成功率结论 |
 | H9-recovery | 恢复 H9 中间 checkpoint | 与 H9-scale-b 相同，训练至 20K | 130704 | 排队 | 尚无新结论 |
-| H13 | 判断 contribution 注入是否必要 | H9 去除 residual 注入，BS64，5K | 130599/130600 | 训练完成；验证排队 | checkpoint `4999` 已完成；尚无成功率结论 |
+| H13 | 判断 contribution 注入是否必要 | H9 去除 residual 注入，BS64，5K | 130599/130774 | 训练完成；2 GPU 验证排队 | checkpoint `4999` 已完成；尚无成功率结论 |
 
 ## 前期筛选结果
 
@@ -77,8 +77,8 @@
 | baseline | topview BS64 | - | job 130669 运行中 |
 | baseline | leftview BS64 | - | job 130670 运行中 |
 | baseline | rightview BS64 | - | job 130671 运行中 |
-| student | backview ACPD-v2 layer 10 BS64 | `24999` | 30K checkpoint `29999` 已完成；5K-20K 等待 job 130704 |
-| ablation | backview loss-only BS64 | - | 5K checkpoint `4999` 已完成，job 130600 验证排队；之后补至 30K |
+| student | backview ACPD-v2 layer 10 BS64 | `24999` | 30K checkpoint `29999` 已完成，job 130773 验证排队；5K-20K 等待 job 130704 |
+| ablation | backview loss-only BS64 | - | 5K checkpoint `4999` 已完成，job 130774 验证排队；之后补至 30K |
 | ablation | backview ACL-only BS64 | - | 尚未运行 |
 
 H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，也不进入正式索引。
