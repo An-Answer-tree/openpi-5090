@@ -22,3 +22,10 @@ ACPD-v2 实验比较。训练 loss 只用于检查运行健康，不作为任务
 
 三项训练除 fixed-view 配置、实验名和输出目录外完全一致。checkpoint 验证范围
 另行锁定；验证结果产生前不比较视角优劣。
+
+## 30K 验证
+
+分别使用对应的 topview、leftview、rightview fixed camera 验证 step 29,999。
+每个模型运行四套 LIBERO benchmark，seed 7，每任务 50 次，即每套 500 episodes、
+每模型共 2,000 episodes。每个模型申请 2 GPU，每张 GPU 串行运行两个 suite；该
+调度只影响并行度，不改变与 backview 30K baseline 的验证协议。

@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# -lt 2 || $# -gt 3 ]]; then
-  echo "Usage: $0 CHECKPOINT_DIR EVAL_DIR [POLICY_CONFIG]" >&2
+if [[ $# -lt 2 || $# -gt 4 ]]; then
+  echo "Usage: $0 CHECKPOINT_DIR EVAL_DIR [POLICY_CONFIG] [BASE_IMAGE_KEY]" >&2
   exit 2
 fi
 
 checkpoint_dir=$1
 eval_dir=$2
 policy_config=${3:-pi05_libero_backview_lora}
+base_image_key=${4:-backview_image}
 
 test -f "${checkpoint_dir}/_CHECKPOINT_METADATA"
 mkdir -p "${eval_dir}/logs"
@@ -40,7 +41,8 @@ run_suite() {
     "${port}" \
     "${suite_name}" \
     50 \
-    "${policy_config}" >"${eval_dir}/logs/${output_name}.log" 2>&1
+    "${policy_config}" \
+    "${base_image_key}" >"${eval_dir}/logs/${output_name}.log" 2>&1
 }
 
 run_pair() {

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# -lt 6 || $# -gt 7 ]]; then
-  echo "Usage: $0 CHECKPOINT_DIR EVAL_DIR GPU_ID PORT SUITE NUM_TRIALS [POLICY_CONFIG]" >&2
+if [[ $# -lt 6 || $# -gt 8 ]]; then
+  echo "Usage: $0 CHECKPOINT_DIR EVAL_DIR GPU_ID PORT SUITE NUM_TRIALS [POLICY_CONFIG] [BASE_IMAGE_KEY]" >&2
   exit 2
 fi
 
@@ -13,6 +13,7 @@ port=$4
 suite_name=$5
 num_trials=$6
 policy_config=${7:-pi05_libero_backview_lora}
+base_image_key=${8:-backview_image}
 
 test -f "${checkpoint_dir}/_CHECKPOINT_METADATA"
 mkdir -p "${eval_dir}"
@@ -74,7 +75,7 @@ CUDA_VISIBLE_DEVICES="${gpu_id}" MUJOCO_EGL_DEVICE_ID="${gpu_id}" \
   --port "${port}" \
   --resize-size 224 \
   --replan-steps 5 \
-  --base-image-key backview_image \
+  --base-image-key "${base_image_key}" \
   --task-suite-name "${suite_name}" \
   --num-steps-wait 10 \
   --num-trials-per-task "${num_trials}" \

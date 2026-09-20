@@ -48,3 +48,7 @@ FSDP topology, optimizer state, and original 30K cosine schedule unchanged.
 Reconstruct the shuffled sampler at logical batch 5,000 by advancing only its
 random-number state. Do not read the skipped images. Save every 5,000 steps and
 retain all checkpoints so the 10K--30K learning curve can be evaluated.
+
+Evaluate checkpoint 29,999 on the four LIBERO suites with the same fixed
+backview camera, seed 7, and 500 episodes per suite as the 5K baseline.
+Use two GPUs, with each GPU evaluating two suites sequentially.
