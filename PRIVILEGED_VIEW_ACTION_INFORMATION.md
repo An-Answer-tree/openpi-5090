@@ -1,52 +1,62 @@
 # 特权视角动作信息
 
-## 定义
+## 输入表示
 
-特权视角动作信息不是普通的视觉特征，也不是表示图像重要性的标量。它表示：
+教师模型接收两张同步图像、任务指令和带噪动作序列：
 
-> 在教师模型生成某个动作 token 时，一个特权视角通过真实注意力计算写入动作表征的定向更新。
+- `agentview`：场景相机图像；
+- `wrist`：腕部相机图像；
+- 任务指令：描述当前操作目标的文本；
+- 带噪动作序列：真实动作与随机噪声按当前流时间混合得到的训练输入。
 
-本文将这一计算对象称为**视角分解的动作注意力残差**
-（view-decomposed action-attention residual）。它位于教师模型的动作表征空间，描述
-视觉信息如何被教师模型用于当前动作预测。
+这些输入在进入 Transformer 前被转换为 token。这里的 token 是一个向量，不只表示
+文本词元：图像被切分并编码为一组图像 token，文本被编码为一组语言 token，动作序列中
+的每个位置被编码为一个动作 token。
 
-## 数学形式
+每个动作 token 都有一个内部向量。Transformer 逐层更新该向量，模型最终用它预测动作。
+下文将其称为动作隐藏向量。
 
-考虑教师模型第 \(\ell\) 层的动作 token \(i\)。对注意力头 \(h\)，动作 token
-产生查询向量 \(\mathbf{q}_{\ell,h,i}\)，所有可见 token 产生键和值
-\(\mathbf{k}_{\ell,h,j}\) 和 \(\mathbf{v}_{\ell,h,j}\)。教师原始注意力权重为
+对动作 token \(i\) 而言，**可读取的输入 token**是注意力掩码允许它参与计算的 token。
+在当前教师模型中，这些 token 包括：
+
+- agentview 中未被填充的图像 token；
+- wrist 中未被填充的图像 token；
+- 任务指令中未被填充的语言 token；
+- 动作序列中的动作 token。
+
+“可读取”只表示注意力掩码没有屏蔽该 token。填充位置、缺失图像和被掩码的位置不参与
+注意力计算。
+
+## 计算方式
+
+注意力由 \(H\) 个并行分支计算，每个分支称为一个注意力头。在教师模型第 \(\ell\) 层，
+注意力头 \(h\) 将动作 token \(i\) 转换为查询向量
+\(\mathbf{q}_{\ell,h,i}\)，并将输入 token \(j\) 转换为键向量
+\(\mathbf{k}_{\ell,h,j}\) 和值向量 \(\mathbf{v}_{\ell,h,j}\)。动作 token 对输入
+token 的注意力权重为
 
 $$
 p_{\ell,h,i,j}
 =
 \frac{
-\exp\!\left(\mathbf{q}_{\ell,h,i}^{\mathsf{T}}
-\mathbf{k}_{\ell,h,j}/\sqrt{d_h}\right)
+\exp\!\left(
+\mathbf{q}_{\ell,h,i}^{\mathsf{T}}
+\mathbf{k}_{\ell,h,j}/\sqrt{d_h}
+\right)
 }{
-\sum_{r\in\mathcal{S}}
-\exp\!\left(\mathbf{q}_{\ell,h,i}^{\mathsf{T}}
-\mathbf{k}_{\ell,h,r}/\sqrt{d_h}\right)
-},
+\sum_{r\in\mathcal{S}_i}
+\exp\!\left(
+\mathbf{q}_{\ell,h,i}^{\mathsf{T}}
+\mathbf{k}_{\ell,h,r}/\sqrt{d_h}
+\right)
+}.
 $$
 
-其中，\(\mathcal{S}\) 包含该动作 token 可以读取的全部有效图像、语言和动作 token。
-因此，视角信息始终在教师模型的完整上下文中计算，而不是在单个视角内部重新归一化。
+\(\mathcal{S}_i\) 是注意力掩码允许动作 token \(i\) 读取的全部输入 token。分母同时
+包含图像、语言和动作 token，因此每个视角的权重是在完整输入上计算的。
 
-设 \(\mathcal{T}_v\) 是视角 \(v\) 的图像 token 集合。该视角传递给动作 token \(i\)
-的多头注意力消息为
-
-$$
-\mathbf{a}_{\ell,i}^{(v)}
-=
-\operatorname{Concat}_{h=1}^{H}
-\left(
-\sum_{j\in\mathcal{T}_v}
-p_{\ell,h,i,j}\,\mathbf{v}_{\ell,h,j}
-\right).
-$$
-
-经过教师模型真实的注意力输出投影 \(\mathbf{W}_{\ell}^{O}\) 和残差门
-\(\mathbf{g}_{\ell,i}\) 后，得到该视角的动作信息：
+设 \(\mathcal{T}_v\) 是视角 \(v\) 的图像 token 集合。该视角写入动作 token \(i\)
+的向量为
 
 $$
 \mathbf{m}_{\ell,i}^{(v)}
@@ -54,84 +64,71 @@ $$
 \mathbf{g}_{\ell,i}
 \odot
 \mathbf{W}_{\ell}^{O}
-\mathbf{a}_{\ell,i}^{(v)}
-$$
-
-其中，\(\mathbf{m}_{\ell,i}^{(v)}\) 与动作 token 的隐藏状态维度相同。对于
-agentview 和 wrist 两个特权视角，教师分别产生
-
-$$
-\mathbf{m}_{\ell,i}^{(\mathrm{agent})}
-,\qquad
-\mathbf{m}_{\ell,i}^{(\mathrm{wrist})}.
-$$
-
-二者的和表示两个特权视角共同写入当前动作 token 的信息：
-
-$$
-\mathbf{m}_{\ell,i}^{(\mathrm{priv})}
-=
-\mathbf{m}_{\ell,i}^{(\mathrm{agent})}
-+
-\mathbf{m}_{\ell,i}^{(\mathrm{wrist})}.
-$$
-
-## 为什么它与动作相关
-
-注意力权重由动作 token 的查询向量决定：
-
-$$
-p_{\ell,h,i,j}
-\propto
-\exp\!\left(
-\mathbf{q}_{\ell,h,i}^{\mathsf{T}}\mathbf{k}_{\ell,h,j}
-/\sqrt{d_h}
+\operatorname{Concat}_{h=1}^{H}
+\left(
+\sum_{j\in\mathcal{T}_v}
+p_{\ell,h,i,j}\mathbf{v}_{\ell,h,j}
 \right).
 $$
 
-不同动作 token 具有不同的查询向量，因此会从相同图像中读取不同的信息。例如，接近物体、
-调整抓取姿态和闭合夹爪所需的视觉证据并不相同。该向量还随噪声动作、流时间和上下文变化，
-所以它不是固定的图像表示，而是**由当前动作计算条件化的特权视角信息**。
+其中：
 
-## 与常见视觉量的区别
+- \(p_{\ell,h,i,j}\) 决定动作 token 从图像 token \(j\) 读取多少信息；
+- \(\mathbf{v}_{\ell,h,j}\) 是被读取的图像内容；
+- \(\mathbf{W}_{\ell}^{O}\) 将所有注意力头的结果映射回动作隐藏空间；
+- \(\mathbf{g}_{\ell,i}\) 控制注意力输出以多大幅度加到原动作隐藏向量上；
+- \(\mathbf{m}_{\ell,i}^{(v)}\) 与动作 token 的隐藏向量维度相同。
 
-| 对象 | 表示内容 | 与特权视角动作信息的区别 |
-|---|---|---|
-| 视觉编码器特征 | 图像内容的通用表示 | 尚未说明这些内容如何参与动作计算 |
-| 注意力权重 | 动作 token 对各输入 token 的读取比例 | 只有权重，没有包含被读取的 value 内容和输出投影 |
-| 显著性或重要性分数 | 某区域可能有多重要 | 通常是标量，不能作为动作隐藏状态的更新量 |
-| 因果贡献 | 删除或干预某信息造成的输出变化 | 当前量是注意力输出的精确分解，不等同于因果效应 |
-| 特权视角动作信息 | 特权视角写入动作残差流的向量更新 | 同时包含 action query、attention、value、输出投影和残差门 |
+当前方法分别计算 agentview 和 wrist 对应的向量：
 
-## 可加分解性质
+$$
+\mathbf{m}_{\ell,i}^{(\mathrm{agent})},
+\qquad
+\mathbf{m}_{\ell,i}^{(\mathrm{wrist})}.
+$$
 
-由于注意力的 value 聚合、输出投影和残差门对各来源的消息保持线性，若所有可见 token
-被划分为互不重叠的来源集合 \(\mathcal{V}\)，则完整的动作注意力更新可以写成
+这两个向量称为**特权视角动作信息**。它们是教师注意力输出中由两个特权视角产生的部分。
+
+## 与动作的关系
+
+注意力权重由动作 token 的查询向量 \(\mathbf{q}_{\ell,h,i}\) 决定。不同动作位置具有
+不同的查询向量，因此可以从同一张图像读取不同内容。带噪动作和流时间也参与动作 token
+的计算，所以特权视角动作信息随动作位置、带噪动作、流时间和输入场景变化。
+
+特权视角动作信息位于动作隐藏空间，不是固定的图像表示。
+
+## 与完整注意力输出的关系
+
+将动作 token 可以读取的输入按来源划分为互不重叠的集合，例如 agentview、wrist、语言
+和动作序列。由于值向量求和、输出投影和残差门对各来源都是线性运算，各来源向量之和等于
+该动作 token 的完整注意力残差：
 
 $$
 \Delta\mathbf{h}_{\ell,i}^{(\mathrm{attn})}
 =
-\sum_{v\in\mathcal{V}}
-\mathbf{m}_{\ell,i}^{(v)}.
+\sum_{s\in\mathcal{P}_i}
+\mathbf{m}_{\ell,i}^{(s)}.
 $$
 
-因此，\(\mathbf{m}_{\ell,i}^{(v)}\) 不是人为定义的辅助特征，而是教师模型原始注意力更新
-按照 token 来源得到的精确分量。agentview 和 wrist 分量只覆盖两个特权视觉来源；语言、
-动作和其他 token 的分量仍属于完整注意力更新的其余部分。
+\(\mathcal{P}_i\) 表示输入来源的完整划分。agentview 和 wrist 只对应其中两个来源；
+语言和动作 token 产生的部分不属于特权视角动作信息。
 
-## 在学生模型中的作用
+## 学生模型如何使用
 
-训练时，学生只能观察弱视角。学生根据自己的动作隐藏状态预测教师的两路特权视角动作信息：
+学生模型只接收一个弱视角。训练时，预测器根据学生第 \(\ell\) 层的动作隐藏向量
+\(\mathbf{h}_{\ell,i}^{(S)}\)，分别预测教师的两路特权视角动作信息：
 
 $$
+\left[
 \widehat{\mathbf{m}}_{\ell,i}^{(\mathrm{agent})},
 \widehat{\mathbf{m}}_{\ell,i}^{(\mathrm{wrist})}
+\right]
 =
 f_{\theta}\!\left(\mathbf{h}_{\ell,i}^{(S)}\right).
 $$
 
-该目标要求学生从弱视角和动作上下文中恢复教师在训练时从特权视角获得的动作相关信息。
-预测结果可以作为辅助监督，也可以通过可学习门控补充学生的动作表征：
+预测向量用于蒸馏损失。启用注入时，两路预测向量相加后，通过可学习门加入学生的动作隐藏
+向量：
 
 $$
 \widetilde{\mathbf{h}}_{i}^{(S)}
@@ -139,26 +136,24 @@ $$
 \mathbf{h}_{i}^{(S)}
 +
 \tanh(\alpha)
-\sum_{v\in\{\mathrm{agent},\mathrm{wrist}\}}
 \operatorname{sg}\!\left(
-\widehat{\mathbf{m}}_{\ell,i}^{(v)}
-\right),
+\widehat{\mathbf{m}}_{\ell,i}^{(\mathrm{agent})}
++
+\widehat{\mathbf{m}}_{\ell,i}^{(\mathrm{wrist})}
+\right).
 $$
 
-其中，\(\alpha\) 是可学习门，\(\operatorname{sg}\) 表示停止梯度。部署时不再需要教师或
-特权视角；学生只使用弱视角生成动作。
+\(\alpha\) 是可学习门，\(\operatorname{sg}\) 表示注入路径不向预测器反向传播梯度。
+部署时移除教师，学生只使用弱视角。
 
-## 准确的表述边界
+## 含义边界
 
-该向量可以表述为：
+| 名称 | 数学对象 |
+|---|---|
+| 图像特征 | 视觉编码器产生的图像 token |
+| 注意力权重 | 标量 \(p_{\ell,h,i,j}\) |
+| 特权视角动作信息 | 指定视角经过注意力加权、输出投影和残差门后得到的动作空间向量 |
+| 因果效应 | 对输入进行干预后测得的输出变化 |
 
-> 教师模型中由动作 token 查询、从指定特权视角读取并写入动作残差流的信息。
-
-不应将其直接表述为：
-
-- 图像中全部与任务有关的信息；
-- 特权视角对最终动作的因果效应；
-- 视觉区域的重要性或显著性；
-- 教师模型完整的动作知识。
-
-它精确描述的是**教师单层注意力计算中的来源特定动作更新**。
+特权视角动作信息是教师单层注意力输出的来源分量。该定义不表示图像区域的重要性，也不表示
+特权视角对最终动作的因果效应。
