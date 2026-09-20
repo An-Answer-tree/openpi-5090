@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-20 10:58 CST"
+  checked_at: "2026-09-20 23:11 CST"
   jobs:
     - id: 130704
       experiment: h9_recover_5k_to_20k
@@ -21,18 +21,19 @@ current_execution:
     - id: 130669
       experiment: topview_sft_bs64_30k
       state: running
-      step: 4540
+      step: 23100
     - id: 130670
       experiment: leftview_sft_bs64_30k
       state: running
-      step: 1800
+      step: 20800
     - id: 130671
       experiment: rightview_sft_bs64_30k
       state: running
-      step: 77
+      step: 17000
     - id: 130762
       experiment: backview_sft_bs64_resume_30k
-      state: pending
+      state: running
+      step: 19500
       output: baseline/backview_bs64
   recently_completed:
     - id: 129728
@@ -52,16 +53,19 @@ formal_matrix:
       status: complete
   baseline:
     backview_bs64:
-      checkpoints: [4999]
-      status: resume_30k_pending
+      checkpoints: [4999, 10000, 15000]
+      status: running
       job: 130762
-      missing: [10k, 15k, 20k, 25k, 30k]
+      missing: [20k, 25k, 30k]
     topview_bs64:
       status: running
+      checkpoints: [5000, 10000, 15000, 20000]
     leftview_bs64:
       status: running
+      checkpoints: [5000, 10000, 15000, 20000]
     rightview_bs64:
       status: running
+      checkpoints: [5000, 10000, 15000]
   student:
     backview_acpdv2_layer10_bs64:
       checkpoints: [24999, 29999]
