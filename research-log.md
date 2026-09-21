@@ -28,3 +28,4 @@
 | 2026-09-21 | 方法 | H9 从完整 30K checkpoint 恢复 optimizer、随机数据顺序和 step-conditioned RNG，以末端学习率 2.5e-6 续训至 60K；只验证 40K、50K、60K，不复测第二 seed。 |
 | 2026-09-21 | 结果 | H13 loss-only 5K 为 20.60%，H9 为 23.15%；H9 高 2.55 点，配对 95% CI `[+0.40, +4.70]`，达到预注册判据，支持显式 contribution 注入。 |
 | 2026-09-21 | 结果 | BS64 SFT 30K 的 topview 为 71.55%，leftview 为 78.65%；backview 正在验证，rightview 排队。 |
+| 2026-09-21 | 方法 | 提交 job 131849，使用同一 H9 30K checkpoint 关闭推理注入，区分后期差异来自 residual 注入还是训练期辅助目标。 |

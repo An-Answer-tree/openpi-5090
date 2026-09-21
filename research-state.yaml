@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-21 13:52 CST"
+  checked_at: "2026-09-21 14:14 CST"
   jobs:
     - id: 130704
       experiment: h9_recover_5k_to_20k
@@ -30,6 +30,11 @@ current_execution:
       resources: 2gpu_16cpu_48g
     - id: 130892
       experiment: rightview_sft_bs64_30k_eval
+      state: pending
+      reason: priority
+      resources: 2gpu_16cpu_48g
+    - id: 131849
+      experiment: h9_30k_injection_off_eval
       state: pending
       reason: priority
       resources: 2gpu_16cpu_48g

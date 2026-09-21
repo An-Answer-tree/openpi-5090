@@ -32,6 +32,7 @@
 | H9-trajectory | 定位 30K 后最佳 checkpoint | H9 从 30K 精确续训至 60K；验证 40K/50K/60K | 131642/131643 | 训练排队；验证等待训练 | 尚无结论 |
 | H9-recovery | 恢复 H9 中间 checkpoint | 与 H9-scale-b 相同，训练至 20K | 130704 | 运行中 | 尚无新结论 |
 | H13 | 判断 contribution 注入是否有效 | H9 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
+| H9-toggle | 定位 H9 30K 差异来源 | 同一 H9 30K checkpoint，推理时关闭 residual 注入 | 131849 | 验证排队 | 尚无结论 |
 
 ## 前期筛选结果
 
@@ -101,6 +102,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H9 30K--60K 协议 | `experiments/student/acpd-v2-h9-trajectory-60k/protocol.md` |
 | H12 分析 | `experiments/baseline/sft-backview-bs64-5k/analysis.md` |
 | H13 分析 | `experiments/ablation/acpd-v2-h13-injection-ablation/analysis.md` |
+| H9 30K 注入诊断协议 | `experiments/ablation/acpd-v2-h9-30k-injection-toggle/protocol.md` |
 | H14 top/left 结果 | `experiments/baseline/sft-multiview-bs64-30k/analysis.md` |
 | SFT 验证目录 | `/opt/liutong/openpi-5090-evals/` |
 | ACPD 验证目录 | `/opt/liutong/openpi-5090-evals/acpd-*` |
