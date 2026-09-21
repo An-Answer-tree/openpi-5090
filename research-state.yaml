@@ -183,6 +183,15 @@ formal_matrix:
         decay_steps: [5000, 15000]
       target_step: 30000
       primary_baseline_pooled: 0.6045
+  mechanism:
+    h15a_gradient_conflict:
+      status: protocol_locked_waiting_for_5k_checkpoint
+      checkpoints: [4999, 29999]
+      batches_per_checkpoint: 200
+      batch_size: 32
+      gpus: 2
+      measured_parameters: shared_lora
+      updates_model: false
   ablation:
     backview_loss_only_bs64:
       checkpoints: [4999]

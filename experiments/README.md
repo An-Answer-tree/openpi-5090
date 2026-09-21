@@ -22,6 +22,7 @@
 | baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 30K 完成；25K 单卡数组验证排队 |
 | baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | top/left 完成，right 验证排队 |
 | student | H9-scale-b ACPD-v2 BS64 | `student/acpd-v2-h9-batch-scaling-30k/` | 30K 完成；25K 验证中；5K checkpoint 恢复中 |
+| mechanism | H15a ACPD-v2 梯度冲突诊断 | `mechanism/acpd-v2-h15a-gradient-conflict/` | 协议已锁定；等待 H9 5K checkpoint |
 | student | H15 持续蒸馏 ACPD-v2 | `student/acpd-v2-h15-persistent-distillation/` | 协议已锁定；等待 H9 5K checkpoint |
 | student | H9 ACPD-v2 30K--60K | `student/acpd-v2-h9-trajectory-60k/` | 用户取消；训练和验证均未运行 |
 | student | H9 ACPD-v2 25K | `student/acpd-v2-h9-20k-30k-trajectory/` | 25K array job 132082 验证中；20K 路线已取消 |
