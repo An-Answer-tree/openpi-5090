@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-21 14:14 CST"
+  checked_at: "2026-09-21 14:24 CST"
   jobs:
     - id: 130704
       experiment: h9_recover_5k_to_20k
@@ -33,10 +33,15 @@ current_execution:
       state: pending
       reason: priority
       resources: 2gpu_16cpu_48g
-    - id: 131849
-      experiment: h9_30k_injection_off_eval
+    - id: 131860
+      experiment: h9_25k_eval
       state: pending
       reason: priority
+      resources: 2gpu_16cpu_48g
+    - id: 131861
+      experiment: h9_20k_eval
+      state: dependency
+      depends_on: 130704
       resources: 2gpu_16cpu_48g
   recently_completed:
     - id: 130774
@@ -113,6 +118,8 @@ formal_matrix:
       checkpoints: [24999, 29999]
       status: 30k_eval_complete_recovery_running_60k_pending
       eval_30k_job: 130773
+      eval_25k_job: 131860
+      eval_20k_job: 131861
       resume_60k_job: 131642
       eval_40k_50k_60k_job: 131643
       eval_30k:
