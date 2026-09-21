@@ -30,9 +30,9 @@
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 完成 | 30K pooled `78.65%` |
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 30K 训练完成；验证排队 | 尚无结论 |
 | H9-scale-b | backview ACPD-v2 主 student | layer 10，BS64，30K | 129728/130773 | 训练和 30K 验证完成 | 5K pooled `23.15%`；30K pooled `58.00%` |
-| H9-mid-trajectory | 检查 30K 前是否已过峰值 | 验证 20K/25K；相同 2,000 episodes | 131861/132082 | 20K 等待 checkpoint；25K 单卡数组验证排队 | 尚无结论 |
+| H9-mid-trajectory | 检查 30K 前是否已过峰值 | 验证 25K；相同 2,000 episodes | 132082 | 单卡数组验证中；20K 路线已取消 | 尚无结论 |
 | H9-trajectory | 定位 30K 后最佳 checkpoint | H9 从 30K 精确续训至 60K；验证 40K/50K/60K | 131642/131643 | 用户取消；训练和验证均未运行 | 尚无结论 |
-| H9-recovery | 恢复 H9 中间 checkpoint | 与 H9-scale-b 相同，训练至 20K | 130704 | 运行中 | 尚无新结论 |
+| H9-recovery | 恢复 H9 的 5K checkpoint | 与 H9-scale-b 相同，写完 `4999` 后停止 | 130704/132198 | 运行中；watchdog 只检查明确 checkpoint 路径 | 尚无新结论 |
 | H13 | 判断 contribution 注入是否有效 | H9 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
 
 ## 前期筛选结果
@@ -86,7 +86,7 @@
 | baseline | topview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
 | baseline | leftview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
 | baseline | rightview BS64 | - | 5K--30K checkpoint 完整；job 130892 验证排队 |
-| student | backview ACPD-v2 layer 10 BS64 | `24999` | 30K checkpoint 和验证完整；job 130704 正在恢复 5K--20K；60K 路线已取消 |
+| student | backview ACPD-v2 layer 10 BS64 | `24999` | 30K checkpoint 和验证完整；job 130704 只恢复 5K；60K 路线已取消 |
 | ablation | backview loss-only BS64 | - | 5K checkpoint 和验证完整；之后补至 30K |
 | ablation | backview ACL-only BS64 | - | 尚未运行 |
 
@@ -105,8 +105,9 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H9/H12 30K 配对分析 | `experiments/baseline/sft-backview-bs64-5k/results/h9_vs_h12_30k_paired_analysis.json` |
 | H12 30K 验证 | `/opt/liutong/openpi-5090-evals/sft-backview-bs64-30k/29999/summary.txt` |
 | H9-scale-b 30K 验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/29999/summary.txt` |
-| H9 20K--30K 协议 | `experiments/student/acpd-v2-h9-20k-30k-trajectory/protocol.md` |
+| H9 25K 协议 | `experiments/student/acpd-v2-h9-20k-30k-trajectory/protocol.md` |
 | H9 30K--60K 协议 | `experiments/student/acpd-v2-h9-trajectory-60k/protocol.md` |
+| H15 持续蒸馏协议 | `experiments/student/acpd-v2-h15-persistent-distillation/protocol.md` |
 | H12 分析 | `experiments/baseline/sft-backview-bs64-5k/analysis.md` |
 | H13 分析 | `experiments/ablation/acpd-v2-h13-injection-ablation/analysis.md` |
 | H14 top/left 结果 | `experiments/baseline/sft-multiview-bs64-30k/analysis.md` |

@@ -5,14 +5,22 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-21 18:07 CST"
+  checked_at: "2026-09-21 20:49 CST"
   jobs:
     - id: 130704
-      experiment: h9_recover_5k_to_20k
+      experiment: h9_recover_5k
       state: running
       node: gpu04
-      step: 3430
-      eta: "about 41 hours"
+      step: 4500
+      stop_after_checkpoint: 4999
+      resources: 4gpu_32cpu_96g
+    - id: 132198
+      experiment: stop_h9_recovery_after_5k
+      state: running
+      node: gpu02
+      watches_job: 130704
+      checkpoint: 4999
+      resources: 1cpu_1g
     - id: 130892
       experiment: rightview_sft_bs64_30k_eval
       state: pending
@@ -20,21 +28,26 @@ current_execution:
       resources: 2gpu_16cpu_48g
     - id: 132082
       experiment: h9_25k_eval_single_gpu_array
-      state: pending
-      reason: priority
+      state: running
       resources: 4x_1gpu_8cpu_24g
+      completed_suites:
+        spatial: 0.632
+        object: 0.694
       summary_job: 132084
-    - id: 131861
-      experiment: h9_20k_eval
-      state: dependency
-      depends_on: 130704
-      resources: 2gpu_16cpu_48g
     - id: 132083
       experiment: backview_sft_bs64_25k_eval_single_gpu_array
       state: pending
       reason: priority
       resources: 4x_1gpu_8cpu_24g
       summary_job: 132085
+    - id: 132084
+      experiment: h9_25k_summary
+      state: dependency
+      depends_on: 132082
+    - id: 132085
+      experiment: backview_sft_25k_summary
+      state: dependency
+      depends_on: 132083
   recently_completed:
     - id: 130889
       experiment: backview_sft_bs64_30k_eval
@@ -75,6 +88,9 @@ current_execution:
       experiment: h13_loss_only_5k
       checkpoint: 4999
   recently_cancelled:
+    - id: 131861
+      experiment: h9_20k_eval
+      state: cancelled_before_checkpoint
     - id: 131860
       experiment: h9_25k_eval_2gpu
       state: cancelled_before_start_for_single_gpu_array
@@ -133,11 +149,17 @@ formal_matrix:
   student:
     backview_acpdv2_layer10_bs64:
       checkpoints: [24999, 29999]
-      status: 30k_eval_complete_recovery_running
+      status: 30k_eval_complete_25k_eval_running_5k_recovery_running
+      recovery_target: 4999
+      recovery_job: 130704
+      recovery_watchdog_job: 132198
       eval_30k_job: 130773
       eval_25k_job: 132082
       eval_25k_summary_job: 132084
-      eval_20k_job: 131861
+      eval_25k_partial:
+        spatial: 0.632
+        object: 0.694
+      cancelled_20k_eval_job: 131861
       cancelled_60k_jobs: [131642, 131643]
       eval_30k:
         spatial: 0.640
@@ -145,6 +167,22 @@ formal_matrix:
         goal: 0.618
         libero_10: 0.332
         pooled: 0.580
+    h15_persistent_distillation:
+      status: protocol_locked_waiting_for_5k_checkpoint
+      start_checkpoint: h9_recovery_4999
+      batch_size: 64
+      gpus: 4
+      supervised_loss_weight: 1.0
+      acpd_loss_weight:
+        initial: 0.2
+        floor: 0.02
+        decay_steps: [5000, 15000]
+      action_corr_loss_weight:
+        initial: 0.5
+        floor: 0.1
+        decay_steps: [5000, 15000]
+      target_step: 30000
+      primary_baseline_pooled: 0.6045
   ablation:
     backview_loss_only_bs64:
       checkpoints: [4999]
@@ -165,7 +203,8 @@ formal_matrix:
       target: 30k
 
 evidence_gaps:
-  - "Final claims require BS64 checkpoints and validation through 30K."
+  - "H15 must reach and validate 30K before claiming that persistent ACPD-v2 raises the model ceiling."
+  - "H9 and SFT 25K evaluations must finish before interpreting the late-training trajectory."
   - "ACL-only must be rerun at BS64 for the final fair ablation."
 
 constraints:
@@ -173,6 +212,7 @@ constraints:
   - "Do not modify paths used by running, pending, or dependency jobs."
   - "Curate only completed checkpoints with same-filesystem hard links."
   - "Use save_interval=5000 and keep_period=1 for future 30K distillation runs."
+  - "Do not reduce H15 auxiliary losses to zero; preserve a nonzero teacher-signal floor."
   - "Do not recursively scan large checkpoint, log, dataset, or video trees."
 
 workspace:
