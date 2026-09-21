@@ -19,6 +19,7 @@
 | ACPD-v2 是否降低训练 flow MSE | 299 个对齐点与 SFT 的相关系数为 `0.9985`，全程平均 MSE 几乎相同 | 5K 成功率增益不是更低训练 MSE 的结果；内部表示改变是待验证的机制解释。 |
 | 固定蒸馏权重是否适合全程训练 | 30K 时加权 contribution 与 ACL 的标量和约为 supervised 的 `3.29` 倍，而5K后的 contribution cosine 改善有限 | 固定权重可能使后期辅助目标过强；该证据支持测试非零下限退火，但不等同于梯度冲突证明。 |
 | 后期辅助梯度是否更冲突 | H15a-fast 中组合冲突率从 5K `6%` 降至 30K `3%`，cosine 中位数为 `0.4228` 对 `0.3795` | BS1 探索结果不支持明显的后期组合梯度冲突；最终判断等待正式 BS32。 |
+| 单视角 baseline 是否受视角影响 | left/right/top/backview 30K pooled 分别为 `78.65/77.00/71.55/60.45%` | 视角差异大；ACPD 必须使用相同 student 视角的 SFT 对照。 |
 
 ## 方法判断
 
@@ -58,7 +59,6 @@ conflict-aware ACPD。当前转向更直接的结构问题：H9 用一个全局�
 
 ## 待回答问题
 
-- BS64 rightview baseline 的 30K 表现如何？
 - H15a 是否检测到 5K 到 30K 增强的辅助梯度冲突？
 - H16 的 token-conditioned 双视角 gate 能否扩大并保持 5K 增益？
 - 公平 BS64 ACL-only 训练到 30K 后，ACPD-v2 的增益是否仍然成立？
