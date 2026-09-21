@@ -21,8 +21,8 @@
 |---|---|---|---|
 | baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 30K 完成；25K 单卡数组验证排队 |
 | baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | top/left 完成，right 验证排队 |
-| student | H9-scale-b ACPD-v2 BS64 | `student/acpd-v2-h9-batch-scaling-30k/` | 30K 完成；25K 验证中；5K checkpoint 恢复中 |
-| mechanism | H15a ACPD-v2 梯度冲突诊断 | `mechanism/acpd-v2-h15a-gradient-conflict/` | 协议已锁定；等待 H9 5K checkpoint |
+| student | H9-scale-b ACPD-v2 BS64 | `student/acpd-v2-h9-batch-scaling-30k/` | 5K/30K 完成；25K 验证中 |
+| mechanism | H15a ACPD-v2 梯度冲突诊断 | `mechanism/acpd-v2-h15a-gradient-conflict/` | 5K 已完整；smoke 132244/132261 排队，正式 job 132250 等待依赖 |
 | student | H15 持续蒸馏 ACPD-v2 | `student/acpd-v2-h15-persistent-distillation/` | 协议已锁定；等待 H9 5K checkpoint |
 | student | H9 ACPD-v2 30K--60K | `student/acpd-v2-h9-trajectory-60k/` | 用户取消；训练和验证均未运行 |
 | student | H9 ACPD-v2 25K | `student/acpd-v2-h9-20k-30k-trajectory/` | 25K array job 132082 验证中；20K 路线已取消 |
@@ -45,7 +45,7 @@ H11 已归档，不进入正式 checkpoint 集合，也不继续训练。
 | baseline/topview_bs64 | C | C | C | C | C | C |
 | baseline/leftview_bs64 | C | C | C | C | C | C |
 | baseline/rightview_bs64 | C | C | C | C | C | C |
-| student/backview_acpdv2_layer10_bs64 | R | - | - | - | Y | C |
+| student/backview_acpdv2_layer10_bs64 | C | - | - | - | Y | C |
 | ablation/backview_loss_only_bs64 | C | P | P | P | P | P |
 | ablation/backview_acl_only_bs64 | P | P | P | P | P | P |
 

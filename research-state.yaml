@@ -5,22 +5,8 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-21 20:49 CST"
+  checked_at: "2026-09-21 22:07 CST"
   jobs:
-    - id: 130704
-      experiment: h9_recover_5k
-      state: running
-      node: gpu04
-      step: 4500
-      stop_after_checkpoint: 4999
-      resources: 4gpu_32cpu_96g
-    - id: 132198
-      experiment: stop_h9_recovery_after_5k
-      state: running
-      node: gpu02
-      watches_job: 130704
-      checkpoint: 4999
-      resources: 1cpu_1g
     - id: 130892
       experiment: rightview_sft_bs64_30k_eval
       state: pending
@@ -48,7 +34,29 @@ current_execution:
       experiment: backview_sft_25k_summary
       state: dependency
       depends_on: 132083
+    - id: 132244
+      experiment: h15a_gradient_conflict_smoke_2gpu
+      state: pending
+      reason: priority
+      resources: 2gpu_8cpu_48g
+    - id: 132261
+      experiment: h15a_gradient_conflict_smoke_1gpu
+      state: pending
+      reason: priority
+      resources: 1gpu_4cpu_24g
+    - id: 132250
+      experiment: h15a_gradient_conflict_5k_30k
+      state: dependency
+      depends_on: 132244
+      resources: 2gpu_16cpu_48g
   recently_completed:
+    - id: 130704
+      experiment: h9_recover_5k
+      checkpoint: 4999
+      state: stopped_after_complete_checkpoint
+    - id: 132198
+      experiment: stop_h9_recovery_after_5k
+      state: complete
     - id: 130889
       experiment: backview_sft_bs64_30k_eval
       checkpoint: 29999
@@ -148,8 +156,8 @@ formal_matrix:
       eval_job: 130892
   student:
     backview_acpdv2_layer10_bs64:
-      checkpoints: [24999, 29999]
-      status: 30k_eval_complete_25k_eval_running_5k_recovery_running
+      checkpoints: [4999, 24999, 29999]
+      status: 5k_recovered_30k_eval_complete_25k_eval_running
       recovery_target: 4999
       recovery_job: 130704
       recovery_watchdog_job: 132198
@@ -185,13 +193,15 @@ formal_matrix:
       primary_baseline_pooled: 0.6045
   mechanism:
     h15a_gradient_conflict:
-      status: protocol_locked_waiting_for_5k_checkpoint
+      status: submitted_waiting_for_smoke
       checkpoints: [4999, 29999]
       batches_per_checkpoint: 200
       batch_size: 32
       gpus: 2
       measured_parameters: shared_lora
       updates_model: false
+      smoke_jobs: [132244, 132261]
+      job: 132250
   ablation:
     backview_loss_only_bs64:
       checkpoints: [4999]

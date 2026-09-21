@@ -507,6 +507,7 @@ def compute_gradients(
     teacher_state: FrozenModelState,
     batch: tuple[_model.Observation, _model.Observation, _model.Actions],
     micro_step: at.Int[at.Array, ""],
+    loss_weights: at.Array | None = None,
 ) -> tuple[nnx.State, dict[str, at.Array]]:
     student_model = nnx.merge(student_state.model_def, student_state.params)
     teacher_model = nnx.merge(teacher_state.model_def, teacher_state.params)
@@ -595,13 +596,17 @@ def compute_gradients(
             acpd_prediction_loss = jnp.mean(jnp.stack(prediction_losses))
             acpd_variance_loss = jnp.mean(jnp.stack(variance_losses))
         weighted_acpd_loss = config.acpd_loss_weight * acpd_loss
-        loss = (
+        total_loss = (
             config.supervised_loss_weight * supervised_loss
             + weighted_acpd_loss
             + config.action_corr_loss_weight * action_corr_loss
         )
-        return loss, {
-            "loss": loss,
+        objective_loss = total_loss
+        if loss_weights is not None:
+            component_losses = jnp.stack([supervised_loss, acpd_loss, action_corr_loss])
+            objective_loss = jnp.sum(loss_weights * component_losses)
+        return objective_loss, {
+            "loss": total_loss,
             "supervised_loss": supervised_loss,
             "acpd_loss": acpd_loss,
             "acpd_prediction_loss": acpd_prediction_loss,
