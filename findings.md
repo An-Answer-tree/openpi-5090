@@ -12,6 +12,7 @@
 | 特权视觉贡献能否恢复 | layer 10 overall gap `0.3992`，比次优层高 `0.0485` | backview 表征可以预测 teacher 的真实 attention contribution。 |
 | ACPD-v2 是否有正向任务信号 | BS32 5K 相对 ACL-only 提升 `5.00` 点，95% CI `[3.60, 6.45]` | 单 seed、5K 筛选支持 ACPD-v2。 |
 | ACPD-v2 是否优于公平 SFT | BS64 5K 为 `23.15%` 对 `13.85%`；30K 为 `58.00%` 对 `60.45%` | ACPD-v2 有早期优势，但没有保持到 30K。 |
+| ACPD-v2 在 25K 是否仍有优势 | ACPD-v2 `55.75%`，SFT `55.80%`；差值 `-0.05` 点，95% CI `[-2.50, +2.45]` | 25K 已无可检测优势。 |
 | ACPD-v2 延长训练是否有效 | H9-scale-b 从 5K `23.15%` 提高到 30K `58.00%`，但匹配 SFT 30K 为 `60.45%` | 延长训练提高了绝对成功率，尚未证明最终优于 SFT。 |
 | H9 是否在 25K 早于 30K 达峰 | 25K 为 `55.75%`，30K 为 `58.00%`；差值 `-2.25` 点，95% CI `[-4.70, +0.20]` | 不支持 25K 已过峰值；仍需匹配 SFT 25K 判断同进度优势。 |
 | 显式 residual 注入是否有效 | H9 为 `23.15%`，H13 loss-only 为 `20.60%`；差值 `+2.55` 点，配对 95% CI `[+0.40, +4.70]` | 达到预注册判据，支持显式注入。 |
@@ -33,8 +34,9 @@ H7/H7.1 证明该目标可以从 backview 恢复；H9 与 H12 在 5K 检测到 A
 匹配 loss 分析显示，SFT 与 ACPD-v2 的监督 flow MSE 轨迹几乎重合，但 ACPD-v2
 在 5K 已有明显成功率优势。Contribution cosine 在 5K 达到 `0.7157`，之后缓慢
 升至 30K 的 `0.7999`；gate 在约 12K 达峰后下降。25K 成功率为 `55.75%`，
-低于 30K 的 `58.00%`，因此当前任务指标不支持 25K 已经更优；训练 loss、cosine
-和 gate 都不能替代任务成功率验证。
+低于 30K 的 `58.00%`。匹配 SFT 在 25K 为 `55.80%`，与 ACPD-v2 的
+`55.75%` 无差异，因此早期增益在 25K 已消失；训练 loss、cosine 和 gate 都不能
+替代任务成功率验证。
 
 当前先运行 H15a 梯度诊断：在 H9 的 5K 与 30K checkpoint 上，用相同 batch、噪声
 和 flow time，直接比较共享 LoRA 参数中的 flow、contribution 与 ACL 梯度。该实验回答
@@ -57,7 +59,6 @@ conflict-aware ACPD。当前转向更直接的结构问题：H9 用一个全局�
 ## 待回答问题
 
 - BS64 rightview baseline 的 30K 表现如何？
-- H9-scale-b 25K 是否优于匹配 SFT 25K？
 - H15a 是否检测到 5K 到 30K 增强的辅助梯度冲突？
-- 应测试 conflict-aware ACPD，还是视角分离的动态 gate？
+- H16 的 token-conditioned 双视角 gate 能否扩大并保持 5K 增益？
 - 公平 BS64 ACL-only 训练到 30K 后，ACPD-v2 的增益是否仍然成立？

@@ -5,28 +5,31 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-22 01:21 CST"
+  checked_at: "2026-09-22 01:49 CST"
   jobs:
     - id: 130892
       experiment: rightview_sft_bs64_30k_eval
       state: running
       node: gpu05
       resources: 2gpu_16cpu_48g
-    - id: 132083
-      experiment: backview_sft_bs64_25k_eval_single_gpu_array
-      state: running
-      resources: 4x_1gpu_8cpu_24g
-      summary_job: 132085
-    - id: 132085
-      experiment: backview_sft_25k_summary
-      state: dependency
-      depends_on: 132083
     - id: 132250
       experiment: h15a_gradient_conflict_5k_30k
       state: pending
       reason: priority
       resources: 2gpu_16cpu_48g
+    - id: 132316
+      experiment: h16_dynamic_view_gate_smoke
+      state: pending
+      reason: priority
+      resources: 1gpu_8cpu_48g
   recently_completed:
+    - id: 132083
+      experiment: backview_sft_bs64_25k_eval_single_gpu_array
+      state: complete
+    - id: 132085
+      experiment: backview_sft_25k_summary
+      state: complete
+      pooled_success: 0.5580
     - id: 132311
       experiment: h15a_gradient_conflict_fast_5k_30k
       state: complete
@@ -110,9 +113,15 @@ formal_matrix:
   baseline:
     backview_bs64:
       checkpoints: [4999, 10000, 15000, 20000, 25000, 29999]
-      status: complete_30k_eval_complete_25k_eval_pending
+      status: complete
       eval_25k_job: 132083
       eval_25k_summary_job: 132085
+      eval_25k:
+        spatial: 0.640
+        object: 0.640
+        goal: 0.656
+        libero_10: 0.296
+        pooled: 0.5580
       eval_30k_job: 130889
       eval_30k:
         spatial: 0.700
@@ -187,6 +196,14 @@ formal_matrix:
         decay_steps: [5000, 15000]
       target_step: 30000
       primary_baseline_pooled: 0.6045
+    h16_dynamic_view_gate:
+      status: smoke_pending
+      smoke_job: 132316
+      layer: 10
+      batch_size: 64
+      gpus: 4
+      target_step: 5000
+      primary_baseline_pooled: 0.2315
   mechanism:
     h15a_gradient_conflict:
       status: debug_smoke_complete_formal_pending
@@ -235,7 +252,7 @@ formal_matrix:
 
 evidence_gaps:
   - "H15a must determine whether late-training auxiliary gradients conflict with the flow objective before selecting the next ACPD-v2 variant."
-  - "SFT 25K evaluation must finish before judging whether ACPD-v2 retains a matched-step advantage at 25K."
+  - "H16 must test whether token-conditioned view selection improves the H9 5K task success rate."
   - "ACL-only must be rerun at BS64 for the final fair ablation."
 
 constraints:

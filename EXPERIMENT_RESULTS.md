@@ -14,6 +14,7 @@
 | 原始 ACPD 的 Cue 是否有效 | 没有可靠证据。Full 仅比 ACL-only 高 `0.15` 点，95% CI `[-1.15, 1.40]`。 | H5、H8 |
 | 哪层 exact contribution 最可恢复 | layer 10；overall gap `0.3992`，比次优 layer 11 高 `0.0485`。 | H7/H7.1 |
 | ACPD-v2 是否优于匹配 BS64 SFT | 5K 时提升 `9.30` 点；30K 时为 `58.00%` 对 `60.45%`，差值 `-2.45` 点，95% CI `[-5.00, 0.00]`。早期优势未保持到 30K。 | H9-scale-b、H12 |
+| ACPD-v2 的早期优势何时消失 | 25K 时 ACPD-v2 为 `55.75%`，SFT 为 `55.80%`；差值 `-0.05` 点，95% CI `[-2.50, +2.45]`。25K 已无可检测优势。 | 相同 2,000 episodes |
 | ACPD-v2 从 5K 继续训练是否有效 | 同一 H9-scale-b 训练在 30K 达到 `58.00%`，比 5K 高 `34.85` 点；匹配 SFT 30K 为 `60.45%`，尚未证明最终优势。 | 4×500 episodes |
 | H9 25K 是否早于 30K 达峰 | 不支持。25K 为 `55.75%`，30K 为 `58.00%`；25K-30K 为 `-2.25` 点，95% CI `[-4.70, +0.20]`。 | 相同 2,000 episodes |
 | 显式 contribution 注入是否有效 | 有正向证据。H9 为 `23.15%`，H13 loss-only 为 `20.60%`；差值 `+2.55` 点，配对 95% CI `[+0.40, +4.70]`。 | H13 |
@@ -27,7 +28,7 @@
 | ID | 目的 | 实际配置 | Job | 状态 | 结果 |
 |---|---|---|---:|---|---|
 | Teacher | 提供 agentview+wrist 特权信息 | 全量 SFT，30K | 历史任务 | 完成 | checkpoint `29999` |
-| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762/130889/132083 | 30K 完成；25K 单卡数组验证中 | 5K pooled `13.85%`；30K pooled `60.45%` |
+| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762/130889/132083/132085 | 完成 | 5K `13.85%`；25K `55.80%`；30K `60.45%` |
 | H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669/130890 | 完成 | 30K pooled `71.55%` |
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 完成 | 30K pooled `78.65%` |
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 30K 训练完成；验证中 | 尚无结论 |
@@ -42,6 +43,7 @@
 | ID | 目的 | 实际配置 | Job | 状态 | 结论 |
 |---|---|---|---:|---|---|
 | H15a | 判断 ACPD-v2 后期是否存在辅助梯度干扰 | H9 5K/30K；正式为每点200个相同BS32 batch；另有探索性BS1快速诊断；不更新参数 | smoke 132308；快速 132311；正式 132250 | 快速诊断完成；正式任务排队 | 快速诊断不支持后期组合梯度冲突增强；等待正式 BS32 |
+| H16 | 检验按 token 选择 agentview/wrist 是否优于 H9 全局 gate | layer 10；零初始化 dynamic view gate；先 smoke，再运行4卡BS64 5K | smoke 132316 | smoke 排队 | 尚无结论 |
 
 H15 固定权重退火仅保留为候选工程对照。是否执行由 H15a 决定，不作为当前主方法。
 
@@ -80,6 +82,7 @@ H15 固定权重退火仅保留为候选工程对照。是否执行由 H15a 决�
 | ACPD-v2 backview BS64 25K | 63.20% | 69.40% | 62.00% | 28.40% | 55.75% |
 | ACPD-v2 backview BS64 30K | 64.00% | 73.00% | 61.80% | 33.20% | 58.00% |
 | ACPD-v2 loss-only backview BS64 5K | 19.40% | 35.60% | 25.00% | 2.40% | 20.60% |
+| SFT backview BS64 25K | 64.00% | 64.00% | 65.60% | 29.60% | 55.80% |
 | SFT backview BS64 30K | 70.00% | 69.80% | 68.20% | 33.80% | 60.45% |
 | SFT topview BS64 30K | 81.00% | 80.60% | 79.20% | 45.40% | 71.55% |
 | SFT leftview BS64 30K | 84.00% | 79.60% | 79.40% | 71.60% | 78.65% |
@@ -93,7 +96,7 @@ H15 固定权重退火仅保留为候选工程对照。是否执行由 H15a 决�
 | 分类 | 模型 | 已归档 | 状态 |
 |---|---|---|---|
 | teacher | agentview+wrist | `29999` | 完整 |
-| baseline | backview BS64 | `4999` | 5K--30K checkpoint 完整；30K 验证完成；25K array job 132083 运行中 |
+| baseline | backview BS64 | `4999` | 5K--30K checkpoint 完整；25K 和 30K 验证完成 |
 | baseline | topview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
 | baseline | leftview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
 | baseline | rightview BS64 | - | 5K--30K checkpoint 完整；job 130892 验证中 |
@@ -114,6 +117,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H9/H12 loss 对齐指标 | `experiments/student/acpd-v2-h9-batch-scaling-30k/results/loss_comparison.json` |
 | H9/H12 loss 对齐图 | `artifacts/pi05_backview_sft_vs_acpdv2_loss.png` |
 | H9/H12 30K 配对分析 | `experiments/baseline/sft-backview-bs64-5k/results/h9_vs_h12_30k_paired_analysis.json` |
+| H9/H12 25K 配对分析 | `experiments/baseline/sft-backview-bs64-5k/results/h9_vs_h12_25k_paired_analysis.json` |
 | H12 30K 验证 | `/opt/liutong/openpi-5090-evals/sft-backview-bs64-30k/29999/summary.txt` |
 | H9-scale-b 30K 验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/29999/summary.txt` |
 | H9-scale-b 25K 验证 | `/opt/liutong/openpi-5090-evals/slurm-log/sum-bv-h9-25k_132084.out` |
