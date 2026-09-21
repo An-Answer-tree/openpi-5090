@@ -5,14 +5,14 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-21 15:20 CST"
+  checked_at: "2026-09-21 17:00 CST"
   jobs:
     - id: 130704
       experiment: h9_recover_5k_to_20k
       state: running
       node: gpu04
-      step: 1790
-      eta: "about 55 hours"
+      step: 3000
+      eta: "about 44 hours"
     - id: 130889
       experiment: backview_sft_bs64_30k_eval
       state: running
@@ -32,6 +32,11 @@ current_execution:
       state: dependency
       depends_on: 130704
       resources: 2gpu_16cpu_48g
+    - id: 132033
+      experiment: backview_sft_bs64_25k_eval
+      state: pending
+      reason: priority
+      resources: 4gpu_32cpu_96g
   recently_completed:
     - id: 130774
       experiment: h13_loss_only_eval
@@ -84,6 +89,7 @@ formal_matrix:
     backview_bs64:
       checkpoints: [4999, 10000, 15000, 20000, 25000, 29999]
       status: complete_eval_running
+      eval_25k_job: 132033
       eval_job: 130889
     topview_bs64:
       status: complete

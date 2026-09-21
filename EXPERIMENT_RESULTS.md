@@ -25,7 +25,7 @@
 | ID | 目的 | 实际配置 | Job | 状态 | 结果 |
 |---|---|---|---:|---|---|
 | Teacher | 提供 agentview+wrist 特权信息 | 全量 SFT，30K | 历史任务 | 完成 | checkpoint `29999` |
-| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762/130889 | 30K 训练完成；验证中 | 5K pooled `13.85%`；30K 尚无结论 |
+| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762/130889/132033 | 30K 验证中；25K 验证排队 | 5K pooled `13.85%`；25K/30K 尚无结论 |
 | H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669/130890 | 完成 | 30K pooled `71.55%` |
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 完成 | 30K pooled `78.65%` |
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 30K 训练完成；验证排队 | 尚无结论 |
@@ -81,7 +81,7 @@
 | 分类 | 模型 | 已归档 | 状态 |
 |---|---|---|---|
 | teacher | agentview+wrist | `29999` | 完整 |
-| baseline | backview BS64 | `4999` | 5K--30K checkpoint 完整；job 130889 验证中 |
+| baseline | backview BS64 | `4999` | 5K--30K checkpoint 完整；30K job 130889 验证中；25K job 132033 排队 |
 | baseline | topview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
 | baseline | leftview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
 | baseline | rightview BS64 | - | 5K--30K checkpoint 完整；job 130892 验证排队 |
