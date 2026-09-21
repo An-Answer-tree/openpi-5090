@@ -5,46 +5,27 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-21 12:07 CST"
+  checked_at: "2026-09-21 13:52 CST"
   jobs:
     - id: 130704
       experiment: h9_recover_5k_to_20k
       state: running
       node: gpu04
-      step: 797
-      eta: "about 59 hours"
+      step: 1790
+      eta: "about 55 hours"
     - id: 131642
       experiment: h9_resume_30k_to_60k
       state: pending
       reason: priority
       resources: 4gpu_32cpu_96g
-      estimated_start: "2026-09-24 10:19 CST"
+      estimated_start: "2026-09-22 10:04 CST"
     - id: 131643
       experiment: h9_40k_50k_60k_eval
       state: dependency
       depends_on: 131642
       resources: 2gpu_16cpu_48g
-    - id: 130774
-      experiment: h13_loss_only_eval
-      state: running
-      resources: 2gpu_16cpu_48g
-      completed_suites:
-        spatial: 0.194
-        object: 0.356
     - id: 130889
       experiment: backview_sft_bs64_30k_eval
-      state: pending
-      reason: priority
-      resources: 2gpu_16cpu_48g
-    - id: 130890
-      experiment: topview_sft_bs64_30k_eval
-      state: running
-      resources: 2gpu_16cpu_48g
-      completed_suites:
-        spatial: 0.810
-        object: 0.806
-    - id: 130891
-      experiment: leftview_sft_bs64_30k_eval
       state: running
       resources: 2gpu_16cpu_48g
     - id: 130892
@@ -53,6 +34,15 @@ current_execution:
       reason: priority
       resources: 2gpu_16cpu_48g
   recently_completed:
+    - id: 130774
+      experiment: h13_loss_only_eval
+      pooled_success: 0.2060
+    - id: 130890
+      experiment: topview_sft_bs64_30k_eval
+      pooled_success: 0.7155
+    - id: 130891
+      experiment: leftview_sft_bs64_30k_eval
+      pooled_success: 0.7865
     - id: 130773
       experiment: h9_scale_b_30k_eval
       checkpoint: 29999
@@ -87,16 +77,28 @@ formal_matrix:
   baseline:
     backview_bs64:
       checkpoints: [4999, 10000, 15000, 20000, 25000, 29999]
-      status: complete_eval_pending
+      status: complete_eval_running
       eval_job: 130889
     topview_bs64:
-      status: complete_eval_running
+      status: complete
       checkpoints: [5000, 10000, 15000, 20000, 25000, 29999]
       eval_job: 130890
+      eval_30k:
+        spatial: 0.810
+        object: 0.806
+        goal: 0.792
+        libero_10: 0.454
+        pooled: 0.7155
     leftview_bs64:
-      status: complete_eval_running
+      status: complete
       checkpoints: [5000, 10000, 15000, 20000, 25000, 29999]
       eval_job: 130891
+      eval_30k:
+        spatial: 0.840
+        object: 0.796
+        goal: 0.794
+        libero_10: 0.716
+        pooled: 0.7865
     rightview_bs64:
       status: complete_eval_pending
       checkpoints: [5000, 10000, 15000, 20000, 25000, 29999]
@@ -117,15 +119,23 @@ formal_matrix:
   ablation:
     backview_loss_only_bs64:
       checkpoints: [4999]
-      status: 5k_complete_eval_running
+      status: 5k_complete
       eval_job: 130774
+      eval_5k:
+        spatial: 0.194
+        object: 0.356
+        goal: 0.250
+        libero_10: 0.024
+        pooled: 0.206
+      h9_minus_h13:
+        pooled: 0.0255
+        ci95: [0.0040, 0.0470]
       target: 30k
     backview_acl_only_bs64:
       status: not_started
       target: 30k
 
 evidence_gaps:
-  - "H13 must isolate explicit residual injection from loss-only distillation."
   - "Final claims require BS64 checkpoints and validation through 30K."
   - "ACL-only must be rerun at BS64 for the final fair ablation."
 

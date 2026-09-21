@@ -15,7 +15,7 @@
 | 哪层 exact contribution 最可恢复 | layer 10；overall gap `0.3992`，比次优 layer 11 高 `0.0485`。 | H7/H7.1 |
 | ACPD-v2 是否优于匹配 BS64 SFT | 5K 时为 `23.15%` 对 `13.85%`，提升 `9.30` 点，95% CI `[7.30, 11.35]`。 | H9-scale-b、H12 |
 | ACPD-v2 从 5K 继续训练是否有效 | 同一 H9-scale-b 训练在 30K 达到 `58.00%`，比 5K 高 `34.85` 点；匹配 SFT 30K 尚未完成验证。 | 4×500 episodes |
-| 显式 contribution 注入是否必要 | 尚无结论。H13 loss-only 已完成 5K，正在验证，最终以相同 BS64、5K 成功率比较。 | H13 |
+| 显式 contribution 注入是否有效 | 有正向证据。H9 为 `23.15%`，H13 loss-only 为 `20.60%`；差值 `+2.55` 点，配对 95% CI `[+0.40, +4.70]`。 | H13 |
 
 ## 正式 BS64 实验
 
@@ -24,14 +24,14 @@
 | ID | 目的 | 实际配置 | Job | 状态 | 结果 |
 |---|---|---|---:|---|---|
 | Teacher | 提供 agentview+wrist 特权信息 | 全量 SFT，30K | 历史任务 | 完成 | checkpoint `29999` |
-| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762/130889 | 30K 训练完成；验证排队 | 5K pooled `13.85%`；30K 尚无结论 |
-| H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669/130890 | 30K 训练完成；验证中 | 尚无最终结论 |
-| H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 30K 训练完成；验证中 | 尚无最终结论 |
+| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762/130889 | 30K 训练完成；验证中 | 5K pooled `13.85%`；30K 尚无结论 |
+| H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669/130890 | 完成 | 30K pooled `71.55%` |
+| H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 完成 | 30K pooled `78.65%` |
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 30K 训练完成；验证排队 | 尚无结论 |
 | H9-scale-b | backview ACPD-v2 主 student | layer 10，BS64，30K | 129728/130773 | 训练和 30K 验证完成 | 5K pooled `23.15%`；30K pooled `58.00%` |
 | H9-trajectory | 定位 30K 后最佳 checkpoint | H9 从 30K 精确续训至 60K；验证 40K/50K/60K | 131642/131643 | 训练排队；验证等待训练 | 尚无结论 |
 | H9-recovery | 恢复 H9 中间 checkpoint | 与 H9-scale-b 相同，训练至 20K | 130704 | 运行中 | 尚无新结论 |
-| H13 | 判断 contribution 注入是否必要 | H9 去除 residual 注入，BS64，5K | 130599/130774 | 训练完成；2 GPU 验证中 | checkpoint `4999` 已完成；尚无最终结论 |
+| H13 | 判断 contribution 注入是否有效 | H9 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
 
 ## 前期筛选结果
 
@@ -66,6 +66,9 @@
 | SFT backview BS64 5K | 9.40% | 18.40% | 24.80% | 2.80% | 13.85% |
 | ACPD-v2 backview BS64 5K | 25.40% | 32.40% | 30.00% | 4.80% | 23.15% |
 | ACPD-v2 backview BS64 30K | 64.00% | 73.00% | 61.80% | 33.20% | 58.00% |
+| ACPD-v2 loss-only backview BS64 5K | 19.40% | 35.60% | 25.00% | 2.40% | 20.60% |
+| SFT topview BS64 30K | 81.00% | 80.60% | 79.20% | 45.40% | 71.55% |
+| SFT leftview BS64 30K | 84.00% | 79.60% | 79.40% | 71.60% | 78.65% |
 
 ## 精选 Checkpoint
 
@@ -76,12 +79,12 @@
 | 分类 | 模型 | 已归档 | 状态 |
 |---|---|---|---|
 | teacher | agentview+wrist | `29999` | 完整 |
-| baseline | backview BS64 | `4999` | 5K--30K checkpoint 完整；job 130889 验证排队 |
-| baseline | topview BS64 | - | 5K--30K checkpoint 完整；job 130890 验证中 |
-| baseline | leftview BS64 | - | 5K--30K checkpoint 完整；job 130891 验证中 |
+| baseline | backview BS64 | `4999` | 5K--30K checkpoint 完整；job 130889 验证中 |
+| baseline | topview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
+| baseline | leftview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
 | baseline | rightview BS64 | - | 5K--30K checkpoint 完整；job 130892 验证排队 |
 | student | backview ACPD-v2 layer 10 BS64 | `24999` | 30K checkpoint 和验证完整；job 130704 正在恢复 5K--20K，job 131642 排队续训至 60K |
-| ablation | backview loss-only BS64 | - | 5K checkpoint `4999` 已完成，job 130774 验证中；之后补至 30K |
+| ablation | backview loss-only BS64 | - | 5K checkpoint 和验证完整；之后补至 30K |
 | ablation | backview ACL-only BS64 | - | 尚未运行 |
 
 H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，也不进入正式索引。
@@ -97,6 +100,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H9-scale-b 30K 验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/29999/summary.txt` |
 | H9 30K--60K 协议 | `experiments/student/acpd-v2-h9-trajectory-60k/protocol.md` |
 | H12 分析 | `experiments/baseline/sft-backview-bs64-5k/analysis.md` |
-| H13 协议 | `experiments/ablation/acpd-v2-h13-injection-ablation/protocol.md` |
+| H13 分析 | `experiments/ablation/acpd-v2-h13-injection-ablation/analysis.md` |
+| H14 top/left 结果 | `experiments/baseline/sft-multiview-bs64-30k/analysis.md` |
 | SFT 验证目录 | `/opt/liutong/openpi-5090-evals/` |
 | ACPD 验证目录 | `/opt/liutong/openpi-5090-evals/acpd-*` |

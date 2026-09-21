@@ -1,0 +1,53 @@
+{
+  "baseline_dir": "/opt/liutong/openpi-5090-evals/acpd-v2-injection-ablation-5k/loss-only/4999",
+  "treatment_dir": "/opt/liutong/openpi-5090-evals/acpd-v2-injection-location-5k/final-hidden/4999",
+  "bootstrap_samples": 10000,
+  "seed": 42,
+  "suites": {
+    "spatial": {
+      "tasks": 10,
+      "episodes": 500,
+      "baseline_success": 0.194,
+      "treatment_success": 0.254,
+      "difference": 0.06,
+      "ci95_lower": 0.01,
+      "ci95_upper": 0.11
+    },
+    "object": {
+      "tasks": 10,
+      "episodes": 500,
+      "baseline_success": 0.356,
+      "treatment_success": 0.324,
+      "difference": -0.032,
+      "ci95_lower": -0.086,
+      "ci95_upper": 0.02
+    },
+    "goal": {
+      "tasks": 10,
+      "episodes": 500,
+      "baseline_success": 0.25,
+      "treatment_success": 0.3,
+      "difference": 0.05,
+      "ci95_lower": 0.012,
+      "ci95_upper": 0.088
+    },
+    "libero_10": {
+      "tasks": 10,
+      "episodes": 500,
+      "baseline_success": 0.024,
+      "treatment_success": 0.048,
+      "difference": 0.024,
+      "ci95_lower": 0.002,
+      "ci95_upper": 0.046
+    }
+  },
+  "pooled": {
+    "tasks": 40,
+    "episodes": 2000,
+    "baseline_success": 0.206,
+    "treatment_success": 0.2315,
+    "difference": 0.0255,
+    "ci95_lower": 0.004,
+    "ci95_upper": 0.047
+  }
+}

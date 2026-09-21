@@ -13,7 +13,7 @@
 | ACPD-v2 是否有正向任务信号 | BS32 5K 相对 ACL-only 提升 `5.00` 点，95% CI `[3.60, 6.45]` | 单 seed、5K 筛选支持 ACPD-v2。 |
 | ACPD-v2 是否优于公平 SFT | BS64 5K 为 `23.15%` 对 `13.85%`，差值 `+9.30` 点，95% CI `[7.30, 11.35]` | 当前公平对照支持 ACPD-v2 整体方案。 |
 | ACPD-v2 延长训练是否有效 | H9-scale-b 从 5K `23.15%` 提高到 30K `58.00%` | 该配置在 5K 后仍有明显收益；尚不能替代匹配 SFT 30K 对照。 |
-| 显式 residual 注入是否必要 | H13 loss-only 已完成 5K，验证中 | 尚无最终结论。 |
+| 显式 residual 注入是否有效 | H9 为 `23.15%`，H13 loss-only 为 `20.60%`；差值 `+2.55` 点，配对 95% CI `[+0.40, +4.70]` | 达到预注册判据，支持显式注入。 |
 
 ## 方法判断
 
@@ -22,8 +22,9 @@ ACPD-v2 使用 teacher 真实 Q/K/V、完整 attention softmax、输出投影和
 贡献向量，训练时使用 contribution loss，并在最终 hidden 上进行门控注入。
 
 H7/H7.1 证明该目标可以从 backview 恢复；H9 与 H12 证明完整 ACPD-v2 在相同
-BS64、step 和初始化下优于 SFT。H13 用完全匹配的 loss-only 训练判断任务增益来自
-辅助监督还是显式注入。训练 loss 只用于健康检查，最终判断使用 benchmark 成功率。
+BS64、step 和初始化下优于 SFT。H13 进一步表明，在保留 contribution loss 和 ACL
+时，显式注入仍带来 `2.55` 点 pooled 增益。训练 loss 只用于健康检查，最终判断
+使用 benchmark 成功率。
 
 ## 工程约束
 
@@ -36,7 +37,6 @@ BS64、step 和初始化下优于 SFT。H13 用完全匹配的 loss-only 训练�
 
 ## 待回答问题
 
-- H13 loss-only 与 H9-scale-b 在 5K benchmark 上是否存在显著差异？
 - BS64 backview、topview、leftview、rightview baseline 的 30K 表现如何？
 - H9-scale-b 在 10K-30K 的最佳停止点是什么？
 - 公平 BS64 ACL-only 训练到 30K 后，ACPD-v2 的增益是否仍然成立？

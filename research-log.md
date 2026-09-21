@@ -26,3 +26,5 @@
 | 2026-09-20 | 方法 | H12 从 5K 恢复至 30K 时恢复模型、优化器和逻辑 batch 5000 的确定性随机采样顺序；只推进 sampler 随机状态，不重读已训练样本。 |
 | 2026-09-21 | 结果 | H9-scale-b 30K pooled success 为 58.00%，较同一训练 5K 的 23.15% 提高 34.85 点；该结果支持继续训练，但匹配 backview BS64 SFT 30K 验证完成前不作方法优越性结论。 |
 | 2026-09-21 | 方法 | H9 从完整 30K checkpoint 恢复 optimizer、随机数据顺序和 step-conditioned RNG，以末端学习率 2.5e-6 续训至 60K；只验证 40K、50K、60K，不复测第二 seed。 |
+| 2026-09-21 | 结果 | H13 loss-only 5K 为 20.60%，H9 为 23.15%；H9 高 2.55 点，配对 95% CI `[+0.40, +4.70]`，达到预注册判据，支持显式 contribution 注入。 |
+| 2026-09-21 | 结果 | BS64 SFT 30K 的 topview 为 71.55%，leftview 为 78.65%；backview 正在验证，rightview 排队。 |
