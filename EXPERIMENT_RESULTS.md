@@ -43,7 +43,7 @@
 | ID | 目的 | 实际配置 | Job | 状态 | 结论 |
 |---|---|---|---:|---|---|
 | H15a | 判断 ACPD-v2 后期是否存在辅助梯度干扰 | H9 5K/30K；正式为每点200个相同BS32 batch；另有探索性BS1快速诊断；不更新参数 | smoke 132308；快速 132311；正式 132250 | 快速诊断完成；正式任务排队 | 快速诊断不支持后期组合梯度冲突增强；等待正式 BS32 |
-| H16 | 检验按 token 选择 agentview/wrist 是否优于 H9 全局 gate | layer 10；零初始化 dynamic view gate；先 smoke，再运行4卡BS64 5K | smoke 132316 | smoke 排队 | 尚无结论 |
+| H16 | 检验按 token 选择 agentview/wrist 是否优于 H9 全局 gate | layer 10；零初始化 dynamic view gate；4卡BS64 5K | smoke 132316；训练 132317；验证 132318 | smoke 完成；训练排队 | 尚无结论 |
 
 H15 固定权重退火仅保留为候选工程对照。是否执行由 H15a 决定，不作为当前主方法。
 

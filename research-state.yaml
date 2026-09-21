@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-22 01:49 CST"
+  checked_at: "2026-09-22 01:59 CST"
   jobs:
     - id: 130892
       experiment: rightview_sft_bs64_30k_eval
@@ -17,12 +17,21 @@ current_execution:
       state: pending
       reason: priority
       resources: 2gpu_16cpu_48g
-    - id: 132316
-      experiment: h16_dynamic_view_gate_smoke
+    - id: 132317
+      experiment: h16_dynamic_view_gate_5k
       state: pending
       reason: priority
-      resources: 1gpu_8cpu_48g
+      resources: 4gpu_32cpu_96g
+    - id: 132318
+      experiment: h16_dynamic_view_gate_5k_eval
+      state: dependency
+      depends_on: 132317
+      resources: 2gpu_16cpu_48g
   recently_completed:
+    - id: 132316
+      experiment: h16_dynamic_view_gate_smoke
+      state: complete
+      gate_grad_norm: 0.0149
     - id: 132083
       experiment: backview_sft_bs64_25k_eval_single_gpu_array
       state: complete
@@ -197,8 +206,10 @@ formal_matrix:
       target_step: 30000
       primary_baseline_pooled: 0.6045
     h16_dynamic_view_gate:
-      status: smoke_pending
+      status: smoke_complete_formal_pending
       smoke_job: 132316
+      train_job: 132317
+      eval_job: 132318
       layer: 10
       batch_size: 64
       gpus: 4
