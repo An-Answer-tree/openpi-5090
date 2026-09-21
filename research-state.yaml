@@ -5,39 +5,27 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-22 00:17 CST"
+  checked_at: "2026-09-22 00:30 CST"
   jobs:
     - id: 130892
       experiment: rightview_sft_bs64_30k_eval
-      state: pending
-      reason: priority
-      resources: 2gpu_16cpu_48g
-    - id: 132082
-      experiment: h9_25k_eval_single_gpu_array
       state: running
-      resources: 4x_1gpu_8cpu_24g
-      completed_suites:
-        spatial: 0.632
-        object: 0.694
-      summary_job: 132084
+      node: gpu05
+      resources: 2gpu_16cpu_48g
     - id: 132083
       experiment: backview_sft_bs64_25k_eval_single_gpu_array
-      state: pending
-      reason: priority
+      state: running
       resources: 4x_1gpu_8cpu_24g
       summary_job: 132085
-    - id: 132084
-      experiment: h9_25k_summary
-      state: dependency
-      depends_on: 132082
     - id: 132085
       experiment: backview_sft_25k_summary
       state: dependency
       depends_on: 132083
     - id: 132308
       experiment: h15a_gradient_conflict_smoke_1gpu
-      state: pending
+      state: running
       partition: debug01
+      node: debug01
       resources: 1gpu_4cpu_24g
     - id: 132250
       experiment: h15a_gradient_conflict_5k_30k
@@ -45,6 +33,13 @@ current_execution:
       depends_on: 132308
       resources: 2gpu_16cpu_48g
   recently_completed:
+    - id: 132082
+      experiment: h9_25k_eval_single_gpu_array
+      state: complete
+    - id: 132084
+      experiment: h9_25k_summary
+      state: complete
+      pooled_success: 0.5575
     - id: 130704
       experiment: h9_recover_5k
       checkpoint: 4999
@@ -152,16 +147,22 @@ formal_matrix:
   student:
     backview_acpdv2_layer10_bs64:
       checkpoints: [4999, 24999, 29999]
-      status: 5k_recovered_30k_eval_complete_25k_eval_running
+      status: 5k_recovered_25k_30k_eval_complete
       recovery_target: 4999
       recovery_job: 130704
       recovery_watchdog_job: 132198
       eval_30k_job: 130773
       eval_25k_job: 132082
       eval_25k_summary_job: 132084
-      eval_25k_partial:
+      eval_25k:
         spatial: 0.632
         object: 0.694
+        goal: 0.620
+        libero_10: 0.284
+        pooled: 0.5575
+      eval_25k_minus_30k:
+        pooled: -0.0225
+        ci95: [-0.0470, 0.0020]
       cancelled_20k_eval_job: 131861
       cancelled_60k_jobs: [131642, 131643]
       eval_30k:
@@ -188,7 +189,7 @@ formal_matrix:
       primary_baseline_pooled: 0.6045
   mechanism:
     h15a_gradient_conflict:
-      status: debug_smoke_pending_formal_submitted
+      status: debug_smoke_running_formal_submitted
       checkpoints: [4999, 29999]
       batches_per_checkpoint: 200
       batch_size: 32
@@ -218,7 +219,7 @@ formal_matrix:
 
 evidence_gaps:
   - "H15a must determine whether late-training auxiliary gradients conflict with the flow objective before selecting the next ACPD-v2 variant."
-  - "H9 and SFT 25K evaluations must finish before interpreting the late-training trajectory."
+  - "SFT 25K evaluation must finish before judging whether ACPD-v2 retains a matched-step advantage at 25K."
   - "ACL-only must be rerun at BS64 for the final fair ablation."
 
 constraints:

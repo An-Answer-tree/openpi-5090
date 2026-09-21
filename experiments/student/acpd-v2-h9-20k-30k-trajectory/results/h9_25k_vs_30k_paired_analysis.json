@@ -1,0 +1,53 @@
+{
+  "baseline_dir": "/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/29999",
+  "treatment_dir": "/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/24999",
+  "bootstrap_samples": 10000,
+  "seed": 42,
+  "suites": {
+    "spatial": {
+      "tasks": 10,
+      "episodes": 500,
+      "baseline_success": 0.64,
+      "treatment_success": 0.632,
+      "difference": -0.008,
+      "ci95_lower": -0.064,
+      "ci95_upper": 0.048
+    },
+    "object": {
+      "tasks": 10,
+      "episodes": 500,
+      "baseline_success": 0.73,
+      "treatment_success": 0.694,
+      "difference": -0.036,
+      "ci95_lower": -0.082,
+      "ci95_upper": 0.01
+    },
+    "goal": {
+      "tasks": 10,
+      "episodes": 500,
+      "baseline_success": 0.618,
+      "treatment_success": 0.62,
+      "difference": 0.002,
+      "ci95_lower": -0.046,
+      "ci95_upper": 0.05
+    },
+    "libero_10": {
+      "tasks": 10,
+      "episodes": 500,
+      "baseline_success": 0.332,
+      "treatment_success": 0.284,
+      "difference": -0.048,
+      "ci95_lower": -0.096,
+      "ci95_upper": 0.0
+    }
+  },
+  "pooled": {
+    "tasks": 40,
+    "episodes": 2000,
+    "baseline_success": 0.58,
+    "treatment_success": 0.5575,
+    "difference": -0.0225,
+    "ci95_lower": -0.047,
+    "ci95_upper": 0.002
+  }
+}

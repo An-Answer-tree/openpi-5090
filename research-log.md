@@ -39,3 +39,4 @@
 | 2026-09-21 | 方法 | H15 预注册为持续蒸馏：从 H9 5K 完整状态继续，5K--15K 将 contribution/ACL 权重由 `0.2/0.5` 余弦退火至非零下限 `0.02/0.1`，15K--30K 保持下限；目标是在保留 teacher 信号的同时提高 30K 上限。 |
 | 2026-09-21 | 方法 | H15a 预注册为梯度冲突诊断：在 H9 5K/30K 上用相同的200个BS32 batch，测量共享 LoRA 参数中 flow、contribution、ACL 梯度的 cosine、冲突率和范数比；结果决定测试 conflict-aware ACPD 还是动态 gate。 |
 | 2026-09-22 | 管理 | H9 `4999` checkpoint 完整写入后，在 debug01 提交 H15a 单卡单 batch smoke job 132308；正式2卡BS32 job 132250 依赖 smoke 成功后运行5K与30K各200个 batch。 |
+| 2026-09-22 | 结果 | H9-scale-b 25K pooled success 为 55.75%，30K 为 58.00%；25K-30K 差值 -2.25 点，配对 95% CI `[-4.70, +0.20]`，不支持 25K 已经早于 30K 达峰。 |
