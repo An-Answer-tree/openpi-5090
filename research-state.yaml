@@ -5,34 +5,36 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-21 17:26 CST"
+  checked_at: "2026-09-21 18:07 CST"
   jobs:
     - id: 130704
       experiment: h9_recover_5k_to_20k
       state: running
       node: gpu04
-      step: 3170
-      eta: "about 39 hours"
+      step: 3430
+      eta: "about 41 hours"
     - id: 130892
       experiment: rightview_sft_bs64_30k_eval
       state: pending
       reason: priority
       resources: 2gpu_16cpu_48g
-    - id: 131860
-      experiment: h9_25k_eval
+    - id: 132082
+      experiment: h9_25k_eval_single_gpu_array
       state: pending
       reason: priority
-      resources: 2gpu_16cpu_48g
+      resources: 4x_1gpu_8cpu_24g
+      summary_job: 132084
     - id: 131861
       experiment: h9_20k_eval
       state: dependency
       depends_on: 130704
       resources: 2gpu_16cpu_48g
-    - id: 132033
-      experiment: backview_sft_bs64_25k_eval
+    - id: 132083
+      experiment: backview_sft_bs64_25k_eval_single_gpu_array
       state: pending
       reason: priority
-      resources: 4gpu_32cpu_96g
+      resources: 4x_1gpu_8cpu_24g
+      summary_job: 132085
   recently_completed:
     - id: 130889
       experiment: backview_sft_bs64_30k_eval
@@ -73,6 +75,12 @@ current_execution:
       experiment: h13_loss_only_5k
       checkpoint: 4999
   recently_cancelled:
+    - id: 131860
+      experiment: h9_25k_eval_2gpu
+      state: cancelled_before_start_for_single_gpu_array
+    - id: 132033
+      experiment: backview_sft_bs64_25k_eval_4gpu
+      state: cancelled_before_start_for_single_gpu_array
     - id: 131642
       experiment: h9_resume_30k_to_60k
       state: cancelled_before_start
@@ -89,7 +97,8 @@ formal_matrix:
     backview_bs64:
       checkpoints: [4999, 10000, 15000, 20000, 25000, 29999]
       status: complete_30k_eval_complete_25k_eval_pending
-      eval_25k_job: 132033
+      eval_25k_job: 132083
+      eval_25k_summary_job: 132085
       eval_30k_job: 130889
       eval_30k:
         spatial: 0.700
@@ -126,7 +135,8 @@ formal_matrix:
       checkpoints: [24999, 29999]
       status: 30k_eval_complete_recovery_running
       eval_30k_job: 130773
-      eval_25k_job: 131860
+      eval_25k_job: 132082
+      eval_25k_summary_job: 132084
       eval_20k_job: 131861
       cancelled_60k_jobs: [131642, 131643]
       eval_30k:
