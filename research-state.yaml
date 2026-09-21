@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-21 10:47 CST"
+  checked_at: "2026-09-21 12:07 CST"
   jobs:
     - id: 130704
       experiment: h9_recover_5k_to_20k
@@ -13,6 +13,17 @@ current_execution:
       node: gpu04
       step: 797
       eta: "about 59 hours"
+    - id: 131642
+      experiment: h9_resume_30k_to_60k
+      state: pending
+      reason: priority
+      resources: 4gpu_32cpu_96g
+      estimated_start: "2026-09-24 10:19 CST"
+    - id: 131643
+      experiment: h9_40k_50k_60k_eval
+      state: dependency
+      depends_on: 131642
+      resources: 2gpu_16cpu_48g
     - id: 130774
       experiment: h13_loss_only_eval
       state: running
@@ -93,8 +104,10 @@ formal_matrix:
   student:
     backview_acpdv2_layer10_bs64:
       checkpoints: [24999, 29999]
-      status: 30k_eval_complete_recovery_running
+      status: 30k_eval_complete_recovery_running_60k_pending
       eval_30k_job: 130773
+      resume_60k_job: 131642
+      eval_40k_50k_60k_job: 131643
       eval_30k:
         spatial: 0.640
         object: 0.730

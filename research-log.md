@@ -25,3 +25,4 @@
 | 2026-09-20 | 管理 | 正式 checkpoint 按 `teacher`、`baseline`、`student`、`ablation` 建立同文件系统硬链接索引；不移动或删除源 checkpoint，不纳入 H11，正式学生与消融实验统一以 BS64、每 5K 保存为准。 |
 | 2026-09-20 | 方法 | H12 从 5K 恢复至 30K 时恢复模型、优化器和逻辑 batch 5000 的确定性随机采样顺序；只推进 sampler 随机状态，不重读已训练样本。 |
 | 2026-09-21 | 结果 | H9-scale-b 30K pooled success 为 58.00%，较同一训练 5K 的 23.15% 提高 34.85 点；该结果支持继续训练，但匹配 backview BS64 SFT 30K 验证完成前不作方法优越性结论。 |
+| 2026-09-21 | 方法 | H9 从完整 30K checkpoint 恢复 optimizer、随机数据顺序和 step-conditioned RNG，以末端学习率 2.5e-6 续训至 60K；只验证 40K、50K、60K，不复测第二 seed。 |

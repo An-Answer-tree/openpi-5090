@@ -22,6 +22,7 @@
 | baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 30K 完成；2 GPU 验证排队 |
 | baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 30K 全部完成；top/left 验证中，right 排队 |
 | student | H9-scale-b ACPD-v2 BS64 | `student/acpd-v2-h9-batch-scaling-30k/` | 30K 训练和验证完成；中间 checkpoint 恢复中 |
+| student | H9 ACPD-v2 30K--60K | `student/acpd-v2-h9-trajectory-60k/` | 续训排队；40K/50K/60K 验证等待训练 |
 | ablation | H13 loss-only BS64 | `ablation/acpd-v2-h13-injection-ablation/` | 5K 完成；2 GPU 验证中 |
 | ablation | ACL-only BS64 | 尚未创建协议 | 待运行 |
 
