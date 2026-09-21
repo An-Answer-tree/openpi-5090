@@ -17,3 +17,20 @@ exact contribution loss 和最终 hidden 注入。
 
 该结果不能单独区分 ACL、contribution loss 和显式注入的贡献；H13 负责隔离
 显式注入。原始配对结果位于 `results/h9_vs_h12_paired_analysis.json`。
+
+## 30K 结果
+
+| 方法 | Spatial | Object | Goal | LIBERO-10 | Pooled |
+|---|---:|---:|---:|---:|---:|
+| H12：匹配 SFT | 70.00% | 69.80% | 68.20% | 33.80% | 60.45% |
+| H9-scale-b：ACPD-v2 | 64.00% | 73.00% | 61.80% | 33.20% | 58.00% |
+| H9 - H12 | -6.00 | +3.20 | -6.40 | -0.60 | -2.45 |
+
+10,000 次 task-stratified paired bootstrap 得到 pooled 差值 95% CI
+`[-5.00, 0.00]` 个百分点。Spatial 和 Goal 的差值分别为 `-6.00` 和
+`-6.40` 点，置信区间均低于零；Object 的 `+3.20` 点和 LIBERO-10 的
+`-0.60` 点均未排除零。
+
+因此，5K 的 ACPD-v2 优势没有保持到 30K。20K/25K 验证用于判断优势消失前
+是否存在优于双方 30K 的中间 checkpoint。原始配对结果位于
+`results/h9_vs_h12_30k_paired_analysis.json`。

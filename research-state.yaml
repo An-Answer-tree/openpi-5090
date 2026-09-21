@@ -5,18 +5,14 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-21 17:00 CST"
+  checked_at: "2026-09-21 17:26 CST"
   jobs:
     - id: 130704
       experiment: h9_recover_5k_to_20k
       state: running
       node: gpu04
-      step: 3000
-      eta: "about 44 hours"
-    - id: 130889
-      experiment: backview_sft_bs64_30k_eval
-      state: running
-      resources: 2gpu_16cpu_48g
+      step: 3170
+      eta: "about 39 hours"
     - id: 130892
       experiment: rightview_sft_bs64_30k_eval
       state: pending
@@ -38,6 +34,10 @@ current_execution:
       reason: priority
       resources: 4gpu_32cpu_96g
   recently_completed:
+    - id: 130889
+      experiment: backview_sft_bs64_30k_eval
+      checkpoint: 29999
+      pooled_success: 0.6045
     - id: 130774
       experiment: h13_loss_only_eval
       pooled_success: 0.2060
@@ -88,9 +88,15 @@ formal_matrix:
   baseline:
     backview_bs64:
       checkpoints: [4999, 10000, 15000, 20000, 25000, 29999]
-      status: complete_eval_running
+      status: complete_30k_eval_complete_25k_eval_pending
       eval_25k_job: 132033
-      eval_job: 130889
+      eval_30k_job: 130889
+      eval_30k:
+        spatial: 0.700
+        object: 0.698
+        goal: 0.682
+        libero_10: 0.338
+        pooled: 0.6045
     topview_bs64:
       status: complete
       checkpoints: [5000, 10000, 15000, 20000, 25000, 29999]
