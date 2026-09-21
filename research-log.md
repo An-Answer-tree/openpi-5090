@@ -38,4 +38,4 @@
 | 2026-09-21 | 管理 | 保留 rightview baseline 验证；取消 H9 20K 验证 job 131861；H9 恢复训练 130704 只运行到完整 `4999` checkpoint，由 CPU watchdog job 132198 检查明确路径后停止。 |
 | 2026-09-21 | 方法 | H15 预注册为持续蒸馏：从 H9 5K 完整状态继续，5K--15K 将 contribution/ACL 权重由 `0.2/0.5` 余弦退火至非零下限 `0.02/0.1`，15K--30K 保持下限；目标是在保留 teacher 信号的同时提高 30K 上限。 |
 | 2026-09-21 | 方法 | H15a 预注册为梯度冲突诊断：在 H9 5K/30K 上用相同的200个BS32 batch，测量共享 LoRA 参数中 flow、contribution、ACL 梯度的 cosine、冲突率和范数比；结果决定测试 conflict-aware ACPD 还是动态 gate。 |
-| 2026-09-21 | 管理 | H9 `4999` checkpoint 完整写入后，在 debug01 提交 H15a 单卡单 batch smoke job 132261；正式2卡BS32 job 132250 依赖 smoke 成功后运行5K与30K各200个 batch。 |
+| 2026-09-22 | 管理 | H9 `4999` checkpoint 完整写入后，在 debug01 提交 H15a 单卡单 batch smoke job 132307；正式2卡BS32 job 132250 依赖 smoke 成功后运行5K与30K各200个 batch。 |

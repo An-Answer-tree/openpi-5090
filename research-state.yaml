@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-21 23:45 CST"
+  checked_at: "2026-09-22 00:17 CST"
   jobs:
     - id: 130892
       experiment: rightview_sft_bs64_30k_eval
@@ -34,7 +34,7 @@ current_execution:
       experiment: backview_sft_25k_summary
       state: dependency
       depends_on: 132083
-    - id: 132261
+    - id: 132307
       experiment: h15a_gradient_conflict_smoke_1gpu
       state: pending
       partition: debug01
@@ -42,7 +42,7 @@ current_execution:
     - id: 132250
       experiment: h15a_gradient_conflict_5k_30k
       state: dependency
-      depends_on: 132261
+      depends_on: 132307
       resources: 2gpu_16cpu_48g
   recently_completed:
     - id: 130704
@@ -195,7 +195,7 @@ formal_matrix:
       gpus: 2
       measured_parameters: shared_lora
       updates_model: false
-      smoke_job: 132261
+      smoke_job: 132307
       job: 132250
   ablation:
     backview_loss_only_bs64:
