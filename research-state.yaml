@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-21 22:07 CST"
+  checked_at: "2026-09-21 23:45 CST"
   jobs:
     - id: 130892
       experiment: rightview_sft_bs64_30k_eval
@@ -34,20 +34,15 @@ current_execution:
       experiment: backview_sft_25k_summary
       state: dependency
       depends_on: 132083
-    - id: 132244
-      experiment: h15a_gradient_conflict_smoke_2gpu
-      state: pending
-      reason: priority
-      resources: 2gpu_8cpu_48g
     - id: 132261
       experiment: h15a_gradient_conflict_smoke_1gpu
       state: pending
-      reason: priority
+      partition: debug01
       resources: 1gpu_4cpu_24g
     - id: 132250
       experiment: h15a_gradient_conflict_5k_30k
       state: dependency
-      depends_on: 132244
+      depends_on: 132261
       resources: 2gpu_16cpu_48g
   recently_completed:
     - id: 130704
@@ -176,7 +171,7 @@ formal_matrix:
         libero_10: 0.332
         pooled: 0.580
     h15_persistent_distillation:
-      status: protocol_locked_waiting_for_5k_checkpoint
+      status: deferred_engineering_control_pending_h15a
       start_checkpoint: h9_recovery_4999
       batch_size: 64
       gpus: 4
@@ -193,14 +188,14 @@ formal_matrix:
       primary_baseline_pooled: 0.6045
   mechanism:
     h15a_gradient_conflict:
-      status: submitted_waiting_for_smoke
+      status: debug_smoke_pending_formal_submitted
       checkpoints: [4999, 29999]
       batches_per_checkpoint: 200
       batch_size: 32
       gpus: 2
       measured_parameters: shared_lora
       updates_model: false
-      smoke_jobs: [132244, 132261]
+      smoke_job: 132261
       job: 132250
   ablation:
     backview_loss_only_bs64:
@@ -222,7 +217,7 @@ formal_matrix:
       target: 30k
 
 evidence_gaps:
-  - "H15 must reach and validate 30K before claiming that persistent ACPD-v2 raises the model ceiling."
+  - "H15a must determine whether late-training auxiliary gradients conflict with the flow objective before selecting the next ACPD-v2 variant."
   - "H9 and SFT 25K evaluations must finish before interpreting the late-training trajectory."
   - "ACL-only must be rerun at BS64 for the final fair ablation."
 

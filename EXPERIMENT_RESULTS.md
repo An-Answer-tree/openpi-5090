@@ -35,6 +35,14 @@
 | H9-recovery | 恢复 H9 的 5K checkpoint | 与 H9-scale-b 相同，写完 `4999` 后停止 | 130704/132198 | 完成；checkpoint `4999` 完整 | 不产生新的任务成功率结论 |
 | H13 | 判断 contribution 注入是否有效 | H9 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
 
+## 当前机制实验
+
+| ID | 目的 | 实际配置 | Job | 状态 | 结论 |
+|---|---|---|---:|---|---|
+| H15a | 判断 ACPD-v2 后期是否存在辅助梯度干扰 | H9 5K/30K；共享 LoRA；每点200个相同BS32 batch；2×5090；不更新参数 | smoke 132261；正式 132250 | debug smoke 排队；正式任务等待 smoke 成功 | 尚无结论 |
+
+H15 固定权重退火仅保留为候选工程对照。是否执行由 H15a 决定，不作为当前主方法。
+
 ## 前期筛选结果
 
 下表用于记录方法形成过程，不作为最终 BS64 公平对照。
@@ -107,6 +115,8 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H9-scale-b 30K 验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/29999/summary.txt` |
 | H9 25K 协议 | `experiments/student/acpd-v2-h9-20k-30k-trajectory/protocol.md` |
 | H9 30K--60K 协议 | `experiments/student/acpd-v2-h9-trajectory-60k/protocol.md` |
+| H15a 梯度诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/protocol.md` |
+| H15a 结果目录 | `/opt/liutong/openpi-5090-research/acpd-v2-gradient-conflict/` |
 | H15 持续蒸馏协议 | `experiments/student/acpd-v2-h15-persistent-distillation/protocol.md` |
 | H12 分析 | `experiments/baseline/sft-backview-bs64-5k/analysis.md` |
 | H13 分析 | `experiments/ablation/acpd-v2-h13-injection-ablation/analysis.md` |

@@ -33,10 +33,14 @@ H7/H7.1 证明该目标可以从 backview 恢复；H9 与 H12 在 5K 检测到 A
 升至 30K 的 `0.7999`；gate 在约 12K 达峰后下降。这支持继续检查中间 checkpoint，
 但训练 loss、cosine 和 gate 都不能替代任务成功率验证。
 
-下一步 H15 不关闭后期蒸馏，而是把 contribution 权重从 `0.2` 退火到 `0.02`、
-ACL 权重从 `0.5` 退火到 `0.1`，并在 15K--30K 保持该非零下限。目标是让真实动作
-监督成为后期主目标，同时持续更新 privileged contribution predictor，提高最终上限，
-而不是只获得早期训练加速。
+当前先运行 H15a 梯度诊断：在 H9 的 5K 与 30K checkpoint 上，用相同 batch、噪声
+和 flow time，直接比较共享 LoRA 参数中的 flow、contribution 与 ACL 梯度。该实验回答
+后期辅助目标是否与动作监督冲突；标量 loss 比例本身不能回答这个问题。
+
+若 30K 的组合辅助梯度冲突明显高于 5K，则测试 conflict-aware ACPD：保留 teacher
+信号，只投影掉与 flow 梯度冲突的分量并限制辅助梯度范数。若没有冲突证据，则不运行
+该方法，改测 agentview/wrist 分离、按 action token 条件化的动态 gate。原 H15 固定
+权重退火保留为候选工程对照，不是当前主线。
 
 ## 工程约束
 
@@ -51,5 +55,6 @@ ACL 权重从 `0.5` 退火到 `0.1`，并在 15K--30K 保持该非零下限。�
 
 - BS64 rightview baseline 的 30K 表现如何？
 - H9-scale-b 25K 是否优于 30K，或仍低于匹配 SFT？
-- H15 的非零下限持续蒸馏能否在 30K 超过 SFT 的 `60.45%`？
+- H15a 是否检测到 5K 到 30K 增强的辅助梯度冲突？
+- 应测试 conflict-aware ACPD，还是视角分离的动态 gate？
 - 公平 BS64 ACL-only 训练到 30K 后，ACPD-v2 的增益是否仍然成立？
