@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-22 00:30 CST"
+  checked_at: "2026-09-22 00:48 CST"
   jobs:
     - id: 130892
       experiment: rightview_sft_bs64_30k_eval
@@ -21,18 +21,20 @@ current_execution:
       experiment: backview_sft_25k_summary
       state: dependency
       depends_on: 132083
-    - id: 132308
-      experiment: h15a_gradient_conflict_smoke_1gpu
-      state: running
-      partition: debug01
-      node: debug01
-      resources: 1gpu_4cpu_24g
     - id: 132250
       experiment: h15a_gradient_conflict_5k_30k
       state: pending
       reason: priority
       resources: 2gpu_16cpu_48g
+    - id: 132311
+      experiment: h15a_gradient_conflict_fast_5k_30k
+      state: pending
+      reason: priority
+      resources: 1gpu_8cpu_24g
   recently_completed:
+    - id: 132308
+      experiment: h15a_gradient_conflict_smoke_1gpu
+      state: complete
     - id: 132082
       experiment: h9_25k_eval_single_gpu_array
       state: complete
@@ -199,7 +201,8 @@ formal_matrix:
       smoke_job: 132308
       job: 132250
       fast_probe:
-        status: protocol_locked_not_submitted
+        status: submitted_pending
+        job: 132311
         checkpoints: [4999, 29999]
         batches_per_checkpoint: 100
         batch_size: 1

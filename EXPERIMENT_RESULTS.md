@@ -40,7 +40,7 @@
 
 | ID | 目的 | 实际配置 | Job | 状态 | 结论 |
 |---|---|---|---:|---|---|
-| H15a | 判断 ACPD-v2 后期是否存在辅助梯度干扰 | H9 5K/30K；共享 LoRA；每点200个相同BS32 batch；2×5090；不更新参数 | smoke 132308；正式 132250 | debug smoke 运行中；正式任务等待 smoke 成功 | 尚无结论 |
+| H15a | 判断 ACPD-v2 后期是否存在辅助梯度干扰 | H9 5K/30K；正式为每点200个相同BS32 batch；另有探索性BS1快速诊断；不更新参数 | smoke 132308；快速 132311；正式 132250 | smoke 完成；快速和正式任务排队 | 尚无结论 |
 
 H15 固定权重退火仅保留为候选工程对照。是否执行由 H15a 决定，不作为当前主方法。
 
@@ -120,6 +120,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H9 25K 协议 | `experiments/student/acpd-v2-h9-20k-30k-trajectory/protocol.md` |
 | H9 30K--60K 协议 | `experiments/student/acpd-v2-h9-trajectory-60k/protocol.md` |
 | H15a 梯度诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/protocol.md` |
+| H15a 快速诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/fast_protocol.md` |
 | H15a 结果目录 | `/opt/liutong/openpi-5090-research/acpd-v2-gradient-conflict/` |
 | H15 持续蒸馏协议 | `experiments/student/acpd-v2-h15-persistent-distillation/protocol.md` |
 | H12 分析 | `experiments/baseline/sft-backview-bs64-5k/analysis.md` |
