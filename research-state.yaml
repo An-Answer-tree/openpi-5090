@@ -5,57 +5,59 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-20 23:11 CST"
+  checked_at: "2026-09-21 10:47 CST"
   jobs:
     - id: 130704
       experiment: h9_recover_5k_to_20k
-      state: pending
+      state: running
+      node: gpu04
+      step: 797
+      eta: "about 59 hours"
     - id: 130774
       experiment: h13_loss_only_eval
-      state: pending
+      state: running
       resources: 2gpu_16cpu_48g
-    - id: 130773
-      experiment: h9_scale_b_30k_eval
-      state: pending
-      resources: 2gpu_16cpu_48g
-    - id: 130669
-      experiment: topview_sft_bs64_30k
-      state: running
-      step: 23100
-    - id: 130670
-      experiment: leftview_sft_bs64_30k
-      state: running
-      step: 20800
-    - id: 130671
-      experiment: rightview_sft_bs64_30k
-      state: running
-      step: 17000
-    - id: 130762
-      experiment: backview_sft_bs64_resume_30k
-      state: running
-      step: 19500
-      output: baseline/backview_bs64
+      completed_suites:
+        spatial: 0.194
+        object: 0.356
     - id: 130889
       experiment: backview_sft_bs64_30k_eval
-      state: dependency
-      depends_on: 130762
+      state: pending
+      reason: priority
       resources: 2gpu_16cpu_48g
     - id: 130890
       experiment: topview_sft_bs64_30k_eval
-      state: dependency
-      depends_on: 130669
+      state: running
       resources: 2gpu_16cpu_48g
+      completed_suites:
+        spatial: 0.810
+        object: 0.806
     - id: 130891
       experiment: leftview_sft_bs64_30k_eval
-      state: dependency
-      depends_on: 130670
+      state: running
       resources: 2gpu_16cpu_48g
     - id: 130892
       experiment: rightview_sft_bs64_30k_eval
-      state: dependency
-      depends_on: 130671
+      state: pending
+      reason: priority
       resources: 2gpu_16cpu_48g
   recently_completed:
+    - id: 130773
+      experiment: h9_scale_b_30k_eval
+      checkpoint: 29999
+      pooled_success: 0.5800
+    - id: 130669
+      experiment: topview_sft_bs64_30k
+      checkpoint: 29999
+    - id: 130670
+      experiment: leftview_sft_bs64_30k
+      checkpoint: 29999
+    - id: 130671
+      experiment: rightview_sft_bs64_30k
+      checkpoint: 29999
+    - id: 130762
+      experiment: backview_sft_bs64_resume_30k
+      checkpoint: 29999
     - id: 129728
       experiment: h9_scale_b_student_30k
       checkpoint: 29999
@@ -73,32 +75,36 @@ formal_matrix:
       status: complete
   baseline:
     backview_bs64:
-      checkpoints: [4999, 10000, 15000]
-      status: running
-      job: 130762
+      checkpoints: [4999, 10000, 15000, 20000, 25000, 29999]
+      status: complete_eval_pending
       eval_job: 130889
-      missing: [20k, 25k, 30k]
     topview_bs64:
-      status: running
-      checkpoints: [5000, 10000, 15000, 20000]
+      status: complete_eval_running
+      checkpoints: [5000, 10000, 15000, 20000, 25000, 29999]
       eval_job: 130890
     leftview_bs64:
-      status: running
-      checkpoints: [5000, 10000, 15000, 20000]
+      status: complete_eval_running
+      checkpoints: [5000, 10000, 15000, 20000, 25000, 29999]
       eval_job: 130891
     rightview_bs64:
-      status: running
-      checkpoints: [5000, 10000, 15000]
+      status: complete_eval_pending
+      checkpoints: [5000, 10000, 15000, 20000, 25000, 29999]
       eval_job: 130892
   student:
     backview_acpdv2_layer10_bs64:
       checkpoints: [24999, 29999]
-      status: 30k_complete_recovery_pending
+      status: 30k_eval_complete_recovery_running
       eval_30k_job: 130773
+      eval_30k:
+        spatial: 0.640
+        object: 0.730
+        goal: 0.618
+        libero_10: 0.332
+        pooled: 0.580
   ablation:
     backview_loss_only_bs64:
       checkpoints: [4999]
-      status: 5k_complete_eval_pending
+      status: 5k_complete_eval_running
       eval_job: 130774
       target: 30k
     backview_acl_only_bs64:

@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-09-20（CST）
+更新时间：2026-09-21（CST）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -14,7 +14,8 @@
 | 原始 ACPD 的 Cue 是否有效 | 没有可靠证据。Full 仅比 ACL-only 高 `0.15` 点，95% CI `[-1.15, 1.40]`。 | H5、H8 |
 | 哪层 exact contribution 最可恢复 | layer 10；overall gap `0.3992`，比次优 layer 11 高 `0.0485`。 | H7/H7.1 |
 | ACPD-v2 是否优于匹配 BS64 SFT | 5K 时为 `23.15%` 对 `13.85%`，提升 `9.30` 点，95% CI `[7.30, 11.35]`。 | H9-scale-b、H12 |
-| 显式 contribution 注入是否必要 | 尚无结论。H13 loss-only 已完成 5K，验证排队，最终以相同 BS64、5K 成功率比较。 | H13 |
+| ACPD-v2 从 5K 继续训练是否有效 | 同一 H9-scale-b 训练在 30K 达到 `58.00%`，比 5K 高 `34.85` 点；匹配 SFT 30K 尚未完成验证。 | 4×500 episodes |
+| 显式 contribution 注入是否必要 | 尚无结论。H13 loss-only 已完成 5K，正在验证，最终以相同 BS64、5K 成功率比较。 | H13 |
 
 ## 正式 BS64 实验
 
@@ -23,13 +24,13 @@
 | ID | 目的 | 实际配置 | Job | 状态 | 结果 |
 |---|---|---|---:|---|---|
 | Teacher | 提供 agentview+wrist 特权信息 | 全量 SFT，30K | 历史任务 | 完成 | checkpoint `29999` |
-| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762/130889 | 30K 训练中；验证等待训练 | 5K pooled `13.85%`；30K 尚无结论 |
-| H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669/130890 | 训练中；验证等待训练 | 尚无结论 |
-| H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 训练中；验证等待训练 | 尚无结论 |
-| H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 训练中；验证等待训练 | 尚无结论 |
-| H9-scale-b | backview ACPD-v2 主 student | layer 10，BS64，30K | 129728/130773 | 训练完成；30K 验证排队 | 5K pooled `23.15%`；30K checkpoint `29999` 已完成，尚无成功率结论 |
-| H9-recovery | 恢复 H9 中间 checkpoint | 与 H9-scale-b 相同，训练至 20K | 130704 | 排队 | 尚无新结论 |
-| H13 | 判断 contribution 注入是否必要 | H9 去除 residual 注入，BS64，5K | 130599/130774 | 训练完成；2 GPU 验证排队 | checkpoint `4999` 已完成；尚无成功率结论 |
+| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762/130889 | 30K 训练完成；验证排队 | 5K pooled `13.85%`；30K 尚无结论 |
+| H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669/130890 | 30K 训练完成；验证中 | 尚无最终结论 |
+| H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 30K 训练完成；验证中 | 尚无最终结论 |
+| H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 30K 训练完成；验证排队 | 尚无结论 |
+| H9-scale-b | backview ACPD-v2 主 student | layer 10，BS64，30K | 129728/130773 | 训练和 30K 验证完成 | 5K pooled `23.15%`；30K pooled `58.00%` |
+| H9-recovery | 恢复 H9 中间 checkpoint | 与 H9-scale-b 相同，训练至 20K | 130704 | 运行中 | 尚无新结论 |
+| H13 | 判断 contribution 注入是否必要 | H9 去除 residual 注入，BS64，5K | 130599/130774 | 训练完成；2 GPU 验证中 | checkpoint `4999` 已完成；尚无最终结论 |
 
 ## 前期筛选结果
 
@@ -63,6 +64,7 @@
 | ACPD-v2 BS32 5K | 5.20% | 24.20% | 15.60% | 0.40% | 11.35% |
 | SFT backview BS64 5K | 9.40% | 18.40% | 24.80% | 2.80% | 13.85% |
 | ACPD-v2 backview BS64 5K | 25.40% | 32.40% | 30.00% | 4.80% | 23.15% |
+| ACPD-v2 backview BS64 30K | 64.00% | 73.00% | 61.80% | 33.20% | 58.00% |
 
 ## 精选 Checkpoint
 
@@ -73,12 +75,12 @@
 | 分类 | 模型 | 已归档 | 状态 |
 |---|---|---|---|
 | teacher | agentview+wrist | `29999` | 完整 |
-| baseline | backview BS64 | `4999` | job 130762 已提交，确定性续训至 30K |
-| baseline | topview BS64 | - | job 130669 运行中 |
-| baseline | leftview BS64 | - | job 130670 运行中 |
-| baseline | rightview BS64 | - | job 130671 运行中 |
-| student | backview ACPD-v2 layer 10 BS64 | `24999` | 30K checkpoint `29999` 已完成，job 130773 验证排队；5K-20K 等待 job 130704 |
-| ablation | backview loss-only BS64 | - | 5K checkpoint `4999` 已完成，job 130774 验证排队；之后补至 30K |
+| baseline | backview BS64 | `4999` | 5K--30K checkpoint 完整；job 130889 验证排队 |
+| baseline | topview BS64 | - | 5K--30K checkpoint 完整；job 130890 验证中 |
+| baseline | leftview BS64 | - | 5K--30K checkpoint 完整；job 130891 验证中 |
+| baseline | rightview BS64 | - | 5K--30K checkpoint 完整；job 130892 验证排队 |
+| student | backview ACPD-v2 layer 10 BS64 | `24999` | 30K checkpoint 和验证完整；job 130704 正在恢复 5K--20K |
+| ablation | backview loss-only BS64 | - | 5K checkpoint `4999` 已完成，job 130774 验证中；之后补至 30K |
 | ablation | backview ACL-only BS64 | - | 尚未运行 |
 
 H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，也不进入正式索引。
@@ -91,6 +93,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H7/H7.1 原始指标 | `/opt/liutong/openpi-5090-research/acpd-exact-attention-probe/results/` |
 | H9 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-pbs32-5k_129710.out` |
 | H9-scale-b 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-fsdp4-bs64-30k_129728.out` |
+| H9-scale-b 30K 验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/29999/summary.txt` |
 | H12 分析 | `experiments/baseline/sft-backview-bs64-5k/analysis.md` |
 | H13 协议 | `experiments/ablation/acpd-v2-h13-injection-ablation/protocol.md` |
 | SFT 验证目录 | `/opt/liutong/openpi-5090-evals/` |

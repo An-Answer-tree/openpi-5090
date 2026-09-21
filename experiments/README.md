@@ -19,10 +19,10 @@
 
 | 类别 | 实验 | 协议/分析 | 状态 |
 |---|---|---|---|
-| baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 30K 训练中；2 GPU 验证等待训练 |
-| baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 训练中；2 GPU 验证等待训练 |
-| student | H9-scale-b ACPD-v2 BS64 | `student/acpd-v2-h9-batch-scaling-30k/` | 30K 完成并等待 2 GPU 验证；中间 checkpoint 恢复排队 |
-| ablation | H13 loss-only BS64 | `ablation/acpd-v2-h13-injection-ablation/` | 5K 完成；2 GPU 验证排队 |
+| baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 30K 完成；2 GPU 验证排队 |
+| baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 30K 全部完成；top/left 验证中，right 排队 |
+| student | H9-scale-b ACPD-v2 BS64 | `student/acpd-v2-h9-batch-scaling-30k/` | 30K 训练和验证完成；中间 checkpoint 恢复中 |
+| ablation | H13 loss-only BS64 | `ablation/acpd-v2-h13-injection-ablation/` | 5K 完成；2 GPU 验证中 |
 | ablation | ACL-only BS64 | 尚未创建协议 | 待运行 |
 
 H11 已归档，不进入正式 checkpoint 集合，也不继续训练。
@@ -36,11 +36,11 @@ H11 已归档，不进入正式 checkpoint 集合，也不继续训练。
 | 模型 | 5K | 10K | 15K | 20K | 25K | 30K |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
 | teacher/agentview_wrist | - | - | - | - | - | Y |
-| baseline/backview_bs64 | Y | Q | Q | Q | Q | Q |
-| baseline/topview_bs64 | R | R | R | R | R | R |
-| baseline/leftview_bs64 | R | R | R | R | R | R |
-| baseline/rightview_bs64 | R | R | R | R | R | R |
-| student/backview_acpdv2_layer10_bs64 | Q | Q | Q | Q | Y | C |
+| baseline/backview_bs64 | Y | C | C | C | C | C |
+| baseline/topview_bs64 | C | C | C | C | C | C |
+| baseline/leftview_bs64 | C | C | C | C | C | C |
+| baseline/rightview_bs64 | C | C | C | C | C | C |
+| student/backview_acpdv2_layer10_bs64 | R | R | R | R | Y | C |
 | ablation/backview_loss_only_bs64 | C | P | P | P | P | P |
 | ablation/backview_acl_only_bs64 | P | P | P | P | P | P |
 

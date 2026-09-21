@@ -12,7 +12,8 @@
 | 特权视觉贡献能否恢复 | layer 10 overall gap `0.3992`，比次优层高 `0.0485` | backview 表征可以预测 teacher 的真实 attention contribution。 |
 | ACPD-v2 是否有正向任务信号 | BS32 5K 相对 ACL-only 提升 `5.00` 点，95% CI `[3.60, 6.45]` | 单 seed、5K 筛选支持 ACPD-v2。 |
 | ACPD-v2 是否优于公平 SFT | BS64 5K 为 `23.15%` 对 `13.85%`，差值 `+9.30` 点，95% CI `[7.30, 11.35]` | 当前公平对照支持 ACPD-v2 整体方案。 |
-| 显式 residual 注入是否必要 | H13 loss-only 已完成 5K，验证排队 | 尚无结论。 |
+| ACPD-v2 延长训练是否有效 | H9-scale-b 从 5K `23.15%` 提高到 30K `58.00%` | 该配置在 5K 后仍有明显收益；尚不能替代匹配 SFT 30K 对照。 |
+| 显式 residual 注入是否必要 | H13 loss-only 已完成 5K，验证中 | 尚无最终结论。 |
 
 ## 方法判断
 
