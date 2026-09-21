@@ -1,0 +1,154 @@
+{
+  "overall": {
+    "matched_points": 299,
+    "supervised_loss_correlation": 0.9984569904949717,
+    "mean_sft_supervised_loss": 0.02514247491638796,
+    "mean_acpd_supervised_loss": 0.025140802675585286,
+    "mean_acpd_minus_sft_percent": 0.004345625970241297,
+    "mean_absolute_acpd_minus_sft_percent": 1.2736265872074972,
+    "peak_gate_step": 11900,
+    "peak_gate": 0.0054,
+    "final_step": 29900,
+    "final_contribution_cosine": 0.7999,
+    "final_gate": 0.004,
+    "final_objective_fractions": {
+      "supervised": 0.23291139240506328,
+      "weighted_contribution": 0.6025316455696202,
+      "weighted_acl": 0.16455696202531642
+    }
+  },
+  "windows": [
+    {
+      "window": "0-5K",
+      "sft_supervised_loss": 0.0374530612244898,
+      "acpd_supervised_loss": 0.037493877551020405,
+      "acpd_minus_sft_percent": 0.10897994768961361,
+      "acpd_total_loss": 0.17109183673469386,
+      "acpd_weighted_contribution_loss": 0.10503877551020409,
+      "acpd_weighted_acl_loss": 0.028559183673469365,
+      "acpd_contribution_cosine": 0.6066510204081632,
+      "acpd_gate": 0.00283265306122449
+    },
+    {
+      "window": "5K-10K",
+      "sft_supervised_loss": 0.02738,
+      "acpd_supervised_loss": 0.027406,
+      "acpd_minus_sft_percent": 0.09495982468954445,
+      "acpd_total_loss": 0.117354,
+      "acpd_weighted_contribution_loss": 0.06953999999999999,
+      "acpd_weighted_acl_loss": 0.02040800000000001,
+      "acpd_contribution_cosine": 0.738786,
+      "acpd_gate": 0.00482
+    },
+    {
+      "window": "10K-15K",
+      "sft_supervised_loss": 0.024763999999999998,
+      "acpd_supervised_loss": 0.024714,
+      "acpd_minus_sft_percent": -0.20190599256985076,
+      "acpd_total_loss": 0.10467,
+      "acpd_weighted_contribution_loss": 0.061734,
+      "acpd_weighted_acl_loss": 0.018222000000000002,
+      "acpd_contribution_cosine": 0.7643599999999999,
+      "acpd_gate": 0.005122
+    },
+    {
+      "window": "15K-20K",
+      "sft_supervised_loss": 0.022463999999999998,
+      "acpd_supervised_loss": 0.022330000000000003,
+      "acpd_minus_sft_percent": -0.5965099715099509,
+      "acpd_total_loss": 0.094568,
+      "acpd_weighted_contribution_loss": 0.055987999999999996,
+      "acpd_weighted_acl_loss": 0.01625,
+      "acpd_contribution_cosine": 0.780664,
+      "acpd_gate": 0.004904
+    },
+    {
+      "window": "20K-25K",
+      "sft_supervised_loss": 0.020312,
+      "acpd_supervised_loss": 0.020326,
+      "acpd_minus_sft_percent": 0.06892477353288573,
+      "acpd_total_loss": 0.086738,
+      "acpd_weighted_contribution_loss": 0.051786000000000006,
+      "acpd_weighted_acl_loss": 0.014625999999999993,
+      "acpd_contribution_cosine": 0.790774,
+      "acpd_gate": 0.004496
+    },
+    {
+      "window": "25K-30K",
+      "sft_supervised_loss": 0.018728,
+      "acpd_supervised_loss": 0.018822000000000002,
+      "acpd_minus_sft_percent": 0.5019222554463854,
+      "acpd_total_loss": 0.081164,
+      "acpd_weighted_contribution_loss": 0.048932,
+      "acpd_weighted_acl_loss": 0.013409999999999991,
+      "acpd_contribution_cosine": 0.79718,
+      "acpd_gate": 0.004124
+    }
+  ],
+  "anchors": [
+    {
+      "step": 100,
+      "sft_supervised_loss": 0.0782,
+      "acpd_supervised_loss": 0.0784,
+      "acpd_minus_sft_percent": 0.2557544757033181,
+      "acpd_contribution_cosine": 0.0874,
+      "acpd_gate": 0.0
+    },
+    {
+      "step": 1000,
+      "sft_supervised_loss": 0.0431,
+      "acpd_supervised_loss": 0.0434,
+      "acpd_minus_sft_percent": 0.6960556844547661,
+      "acpd_contribution_cosine": 0.5366,
+      "acpd_gate": 0.0017
+    },
+    {
+      "step": 5000,
+      "sft_supervised_loss": 0.0259,
+      "acpd_supervised_loss": 0.0296,
+      "acpd_minus_sft_percent": 14.285714285714302,
+      "acpd_contribution_cosine": 0.7157,
+      "acpd_gate": 0.0043
+    },
+    {
+      "step": 10000,
+      "sft_supervised_loss": 0.0263,
+      "acpd_supervised_loss": 0.0258,
+      "acpd_minus_sft_percent": -1.9011406844106515,
+      "acpd_contribution_cosine": 0.7536,
+      "acpd_gate": 0.0051
+    },
+    {
+      "step": 15000,
+      "sft_supervised_loss": 0.0236,
+      "acpd_supervised_loss": 0.0235,
+      "acpd_minus_sft_percent": -0.4237288135593209,
+      "acpd_contribution_cosine": 0.7731,
+      "acpd_gate": 0.0051
+    },
+    {
+      "step": 20000,
+      "sft_supervised_loss": 0.0213,
+      "acpd_supervised_loss": 0.0212,
+      "acpd_minus_sft_percent": -0.46948356807511304,
+      "acpd_contribution_cosine": 0.789,
+      "acpd_gate": 0.0046
+    },
+    {
+      "step": 25000,
+      "sft_supervised_loss": 0.0193,
+      "acpd_supervised_loss": 0.0195,
+      "acpd_minus_sft_percent": 1.0362694300518172,
+      "acpd_contribution_cosine": 0.7948,
+      "acpd_gate": 0.0043
+    },
+    {
+      "step": 29900,
+      "sft_supervised_loss": 0.0183,
+      "acpd_supervised_loss": 0.0184,
+      "acpd_minus_sft_percent": 0.5464480874316946,
+      "acpd_contribution_cosine": 0.7999,
+      "acpd_gate": 0.004
+    }
+  ]
+}
