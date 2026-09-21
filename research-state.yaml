@@ -29,8 +29,8 @@ current_execution:
       resources: 1gpu_4cpu_24g
     - id: 132250
       experiment: h15a_gradient_conflict_5k_30k
-      state: dependency
-      depends_on: 132308
+      state: pending
+      reason: priority
       resources: 2gpu_16cpu_48g
   recently_completed:
     - id: 132082
@@ -189,7 +189,7 @@ formal_matrix:
       primary_baseline_pooled: 0.6045
   mechanism:
     h15a_gradient_conflict:
-      status: debug_smoke_running_formal_submitted
+      status: debug_smoke_complete_formal_pending
       checkpoints: [4999, 29999]
       batches_per_checkpoint: 200
       batch_size: 32
@@ -198,6 +198,12 @@ formal_matrix:
       updates_model: false
       smoke_job: 132308
       job: 132250
+      fast_probe:
+        status: protocol_locked_not_submitted
+        checkpoints: [4999, 29999]
+        batches_per_checkpoint: 100
+        batch_size: 1
+        gpus: 1
   ablation:
     backview_loss_only_bs64:
       checkpoints: [4999]

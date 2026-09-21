@@ -40,3 +40,4 @@
 | 2026-09-21 | 方法 | H15a 预注册为梯度冲突诊断：在 H9 5K/30K 上用相同的200个BS32 batch，测量共享 LoRA 参数中 flow、contribution、ACL 梯度的 cosine、冲突率和范数比；结果决定测试 conflict-aware ACPD 还是动态 gate。 |
 | 2026-09-22 | 管理 | H9 `4999` checkpoint 完整写入后，在 debug01 提交 H15a 单卡单 batch smoke job 132308；正式2卡BS32 job 132250 依赖 smoke 成功后运行5K与30K各200个 batch。 |
 | 2026-09-22 | 结果 | H9-scale-b 25K pooled success 为 55.75%，30K 为 58.00%；25K-30K 差值 -2.25 点，配对 95% CI `[-4.70, +0.20]`，不支持 25K 已经早于 30K 达峰。 |
+| 2026-09-22 | 方法 | H15a 正式任务等待 2 卡期间，预注册单卡 BS1、5K/30K 各100个相同样本的探索性快速诊断；只用于选择下一步方向，不替代正式 BS32 结论。 |
