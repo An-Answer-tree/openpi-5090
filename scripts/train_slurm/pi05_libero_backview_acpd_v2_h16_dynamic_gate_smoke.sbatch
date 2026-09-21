@@ -4,7 +4,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
-#SBATCH --mem=24G
+#SBATCH --mem=48G
 #SBATCH --gres=gpu:1
 #SBATCH --time=01:00:00
 #SBATCH --output=/home/liutong/Projects/openpi-5090/slurm-log/%x_%j.out
