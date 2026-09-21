@@ -12,6 +12,8 @@
 - 资源：1×RTX 5090，BS1，无参数更新。
 - 权重：flow `1.0`、contribution `0.2`、ACL `0.5`，与 H9 一致。
 - 测量：共享 LoRA 参数上的 cosine、冲突率和相对范数。
+- 分析：相同 sample 成对比较 5K 与 30K，并以 10,000 次 paired bootstrap 报告
+  冲突率差和 cosine 中位数差的 95% 区间。
 
 ## 判断
 
