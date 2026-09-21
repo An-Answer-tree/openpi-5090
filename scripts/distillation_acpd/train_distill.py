@@ -90,6 +90,7 @@ class DistillTrainConfig:
     save_final_checkpoint: bool = True
     overwrite: bool = False
     resume: bool = False
+    resume_data_loader: bool = False
     wandb_enabled: bool = True
     fsdp_devices: int = 4
 
@@ -294,6 +295,7 @@ def _make_student_train_config(
         keep_period=config.keep_period,
         overwrite=config.overwrite,
         resume=config.resume,
+        resume_data_loader=config.resume_data_loader,
         wandb_enabled=config.wandb_enabled,
         fsdp_devices=config.fsdp_devices,
         ema_decay=None,
@@ -327,6 +329,7 @@ def _create_paired_data_loader(
     *,
     sharding_: jax.sharding.Sharding,
     shuffle: bool,
+    start_batch: int = 0,
     episodes: Sequence[int] | None = None,
     include_episode_index: bool = False,
 ) -> PairedDataLoader:
@@ -368,9 +371,18 @@ def _create_paired_data_loader(
         num_batches=None,
         num_workers=train_config.num_workers,
         seed=train_config.seed,
+        start_batch=start_batch,
         framework="jax",
     )
     return PairedDataLoader(data_config, torch_loader, include_episode_index=include_episode_index)
+
+
+def _data_start_batch(config: DistillTrainConfig, start_step: int, *, resuming: bool) -> int:
+    if config.resume_data_loader and not resuming:
+        raise ValueError("--resume-data-loader requires an existing checkpoint.")
+    if not config.resume_data_loader:
+        return 0
+    return start_step * config.gradient_accumulation_steps
 
 
 def _init_frozen_model_state(
@@ -703,11 +715,6 @@ def main(config: DistillTrainConfig):
     if config.wandb_enabled:
         wandb.config.update(dataclasses.asdict(config), allow_val_change=True)
 
-    data_loader = _create_paired_data_loader(config, student_config, sharding_=data_sharding, shuffle=True)
-    data_iter = iter(data_loader)
-    batch = next(data_iter)
-    logging.info("Initialized paired data loader:\n%s", training_utils.array_tree_to_info(batch))
-
     student_state, student_state_sharding = init_train_state(
         student_config,
         student_init_rng,
@@ -717,6 +724,23 @@ def main(config: DistillTrainConfig):
     jax.block_until_ready(student_state)
     if resuming:
         student_state = _checkpoints.restore_state(checkpoint_manager, student_state)
+
+    start_step = int(student_state.step)
+    data_start_batch = _data_start_batch(config, start_step, resuming=resuming)
+    data_loader = _create_paired_data_loader(
+        config,
+        student_config,
+        sharding_=data_sharding,
+        shuffle=True,
+        start_batch=data_start_batch,
+    )
+    data_iter = iter(data_loader)
+    batch = next(data_iter)
+    logging.info(
+        "Initialized paired data loader at batch %d:\n%s",
+        data_start_batch,
+        training_utils.array_tree_to_info(batch),
+    )
 
     teacher_state, teacher_state_sharding = _init_frozen_model_state(
         teacher_config,
@@ -751,7 +775,6 @@ def main(config: DistillTrainConfig):
         donate_argnums=(0, 1),
     )
 
-    start_step = int(student_state.step)
     progress = tqdm.tqdm(
         range(start_step, config.num_train_steps),
         initial=start_step,

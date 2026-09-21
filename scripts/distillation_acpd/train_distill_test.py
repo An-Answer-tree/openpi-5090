@@ -13,6 +13,7 @@ from scripts.distillation_acpd.train_distill import _acpd_prediction_loss
 from scripts.distillation_acpd.train_distill import _acpd_variance_loss
 from scripts.distillation_acpd.train_distill import _action_corr_loss
 from scripts.distillation_acpd.train_distill import _add_scaled_gradients
+from scripts.distillation_acpd.train_distill import _data_start_batch
 from scripts.distillation_acpd.train_distill import _exact_contribution_loss
 from scripts.distillation_acpd.train_distill import _make_student_train_config
 from scripts.distillation_acpd.train_distill import _make_teacher_train_config
@@ -188,3 +189,16 @@ def test_gradient_accumulation_averages_independent_microbatches():
     first_rng = _micro_step_train_rng(jax.random.key(0), 3, 0, gradient_accumulation_steps=4)
     second_rng = _micro_step_train_rng(jax.random.key(0), 3, 1, gradient_accumulation_steps=4)
     assert not np.array_equal(first_rng, second_rng)
+
+
+def test_resume_data_loader_accounts_for_gradient_accumulation():
+    config = DistillTrainConfig(
+        student_init_params="base/params",
+        teacher_params="teacher/params",
+        assets_dir="assets",
+        checkpoint_base_dir="checkpoints",
+        gradient_accumulation_steps=4,
+        resume_data_loader=True,
+    )
+
+    assert _data_start_batch(config, 30_000, resuming=True) == 120_000
