@@ -18,6 +18,7 @@
 | H9 25K 是否早于 30K 达峰 | 不支持。25K 为 `55.75%`，30K 为 `58.00%`；25K-30K 为 `-2.25` 点，95% CI `[-4.70, +0.20]`。 | 相同 2,000 episodes |
 | 显式 contribution 注入是否有效 | 有正向证据。H9 为 `23.15%`，H13 loss-only 为 `20.60%`；差值 `+2.55` 点，配对 95% CI `[+0.40, +4.70]`。 | H13 |
 | ACPD-v2 是否通过降低训练 MSE 获益 | 没有该证据。与 SFT 对齐的 299 个监督 loss 点相关系数为 `0.9985`，全程均值几乎相同；5K 成功率增益不能由更低训练 MSE 解释。 | H9/H12 loss 对齐 |
+| 后期是否出现明显辅助梯度冲突 | H15a-fast 不支持。组合冲突率从 5K `6%` 降至 30K `3%`，30K cosine 中位数仍为正 `0.3795`。 | BS1，100 个成对 samples；探索性 |
 
 ## 正式 BS64 实验
 
@@ -40,7 +41,7 @@
 
 | ID | 目的 | 实际配置 | Job | 状态 | 结论 |
 |---|---|---|---:|---|---|
-| H15a | 判断 ACPD-v2 后期是否存在辅助梯度干扰 | H9 5K/30K；正式为每点200个相同BS32 batch；另有探索性BS1快速诊断；不更新参数 | smoke 132308；快速 132311；正式 132250 | smoke 完成；快速和正式任务排队 | 尚无结论 |
+| H15a | 判断 ACPD-v2 后期是否存在辅助梯度干扰 | H9 5K/30K；正式为每点200个相同BS32 batch；另有探索性BS1快速诊断；不更新参数 | smoke 132308；快速 132311；正式 132250 | 快速诊断完成；正式任务排队 | 快速诊断不支持后期组合梯度冲突增强；等待正式 BS32 |
 
 H15 固定权重退火仅保留为候选工程对照。是否执行由 H15a 决定，不作为当前主方法。
 
@@ -121,6 +122,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H9 30K--60K 协议 | `experiments/student/acpd-v2-h9-trajectory-60k/protocol.md` |
 | H15a 梯度诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/protocol.md` |
 | H15a 快速诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/fast_protocol.md` |
+| H15a 快速诊断分析 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/analysis.md` |
 | H15a 结果目录 | `/opt/liutong/openpi-5090-research/acpd-v2-gradient-conflict/` |
 | H15 持续蒸馏协议 | `experiments/student/acpd-v2-h15-persistent-distillation/protocol.md` |
 | H12 分析 | `experiments/baseline/sft-backview-bs64-5k/analysis.md` |

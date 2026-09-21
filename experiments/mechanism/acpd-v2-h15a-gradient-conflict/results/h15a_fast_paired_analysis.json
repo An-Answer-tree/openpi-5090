@@ -1,0 +1,65 @@
+{
+  "bootstrap_samples": 10000,
+  "early_rows": "/opt/liutong/openpi-5090-research/acpd-v2-gradient-conflict/h9-5k-bs1-n100/per_batch.jsonl",
+  "late_rows": "/opt/liutong/openpi-5090-research/acpd-v2-gradient-conflict/h9-30k-bs1-n100/per_batch.jsonl",
+  "metrics": {
+    "action_corr": {
+      "conflict_rate_delta": 0.01,
+      "conflict_rate_delta_ci95": [
+        0.0,
+        0.03
+      ],
+      "conflict_rate_early": 0.0,
+      "conflict_rate_late": 0.01,
+      "cosine_median_delta": -0.0011615157127380371,
+      "cosine_median_delta_ci95": [
+        -0.01937764063477516,
+        0.016340294480323782
+      ],
+      "cosine_median_early": 0.9413929879665375,
+      "cosine_median_late": 0.9402314722537994,
+      "norm_ratio_median_early": 0.9011476635932922,
+      "norm_ratio_median_late": 0.8689986765384674
+    },
+    "contribution": {
+      "conflict_rate_delta": 0.06,
+      "conflict_rate_delta_ci95": [
+        -0.04999999999999999,
+        0.17
+      ],
+      "conflict_rate_early": 0.24,
+      "conflict_rate_late": 0.3,
+      "cosine_median_delta": -0.023999588564038277,
+      "cosine_median_delta_ci95": [
+        -0.06721726302057504,
+        0.004567176103591919
+      ],
+      "cosine_median_early": 0.05715077929198742,
+      "cosine_median_late": 0.03315119072794914,
+      "norm_ratio_median_early": 2.3949054479599,
+      "norm_ratio_median_late": 2.639139175415039
+    },
+    "privileged": {
+      "conflict_rate_delta": -0.03,
+      "conflict_rate_delta_ci95": [
+        -0.09,
+        0.03
+      ],
+      "conflict_rate_early": 0.06,
+      "conflict_rate_late": 0.03,
+      "cosine_median_delta": -0.043306171894073486,
+      "cosine_median_delta_ci95": [
+        -0.10120393894612789,
+        -0.008515605330467241
+      ],
+      "cosine_median_early": 0.422763392329216,
+      "cosine_median_late": 0.3794572204351425,
+      "norm_ratio_median_early": 2.691937208175659,
+      "norm_ratio_median_late": 2.810857653617859
+    }
+  },
+  "next_experiment": "dynamic_view_gate",
+  "num_paired_batches": 100,
+  "seed": 42,
+  "supports_late_gradient_conflict": false
+}

@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-22 00:48 CST"
+  checked_at: "2026-09-22 01:21 CST"
   jobs:
     - id: 130892
       experiment: rightview_sft_bs64_30k_eval
@@ -26,12 +26,10 @@ current_execution:
       state: pending
       reason: priority
       resources: 2gpu_16cpu_48g
+  recently_completed:
     - id: 132311
       experiment: h15a_gradient_conflict_fast_5k_30k
-      state: pending
-      reason: priority
-      resources: 1gpu_8cpu_24g
-  recently_completed:
+      state: complete
     - id: 132308
       experiment: h15a_gradient_conflict_smoke_1gpu
       state: complete
@@ -201,12 +199,21 @@ formal_matrix:
       smoke_job: 132308
       job: 132250
       fast_probe:
-        status: submitted_pending
+        status: complete_exploratory
         job: 132311
         checkpoints: [4999, 29999]
         batches_per_checkpoint: 100
         batch_size: 1
         gpus: 1
+        privileged_conflict_rate:
+          step_5k: 0.06
+          step_30k: 0.03
+          delta: -0.03
+          delta_ci95: [-0.09, 0.03]
+        privileged_cosine_median:
+          step_5k: 0.4228
+          step_30k: 0.3795
+        supports_late_gradient_conflict: false
   ablation:
     backview_loss_only_bs64:
       checkpoints: [4999]

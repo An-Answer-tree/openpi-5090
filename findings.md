@@ -17,6 +17,7 @@
 | 显式 residual 注入是否有效 | H9 为 `23.15%`，H13 loss-only 为 `20.60%`；差值 `+2.55` 点，配对 95% CI `[+0.40, +4.70]` | 达到预注册判据，支持显式注入。 |
 | ACPD-v2 是否降低训练 flow MSE | 299 个对齐点与 SFT 的相关系数为 `0.9985`，全程平均 MSE 几乎相同 | 5K 成功率增益不是更低训练 MSE 的结果；内部表示改变是待验证的机制解释。 |
 | 固定蒸馏权重是否适合全程训练 | 30K 时加权 contribution 与 ACL 的标量和约为 supervised 的 `3.29` 倍，而5K后的 contribution cosine 改善有限 | 固定权重可能使后期辅助目标过强；该证据支持测试非零下限退火，但不等同于梯度冲突证明。 |
+| 后期辅助梯度是否更冲突 | H15a-fast 中组合冲突率从 5K `6%` 降至 30K `3%`，cosine 中位数为 `0.4228` 对 `0.3795` | BS1 探索结果不支持明显的后期组合梯度冲突；最终判断等待正式 BS32。 |
 
 ## 方法判断
 
@@ -39,10 +40,10 @@ H7/H7.1 证明该目标可以从 backview 恢复；H9 与 H12 在 5K 检测到 A
 和 flow time，直接比较共享 LoRA 参数中的 flow、contribution 与 ACL 梯度。该实验回答
 后期辅助目标是否与动作监督冲突；标量 loss 比例本身不能回答这个问题。
 
-若 30K 的组合辅助梯度冲突明显高于 5K，则测试 conflict-aware ACPD：保留 teacher
-信号，只投影掉与 flow 梯度冲突的分量并限制辅助梯度范数。若没有冲突证据，则不运行
-该方法，改测 agentview/wrist 分离、按 action token 条件化的动态 gate。原 H15 固定
-权重退火保留为候选工程对照，不是当前主线。
+H15a-fast 没有观察到 30K 组合冲突率上升，暂不优先测试只处理负梯度的
+conflict-aware ACPD。当前转向更直接的结构问题：H9 用一个全局标量同时缩放两个
+视角的 contribution，无法按 action token 选择 agentview 或 wrist。下一项小实验测试
+零初始化的 token-conditioned 双视角 gate；正式 H15a 继续用于确认 BS32 结论。
 
 ## 工程约束
 
