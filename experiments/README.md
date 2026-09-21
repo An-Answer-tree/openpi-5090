@@ -24,6 +24,7 @@
 | student | H9-scale-b ACPD-v2 BS64 | `student/acpd-v2-h9-batch-scaling-30k/` | 30K 训练和验证完成；中间 checkpoint 恢复中 |
 | student | H9 ACPD-v2 30K--60K | `student/acpd-v2-h9-trajectory-60k/` | 续训排队；40K/50K/60K 验证等待训练 |
 | ablation | H13 loss-only BS64 | `ablation/acpd-v2-h13-injection-ablation/` | 5K 训练和验证完成；支持显式注入 |
+| ablation | H9 30K 推理注入开关 | `ablation/acpd-v2-h9-30k-injection-toggle/` | 协议已锁定；尚无结论 |
 | ablation | ACL-only BS64 | 尚未创建协议 | 待运行 |
 
 H11 已归档，不进入正式 checkpoint 集合，也不继续训练。
