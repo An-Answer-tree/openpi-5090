@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=96G
 #SBATCH --gres=gpu:4
-#SBATCH --time=8-00:00:00
+#SBATCH --time=3-00:00:00
 #SBATCH --output=/home/liutong/Projects/openpi-5090/slurm-log/%x_%j.out
 
 set -euo pipefail
@@ -76,5 +76,6 @@ python -m scripts.distillation_acpd.train_distill \
   --save-interval=5000 \
   --keep-period=1 \
   --resume \
+  --resume-data-loader \
   --fsdp-devices=4 \
   --no-wandb-enabled
