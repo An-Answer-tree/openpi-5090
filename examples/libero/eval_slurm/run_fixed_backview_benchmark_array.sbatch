@@ -12,8 +12,8 @@
 
 set -euo pipefail
 
-if [[ $# -lt 2 || $# -gt 4 ]]; then
-  echo "Usage: $0 CHECKPOINT_DIR EVAL_DIR [POLICY_CONFIG] [BASE_IMAGE_KEY]" >&2
+if [[ $# -lt 2 || $# -gt 5 ]]; then
+  echo "Usage: $0 CHECKPOINT_DIR EVAL_DIR [POLICY_CONFIG] [BASE_IMAGE_KEY] [NUM_TRIALS]" >&2
   exit 2
 fi
 
@@ -21,6 +21,7 @@ checkpoint_dir=$1
 eval_dir=$2
 policy_config=${3:-pi05_libero_backview_lora}
 base_image_key=${4:-backview_image}
+num_trials=${5:-50}
 suite_names=(libero_spatial libero_object libero_goal libero_10)
 output_names=(spatial object goal libero_10)
 task_id=${SLURM_ARRAY_TASK_ID}
@@ -38,6 +39,6 @@ bash examples/libero/eval_slurm/run_fixed_backview_suite.bash \
   "${gpu_id}" \
   "${port}" \
   "${suite_names[task_id]}" \
-  50 \
+  "${num_trials}" \
   "${policy_config}" \
   "${base_image_key}" >"${eval_dir}/logs/${output_names[task_id]}.log" 2>&1
