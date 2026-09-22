@@ -23,7 +23,7 @@ current_execution:
       state: pending
       reason: priority
       resources: 4gpu_32cpu_96g
-      time_limit: 8-00:00:00
+      time_limit: 4-00:00:00
     - id: 132391
       experiment: h9_40k_50k_60k_eval
       state: dependency
