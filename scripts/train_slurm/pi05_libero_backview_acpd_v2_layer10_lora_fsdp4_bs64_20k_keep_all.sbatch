@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=32
 #SBATCH --mem=96G
 #SBATCH --gres=gpu:4
-#SBATCH --time=3-00:00:00
+#SBATCH --time=5-00:00:00
 #SBATCH --output=/home/liutong/Projects/openpi-5090/slurm-log/%x_%j.out
 
 set -euo pipefail

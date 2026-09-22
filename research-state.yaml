@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-22 16:50 CST"
+  checked_at: "2026-09-22 17:32 CST"
   jobs:
     - id: 132390
       experiment: h9_resume_30k_to_60k
@@ -13,6 +13,8 @@ current_execution:
       node: gpu05
       resources: 4gpu_32cpu_96g
       time_limit: 4-00:00:00
+      recommended_time_limit: 8-00:00:00
+      time_extension_status: requires_admin
     - id: 132391
       experiment: h9_40k_50k_60k_eval
       state: dependency
@@ -23,7 +25,7 @@ current_execution:
       state: pending
       reason: resources
       resources: 4gpu_32cpu_96g
-      time_limit: 3-00:00:00
+      time_limit: 5-00:00:00
     - id: 132452
       experiment: backview_sft_bs64_20k_eval_single_gpu_array
       state: running
