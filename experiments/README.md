@@ -19,15 +19,13 @@
 
 | 类别 | 实验 | 协议/分析 | 状态 |
 |---|---|---|---|
-| baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 30K 完成；25K 单卡数组验证中 |
-| baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | top/left 完成，right 验证中 |
+| baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 25K/30K 完成；20K 单卡数组验证中 |
+| baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 全部完成 |
 | student | H9-scale-b ACPD-v2 BS64 | `student/acpd-v2-h9-batch-scaling-30k/` | 5K/25K/30K 完成；25K 未高于 30K |
-| mechanism | H15a ACPD-v2 梯度冲突诊断 | `mechanism/acpd-v2-h15a-gradient-conflict/` | 快速诊断完成且不支持冲突假设；正式 job 132250 排队 |
-| student | H15 固定权重退火对照 | `student/acpd-v2-h15-persistent-distillation/` | 候选工程对照；H15a 完成前不提交 |
-| student | H9 ACPD-v2 30K--60K | `student/acpd-v2-h9-trajectory-60k/` | 用户取消；训练和验证均未运行 |
-| student | H9 ACPD-v2 25K | `student/acpd-v2-h9-20k-30k-trajectory/` | 完成；25K pooled 55.75%，低于 30K 2.25 点 |
+| mechanism | H15a ACPD-v2 梯度冲突诊断 | `mechanism/acpd-v2-h15a-gradient-conflict/` | 完成；不支持后期梯度冲突假设 |
+| student | H9 ACPD-v2 30K--60K | `student/acpd-v2-h9-trajectory-60k/` | 已提交续训和40K/50K/60K验证 |
+| student | H9 ACPD-v2 20K--30K | `student/acpd-v2-h9-20k-30k-trajectory/` | 25K完成；5K→20K续训排队 |
 | ablation | H13 loss-only BS64 | `ablation/acpd-v2-h13-injection-ablation/` | 5K 训练和验证完成；支持显式注入 |
-| ablation | H9 30K 推理注入开关 | `ablation/acpd-v2-h9-30k-injection-toggle/` | job 131849 已取消，未运行 |
 | ablation | ACL-only BS64 | 尚未创建协议 | 待运行 |
 
 H11 已归档，不进入正式 checkpoint 集合，也不继续训练。
@@ -45,7 +43,7 @@ H11 已归档，不进入正式 checkpoint 集合，也不继续训练。
 | baseline/topview_bs64 | C | C | C | C | C | C |
 | baseline/leftview_bs64 | C | C | C | C | C | C |
 | baseline/rightview_bs64 | C | C | C | C | C | C |
-| student/backview_acpdv2_layer10_bs64 | C | - | - | - | Y | C |
+| student/backview_acpdv2_layer10_bs64 | C | Q | Q | Q | Y | C |
 | ablation/backview_loss_only_bs64 | C | P | P | P | P | P |
 | ablation/backview_acl_only_bs64 | P | P | P | P | P | P |
 

@@ -5,23 +5,12 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-22 11:40 CST"
+  checked_at: "2026-09-22 13:05 CST"
   jobs:
-    - id: 132317
-      experiment: h16_dynamic_view_gate_5k
-      state: pending
-      reason: priority
-      resources: 4gpu_32cpu_96g
-      time_limit: 2-00:00:00
-    - id: 132389
-      experiment: h16_dynamic_view_gate_5k_eval
-      state: dependency
-      depends_on: 132317
-      resources: 2gpu_16cpu_48g
     - id: 132390
       experiment: h9_resume_30k_to_60k
-      state: pending
-      reason: priority
+      state: running
+      node: gpu05
       resources: 4gpu_32cpu_96g
       time_limit: 4-00:00:00
     - id: 132391
@@ -29,6 +18,23 @@ current_execution:
       state: dependency
       depends_on: 132390
       resources: 2gpu_16cpu_48g
+    - id: 132398
+      experiment: h9_resume_5k_to_20k
+      state: pending
+      reason: resources
+      resources: 4gpu_32cpu_96g
+      time_limit: 3-00:00:00
+    - id: 132399
+      experiment: backview_sft_bs64_20k_eval_single_gpu_array
+      state: running
+      resources_per_task: 1gpu_8cpu_24g
+      array_tasks: 4
+      time_limit: 04:00:00
+    - id: 132400
+      experiment: backview_sft_bs64_20k_summary
+      state: dependency
+      depends_on: 132399
+      resources: 1cpu_1g
   recently_completed:
     - id: 132250
       experiment: h15a_gradient_conflict_5k_30k
@@ -40,10 +46,6 @@ current_execution:
       experiment: rightview_sft_bs64_30k_eval
       state: complete
       pooled_success: 0.7700
-    - id: 132316
-      experiment: h16_dynamic_view_gate_smoke
-      state: complete
-      gate_grad_norm: 0.0149
     - id: 132083
       experiment: backview_sft_bs64_25k_eval_single_gpu_array
       state: complete
@@ -110,6 +112,12 @@ current_execution:
       experiment: h13_loss_only_5k
       checkpoint: 4999
   recently_cancelled:
+    - id: 132317
+      experiment: h16_dynamic_view_gate_5k
+      state: cancelled_without_checkpoint
+    - id: 132389
+      experiment: h16_dynamic_view_gate_5k_eval
+      state: cancelled_with_parent
     - id: 131861
       experiment: h9_20k_eval
       state: cancelled_before_checkpoint
@@ -135,6 +143,9 @@ formal_matrix:
     backview_bs64:
       checkpoints: [4999, 10000, 15000, 20000, 25000, 29999]
       status: complete
+      eval_20k_job: 132399
+      eval_20k_summary_job: 132400
+      eval_20k_status: running
       eval_25k_job: 132083
       eval_25k_summary_job: 132085
       eval_25k:
@@ -187,6 +198,8 @@ formal_matrix:
       recovery_target: 4999
       recovery_job: 130704
       recovery_watchdog_job: 132198
+      recovery_resume_20k_job: 132398
+      recovery_resume_20k_status: pending
       eval_30k_job: 130773
       eval_25k_job: 132082
       eval_25k_summary_job: 132084
@@ -203,39 +216,13 @@ formal_matrix:
       cancelled_60k_jobs: [131642, 131643]
       resume_60k_job: 132390
       eval_40k_50k_60k_job: 132391
-      trajectory_60k_status: submitted
+      trajectory_60k_status: running
       eval_30k:
         spatial: 0.640
         object: 0.730
         goal: 0.618
         libero_10: 0.332
         pooled: 0.580
-    h15_persistent_distillation:
-      status: deferred_engineering_control_pending_h15a
-      start_checkpoint: h9_recovery_4999
-      batch_size: 64
-      gpus: 4
-      supervised_loss_weight: 1.0
-      acpd_loss_weight:
-        initial: 0.2
-        floor: 0.02
-        decay_steps: [5000, 15000]
-      action_corr_loss_weight:
-        initial: 0.5
-        floor: 0.1
-        decay_steps: [5000, 15000]
-      target_step: 30000
-      primary_baseline_pooled: 0.6045
-    h16_dynamic_view_gate:
-      status: smoke_complete_formal_pending
-      smoke_job: 132316
-      train_job: 132317
-      eval_job: 132389
-      layer: 10
-      batch_size: 64
-      gpus: 4
-      target_step: 5000
-      primary_baseline_pooled: 0.2315
   mechanism:
     h15a_gradient_conflict:
       status: complete
@@ -296,8 +283,7 @@ formal_matrix:
       target: 30k
 
 evidence_gaps:
-  - "H15a must determine whether late-training auxiliary gradients conflict with the flow objective before selecting the next ACPD-v2 variant."
-  - "H16 must test whether token-conditioned view selection improves the H9 5K task success rate."
+  - "Matched H9 and SFT 20K evaluations must locate whether the ACPD-v2 early advantage remains at 20K."
   - "ACL-only must be rerun at BS64 for the final fair ablation."
 
 constraints:
@@ -305,7 +291,6 @@ constraints:
   - "Do not modify paths used by running, pending, or dependency jobs."
   - "Curate only completed checkpoints with same-filesystem hard links."
   - "Use save_interval=5000 and keep_period=1 for future 30K distillation runs."
-  - "Do not reduce H15 auxiliary losses to zero; preserve a nonzero teacher-signal floor."
   - "Do not recursively scan large checkpoint, log, dataset, or video trees."
 
 workspace:

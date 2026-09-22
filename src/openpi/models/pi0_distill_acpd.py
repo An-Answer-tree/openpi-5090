@@ -96,9 +96,8 @@ class AcpdHead(nnx.Module):
 class ExactContributionHead(nnx.Module):
     """Predicts two teacher-view contributions and fuses them at inference."""
 
-    def __init__(self, hidden_dim: int, *, dynamic_view_gate: bool = False, rngs: nnx.Rngs):
+    def __init__(self, hidden_dim: int, *, rngs: nnx.Rngs):
         self.hidden_dim = hidden_dim
-        self.dynamic_view_gate = dynamic_view_gate
         self.predictor = nnx.Linear(
             hidden_dim,
             2 * hidden_dim,
@@ -106,38 +105,16 @@ class ExactContributionHead(nnx.Module):
             rngs=rngs,
         )
         self.gate = nnx.Param(jnp.zeros((), dtype=jnp.float32))
-        if dynamic_view_gate:
-            self.view_gate = nnx.Linear(
-                hidden_dim,
-                2,
-                kernel_init=jax.nn.initializers.zeros,
-                bias_init=jax.nn.initializers.zeros,
-                rngs=rngs,
-            )
 
     def predict(self, student_hidden: at.Array) -> at.Array:
         prediction = self.predictor(student_hidden.astype(jnp.float32))
         return einops.rearrange(prediction, "b h (v d) -> b v h d", v=2, d=self.hidden_dim)
 
-    def view_gates(self, student_hidden: at.Array) -> at.Array:
-        """Returns agentview and wrist gates for each action token."""
-        gate_logits = self.gate.value
-        if self.dynamic_view_gate:
-            hidden = jax.lax.stop_gradient(student_hidden.astype(jnp.float32))
-            gate_logits = gate_logits + self.view_gate(hidden)
-        else:
-            gate_logits = jnp.broadcast_to(gate_logits, (*student_hidden.shape[:-1], 2))
-        return jnp.tanh(gate_logits)
-
     def fuse(self, final_hidden: at.Array, student_hidden: at.Array) -> at.Array:
         predicted = jax.lax.stop_gradient(self.predict(student_hidden))
-        if not self.dynamic_view_gate:
-            predicted_residual = jnp.sum(predicted, axis=1).astype(final_hidden.dtype)
-            gate = jnp.tanh(self.gate.value).astype(final_hidden.dtype)
-            return final_hidden + gate * predicted_residual
-        gates = einops.rearrange(self.view_gates(student_hidden), "b h v -> b v h 1")
-        predicted_residual = jnp.sum(gates * predicted, axis=1).astype(final_hidden.dtype)
-        return final_hidden + predicted_residual
+        predicted_residual = jnp.sum(predicted, axis=1).astype(final_hidden.dtype)
+        gate = jnp.tanh(self.gate.value).astype(final_hidden.dtype)
+        return final_hidden + gate * predicted_residual
 
 
 @dataclasses.dataclass(frozen=True)
@@ -149,7 +126,6 @@ class AcpdPi0Config(pi0_config.Pi0Config):
     exact_contribution_fusion: bool = False
     exact_contribution_injection: bool = True
     exact_contribution_fusion_location: Literal["final", "aligned_attention"] = "final"
-    exact_contribution_dynamic_view_gate: bool = False
 
     @override
     def create(self, rng: at.KeyArrayLike) -> "AcpdPi0":
@@ -186,11 +162,8 @@ class AcpdPi0(pi0.Pi0):
         if self.exact_contribution_fusion:
             if len(self.align_layers) != 1:
                 raise ValueError("Exact contribution fusion requires exactly one alignment layer.")
-            if config.exact_contribution_dynamic_view_gate and config.exact_contribution_fusion_location != "final":
-                raise ValueError("Dynamic view gating requires final-hidden contribution fusion.")
             self.exact_contribution_head = ExactContributionHead(
                 action_expert_config.width,
-                dynamic_view_gate=config.exact_contribution_dynamic_view_gate,
                 rngs=rngs,
             )
 

@@ -76,10 +76,7 @@ def analyze(args: Args) -> dict[str, object]:
         }
 
     privileged = metrics["privileged"]
-    supports_conflict = (
-        privileged["conflict_rate_delta"] >= 0.10
-        and privileged["cosine_median_late"] < 0.0
-    )
+    supports_conflict = privileged["conflict_rate_delta"] >= 0.10 and privileged["cosine_median_late"] < 0.0
     return {
         "early_rows": str(args.early_rows),
         "late_rows": str(args.late_rows),
@@ -88,7 +85,6 @@ def analyze(args: Args) -> dict[str, object]:
         "seed": args.seed,
         "metrics": metrics,
         "supports_late_gradient_conflict": supports_conflict,
-        "next_experiment": "conflict_aware_acpd" if supports_conflict else "dynamic_view_gate",
     }
 
 

@@ -615,7 +615,6 @@ def _make_pi05_libero_acpd_v2_config(
     *,
     fusion_location: Literal["final", "aligned_attention"] = "final",
     injection: bool = True,
-    dynamic_view_gate: bool = False,
 ) -> TrainConfig:
     """Creates a deployed exact-contribution policy config."""
     base = _make_pi05_libero_lora_config("backview")
@@ -627,11 +626,8 @@ def _make_pi05_libero_acpd_v2_config(
         exact_contribution_fusion=True,
         exact_contribution_injection=injection,
         exact_contribution_fusion_location=fusion_location,
-        exact_contribution_dynamic_view_gate=dynamic_view_gate,
     )
-    if dynamic_view_gate:
-        name = f"pi05_libero_backview_acpd_v2_layer{layer}_dynamic_gate_lora"
-    elif not injection:
+    if not injection:
         name = f"pi05_libero_backview_acpd_v2_layer{layer}_loss_only_lora"
     elif fusion_location == "aligned_attention":
         name = f"pi05_libero_backview_acpd_v2_layer{layer}_aligned_lora"
@@ -853,7 +849,6 @@ _CONFIGS = [
     _make_pi05_libero_lora_config("backview"),
     _make_pi05_libero_acpd_v2_config(),
     _make_pi05_libero_acpd_v2_config(layer=10),
-    _make_pi05_libero_acpd_v2_config(layer=10, dynamic_view_gate=True),
     _make_pi05_libero_acpd_v2_config(layer=10, fusion_location="aligned_attention"),
     _make_pi05_libero_acpd_v2_config(layer=10, injection=False),
     _make_pi05_libero_lora_config("topview"),

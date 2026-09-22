@@ -103,30 +103,6 @@ def test_exact_contribution_head_has_stable_graph_metadata():
     assert jax.tree_util.tree_structure(first) == jax.tree_util.tree_structure(second)
 
 
-def test_dynamic_view_gate_starts_as_global_gate_and_detaches_flow_inputs():
-    head = ExactContributionHead(4, dynamic_view_gate=True, rngs=nnx.Rngs(0))
-    student_hidden = jnp.arange(24, dtype=jnp.float32).reshape(2, 3, 4) / 10.0
-    final_hidden = jnp.arange(24, dtype=jnp.float32).reshape(2, 3, 4)
-    head.predictor.kernel.value = jnp.ones_like(head.predictor.kernel.value)
-    head.predictor.bias.value = jnp.zeros_like(head.predictor.bias.value)
-    head.gate.value = jnp.asarray(0.5)
-
-    expected = final_hidden + jnp.tanh(0.5) * jnp.sum(head.predict(student_hidden), axis=1)
-    np.testing.assert_allclose(head.fuse(final_hidden, student_hidden), expected, rtol=1e-6)
-
-    def flow_loss(model):
-        return jnp.mean(model.fuse(final_hidden, student_hidden))
-
-    _, gradients = nnx.value_and_grad(flow_loss)(head)
-    np.testing.assert_allclose(optax.global_norm(gradients["predictor"]), 0.0)
-    assert float(optax.global_norm(gradients["view_gate"])) > 0.0
-
-    def input_loss(hidden):
-        return jnp.mean(head.fuse(final_hidden, hidden))
-
-    np.testing.assert_allclose(jax.grad(input_loss)(student_hidden), 0.0, atol=1e-6)
-
-
 def test_exact_contribution_loss_is_zero_for_equal_targets():
     target = jnp.arange(48, dtype=jnp.float32).reshape(2, 2, 3, 4) + 1.0
 
@@ -138,12 +114,11 @@ def test_exact_contribution_loss_is_zero_for_equal_targets():
 
 
 def test_acpd_v2_policy_configs_deploy_selected_layer():
-    for config_name, layer, fusion_location, injection, dynamic_view_gate in (
-        ("pi05_libero_backview_acpd_v2_lora", 9, "final", True, False),
-        ("pi05_libero_backview_acpd_v2_layer10_lora", 10, "final", True, False),
-        ("pi05_libero_backview_acpd_v2_layer10_dynamic_gate_lora", 10, "final", True, True),
-        ("pi05_libero_backview_acpd_v2_layer10_aligned_lora", 10, "aligned_attention", True, False),
-        ("pi05_libero_backview_acpd_v2_layer10_loss_only_lora", 10, "final", False, False),
+    for config_name, layer, fusion_location, injection in (
+        ("pi05_libero_backview_acpd_v2_lora", 9, "final", True),
+        ("pi05_libero_backview_acpd_v2_layer10_lora", 10, "final", True),
+        ("pi05_libero_backview_acpd_v2_layer10_aligned_lora", 10, "aligned_attention", True),
+        ("pi05_libero_backview_acpd_v2_layer10_loss_only_lora", 10, "final", False),
     ):
         config = training_config.get_config(config_name)
 
@@ -152,17 +127,15 @@ def test_acpd_v2_policy_configs_deploy_selected_layer():
         assert config.model.exact_contribution_fusion
         assert config.model.exact_contribution_injection == injection
         assert config.model.exact_contribution_fusion_location == fusion_location
-        assert config.model.exact_contribution_dynamic_view_gate == dynamic_view_gate
         assert not config.model.create_acpd_heads
 
 
 def test_acpd_v2_train_and_eval_models_have_matching_parameter_trees():
-    for config_name, layer, fusion_location, injection, dynamic_view_gate in (
-        ("pi05_libero_backview_acpd_v2_lora", 9, "final", True, False),
-        ("pi05_libero_backview_acpd_v2_layer10_lora", 10, "final", True, False),
-        ("pi05_libero_backview_acpd_v2_layer10_dynamic_gate_lora", 10, "final", True, True),
-        ("pi05_libero_backview_acpd_v2_layer10_aligned_lora", 10, "aligned_attention", True, False),
-        ("pi05_libero_backview_acpd_v2_layer10_loss_only_lora", 10, "final", False, False),
+    for config_name, layer, fusion_location, injection in (
+        ("pi05_libero_backview_acpd_v2_lora", 9, "final", True),
+        ("pi05_libero_backview_acpd_v2_layer10_lora", 10, "final", True),
+        ("pi05_libero_backview_acpd_v2_layer10_aligned_lora", 10, "aligned_attention", True),
+        ("pi05_libero_backview_acpd_v2_layer10_loss_only_lora", 10, "final", False),
     ):
         distill_config = DistillTrainConfig(
             student_init_params="base/params",
@@ -173,7 +146,6 @@ def test_acpd_v2_train_and_eval_models_have_matching_parameter_trees():
             exact_contribution_fusion=True,
             exact_contribution_injection=injection,
             exact_contribution_fusion_location=fusion_location,
-            exact_contribution_dynamic_view_gate=dynamic_view_gate,
         )
 
         student_config = _make_student_train_config(distill_config, create_acpd_heads=False)

@@ -76,22 +76,41 @@ def build_summary(
     """Builds matched window and anchor summaries."""
     windows = []
     for label, start, end in WINDOWS:
-        sft_loss = mean_metric(sft, "loss", start, end)
-        acpd_supervised = mean_metric(acpd, "supervised_loss", start, end)
-        acpd_total = mean_metric(acpd, "loss", start, end)
-        acpd_contribution = mean_metric(acpd, "weighted_acpd_loss", start, end)
+        matched_steps = [step for step in sorted(set(sft) & set(acpd)) if start <= step <= end]
+        sft_values = [sft[step]["loss"] for step in matched_steps]
+        acpd_values = [acpd[step]["supervised_loss"] for step in matched_steps]
+        differences = [acpd_value - sft_value for acpd_value, sft_value in zip(acpd_values, sft_values, strict=True)]
+        sft_loss = statistics.fmean(sft_values)
+        acpd_supervised = statistics.fmean(acpd_values)
+        acpd_total = statistics.fmean(acpd[step]["loss"] for step in matched_steps)
+        acpd_contribution = statistics.fmean(acpd[step]["weighted_acpd_loss"] for step in matched_steps)
         acpd_acl = acpd_total - acpd_supervised - acpd_contribution
         windows.append(
             {
                 "window": label,
+                "matched_points": len(matched_steps),
                 "sft_supervised_loss": sft_loss,
                 "acpd_supervised_loss": acpd_supervised,
+                "mean_acpd_minus_sft": statistics.fmean(differences),
+                "mean_absolute_acpd_minus_sft": statistics.fmean(map(abs, differences)),
                 "acpd_minus_sft_percent": 100.0 * (acpd_supervised / sft_loss - 1.0),
                 "acpd_total_loss": acpd_total,
                 "acpd_weighted_contribution_loss": acpd_contribution,
                 "acpd_weighted_acl_loss": acpd_acl,
-                "acpd_contribution_cosine": mean_metric(acpd, "exact_contribution_cosine", start, end),
-                "acpd_gate": mean_metric(acpd, "exact_contribution_gate", start, end),
+                "acpd_supervised_fraction": acpd_supervised / acpd_total,
+                "acpd_weighted_contribution_fraction": acpd_contribution / acpd_total,
+                "acpd_weighted_acl_fraction": acpd_acl / acpd_total,
+                "acpd_action_corr_loss": statistics.fmean(acpd[step]["action_corr_loss"] for step in matched_steps),
+                "acpd_contribution_cosine": statistics.fmean(
+                    acpd[step]["exact_contribution_cosine"] for step in matched_steps
+                ),
+                "acpd_gate": statistics.fmean(acpd[step]["exact_contribution_gate"] for step in matched_steps),
+                "student_task_loss": statistics.fmean(acpd[step]["student_task_loss"] for step in matched_steps),
+                "teacher_task_loss": statistics.fmean(acpd[step]["teacher_task_loss"] for step in matched_steps),
+                "teacher_better_ratio": statistics.fmean(acpd[step]["teacher_better_ratio"] for step in matched_steps),
+                "lora_grad_norm": statistics.fmean(acpd[step]["lora_grad_norm"] for step in matched_steps),
+                "predictor_grad_norm": statistics.fmean(acpd[step]["predictor_grad_norm"] for step in matched_steps),
+                "gate_grad_norm": statistics.fmean(acpd[step]["gate_grad_norm"] for step in matched_steps),
             }
         )
 
@@ -140,7 +159,29 @@ def build_summary(
             "weighted_acl": final_acl / acpd[final_step]["loss"],
         },
     }
-    return {"overall": overall, "windows": windows, "anchors": anchors}
+    first_window = windows[0]
+    second_window = windows[1]
+    final_window = windows[-1]
+    cosine_gain = final_window["acpd_contribution_cosine"] - first_window["acpd_contribution_cosine"]
+    trajectory = {
+        "sft_supervised_drop_percent": 100.0
+        * (1.0 - final_window["sft_supervised_loss"] / first_window["sft_supervised_loss"]),
+        "acpd_supervised_drop_percent": 100.0
+        * (1.0 - final_window["acpd_supervised_loss"] / first_window["acpd_supervised_loss"]),
+        "weighted_contribution_drop_percent": 100.0
+        * (1.0 - final_window["acpd_weighted_contribution_loss"] / first_window["acpd_weighted_contribution_loss"]),
+        "weighted_acl_drop_percent": 100.0
+        * (1.0 - final_window["acpd_weighted_acl_loss"] / first_window["acpd_weighted_acl_loss"]),
+        "contribution_cosine_window_gain": cosine_gain,
+        "contribution_cosine_gain_fraction_by_5k_10k": (
+            second_window["acpd_contribution_cosine"] - first_window["acpd_contribution_cosine"]
+        )
+        / cosine_gain,
+        "gate_drop_from_peak_to_final_percent": 100.0 * (1.0 - final_window["acpd_gate"] / overall["peak_gate"]),
+        "student_task_loss_drop_percent": 100.0
+        * (1.0 - final_window["student_task_loss"] / first_window["student_task_loss"]),
+    }
+    return {"overall": overall, "trajectory": trajectory, "windows": windows, "anchors": anchors}
 
 
 def plot_comparison(

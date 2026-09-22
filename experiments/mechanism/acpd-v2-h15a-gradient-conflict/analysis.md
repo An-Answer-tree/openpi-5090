@@ -17,7 +17,7 @@
 
 正式结果不满足预注册判据。30K 的组合辅助梯度仍与 flow 梯度同向，且相对范数没有
 增加。因此，当前证据不支持将 ACPD-v2 后期上限不足归因于辅助梯度冲突，也不支持
-优先运行 conflict-aware 梯度投影。下一项实验按预注册分支测试 H16 动态视角 gate。
+优先运行 conflict-aware 梯度投影。
 
 ## H15a-fast
 
@@ -41,8 +41,7 @@
 归因于组合辅助梯度冲突，暂不优先测试只投影负梯度的 conflict-aware ACPD。
 
 Contribution 单项接近正交且范数较大，但 ACL 梯度与 flow 高度同向，使组合梯度总体
-保持同向。下一项小实验应针对当前结构缺陷：H9 使用一个全局标量同时缩放 agentview
-和 wrist contribution，不能按样本或 action token 选择视角。
+保持同向。
 
 本结果使用 BS1，只用于选择探索方向；正式结论以上述 BS32 结果为准。
 

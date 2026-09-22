@@ -19,6 +19,7 @@
 | H9 25K 是否早于 30K 达峰 | 不支持。25K 为 `55.75%`，30K 为 `58.00%`；25K-30K 为 `-2.25` 点，95% CI `[-4.70, +0.20]`。 | 相同 2,000 episodes |
 | 显式 contribution 注入是否有效 | 有正向证据。H9 为 `23.15%`，H13 loss-only 为 `20.60%`；差值 `+2.55` 点，配对 95% CI `[+0.40, +4.70]`。 | H13 |
 | ACPD-v2 是否通过降低训练 MSE 获益 | 没有该证据。与 SFT 对齐的 299 个监督 loss 点相关系数为 `0.9985`，全程均值几乎相同；5K 成功率增益不能由更低训练 MSE 解释。 | H9/H12 loss 对齐 |
+| 辅助目标在 30K 前是否自然消失 | 没有。加权 contribution/ACL 从首个到末个窗口下降 `53.42/53.04%`，但在总目标中的窗口占比保持约 `59--61%/16--17%`。 | H9 0--30K loss |
 | 后期是否出现明显辅助梯度冲突 | 不支持。正式 BS32 中组合冲突率在 5K/30K 均为 `0%`，cosine 中位数为 `0.6279/0.5920`。 | H15a，200 个成对 batches |
 
 ## 正式 BS64 实验
@@ -28,14 +29,14 @@
 | ID | 目的 | 实际配置 | Job | 状态 | 结果 |
 |---|---|---|---:|---|---|
 | Teacher | 提供 agentview+wrist 特权信息 | 全量 SFT，30K | 历史任务 | 完成 | checkpoint `29999` |
-| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762/130889/132083/132085 | 完成 | 5K `13.85%`；25K `55.80%`；30K `60.45%` |
+| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762/130889/132083/132085/132399/132400 | 25K/30K 完成；20K 验证中 | 5K `13.85%`；25K `55.80%`；30K `60.45%`；20K 尚无结论 |
 | H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669/130890 | 完成 | 30K pooled `71.55%` |
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 完成 | 30K pooled `78.65%` |
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 完成 | 30K pooled `77.00%` |
 | H9-scale-b | backview ACPD-v2 主 student | layer 10，BS64，30K | 129728/130773 | 训练和 30K 验证完成 | 5K pooled `23.15%`；30K pooled `58.00%` |
-| H9-mid-trajectory | 检查 30K 前是否已过峰值 | 验证 25K；相同 2,000 episodes | 132082/132084 | 完成；20K 路线已取消 | 25K pooled `55.75%`，低于 30K `2.25` 点；不支持 25K 已过峰值 |
-| H9-trajectory | 定位 30K 后最佳 checkpoint | H9 从 30K 精确续训至 60K；验证 40K/50K/60K | 132390/132391 | 已重新提交；训练排队 | 尚无结论 |
-| H9-recovery | 恢复 H9 的 5K checkpoint | 与 H9-scale-b 相同，写完 `4999` 后停止 | 130704/132198 | 完成；checkpoint `4999` 完整 | 不产生新的任务成功率结论 |
+| H9-mid-trajectory | 检查 30K 前是否已过峰值 | 验证 20K/25K；相同 2,000 episodes | 132082/132084/132398 | 25K 完成；5K→20K 续训排队 | 25K pooled `55.75%`，低于 30K `2.25` 点；20K 尚无结论 |
+| H9-trajectory | 定位 30K 后最佳 checkpoint | H9 从 30K 精确续训至 60K；验证 40K/50K/60K | 132390/132391 | 训练中 | 尚无结论 |
+| H9-recovery | 恢复 H9 的中期 checkpoint | 与 H9-scale-b 相同，从完整 `4999` 精确续训至 20K | 130704/132198/132398 | 5K 完整；续训排队 | 尚无新的任务成功率结论 |
 | H13 | 判断 contribution 注入是否有效 | H9 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
 
 ## 当前机制实验
@@ -43,9 +44,6 @@
 | ID | 目的 | 实际配置 | Job | 状态 | 结论 |
 |---|---|---|---:|---|---|
 | H15a | 判断 ACPD-v2 后期是否存在辅助梯度干扰 | H9 5K/30K；每点200个相同BS32 batch；不更新参数 | smoke 132308；快速 132311；正式 132250 | 完成 | 5K/30K 组合冲突率均为 `0%`；不支持后期梯度冲突解释 |
-| H16 | 检验按 token 选择 agentview/wrist 是否优于 H9 全局 gate | layer 10；零初始化 dynamic view gate；4卡BS64 5K | smoke 132316；训练 132317；验证 132318 | 训练中 | 尚无结论 |
-
-H15 固定权重退火仅保留为候选工程对照。是否执行由 H15a 决定，不作为当前主方法。
 
 ## 前期筛选结果
 
@@ -101,7 +99,7 @@ H15 固定权重退火仅保留为候选工程对照。是否执行由 H15a 决�
 | baseline | topview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
 | baseline | leftview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
 | baseline | rightview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
-| student | backview ACPD-v2 layer 10 BS64 | `24999` | 5K、25K、30K checkpoint 完整；30K 验证完成；60K 路线已取消 |
+| student | backview ACPD-v2 layer 10 BS64 | `24999` | 5K、25K、30K checkpoint 完整；5K→20K 与 30K→60K 续训已提交 |
 | ablation | backview loss-only BS64 | - | 5K checkpoint 和验证完整；之后补至 30K |
 | ablation | backview ACL-only BS64 | - | 尚未运行 |
 
@@ -115,6 +113,8 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H7/H7.1 原始指标 | `/opt/liutong/openpi-5090-research/acpd-exact-attention-probe/results/` |
 | H9 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-pbs32-5k_129710.out` |
 | H9-scale-b 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-fsdp4-bs64-30k_129728.out` |
+| H12 0--5K 训练日志 | `slurm-log/pi05-bv-sft-bs64-5k_130285.out` |
+| H12 5K--30K 训练日志 | `slurm-log/pi05-bv-sft-bs64-r30k_130762.out` |
 | H9/H12 loss 对齐指标 | `experiments/student/acpd-v2-h9-batch-scaling-30k/results/loss_comparison.json` |
 | H9/H12 loss 对齐图 | `artifacts/pi05_backview_sft_vs_acpdv2_loss.png` |
 | H9/H12 30K 配对分析 | `experiments/baseline/sft-backview-bs64-5k/results/h9_vs_h12_30k_paired_analysis.json` |

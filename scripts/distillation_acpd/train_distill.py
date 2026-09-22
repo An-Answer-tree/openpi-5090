@@ -71,7 +71,6 @@ class DistillTrainConfig:
     exact_contribution_fusion: bool = False
     exact_contribution_injection: bool = True
     exact_contribution_fusion_location: Literal["final", "aligned_attention"] = "final"
-    exact_contribution_dynamic_view_gate: bool = False
 
     assets_dir: str = tyro.MISSING
     asset_id: str = "libero_multiview"
@@ -253,7 +252,6 @@ def _make_distill_model_config(
         exact_contribution_fusion=exact_contribution_fusion,
         exact_contribution_injection=config.exact_contribution_injection,
         exact_contribution_fusion_location=config.exact_contribution_fusion_location,
-        exact_contribution_dynamic_view_gate=config.exact_contribution_dynamic_view_gate,
     )
 
 
@@ -556,14 +554,10 @@ def compute_gradients(
             )
             acpd_prediction_loss = acpd_loss
             acpd_variance_loss = jnp.asarray(0.0, dtype=jnp.float32)
-            view_gates = model.exact_contribution_head.view_gates(student_hiddens[0])
             per_layer = {
                 "exact_contribution_cosine": exact_cosine,
                 "exact_contribution_target_power": target_power,
                 "exact_contribution_gate": jnp.tanh(model.exact_contribution_head.gate.value),
-                "exact_contribution_agent_gate": jnp.mean(view_gates[..., 0]),
-                "exact_contribution_wrist_gate": jnp.mean(view_gates[..., 1]),
-                "exact_contribution_view_gate_gap": jnp.mean(jnp.abs(view_gates[..., 0] - view_gates[..., 1])),
             }
         else:
             layer_losses = []

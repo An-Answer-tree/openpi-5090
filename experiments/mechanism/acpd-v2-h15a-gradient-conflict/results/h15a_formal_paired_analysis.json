@@ -58,7 +58,6 @@
       "norm_ratio_median_late": 1.5010848641395569
     }
   },
-  "next_experiment": "dynamic_view_gate",
   "num_paired_batches": 200,
   "seed": 42,
   "supports_late_gradient_conflict": false

@@ -5,8 +5,6 @@
 | 类型 | 脚本 |
 |---|---|
 | H9 主 student | `pi05_libero_backview_acpd_v2_layer10_lora_fsdp4_bs64_30k.sbatch` |
-| H16 dynamic view gate smoke | `pi05_libero_backview_acpd_v2_h16_dynamic_gate_smoke.sbatch` |
-| H16 dynamic view gate 5K | `pi05_libero_backview_acpd_v2_h16_dynamic_gate_fsdp4_bs64_5k.sbatch` |
 | H9 轨迹恢复 | `pi05_libero_backview_acpd_v2_layer10_lora_fsdp4_bs64_20k_keep_all.sbatch` |
 | H9 25K 恢复 | `restore_pi05_libero_backview_acpd_v2_bs64_25k.sbatch` |
 | H13 loss-only | `pi05_libero_backview_acpd_v2_h13_loss_only_fsdp4_bs64_5k.sbatch` |
