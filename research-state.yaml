@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-22 11:31 CST"
+  checked_at: "2026-09-22 11:40 CST"
   jobs:
     - id: 132317
       experiment: h16_dynamic_view_gate_5k
@@ -17,6 +17,17 @@ current_execution:
       experiment: h16_dynamic_view_gate_5k_eval
       state: dependency
       depends_on: 132317
+      resources: 2gpu_16cpu_48g
+    - id: 132390
+      experiment: h9_resume_30k_to_60k
+      state: pending
+      reason: priority
+      resources: 4gpu_32cpu_96g
+      time_limit: 8-00:00:00
+    - id: 132391
+      experiment: h9_40k_50k_60k_eval
+      state: dependency
+      depends_on: 132390
       resources: 2gpu_16cpu_48g
   recently_completed:
     - id: 132250
@@ -190,6 +201,9 @@ formal_matrix:
         ci95: [-0.0470, 0.0020]
       cancelled_20k_eval_job: 131861
       cancelled_60k_jobs: [131642, 131643]
+      resume_60k_job: 132390
+      eval_40k_50k_60k_job: 132391
+      trajectory_60k_status: submitted
       eval_30k:
         spatial: 0.640
         object: 0.730
