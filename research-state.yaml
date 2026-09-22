@@ -5,24 +5,26 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-22 02:17 CST"
+  checked_at: "2026-09-22 11:31 CST"
   jobs:
-    - id: 132250
-      experiment: h15a_gradient_conflict_5k_30k
-      state: running
-      node: gpu05
-      resources: 2gpu_16cpu_48g
     - id: 132317
       experiment: h16_dynamic_view_gate_5k
       state: pending
       reason: priority
       resources: 4gpu_32cpu_96g
-    - id: 132318
+      time_limit: 2-00:00:00
+    - id: 132389
       experiment: h16_dynamic_view_gate_5k_eval
       state: dependency
       depends_on: 132317
       resources: 2gpu_16cpu_48g
   recently_completed:
+    - id: 132250
+      experiment: h15a_gradient_conflict_5k_30k
+      state: complete
+      supports_late_gradient_conflict: false
+      privileged_conflict_rate_5k: 0.0
+      privileged_conflict_rate_30k: 0.0
     - id: 130892
       experiment: rightview_sft_bs64_30k_eval
       state: complete
@@ -214,7 +216,7 @@ formal_matrix:
       status: smoke_complete_formal_pending
       smoke_job: 132316
       train_job: 132317
-      eval_job: 132318
+      eval_job: 132389
       layer: 10
       batch_size: 64
       gpus: 4
@@ -222,7 +224,7 @@ formal_matrix:
       primary_baseline_pooled: 0.2315
   mechanism:
     h15a_gradient_conflict:
-      status: formal_running
+      status: complete
       checkpoints: [4999, 29999]
       batches_per_checkpoint: 200
       batch_size: 32
@@ -231,6 +233,19 @@ formal_matrix:
       updates_model: false
       smoke_job: 132308
       job: 132250
+      formal_probe:
+        status: complete
+        batches_per_checkpoint: 200
+        batch_size: 32
+        privileged_conflict_rate:
+          step_5k: 0.0
+          step_30k: 0.0
+          delta: 0.0
+          delta_ci95: [0.0, 0.0]
+        privileged_cosine_median:
+          step_5k: 0.6279
+          step_30k: 0.5920
+        supports_late_gradient_conflict: false
       fast_probe:
         status: complete_exploratory
         job: 132311

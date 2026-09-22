@@ -1,0 +1,65 @@
+{
+  "bootstrap_samples": 10000,
+  "early_rows": "/opt/liutong/openpi-5090-research/acpd-v2-gradient-conflict/h9-5k/per_batch.jsonl",
+  "late_rows": "/opt/liutong/openpi-5090-research/acpd-v2-gradient-conflict/h9-30k/per_batch.jsonl",
+  "metrics": {
+    "action_corr": {
+      "conflict_rate_delta": 0.0,
+      "conflict_rate_delta_ci95": [
+        0.0,
+        0.0
+      ],
+      "conflict_rate_early": 0.0,
+      "conflict_rate_late": 0.0,
+      "cosine_median_delta": -0.01964014768600464,
+      "cosine_median_delta_ci95": [
+        -0.028804106265306474,
+        -0.012897615134716038
+      ],
+      "cosine_median_early": 0.9208371937274933,
+      "cosine_median_late": 0.9011970460414886,
+      "norm_ratio_median_early": 0.8439733386039734,
+      "norm_ratio_median_late": 0.8513200581073761
+    },
+    "contribution": {
+      "conflict_rate_delta": 0.005000000000000001,
+      "conflict_rate_delta_ci95": [
+        -0.025,
+        0.035
+      ],
+      "conflict_rate_early": 0.02,
+      "conflict_rate_late": 0.025,
+      "cosine_median_delta": -0.07426518201828003,
+      "cosine_median_delta_ci95": [
+        -0.10019022980704903,
+        -0.058266532607376575
+      ],
+      "cosine_median_early": 0.16992568969726562,
+      "cosine_median_late": 0.0956605076789856,
+      "norm_ratio_median_early": 1.2386289238929749,
+      "norm_ratio_median_late": 1.175366997718811
+    },
+    "privileged": {
+      "conflict_rate_delta": 0.0,
+      "conflict_rate_delta_ci95": [
+        0.0,
+        0.0
+      ],
+      "conflict_rate_early": 0.0,
+      "conflict_rate_late": 0.0,
+      "cosine_median_delta": -0.03595033288002014,
+      "cosine_median_delta_ci95": [
+        -0.05602821484208107,
+        -0.01157146692276001
+      ],
+      "cosine_median_early": 0.6279376745223999,
+      "cosine_median_late": 0.5919873416423798,
+      "norm_ratio_median_early": 1.6258631944656372,
+      "norm_ratio_median_late": 1.5010848641395569
+    }
+  },
+  "next_experiment": "dynamic_view_gate",
+  "num_paired_batches": 200,
+  "seed": 42,
+  "supports_late_gradient_conflict": false
+}
