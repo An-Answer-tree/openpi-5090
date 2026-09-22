@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+unset ALL_PROXY HTTP_PROXY HTTPS_PROXY NO_PROXY all_proxy http_proxy https_proxy no_proxy
+
 if [[ $# -lt 6 || $# -gt 8 ]]; then
   echo "Usage: $0 CHECKPOINT_DIR EVAL_DIR GPU_ID PORT SUITE NUM_TRIALS [POLICY_CONFIG] [BASE_IMAGE_KEY]" >&2
   exit 2

@@ -29,7 +29,7 @@
 | ID | 目的 | 实际配置 | Job | 状态 | 结果 |
 |---|---|---|---:|---|---|
 | Teacher | 提供 agentview+wrist 特权信息 | 全量 SFT，30K | 历史任务 | 完成 | checkpoint `29999` |
-| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762/130889/132083/132085/132399/132400 | 25K/30K 完成；20K 验证中 | 5K `13.85%`；25K `55.80%`；30K `60.45%`；20K 尚无结论 |
+| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762/130889/132083/132085/132452/132453 | 25K/30K 完成；20K 验证中 | 5K `13.85%`；25K `55.80%`；30K `60.45%`；20K 尚无结论 |
 | H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669/130890 | 完成 | 30K pooled `71.55%` |
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 完成 | 30K pooled `78.65%` |
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 完成 | 30K pooled `77.00%` |
@@ -129,7 +129,6 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H15a 快速诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/fast_protocol.md` |
 | H15a 快速诊断分析 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/analysis.md` |
 | H15a 结果目录 | `/opt/liutong/openpi-5090-research/acpd-v2-gradient-conflict/` |
-| H15 持续蒸馏协议 | `experiments/student/acpd-v2-h15-persistent-distillation/protocol.md` |
 | H12 分析 | `experiments/baseline/sft-backview-bs64-5k/analysis.md` |
 | H13 分析 | `experiments/ablation/acpd-v2-h13-injection-ablation/analysis.md` |
 | H14 多视角结果 | `experiments/baseline/sft-multiview-bs64-30k/analysis.md` |

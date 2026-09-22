@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-22 13:05 CST"
+  checked_at: "2026-09-22 16:50 CST"
   jobs:
     - id: 132390
       experiment: h9_resume_30k_to_60k
@@ -24,16 +24,16 @@ current_execution:
       reason: resources
       resources: 4gpu_32cpu_96g
       time_limit: 3-00:00:00
-    - id: 132399
+    - id: 132452
       experiment: backview_sft_bs64_20k_eval_single_gpu_array
       state: running
       resources_per_task: 1gpu_8cpu_24g
       array_tasks: 4
-      time_limit: 04:00:00
-    - id: 132400
+      time_limit: 08:00:00
+    - id: 132453
       experiment: backview_sft_bs64_20k_summary
       state: dependency
-      depends_on: 132399
+      depends_on: 132452
       resources: 1cpu_1g
   recently_completed:
     - id: 132250
@@ -143,8 +143,8 @@ formal_matrix:
     backview_bs64:
       checkpoints: [4999, 10000, 15000, 20000, 25000, 29999]
       status: complete
-      eval_20k_job: 132399
-      eval_20k_summary_job: 132400
+      eval_20k_job: 132452
+      eval_20k_summary_job: 132453
       eval_20k_status: running
       eval_25k_job: 132083
       eval_25k_summary_job: 132085

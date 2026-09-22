@@ -12,6 +12,8 @@
 
 set -euo pipefail
 
+unset ALL_PROXY HTTP_PROXY HTTPS_PROXY NO_PROXY all_proxy http_proxy https_proxy no_proxy
+
 export CONDA_ENVS_PATH=/home/liutong/miniconda3/envs
 source /home/liutong/miniconda3/etc/profile.d/conda.sh
 conda activate openpi
