@@ -29,7 +29,7 @@
 | ID | 目的 | 实际配置 | Job | 状态 | 结果 |
 |---|---|---|---:|---|---|
 | Teacher | 提供 agentview+wrist 特权信息 | 全量 SFT，30K | 历史任务 | 完成 | checkpoint `29999` |
-| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762/130889/132083/132085/132452/132453 | 25K/30K 完成；20K 验证中 | 5K `13.85%`；25K `55.80%`；30K `60.45%`；20K 尚无结论 |
+| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762/130889/132083/132085/132452 | 完成 | 5K `13.85%`；20K `47.20%`；25K `55.80%`；30K `60.45%` |
 | H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669/130890 | 完成 | 30K pooled `71.55%` |
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 完成 | 30K pooled `78.65%` |
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 完成 | 30K pooled `77.00%` |
@@ -80,6 +80,7 @@
 | ACPD-v2 backview BS64 25K | 63.20% | 69.40% | 62.00% | 28.40% | 55.75% |
 | ACPD-v2 backview BS64 30K | 64.00% | 73.00% | 61.80% | 33.20% | 58.00% |
 | ACPD-v2 loss-only backview BS64 5K | 19.40% | 35.60% | 25.00% | 2.40% | 20.60% |
+| SFT backview BS64 20K | 50.60% | 62.60% | 54.40% | 21.20% | 47.20% |
 | SFT backview BS64 25K | 64.00% | 64.00% | 65.60% | 29.60% | 55.80% |
 | SFT backview BS64 30K | 70.00% | 69.80% | 68.20% | 33.80% | 60.45% |
 | SFT topview BS64 30K | 81.00% | 80.60% | 79.20% | 45.40% | 71.55% |
@@ -95,7 +96,7 @@
 | 分类 | 模型 | 已归档 | 状态 |
 |---|---|---|---|
 | teacher | agentview+wrist | `29999` | 完整 |
-| baseline | backview BS64 | `4999` | 5K--30K checkpoint 完整；25K 和 30K 验证完成 |
+| baseline | backview BS64 | `4999` | 5K--30K checkpoint 完整；20K、25K 和 30K 验证完成 |
 | baseline | topview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
 | baseline | leftview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
 | baseline | rightview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
@@ -115,6 +116,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H9-scale-b 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-fsdp4-bs64-30k_129728.out` |
 | H12 0--5K 训练日志 | `slurm-log/pi05-bv-sft-bs64-5k_130285.out` |
 | H12 5K--30K 训练日志 | `slurm-log/pi05-bv-sft-bs64-r30k_130762.out` |
+| H12 20K 验证 | `/opt/liutong/openpi-5090-evals/sft-backview-bs64-20k/20000/summary.txt` |
 | H9/H12 loss 对齐指标 | `experiments/student/acpd-v2-h9-batch-scaling-30k/results/loss_comparison.json` |
 | H9/H12 loss 对齐图 | `artifacts/pi05_backview_sft_vs_acpdv2_loss.png` |
 | H9/H12 30K 配对分析 | `experiments/baseline/sft-backview-bs64-5k/results/h9_vs_h12_30k_paired_analysis.json` |

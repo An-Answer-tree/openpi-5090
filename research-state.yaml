@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-22 17:32 CST"
+  checked_at: "2026-09-22 21:53 CST"
   jobs:
     - id: 132390
       experiment: h9_resume_30k_to_60k
@@ -15,6 +15,7 @@ current_execution:
       time_limit: 4-00:00:00
       recommended_time_limit: 8-00:00:00
       time_extension_status: requires_admin
+      latest_logged_metric_step: 32100
     - id: 132391
       experiment: h9_40k_50k_60k_eval
       state: dependency
@@ -22,22 +23,20 @@ current_execution:
       resources: 2gpu_16cpu_48g
     - id: 132398
       experiment: h9_resume_5k_to_20k
-      state: pending
-      reason: resources
+      state: running
+      node: gpu04
       resources: 4gpu_32cpu_96g
       time_limit: 5-00:00:00
+      latest_logged_metric_step: 5800
+  recently_completed:
     - id: 132452
       experiment: backview_sft_bs64_20k_eval_single_gpu_array
-      state: running
-      resources_per_task: 1gpu_8cpu_24g
-      array_tasks: 4
-      time_limit: 08:00:00
-    - id: 132453
-      experiment: backview_sft_bs64_20k_summary
-      state: dependency
-      depends_on: 132452
-      resources: 1cpu_1g
-  recently_completed:
+      state: complete
+      spatial: 0.506
+      object: 0.626
+      goal: 0.544
+      libero_10: 0.212
+      pooled_success: 0.4720
     - id: 132250
       experiment: h15a_gradient_conflict_5k_30k
       state: complete
@@ -147,7 +146,14 @@ formal_matrix:
       status: complete
       eval_20k_job: 132452
       eval_20k_summary_job: 132453
-      eval_20k_status: running
+      eval_20k_status: complete
+      eval_20k_summary_status: rebuilt_from_complete_logs
+      eval_20k:
+        spatial: 0.506
+        object: 0.626
+        goal: 0.544
+        libero_10: 0.212
+        pooled: 0.4720
       eval_25k_job: 132083
       eval_25k_summary_job: 132085
       eval_25k:
