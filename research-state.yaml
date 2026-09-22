@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-22 21:53 CST"
+  checked_at: "2026-09-22 23:36 CST"
   jobs:
     - id: 132390
       experiment: h9_resume_30k_to_60k
@@ -27,7 +27,30 @@ current_execution:
       node: gpu04
       resources: 4gpu_32cpu_96g
       time_limit: 5-00:00:00
-      latest_logged_metric_step: 5800
+      latest_logged_metric_step: 6200
+    - id: 132544
+      experiment: h9_early_trajectory_quick_sft_10k
+      state: running
+      resources: 4x1gpu_array_max2
+      episodes: 400
+    - id: 132546
+      experiment: h9_early_trajectory_quick_sft_15k
+      state: dependency
+      depends_on: 132544
+      resources: 4x1gpu_array_max2
+      episodes: 400
+    - id: 132547
+      experiment: h9_early_trajectory_quick_acpdv2_10k
+      state: dependency
+      depends_on: 132398
+      resources: 4x1gpu_array_max2
+      episodes: 400
+    - id: 132548
+      experiment: h9_early_trajectory_quick_acpdv2_15k
+      state: dependency
+      depends_on: 132547
+      resources: 4x1gpu_array_max2
+      episodes: 400
   recently_completed:
     - id: 132452
       experiment: backview_sft_bs64_20k_eval_single_gpu_array
@@ -207,7 +230,19 @@ formal_matrix:
       recovery_job: 130704
       recovery_watchdog_job: 132198
       recovery_resume_20k_job: 132398
-      recovery_resume_20k_status: pending
+      recovery_resume_20k_status: running
+      early_trajectory_quick:
+        protocol: experiments/student/acpd-v2-h9-early-trajectory/protocol.md
+        trials_per_task: 10
+        episodes_per_checkpoint: 400
+        sft_10k_job: 132544
+        sft_10k_summary_job: 132549
+        sft_15k_job: 132546
+        sft_15k_summary_job: 132552
+        acpdv2_10k_job: 132547
+        acpdv2_10k_summary_job: 132551
+        acpdv2_15k_job: 132548
+        acpdv2_15k_summary_job: 132550
       eval_30k_job: 130773
       eval_25k_job: 132082
       eval_25k_summary_job: 132084
