@@ -19,14 +19,14 @@
 
 | 类别 | 实验 | 协议/分析 | 状态 |
 |---|---|---|---|
-| baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 25K/30K 完成；20K 单卡数组验证中 |
+| baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 10K/15K/20K/25K/30K 正式验证完成 |
 | baseline | backview BS64 30K--60K | `baseline/sft-backview-bs64-trajectory-60k/` | 续训排队；35K/40K/50K/60K验证已提交依赖 |
 | baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 全部完成 |
 | student | H9-scale-b ACPD-v2 BS64 | `student/acpd-v2-h9-batch-scaling-30k/` | 5K/25K/30K 完成；25K 未高于 30K |
 | mechanism | H15a ACPD-v2 梯度冲突诊断 | `mechanism/acpd-v2-h15a-gradient-conflict/` | 完成；不支持后期梯度冲突假设 |
-| student | H9 ACPD-v2 30K--60K | `student/acpd-v2-h9-trajectory-60k/` | 续训中；35K正式验证运行中，40K/50K/60K验证已提交 |
+| student | H9 ACPD-v2 30K--60K | `student/acpd-v2-h9-trajectory-60k/` | 续训中；35K 为 `61.05%`，40K/50K/60K验证已提交 |
 | student | H9 ACPD-v2 20K--30K | `student/acpd-v2-h9-20k-30k-trajectory/` | 25K完成；5K→20K续训运行中 |
-| student | H9/SFT 10K--15K 早期轨迹 | `student/acpd-v2-h9-early-trajectory/` | H9与SFT各2,000回合正式验证已提交 |
+| student | H9/SFT 10K--15K 早期轨迹 | `student/acpd-v2-h9-early-trajectory/` | 10K 正式比较完成；SFT 15K完成，H9 15K等待checkpoint |
 | ablation | H13 loss-only BS64 | `ablation/acpd-v2-h13-injection-ablation/` | 5K 训练和验证完成；支持显式注入 |
 | ablation | ACL-only BS64 | 尚未创建协议 | 待运行 |
 
@@ -45,7 +45,7 @@ H11 已归档，不进入正式 checkpoint 集合，也不继续训练。
 | baseline/topview_bs64 | C | C | C | C | C | C |
 | baseline/leftview_bs64 | C | C | C | C | C | C |
 | baseline/rightview_bs64 | C | C | C | C | C | C |
-| student/backview_acpdv2_layer10_bs64 | C | Q | Q | Q | Y | C |
+| student/backview_acpdv2_layer10_bs64 | C | C | Q | R | Y | C |
 | ablation/backview_loss_only_bs64 | C | P | P | P | P | P |
 | ablation/backview_acl_only_bs64 | P | P | P | P | P | P |
 

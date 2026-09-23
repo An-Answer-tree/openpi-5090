@@ -14,9 +14,11 @@
 | 原始 ACPD 的 Cue 是否有效 | 没有可靠证据。Full 仅比 ACL-only 高 `0.15` 点，95% CI `[-1.15, 1.40]`。 | H5、H8 |
 | 哪层 exact contribution 最可恢复 | layer 10；overall gap `0.3992`，比次优 layer 11 高 `0.0485`。 | H7/H7.1 |
 | ACPD-v2 是否优于匹配 BS64 SFT | 5K 时提升 `9.30` 点；30K 时为 `58.00%` 对 `60.45%`，差值 `-2.45` 点，95% CI `[-5.00, 0.00]`。早期优势未保持到 30K。 | H9-scale-b、H12 |
+| ACPD-v2 的早期优势在 10K 是否仍存在 | 存在。H9 为 `37.45%`，SFT 为 `23.25%`；差值 `+14.20` 点，配对 95% CI `[+11.90, +16.60]`。 | 相同 2,000 episodes |
 | ACPD-v2 的早期优势何时消失 | 25K 时 ACPD-v2 为 `55.75%`，SFT 为 `55.80%`；差值 `-0.05` 点，95% CI `[-2.50, +2.45]`。25K 已无可检测优势。 | 相同 2,000 episodes |
 | ACPD-v2 从 5K 继续训练是否有效 | 同一 H9-scale-b 训练在 30K 达到 `58.00%`，比 5K 高 `34.85` 点；匹配 SFT 30K 为 `60.45%`，尚未证明最终优势。 | 4×500 episodes |
 | H9 25K 是否早于 30K 达峰 | 不支持。25K 为 `55.75%`，30K 为 `58.00%`；25K-30K 为 `-2.25` 点，95% CI `[-4.70, +0.20]`。 | 相同 2,000 episodes |
+| H9 在 30K 后是否继续提高 | 35K 为 `61.05%`，比 30K 高 `3.05` 点，配对 95% CI `[+0.60, +5.50]`。但相对 SFT 30K 仅高 `0.60` 点，95% CI `[-1.90, +3.05]`，尚不能证明最终优于 SFT。 | 相同 2,000 episodes |
 | 显式 contribution 注入是否有效 | 有正向证据。H9 为 `23.15%`，H13 loss-only 为 `20.60%`；差值 `+2.55` 点，配对 95% CI `[+0.40, +4.70]`。 | H13 |
 | ACPD-v2 是否通过降低训练 MSE 获益 | 没有该证据。与 SFT 对齐的 299 个监督 loss 点相关系数为 `0.9985`，全程均值几乎相同；5K 成功率增益不能由更低训练 MSE 解释。 | H9/H12 loss 对齐 |
 | 辅助目标在 30K 前是否自然消失 | 没有。加权 contribution/ACL 从首个到末个窗口下降 `53.42/53.04%`，但在总目标中的窗口占比保持约 `59--61%/16--17%`。 | H9 0--30K loss |
@@ -34,8 +36,8 @@
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 完成 | 30K pooled `78.65%` |
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 完成 | 30K pooled `77.00%` |
 | H9-scale-b | backview ACPD-v2 主 student | layer 10，BS64，30K | 129728/130773 | 训练和 30K 验证完成 | 5K pooled `23.15%`；30K pooled `58.00%` |
-| H9-mid-trajectory | 检查 30K 前是否已过峰值 | 验证 20K/25K；相同 2,000 episodes | 132082/132084/132398 | 25K 完成；5K→20K 续训中 | 25K pooled `55.75%`，低于 30K `2.25` 点；20K 尚无结论 |
-| H9-trajectory | 定位 30K 后最佳 checkpoint | H9 从 30K 精确续训至 60K；验证 40K/50K/60K | 132390/132391 | 训练中 | 尚无结论 |
+| H9-mid-trajectory | 定位早期优势消失区间 | 验证 10K/15K/20K/25K；相同 2,000 episodes | 132731/132732/132082/132084/132398 | 10K/25K 完成；续训中 | 10K 相对 SFT `+14.20` 点；25K `-0.05` 点；15K/20K 尚无结论 |
+| H9-trajectory | 定位 30K 后最佳 checkpoint | H9 从 30K 精确续训至 60K；验证 35K/40K/50K/60K | 132390/132720/132724/132391 | 35K 完成；续训中 | 35K pooled `61.05%`；比 30K 高 `3.05` 点，95% CI `[+0.60, +5.50]` |
 | H9-recovery | 恢复 H9 的中期 checkpoint | 与 H9-scale-b 相同，从完整 `4999` 精确续训至 20K | 130704/132198/132398 | 5K 完整；续训中 | 尚无新的任务成功率结论 |
 | H13 | 判断 contribution 注入是否有效 | H9 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
 
@@ -53,7 +55,7 @@
 |---|---:|---:|---:|---:|---:|---:|---|
 | SFT backview BS64 | 10K | 21.00% | 30.00% | 28.00% | 3.00% | 20.50% | 完成 |
 | SFT backview BS64 | 15K | 34.00% | 58.00% | 53.00% | 12.00% | 39.25% | 完成 |
-| ACPD-v2 backview BS64 | 10K | - | - | - | - | - | 等待checkpoint |
+| ACPD-v2 backview BS64 | 10K | - | - | - | - | - | 未运行；已有正式结果 |
 | ACPD-v2 backview BS64 | 15K | - | - | - | - | - | 等待checkpoint |
 
 ## 前期筛选结果
@@ -88,8 +90,12 @@
 | ACPD-v2 BS32 5K | 5.20% | 24.20% | 15.60% | 0.40% | 11.35% |
 | SFT backview BS64 5K | 9.40% | 18.40% | 24.80% | 2.80% | 13.85% |
 | ACPD-v2 backview BS64 5K | 25.40% | 32.40% | 30.00% | 4.80% | 23.15% |
+| SFT backview BS64 10K | 23.40% | 37.80% | 29.20% | 2.60% | 23.25% |
+| ACPD-v2 backview BS64 10K | 41.60% | 50.60% | 47.60% | 10.00% | 37.45% |
+| SFT backview BS64 15K | 43.60% | 58.00% | 47.40% | 14.60% | 40.90% |
 | ACPD-v2 backview BS64 25K | 63.20% | 69.40% | 62.00% | 28.40% | 55.75% |
 | ACPD-v2 backview BS64 30K | 64.00% | 73.00% | 61.80% | 33.20% | 58.00% |
+| ACPD-v2 backview BS64 35K | 73.20% | 73.80% | 63.60% | 33.60% | 61.05% |
 | ACPD-v2 loss-only backview BS64 5K | 19.40% | 35.60% | 25.00% | 2.40% | 20.60% |
 | SFT backview BS64 20K | 50.60% | 62.60% | 54.40% | 21.20% | 47.20% |
 | SFT backview BS64 25K | 64.00% | 64.00% | 65.60% | 29.60% | 55.80% |
@@ -129,6 +135,8 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H12 5K--30K 训练日志 | `slurm-log/pi05-bv-sft-bs64-r30k_130762.out` |
 | H12 20K 验证 | `/opt/liutong/openpi-5090-evals/sft-backview-bs64-20k/20000/summary.txt` |
 | H9早期轨迹快速验证 | `/opt/liutong/openpi-5090-evals/h9-early-trajectory-quick/` |
+| H9/SFT 10K 正式验证 | `/opt/liutong/openpi-5090-evals/h9-early-trajectory-full/` |
+| H9/SFT 10K 配对分析 | `experiments/student/acpd-v2-h9-early-trajectory/results/h9_vs_sft_10k_paired_analysis.json` |
 | H9/H12 loss 对齐指标 | `experiments/student/acpd-v2-h9-batch-scaling-30k/results/loss_comparison.json` |
 | H9/H12 loss 对齐图 | `artifacts/pi05_backview_sft_vs_acpdv2_loss.png` |
 | H9/H12 30K 配对分析 | `experiments/baseline/sft-backview-bs64-5k/results/h9_vs_h12_30k_paired_analysis.json` |
@@ -139,6 +147,9 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H9 25K/30K 成对分析 | `experiments/student/acpd-v2-h9-20k-30k-trajectory/results/h9_25k_vs_30k_paired_analysis.json` |
 | H9 25K 协议 | `experiments/student/acpd-v2-h9-20k-30k-trajectory/protocol.md` |
 | H9 30K--60K 协议 | `experiments/student/acpd-v2-h9-trajectory-60k/protocol.md` |
+| H9 35K 验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/summary.txt` |
+| H9 35K/30K 配对分析 | `experiments/student/acpd-v2-h9-trajectory-60k/results/h9_35k_vs_h9_30k_paired_analysis.json` |
+| H9 35K/SFT 30K 配对分析 | `experiments/student/acpd-v2-h9-trajectory-60k/results/h9_35k_vs_sft_30k_paired_analysis.json` |
 | H15a 梯度诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/protocol.md` |
 | H15a 快速诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/fast_protocol.md` |
 | H15a 快速诊断分析 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/analysis.md` |

@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-23 12:13 CST"
+  checked_at: "2026-09-23 19:13 CST"
   jobs:
     - id: 132791
       experiment: backview_sft_bs64_resume_30k_to_60k
@@ -25,80 +25,59 @@ current_execution:
       time_limit: 4-00:00:00
       recommended_time_limit: 8-00:00:00
       time_extension_status: requires_admin
-      latest_logged_metric_step: 35400
+      latest_logged_metric_step: 37900
     - id: 132391
       experiment: h9_40k_50k_60k_eval
       state: dependency
       depends_on: 132390
       resources: 2gpu_16cpu_48g
-    - id: 132720
-      experiment: h9_35k_eval
-      state: running
-      resources: 4x1gpu_array
-      episodes: 2000
-    - id: 132724
-      experiment: h9_35k_eval_summary
-      state: dependency
-      depends_on: 132720
-      resources: 1cpu_1g
     - id: 132398
       experiment: h9_resume_5k_to_20k
       state: running
       node: gpu04
       resources: 4gpu_32cpu_96g
       time_limit: 5-00:00:00
-      latest_logged_metric_step: 9400
-    - id: 132731
-      experiment: h9_early_trajectory_full_acpdv2_10k
-      state: dependency
-      depends_on: 132702
-      resources: 4x1gpu_array_max2
-      episodes: 2000
+      latest_logged_metric_step: 12400
     - id: 132732
       experiment: h9_early_trajectory_full_acpdv2_15k
       state: dependency
       depends_on: 132703
       resources: 4x1gpu_array_max2
       episodes: 2000
-    - id: 132734
-      experiment: h9_early_trajectory_full_acpdv2_10k_summary
-      state: dependency
-      depends_on: 132731
-      resources: 1cpu_1g
     - id: 132735
       experiment: h9_early_trajectory_full_acpdv2_15k_summary
       state: dependency
       depends_on: 132732
-      resources: 1cpu_1g
-    - id: 132738
-      experiment: h9_early_trajectory_full_sft_10k
-      state: running_and_pending_array
-      resources: 4x1gpu_array_max2
-      episodes: 2000
-    - id: 132740
-      experiment: h9_early_trajectory_full_sft_15k
-      state: pending
-      resources: 4x1gpu_array_max2
-      episodes: 2000
-    - id: 132741
-      experiment: h9_early_trajectory_full_sft_10k_summary
-      state: dependency
-      depends_on: 132738
-      resources: 1cpu_1g
-    - id: 132742
-      experiment: h9_early_trajectory_full_sft_15k_summary
-      state: dependency
-      depends_on: 132740
-      resources: 1cpu_1g
-    - id: 132702
-      experiment: wait_for_h9_10k_checkpoint
-      state: running
       resources: 1cpu_1g
     - id: 132703
       experiment: wait_for_h9_15k_checkpoint
       state: running
       resources: 1cpu_1g
   recently_completed:
+    - id: 132720
+      experiment: h9_35k_eval
+      state: complete
+      episodes: 2000
+      spatial: 0.732
+      object: 0.738
+      goal: 0.636
+      libero_10: 0.336
+      pooled_success: 0.6105
+    - id: 132731
+      experiment: h9_early_trajectory_full_acpdv2_10k
+      state: complete
+      episodes: 2000
+      pooled_success: 0.3745
+    - id: 132738
+      experiment: h9_early_trajectory_full_sft_10k
+      state: complete
+      episodes: 2000
+      pooled_success: 0.2325
+    - id: 132740
+      experiment: h9_early_trajectory_full_sft_15k
+      state: complete
+      episodes: 2000
+      pooled_success: 0.4090
     - id: 132544
       experiment: h9_early_trajectory_quick_sft_10k
       state: complete_exploratory
@@ -318,6 +297,11 @@ formal_matrix:
         acpdv2_15k_full_summary_job: 132735
         acpdv2_full_trials_per_task: 50
         acpdv2_full_episodes_per_checkpoint: 2000
+        sft_10k_full_pooled: 0.2325
+        acpdv2_10k_full_pooled: 0.3745
+        acpdv2_minus_sft_10k_pooled: 0.1420
+        acpdv2_minus_sft_10k_ci95: [0.1190, 0.1660]
+        sft_15k_full_pooled: 0.4090
       eval_30k_job: 130773
       eval_25k_job: 132082
       eval_25k_summary_job: 132084
@@ -337,6 +321,18 @@ formal_matrix:
       eval_35k_job: 132720
       eval_35k_summary_job: 132724
       trajectory_60k_status: running
+      eval_35k:
+        spatial: 0.732
+        object: 0.738
+        goal: 0.636
+        libero_10: 0.336
+        pooled: 0.6105
+      eval_35k_minus_h9_30k:
+        pooled: 0.0305
+        ci95: [0.0060, 0.0550]
+      eval_35k_minus_sft_30k:
+        pooled: 0.0060
+        ci95: [-0.0190, 0.0305]
       eval_30k:
         spatial: 0.640
         object: 0.730
