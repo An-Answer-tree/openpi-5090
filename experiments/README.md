@@ -20,6 +20,7 @@
 | 类别 | 实验 | 协议/分析 | 状态 |
 |---|---|---|---|
 | baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 25K/30K 完成；20K 单卡数组验证中 |
+| baseline | backview BS64 30K--60K | `baseline/sft-backview-bs64-trajectory-60k/` | 续训排队；35K/40K/50K/60K验证已提交依赖 |
 | baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 全部完成 |
 | student | H9-scale-b ACPD-v2 BS64 | `student/acpd-v2-h9-batch-scaling-30k/` | 5K/25K/30K 完成；25K 未高于 30K |
 | mechanism | H15a ACPD-v2 梯度冲突诊断 | `mechanism/acpd-v2-h15a-gradient-conflict/` | 完成；不支持后期梯度冲突假设 |
