@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-23 10:32 CST"
+  checked_at: "2026-09-23 10:47 CST"
   jobs:
     - id: 132390
       experiment: h9_resume_30k_to_60k
@@ -38,27 +38,27 @@ current_execution:
       resources: 4gpu_32cpu_96g
       time_limit: 5-00:00:00
       latest_logged_metric_step: 9400
-    - id: 132547
-      experiment: h9_early_trajectory_quick_acpdv2_10k
+    - id: 132731
+      experiment: h9_early_trajectory_full_acpdv2_10k
       state: dependency
       depends_on: 132702
       resources: 4x1gpu_array_max2
-      episodes: 400
-    - id: 132548
-      experiment: h9_early_trajectory_quick_acpdv2_15k
+      episodes: 2000
+    - id: 132732
+      experiment: h9_early_trajectory_full_acpdv2_15k
       state: dependency
-      depends_on: [132547, 132703]
+      depends_on: 132703
       resources: 4x1gpu_array_max2
-      episodes: 400
-    - id: 132700
-      experiment: h9_early_trajectory_quick_acpdv2_10k_summary
+      episodes: 2000
+    - id: 132734
+      experiment: h9_early_trajectory_full_acpdv2_10k_summary
       state: dependency
-      depends_on: 132547
+      depends_on: 132731
       resources: 1cpu_1g
-    - id: 132699
-      experiment: h9_early_trajectory_quick_acpdv2_15k_summary
+    - id: 132735
+      experiment: h9_early_trajectory_full_acpdv2_15k_summary
       state: dependency
-      depends_on: 132548
+      depends_on: 132732
       resources: 1cpu_1g
     - id: 132702
       experiment: wait_for_h9_10k_checkpoint
@@ -163,6 +163,9 @@ current_execution:
       experiment: h13_loss_only_5k
       checkpoint: 4999
   recently_cancelled:
+    - id: [132547, 132548, 132699, 132700]
+      experiment: h9_early_trajectory_quick_eval
+      state: cancelled_before_start_for_full_eval
     - id: 132317
       experiment: h16_dynamic_view_gate_5k
       state: cancelled_without_checkpoint
@@ -268,12 +271,15 @@ formal_matrix:
         sft_15k_job: 132546
         sft_15k_summary_job: 132552
         sft_15k_pooled: 0.3925
-        acpdv2_10k_job: 132547
+        cancelled_acpdv2_quick_jobs: [132547, 132548, 132699, 132700]
+        acpdv2_10k_full_job: 132731
         acpdv2_10k_wait_job: 132702
-        acpdv2_10k_summary_job: 132700
-        acpdv2_15k_job: 132548
+        acpdv2_10k_full_summary_job: 132734
+        acpdv2_15k_full_job: 132732
         acpdv2_15k_wait_job: 132703
-        acpdv2_15k_summary_job: 132699
+        acpdv2_15k_full_summary_job: 132735
+        acpdv2_full_trials_per_task: 50
+        acpdv2_full_episodes_per_checkpoint: 2000
       eval_30k_job: 130773
       eval_25k_job: 132082
       eval_25k_summary_job: 132084
