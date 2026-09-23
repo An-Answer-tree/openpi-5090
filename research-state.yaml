@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-23 19:13 CST"
+  checked_at: "2026-09-24 01:05 CST"
   jobs:
     - id: 132791
       experiment: backview_sft_bs64_resume_30k_to_60k
@@ -25,7 +25,7 @@ current_execution:
       time_limit: 4-00:00:00
       recommended_time_limit: 8-00:00:00
       time_extension_status: requires_admin
-      latest_logged_metric_step: 37900
+      latest_logged_metric_step: 39700
     - id: 132391
       experiment: h9_40k_50k_60k_eval
       state: dependency
@@ -37,7 +37,18 @@ current_execution:
       node: gpu04
       resources: 4gpu_32cpu_96g
       time_limit: 5-00:00:00
-      latest_logged_metric_step: 12400
+      latest_logged_metric_step: 14400
+    - id: 134008
+      experiment: h9_early_trajectory_full_acpdv2_20k
+      state: dependency
+      depends_on: 132398
+      resources: 4x1gpu_array
+      episodes: 2000
+    - id: 134009
+      experiment: h9_early_trajectory_full_acpdv2_20k_summary
+      state: dependency
+      depends_on: 134008
+      resources: 1cpu_1g
     - id: 132732
       experiment: h9_early_trajectory_full_acpdv2_15k
       state: dependency
@@ -295,6 +306,8 @@ formal_matrix:
         acpdv2_15k_full_job: 132732
         acpdv2_15k_wait_job: 132703
         acpdv2_15k_full_summary_job: 132735
+        acpdv2_20k_full_job: 134008
+        acpdv2_20k_full_summary_job: 134009
         acpdv2_full_trials_per_task: 50
         acpdv2_full_episodes_per_checkpoint: 2000
         sft_10k_full_pooled: 0.2325
