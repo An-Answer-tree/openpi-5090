@@ -20,3 +20,7 @@ warmup，也不把学习率重新升高。继续在原 checkpoint 目录写入�
 训练成功结束后，用同一 backview 相机、seed 7 和每套 500 episodes，只验证
 40K、50K、60K。每个 checkpoint 报告四套成功率和 2,000 episodes pooled
 success，并将三者中的最高值作为本次训练轨迹的最佳结果。不进行第二组 seed 复测。
+
+训练产生完整 35K checkpoint 后，新增一次探索性提前验证。35K 使用完全相同的
+相机、seed、四套 benchmark 和 2,000 episodes 协议，直接与 30K 比较，用于判断
+30K 后是否已出现继续提高的信号。该结果不替代原定的 40K、50K、60K 验证。
