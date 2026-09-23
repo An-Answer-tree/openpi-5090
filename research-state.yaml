@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-23 10:18 CST"
+  checked_at: "2026-09-23 10:32 CST"
   jobs:
     - id: 132390
       experiment: h9_resume_30k_to_60k
@@ -21,6 +21,16 @@ current_execution:
       state: dependency
       depends_on: 132390
       resources: 2gpu_16cpu_48g
+    - id: 132720
+      experiment: h9_35k_eval
+      state: running
+      resources: 4x1gpu_array
+      episodes: 2000
+    - id: 132724
+      experiment: h9_35k_eval_summary
+      state: dependency
+      depends_on: 132720
+      resources: 1cpu_1g
     - id: 132398
       experiment: h9_resume_5k_to_20k
       state: running
@@ -40,6 +50,16 @@ current_execution:
       depends_on: [132547, 132703]
       resources: 4x1gpu_array_max2
       episodes: 400
+    - id: 132700
+      experiment: h9_early_trajectory_quick_acpdv2_10k_summary
+      state: dependency
+      depends_on: 132547
+      resources: 1cpu_1g
+    - id: 132699
+      experiment: h9_early_trajectory_quick_acpdv2_15k_summary
+      state: dependency
+      depends_on: 132548
+      resources: 1cpu_1g
     - id: 132702
       experiment: wait_for_h9_10k_checkpoint
       state: running
@@ -270,6 +290,8 @@ formal_matrix:
       cancelled_60k_jobs: [131642, 131643]
       resume_60k_job: 132390
       eval_40k_50k_60k_job: 132391
+      eval_35k_job: 132720
+      eval_35k_summary_job: 132724
       trajectory_60k_status: running
       eval_30k:
         spatial: 0.640
