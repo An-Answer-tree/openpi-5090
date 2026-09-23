@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-23 10:47 CST"
+  checked_at: "2026-09-23 10:54 CST"
   jobs:
     - id: 132390
       experiment: h9_resume_30k_to_60k
@@ -59,6 +59,26 @@ current_execution:
       experiment: h9_early_trajectory_full_acpdv2_15k_summary
       state: dependency
       depends_on: 132732
+      resources: 1cpu_1g
+    - id: 132738
+      experiment: h9_early_trajectory_full_sft_10k
+      state: running_and_pending_array
+      resources: 4x1gpu_array_max2
+      episodes: 2000
+    - id: 132740
+      experiment: h9_early_trajectory_full_sft_15k
+      state: pending
+      resources: 4x1gpu_array_max2
+      episodes: 2000
+    - id: 132741
+      experiment: h9_early_trajectory_full_sft_10k_summary
+      state: dependency
+      depends_on: 132738
+      resources: 1cpu_1g
+    - id: 132742
+      experiment: h9_early_trajectory_full_sft_15k_summary
+      state: dependency
+      depends_on: 132740
       resources: 1cpu_1g
     - id: 132702
       experiment: wait_for_h9_10k_checkpoint
@@ -271,6 +291,12 @@ formal_matrix:
         sft_15k_job: 132546
         sft_15k_summary_job: 132552
         sft_15k_pooled: 0.3925
+        sft_10k_full_job: 132738
+        sft_10k_full_summary_job: 132741
+        sft_15k_full_job: 132740
+        sft_15k_full_summary_job: 132742
+        sft_full_trials_per_task: 50
+        sft_full_episodes_per_checkpoint: 2000
         cancelled_acpdv2_quick_jobs: [132547, 132548, 132699, 132700]
         acpdv2_10k_full_job: 132731
         acpdv2_10k_wait_job: 132702
