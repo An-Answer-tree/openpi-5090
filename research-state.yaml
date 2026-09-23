@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-22 23:36 CST"
+  checked_at: "2026-09-23 10:18 CST"
   jobs:
     - id: 132390
       experiment: h9_resume_30k_to_60k
@@ -15,7 +15,7 @@ current_execution:
       time_limit: 4-00:00:00
       recommended_time_limit: 8-00:00:00
       time_extension_status: requires_admin
-      latest_logged_metric_step: 32100
+      latest_logged_metric_step: 35400
     - id: 132391
       experiment: h9_40k_50k_60k_eval
       state: dependency
@@ -27,31 +27,38 @@ current_execution:
       node: gpu04
       resources: 4gpu_32cpu_96g
       time_limit: 5-00:00:00
-      latest_logged_metric_step: 6200
-    - id: 132544
-      experiment: h9_early_trajectory_quick_sft_10k
-      state: running
-      resources: 4x1gpu_array_max2
-      episodes: 400
-    - id: 132546
-      experiment: h9_early_trajectory_quick_sft_15k
-      state: dependency
-      depends_on: 132544
-      resources: 4x1gpu_array_max2
-      episodes: 400
+      latest_logged_metric_step: 9400
     - id: 132547
       experiment: h9_early_trajectory_quick_acpdv2_10k
       state: dependency
-      depends_on: 132398
+      depends_on: 132702
       resources: 4x1gpu_array_max2
       episodes: 400
     - id: 132548
       experiment: h9_early_trajectory_quick_acpdv2_15k
       state: dependency
-      depends_on: 132547
+      depends_on: [132547, 132703]
       resources: 4x1gpu_array_max2
       episodes: 400
+    - id: 132702
+      experiment: wait_for_h9_10k_checkpoint
+      state: running
+      resources: 1cpu_1g
+    - id: 132703
+      experiment: wait_for_h9_15k_checkpoint
+      state: running
+      resources: 1cpu_1g
   recently_completed:
+    - id: 132544
+      experiment: h9_early_trajectory_quick_sft_10k
+      state: complete_exploratory
+      pooled_success: 0.2050
+      episodes: 400
+    - id: 132546
+      experiment: h9_early_trajectory_quick_sft_15k
+      state: complete_exploratory
+      pooled_success: 0.3925
+      episodes: 400
     - id: 132452
       experiment: backview_sft_bs64_20k_eval_single_gpu_array
       state: complete
@@ -237,12 +244,16 @@ formal_matrix:
         episodes_per_checkpoint: 400
         sft_10k_job: 132544
         sft_10k_summary_job: 132549
+        sft_10k_pooled: 0.2050
         sft_15k_job: 132546
         sft_15k_summary_job: 132552
+        sft_15k_pooled: 0.3925
         acpdv2_10k_job: 132547
-        acpdv2_10k_summary_job: 132551
+        acpdv2_10k_wait_job: 132702
+        acpdv2_10k_summary_job: 132700
         acpdv2_15k_job: 132548
-        acpdv2_15k_summary_job: 132550
+        acpdv2_15k_wait_job: 132703
+        acpdv2_15k_summary_job: 132699
       eval_30k_job: 130773
       eval_25k_job: 132082
       eval_25k_summary_job: 132084

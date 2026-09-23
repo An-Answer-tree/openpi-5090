@@ -25,7 +25,7 @@
 | mechanism | H15a ACPD-v2 梯度冲突诊断 | `mechanism/acpd-v2-h15a-gradient-conflict/` | 完成；不支持后期梯度冲突假设 |
 | student | H9 ACPD-v2 30K--60K | `student/acpd-v2-h9-trajectory-60k/` | 已提交续训和40K/50K/60K验证 |
 | student | H9 ACPD-v2 20K--30K | `student/acpd-v2-h9-20k-30k-trajectory/` | 25K完成；5K→20K续训排队 |
-| student | H9/SFT 10K--15K 快速轨迹 | `student/acpd-v2-h9-early-trajectory/` | 已提交；SFT 10K验证中，其余等待依赖 |
+| student | H9/SFT 10K--15K 快速轨迹 | `student/acpd-v2-h9-early-trajectory/` | SFT完成；ACPD等待10K/15K checkpoint |
 | ablation | H13 loss-only BS64 | `ablation/acpd-v2-h13-injection-ablation/` | 5K 训练和验证完成；支持显式注入 |
 | ablation | ACL-only BS64 | 尚未创建协议 | 待运行 |
 

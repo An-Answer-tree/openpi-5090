@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-09-22（CST）
+更新时间：2026-09-23（CST）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -34,9 +34,9 @@
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 完成 | 30K pooled `78.65%` |
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 完成 | 30K pooled `77.00%` |
 | H9-scale-b | backview ACPD-v2 主 student | layer 10，BS64，30K | 129728/130773 | 训练和 30K 验证完成 | 5K pooled `23.15%`；30K pooled `58.00%` |
-| H9-mid-trajectory | 检查 30K 前是否已过峰值 | 验证 20K/25K；相同 2,000 episodes | 132082/132084/132398 | 25K 完成；5K→20K 续训排队 | 25K pooled `55.75%`，低于 30K `2.25` 点；20K 尚无结论 |
+| H9-mid-trajectory | 检查 30K 前是否已过峰值 | 验证 20K/25K；相同 2,000 episodes | 132082/132084/132398 | 25K 完成；5K→20K 续训中 | 25K pooled `55.75%`，低于 30K `2.25` 点；20K 尚无结论 |
 | H9-trajectory | 定位 30K 后最佳 checkpoint | H9 从 30K 精确续训至 60K；验证 40K/50K/60K | 132390/132391 | 训练中 | 尚无结论 |
-| H9-recovery | 恢复 H9 的中期 checkpoint | 与 H9-scale-b 相同，从完整 `4999` 精确续训至 20K | 130704/132198/132398 | 5K 完整；续训排队 | 尚无新的任务成功率结论 |
+| H9-recovery | 恢复 H9 的中期 checkpoint | 与 H9-scale-b 相同，从完整 `4999` 精确续训至 20K | 130704/132198/132398 | 5K 完整；续训中 | 尚无新的任务成功率结论 |
 | H13 | 判断 contribution 注入是否有效 | H9 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
 
 ## 当前机制实验
@@ -44,6 +44,17 @@
 | ID | 目的 | 实际配置 | Job | 状态 | 结论 |
 |---|---|---|---:|---|---|
 | H15a | 判断 ACPD-v2 后期是否存在辅助梯度干扰 | H9 5K/30K；每点200个相同BS32 batch；不更新参数 | smoke 132308；快速 132311；正式 132250 | 完成 | 5K/30K 组合冲突率均为 `0%`；不支持后期梯度冲突解释 |
+
+## 探索性快速轨迹
+
+每个 checkpoint 使用四套共 400 episodes，仅用于选择正式验证点，不作为论文最终数值。
+
+| 模型 | Step | Spatial | Object | Goal | LIBERO-10 | Pooled | 状态 |
+|---|---:|---:|---:|---:|---:|---:|---|
+| SFT backview BS64 | 10K | 21.00% | 30.00% | 28.00% | 3.00% | 20.50% | 完成 |
+| SFT backview BS64 | 15K | 34.00% | 58.00% | 53.00% | 12.00% | 39.25% | 完成 |
+| ACPD-v2 backview BS64 | 10K | - | - | - | - | - | 等待checkpoint |
+| ACPD-v2 backview BS64 | 15K | - | - | - | - | - | 等待checkpoint |
 
 ## 前期筛选结果
 
@@ -117,6 +128,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H12 0--5K 训练日志 | `slurm-log/pi05-bv-sft-bs64-5k_130285.out` |
 | H12 5K--30K 训练日志 | `slurm-log/pi05-bv-sft-bs64-r30k_130762.out` |
 | H12 20K 验证 | `/opt/liutong/openpi-5090-evals/sft-backview-bs64-20k/20000/summary.txt` |
+| H9早期轨迹快速验证 | `/opt/liutong/openpi-5090-evals/h9-early-trajectory-quick/` |
 | H9/H12 loss 对齐指标 | `experiments/student/acpd-v2-h9-batch-scaling-30k/results/loss_comparison.json` |
 | H9/H12 loss 对齐图 | `artifacts/pi05_backview_sft_vs_acpdv2_loss.png` |
 | H9/H12 30K 配对分析 | `experiments/baseline/sft-backview-bs64-5k/results/h9_vs_h12_30k_paired_analysis.json` |
