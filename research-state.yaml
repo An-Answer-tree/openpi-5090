@@ -23,8 +23,19 @@ experiment_names:
   note: "Display aliases only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-24 23:05 CST"
+  checked_at: "2026-09-24 23:17 CST"
   jobs:
+    - id: 135001
+      experiment: h9_fixed_45k_exploratory_full_eval
+      state: pending_priority
+      checkpoint: 44999
+      resources: 4x1gpu_array_max2
+      episodes: 2000
+    - id: 135002
+      experiment: h9_fixed_45k_exploratory_summary
+      state: dependency
+      depends_on: 135001
+      resources: 1cpu_1g
     - id: 134992
       experiment: backview_sft_bs64_35k_early_full_eval
       state: pending_priority
@@ -64,13 +75,6 @@ current_execution:
       node: gpu02
       resources: 4gpu_32cpu_96g
       time_limit: 8-00:00:00
-    - id: 132390
-      experiment: h9_resume_30k_to_60k
-      state: running
-      node: gpu05
-      resources: 4gpu_32cpu_96g
-      time_limit: 8-00:00:00
-      latest_logged_metric_step: 46000
     - id: 134008
       experiment: h9_early_trajectory_full_acpdv2_20k
       state: pending_priority
@@ -97,17 +101,11 @@ current_execution:
       state: dependency
       depends_on: 134371
       resources: 1cpu_1g
-    - id: [134373, 134375]
-      experiment: h9_50k_60k_eval
-      state: dependency
-      depends_on: 132390
-      resources: 4x1gpu_array_max2_each
-      episodes_per_checkpoint: 2000
-    - id: [134374, 134376]
-      experiment: h9_50k_60k_eval_summary
-      state: dependency
-      resources: 1cpu_1g_each
   recently_completed:
+    - id: 132390
+      experiment: h9_resume_30k_to_60k
+      state: cancelled_by_user_after_45k_checkpoint
+      last_complete_checkpoint: 44999
     - id: 132720
       experiment: h9_35k_eval
       state: complete
@@ -376,17 +374,17 @@ formal_matrix:
         ci95: [-0.0470, 0.0020]
       cancelled_20k_eval_job: 131861
       cancelled_60k_jobs: [131642, 131643]
-      resume_60k_job: 132390
+      stopped_resume_60k_job: 132390
       cancelled_eval_40k_50k_60k_job: 132391
       eval_40k_job: 134371
       eval_40k_summary_job: 134372
-      eval_50k_job: 134373
-      eval_50k_summary_job: 134374
-      eval_60k_job: 134375
-      eval_60k_summary_job: 134376
+      cancelled_eval_50k_jobs: [134373, 134374]
+      cancelled_eval_60k_jobs: [134375, 134376]
+      eval_45k_job: 135001
+      eval_45k_summary_job: 135002
       eval_35k_job: 132720
       eval_35k_summary_job: 132724
-      trajectory_60k_status: running
+      trajectory_60k_status: stopped_at_45k_checkpoint
       eval_35k:
         spatial: 0.732
         object: 0.738
