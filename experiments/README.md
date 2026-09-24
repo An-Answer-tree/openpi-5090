@@ -4,6 +4,10 @@
 [`EXPERIMENT_RESULTS.md`](../EXPERIMENT_RESULTS.md) 为准，大型 checkpoint 与验证视频保存在
 `/opt/liutong`。
 
+名称统一为 H9-Fixed（固定 contribution 权重）、H17-Decay（非零 contribution
+权重衰减）、H13-LossOnly（无注入）。详细配置对照见结果台账；旧 ID、目录和任务名
+保留用于检索。“Decay”只表示 contribution 权重衰减，两组 LR 均为原30K cosine。
+
 ## 目录
 
 | 分类 | 内容 |
@@ -22,16 +26,17 @@
 | baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 10K/15K/20K/25K/30K 正式验证完成 |
 | baseline | backview BS64 30K--60K | `baseline/sft-backview-bs64-trajectory-60k/` | 续训排队；35K/40K/50K/60K验证已提交依赖 |
 | baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 全部完成 |
-| student | H9-scale-b ACPD-v2 BS64 | `student/acpd-v2-h9-batch-scaling-30k/` | 5K/25K/30K 完成；25K 未高于 30K |
+| student | H9-Fixed 主实验（原H9-scale-b） | `student/acpd-v2-h9-batch-scaling-30k/` | 固定contribution=0.2；5K/10K/25K/30K/35K有正式结果 |
 | mechanism | H15a ACPD-v2 梯度冲突诊断 | `mechanism/acpd-v2-h15a-gradient-conflict/` | 完成；不支持后期梯度冲突假设 |
-| student | H9 ACPD-v2 30K--60K | `student/acpd-v2-h9-trajectory-60k/` | 续训约42.3K；35K为`61.05%`，40K验证排队，50K/60K等待训练 |
-| student | H9 ACPD-v2 20K--30K | `student/acpd-v2-h9-20k-30k-trajectory/` | 25K完成；5K→20K续训运行中 |
-| student | H9/SFT 10K--15K 早期轨迹 | `student/acpd-v2-h9-early-trajectory/` | 10K 正式比较完成；SFT 15K完成，H9 15K等待checkpoint |
-| ablation | H13 loss-only BS64 | `ablation/acpd-v2-h13-injection-ablation/` | 5K 训练和验证完成；支持显式注入 |
-| ablation | H17 非零 contribution 衰减 | `ablation/acpd-v2-h17-contribution-decay/` | 10K→20K训练134422排队；验证134423、配对分析134424等待依赖 |
+| student | H9-Fixed 延长训练30K--60K | `student/acpd-v2-h9-trajectory-60k/` | 续训运行；35K为`61.05%`，40K验证排队，50K/60K等待训练 |
+| student | H9-Fixed 中期轨迹20K--30K | `student/acpd-v2-h9-20k-30k-trajectory/` | 25K完成；5K→20K恢复训练运行中 |
+| student | H9-Fixed/SFT 早期轨迹10K--15K | `student/acpd-v2-h9-early-trajectory/` | 10K 正式比较完成；SFT 15K完成，H9-Fixed 15K部分验证完成 |
+| ablation | H13-LossOnly BS64 | `ablation/acpd-v2-h13-injection-ablation/` | 5K 训练和验证完成；支持显式注入 |
+| ablation | H17-Decay BS64 | `ablation/acpd-v2-h17-contribution-decay/` | 从H9-Fixed 10K分支；训练134422排队，验证134423、配对分析134424等待依赖 |
 | ablation | ACL-only BS64 | 尚未创建协议 | 待运行 |
 
 H11 已归档，不进入正式 checkpoint 集合，也不继续训练。
+H9-Fixed 的恢复、早中期验证及延长训练是同一方法的不同执行阶段，不作为独立消融。
 
 ## 精选 Checkpoint 完整性
 
@@ -46,7 +51,8 @@ H11 已归档，不进入正式 checkpoint 集合，也不继续训练。
 | baseline/topview_bs64 | C | C | C | C | C | C |
 | baseline/leftview_bs64 | C | C | C | C | C | C |
 | baseline/rightview_bs64 | C | C | C | C | C | C |
-| student/backview_acpdv2_layer10_bs64 | C | C | Q | R | Y | C |
+| student/backview_acpdv2_layer10_bs64（H9-Fixed） | C | C | C | R | Y | C |
+| ablation/H17-Decay | - | 起点为H9-Fixed 10K | Q | Q | - | - |
 | ablation/backview_loss_only_bs64 | C | P | P | P | P | P |
 | ablation/backview_acl_only_bs64 | P | P | P | P | P | P |
 

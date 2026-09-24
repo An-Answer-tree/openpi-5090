@@ -4,6 +4,24 @@ project:
   status: active
   started: "2026-09-11"
 
+experiment_names:
+  h9_fixed:
+    display_name: "H9-Fixed / ACPD-v2 固定权重"
+    legacy_id: H9-scale-b
+    batch_size: 64
+    contribution_weight: 0.2
+    execution_labels: [H9-recovery, H9-mid-trajectory, H9-trajectory]
+  h17_decay:
+    display_name: "H17-Decay / ACPD-v2 非零权重衰减"
+    legacy_id: H17
+    parent: h9_fixed
+    branch_step: 10000
+    primary_control: h9_fixed_recovery_20k
+  h13_loss_only:
+    display_name: "H13-LossOnly / ACPD-v2 无注入"
+    legacy_id: H13
+  note: "Display aliases only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
+
 current_execution:
   checked_at: "2026-09-24 10:24 CST"
   jobs:
@@ -304,6 +322,7 @@ formal_matrix:
         pooled: 0.7700
   student:
     backview_acpdv2_layer10_bs64:
+      display_name: H9-Fixed
       checkpoints: [4999, 24999, 29999]
       status: 5k_recovered_25k_30k_eval_complete
       recovery_target: 4999
@@ -428,6 +447,9 @@ formal_matrix:
         supports_late_gradient_conflict: false
   ablation:
     h17_contribution_decay:
+      display_name: H17-Decay
+      parent_experiment: H9-Fixed
+      primary_control: H9-Fixed_recovery_20k
       status: submitted_pending
       protocol: experiments/ablation/acpd-v2-h17-contribution-decay/protocol.md
       protocol_commit: 0401d01
@@ -451,6 +473,7 @@ formal_matrix:
       cpu_tests_passed: 16
       gpu_training_verified: false
     backview_loss_only_bs64:
+      display_name: H13-LossOnly
       checkpoints: [4999]
       status: 5k_complete
       eval_job: 130774
