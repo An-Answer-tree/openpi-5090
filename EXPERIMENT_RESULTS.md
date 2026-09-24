@@ -60,7 +60,7 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 |---|---|---|---|
 | 恢复（H9-recovery） | 重建被清理的早期 checkpoint，提供 H17 的同源10K起点与20K对照 | 130704/132198/132398 | 10K、15K、20K checkpoint 完整 |
 | 中期验证（H9-mid-trajectory） | 测量10K/15K/20K/25K优势变化 | 132731/132732/134008/134009/132082/132084 | 10K相对SFT +14.20点；15K +5.70点；25K -0.05点；20K待验证 |
-| 延长训练（H9-trajectory） | 原计划30K→60K；45K checkpoint完整后停训，验证35K/40K/45K | 132390/132720/132724/134371/134372/135001/135002 | 35K为61.05%；40K/45K全量验证排队，尚无结论；50K/60K未训练 |
+| 延长训练（H9-trajectory） | 原计划30K→60K；45K checkpoint完整后停训，验证35K/40K | 132390/132720/132724/134371/134372；取消135001/135002 | 35K为61.05%；40K全量验证排队；45K验证已取消，尚无结论；50K/60K未训练 |
 
 H17-Decay 的主比较为同源 **H9-Fixed recovery 20K**，次比较为 SFT BS64 20K。
 H17 尚无验证结果，现有 H9 数值不属于 H17。
@@ -142,7 +142,7 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | baseline | topview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
 | baseline | leftview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
 | baseline | rightview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
-| student | backview ACPD-v2 layer 10 BS64 | `24999` | 恢复轨迹至20K、延长轨迹至45K的 checkpoint 完整；45K后停训，40K/45K待验证 |
+| student | backview ACPD-v2 layer 10 BS64 | `24999` | 恢复轨迹至20K、延长轨迹至45K的 checkpoint 完整；45K后停训，40K待验证；45K验证已取消 |
 | ablation | backview loss-only BS64 | - | 5K checkpoint 和验证完整；之后补至 30K |
 | ablation | backview ACL-only BS64 | - | 尚未运行 |
 
@@ -175,7 +175,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H9 25K 协议 | `experiments/student/acpd-v2-h9-20k-30k-trajectory/protocol.md` |
 | H9 30K--60K 协议 | `experiments/student/acpd-v2-h9-trajectory-60k/protocol.md` |
 | H9 35K 验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/summary.txt` |
-| H9 45K checkpoint与探索性验证 | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/44999`；`/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/44999/` |
+| H9 45K checkpoint（验证已取消） | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/44999` |
 | H9 35K/30K 配对分析 | `experiments/student/acpd-v2-h9-trajectory-60k/results/h9_35k_vs_h9_30k_paired_analysis.json` |
 | H9 35K/SFT 30K 配对分析 | `experiments/student/acpd-v2-h9-trajectory-60k/results/h9_35k_vs_sft_30k_paired_analysis.json` |
 | H15a 梯度诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/protocol.md` |
