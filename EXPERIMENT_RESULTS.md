@@ -46,7 +46,7 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | ID | 目的 | 实际配置 | Job | 状态 | 结果 |
 |---|---|---|---:|---|---|
 | Teacher | 提供 agentview+wrist 特权信息 | 全量 SFT，30K | 历史任务 | 完成 | checkpoint `29999` |
-| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762/130889/132083/132085/132452 | 完成 | 5K `13.85%`；20K `47.20%`；25K `55.80%`；30K `60.45%` |
+| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762/130889/132083/132085/132452 | 30K完成；35K验证已提前提交，40K--60K续训中 | 5K `13.85%`；20K `47.20%`；25K `55.80%`；30K `60.45%`；35K尚无结论 |
 | H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669/130890 | 完成 | 30K pooled `71.55%` |
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 完成 | 30K pooled `78.65%` |
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 完成 | 30K pooled `77.00%` |
@@ -58,8 +58,8 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 
 | 阶段（原标签） | 作用 | Job | 状态/已得结论 |
 |---|---|---|---|
-| 恢复（H9-recovery） | 重建被清理的早期 checkpoint，提供 H17 的同源10K起点与20K对照 | 130704/132198/132398 | 10K、15K完整；继续训练至20K |
-| 中期验证（H9-mid-trajectory） | 测量10K/15K/20K/25K优势变化 | 132731/132732/134008/134009/132082/132084 | 10K相对SFT +14.20点；25K -0.05点；15K部分完成，20K等待训练 |
+| 恢复（H9-recovery） | 重建被清理的早期 checkpoint，提供 H17 的同源10K起点与20K对照 | 130704/132198/132398 | 10K、15K、20K checkpoint 完整 |
+| 中期验证（H9-mid-trajectory） | 测量10K/15K/20K/25K优势变化 | 132731/132732/134008/134009/132082/132084 | 10K相对SFT +14.20点；15K +5.70点；25K -0.05点；20K待验证 |
 | 延长训练（H9-trajectory） | 30K→60K；验证35K/40K/50K/60K | 132390/132720/132724/134371--134376 | 35K为61.05%；40K验证排队；50K/60K等待训练 |
 
 H17-Decay 的主比较为同源 **H9-Fixed recovery 20K**，次比较为 SFT BS64 20K。
@@ -117,6 +117,7 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | SFT backview BS64 10K | 23.40% | 37.80% | 29.20% | 2.60% | 23.25% |
 | H9-Fixed backview BS64 10K | 41.60% | 50.60% | 47.60% | 10.00% | 37.45% |
 | SFT backview BS64 15K | 43.60% | 58.00% | 47.40% | 14.60% | 40.90% |
+| H9-Fixed backview BS64 15K | 49.40% | 64.40% | 53.60% | 19.00% | 46.60% |
 | H9-Fixed backview BS64 25K | 63.20% | 69.40% | 62.00% | 28.40% | 55.75% |
 | H9-Fixed backview BS64 30K | 64.00% | 73.00% | 61.80% | 33.20% | 58.00% |
 | H9-Fixed backview BS64 35K | 73.20% | 73.80% | 63.60% | 33.60% | 61.05% |
@@ -160,6 +161,8 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H12 20K 验证 | `/opt/liutong/openpi-5090-evals/sft-backview-bs64-20k/20000/summary.txt` |
 | H9早期轨迹快速验证 | `/opt/liutong/openpi-5090-evals/h9-early-trajectory-quick/` |
 | H9/SFT 10K 正式验证 | `/opt/liutong/openpi-5090-evals/h9-early-trajectory-full/` |
+| H9 15K 正式验证 | `/opt/liutong/openpi-5090-evals/h9-early-trajectory-full/14999/summary.txt` |
+| SFT 35K 提前验证（待结果） | `/opt/liutong/openpi-5090-evals/sft-backview-bs64-training-trajectory/35000/`；job 134992/134995 |
 | H9/SFT 10K 配对分析 | `experiments/student/acpd-v2-h9-early-trajectory/results/h9_vs_sft_10k_paired_analysis.json` |
 | H9/H12 loss 对齐指标 | `experiments/student/acpd-v2-h9-batch-scaling-30k/results/loss_comparison.json` |
 | H9/H12 loss 对齐图 | `artifacts/pi05_backview_sft_vs_acpdv2_loss.png` |
