@@ -1,3 +1,6 @@
+import dataclasses
+import types
+
 import flax.nnx as nnx
 import jax
 import jax.numpy as jnp
@@ -7,8 +10,12 @@ import optax
 from openpi.models.pi0_distill_acpd import AcpdHead
 from openpi.models.pi0_distill_acpd import AcpdPi0Config
 from openpi.models.pi0_distill_acpd import ExactContributionHead
+from openpi.training import checkpoints
 from openpi.training import config as training_config
+from openpi.training.utils import TrainState
 from scripts.distillation_acpd.train_distill import DistillTrainConfig
+from scripts.distillation_acpd.train_distill import FrozenModelState
+from scripts.distillation_acpd.train_distill import _acpd_loss_weight
 from scripts.distillation_acpd.train_distill import _acpd_prediction_loss
 from scripts.distillation_acpd.train_distill import _acpd_variance_loss
 from scripts.distillation_acpd.train_distill import _action_corr_loss
@@ -19,7 +26,9 @@ from scripts.distillation_acpd.train_distill import _make_student_train_config
 from scripts.distillation_acpd.train_distill import _make_teacher_train_config
 from scripts.distillation_acpd.train_distill import _micro_step_train_rng
 from scripts.distillation_acpd.train_distill import _per_sample_prediction_error
+from scripts.distillation_acpd.train_distill import _restore_from_checkpoint
 from scripts.distillation_acpd.train_distill import _scale_gradients
+from scripts.distillation_acpd.train_distill import compute_gradients
 
 
 def test_acpd_prediction_loss_is_zero_for_equal_cues():
@@ -202,3 +211,109 @@ def test_resume_data_loader_accounts_for_gradient_accumulation():
     )
 
     assert _data_start_batch(config, 30_000, resuming=True) == 120_000
+
+
+def test_contribution_schedule_preserves_constant_default_and_clamps_endpoints():
+    config = DistillTrainConfig()
+    steps = jnp.asarray([0, 9_999, 10_000, 12_500, 15_000, 20_000], dtype=jnp.int32)
+    constant = jax.jit(jax.vmap(lambda step: _acpd_loss_weight(config, step)))
+    np.testing.assert_allclose(constant(steps), 0.2)
+
+    scheduled_config = dataclasses.replace(config, acpd_loss_end_weight=0.05)
+    scheduled = jax.jit(jax.vmap(lambda step: _acpd_loss_weight(scheduled_config, step)))
+    expected = np.asarray([0.2, 0.2, 0.2, 0.125, 0.05, 0.05])
+    np.testing.assert_allclose(scheduled(steps), expected, rtol=1e-6)
+    # Check that the live weight scales a differentiable objective under JIT.
+    gradients = jax.jit(
+        jax.vmap(jax.grad(lambda x, step: _acpd_loss_weight(scheduled_config, step) * x**2), in_axes=(None, 0))
+    )(2.0, steps)
+    np.testing.assert_allclose(gradients, 4.0 * expected, rtol=1e-6)
+
+
+def test_scheduled_weight_scales_actual_training_gradients():
+    class ToyModel(nnx.Module):
+        def __init__(self):
+            self.exact_contribution_head = ExactContributionHead(7, rngs=nnx.Rngs(0))
+
+        def compute_train_outputs(self, rng, observation, noisy_actions, time, *, train):
+            return jnp.zeros_like(noisy_actions), None, (jnp.ones_like(noisy_actions),)
+
+        def compute_attention_contributions(self, rng, observation, noisy_actions, time, *, train):
+            batch, horizon, dim = noisy_actions.shape
+            return jnp.zeros_like(noisy_actions), jnp.ones((batch, 1, 2, horizon, dim)), None, None
+
+    model_def, params = nnx.split(ToyModel())
+    tx = optax.adam(1e-3)
+    state = TrainState(
+        step=jnp.asarray(10_000),
+        params=params,
+        model_def=model_def,
+        opt_state=tx.init(params),
+        tx=tx,
+        ema_decay=None,
+    )
+    teacher = FrozenModelState(params=params, model_def=model_def)
+    config = DistillTrainConfig(
+        exact_contribution_fusion=True,
+        acpd_loss_end_weight=0.05,
+        supervised_loss_weight=0.0,
+        action_corr_loss_weight=0.0,
+    )
+    train_config = types.SimpleNamespace(trainable_filter=nnx.Param)
+    batch = (None, None, jnp.zeros((2, 3, 7)))
+    compute = jax.jit(
+        lambda state: compute_gradients(
+            config,
+            train_config,
+            jax.random.key(42),
+            state,
+            teacher,
+            batch,
+            jnp.asarray(0),
+        )
+    )
+    initial_grads, initial_info = compute(state)
+    final_grads, final_info = compute(dataclasses.replace(state, step=jnp.asarray(15_000)))
+    assert float(optax.global_norm(initial_grads)) > 0.0
+    for initial, final in zip(jax.tree.leaves(initial_grads), jax.tree.leaves(final_grads), strict=True):
+        np.testing.assert_allclose(final, initial * 0.25, rtol=1e-6, atol=1e-7)
+    np.testing.assert_allclose(final_info["weighted_acpd_loss"], initial_info["weighted_acpd_loss"] * 0.25)
+    np.testing.assert_allclose(final_info["acpd_loss"], initial_info["acpd_loss"])
+    np.testing.assert_allclose(final_info["acpd_loss_weight"], 0.05)
+
+
+def test_external_resume_restores_exact_step_and_adam_without_source_writes(tmp_path):
+    model = nnx.Linear(2, 2, rngs=nnx.Rngs(0))
+    model_def, params = nnx.split(model)
+    tx = optax.adam(1e-3)
+    grads = jax.tree.map(jnp.ones_like, params)
+    updates, opt_state = tx.update(grads, tx.init(params), params)
+    state = TrainState(
+        step=jnp.asarray(10_000),
+        params=optax.apply_updates(params, updates),
+        model_def=model_def,
+        opt_state=opt_state,
+        tx=tx,
+        ema_decay=None,
+    )
+    loader = types.SimpleNamespace(data_config=lambda: types.SimpleNamespace(norm_stats=None, asset_id=None))
+    manager, _ = checkpoints.initialize_checkpoint_dir(
+        tmp_path / "source", keep_period=1, overwrite=False, resume=False
+    )
+    checkpoints.save_state(manager, state, loader, 9_999)
+    checkpoints.save_state(manager, dataclasses.replace(state, step=jnp.asarray(15_000)), loader, 14_999)
+    manager.wait_until_finished()
+    manager.close()
+    # This traversal is limited to the tiny temporary test checkpoint.
+    source_files = {path: (path.stat().st_size, path.stat().st_mtime_ns) for path in (tmp_path / "source").rglob("*")}
+    template = jax.tree.map(lambda x: jax.ShapeDtypeStruct(x.shape, x.dtype), state)
+    restored = _restore_from_checkpoint(str(tmp_path / "source" / "9999"), template)
+    assert int(restored.step) == 10_000
+    for actual, expected in zip(jax.tree.leaves(restored), jax.tree.leaves(state), strict=True):
+        np.testing.assert_array_equal(actual, expected)
+    actual_updates, _ = restored.tx.update(grads, restored.opt_state, restored.params)
+    expected_updates, _ = state.tx.update(grads, state.opt_state, state.params)
+    for actual, expected in zip(jax.tree.leaves(actual_updates), jax.tree.leaves(expected_updates), strict=True):
+        np.testing.assert_array_equal(actual, expected)
+    assert source_files == {path: (path.stat().st_size, path.stat().st_mtime_ns) for path in source_files}
+    assert _data_start_batch(DistillTrainConfig(resume_data_loader=True), int(restored.step), resuming=True) == 10_000

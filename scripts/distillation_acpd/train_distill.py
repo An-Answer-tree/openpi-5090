@@ -17,6 +17,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import optax
+import orbax.checkpoint as ocp
 import tqdm_loggable.auto as tqdm
 import tyro
 import wandb
@@ -62,6 +63,9 @@ class DistillTrainConfig:
 
     supervised_loss_weight: float = 1.0
     acpd_loss_weight: float = 0.2
+    acpd_loss_end_weight: float | None = None
+    acpd_loss_decay_start: int = 10_000
+    acpd_loss_decay_steps: int = 5_000
     acpd_variance_loss_weight: float = 0.1
     action_corr_loss_weight: float = 0.5
     align_layers: tuple[int, ...] = (6, 12)
@@ -90,6 +94,7 @@ class DistillTrainConfig:
     save_final_checkpoint: bool = True
     overwrite: bool = False
     resume: bool = False
+    resume_from: str | None = None
     resume_data_loader: bool = False
     wandb_enabled: bool = True
     fsdp_devices: int = 4
@@ -385,6 +390,31 @@ def _data_start_batch(config: DistillTrainConfig, start_step: int, *, resuming: 
     return start_step * config.gradient_accumulation_steps
 
 
+def _restore_from_checkpoint(path: str, state: training_utils.TrainState) -> training_utils.TrainState:
+    """Restores an exact checkpoint read-only, without copying its files."""
+    checkpoint = pathlib.Path(path).resolve()
+    with ocp.CheckpointManager(
+        checkpoint.parent,
+        item_handlers={
+            "train_state": ocp.PyTreeCheckpointHandler(),
+            "params": ocp.PyTreeCheckpointHandler(),
+        },
+        options=ocp.CheckpointManagerOptions(read_only=True, create=False, enable_async_checkpointing=False),
+    ) as manager:
+        return _checkpoints.restore_state(manager, state, step=int(checkpoint.name))
+
+
+def _acpd_loss_weight(config: DistillTrainConfig, step: at.Array) -> at.Array | float:
+    """Returns the contribution weight at the global optimizer step."""
+    if config.acpd_loss_end_weight is None:
+        return config.acpd_loss_weight
+    progress = jnp.clip((step - config.acpd_loss_decay_start) / config.acpd_loss_decay_steps, 0.0, 1.0)
+    return (
+        config.acpd_loss_end_weight
+        + (config.acpd_loss_weight - config.acpd_loss_end_weight) * (1.0 + jnp.cos(jnp.pi * progress)) / 2.0
+    )
+
+
 def _init_frozen_model_state(
     train_config: _config.TrainConfig,
     init_rng: at.KeyArrayLike,
@@ -595,7 +625,8 @@ def compute_gradients(
             acpd_loss = jnp.mean(jnp.stack(layer_losses))
             acpd_prediction_loss = jnp.mean(jnp.stack(prediction_losses))
             acpd_variance_loss = jnp.mean(jnp.stack(variance_losses))
-        weighted_acpd_loss = config.acpd_loss_weight * acpd_loss
+        acpd_weight = _acpd_loss_weight(config, student_state.step)
+        weighted_acpd_loss = acpd_weight * acpd_loss
         total_loss = (
             config.supervised_loss_weight * supervised_loss
             + weighted_acpd_loss
@@ -612,6 +643,7 @@ def compute_gradients(
             "acpd_prediction_loss": acpd_prediction_loss,
             "acpd_variance_loss": acpd_variance_loss,
             "weighted_acpd_loss": weighted_acpd_loss,
+            "acpd_loss_weight": jnp.asarray(acpd_weight, dtype=jnp.float32),
             "action_corr_loss": action_corr_loss,
             "student_task_loss": jnp.mean(student_task_error),
             "teacher_task_loss": jnp.mean(teacher_task_error),
@@ -686,6 +718,10 @@ def main(config: DistillTrainConfig):
     logging.info("Running on: %s", platform.node())
     if config.gradient_accumulation_steps < 1:
         raise ValueError("--gradient-accumulation-steps must be at least 1")
+    if config.acpd_loss_end_weight is not None and config.acpd_loss_decay_steps <= 0:
+        raise ValueError("--acpd-loss-decay-steps must be positive when scheduling the contribution weight")
+    if config.resume_from is not None and not (pathlib.Path(config.resume_from) / "_CHECKPOINT_METADATA").is_file():
+        raise FileNotFoundError(f"Incomplete source checkpoint: {config.resume_from}")
     if config.batch_size % jax.device_count() != 0:
         raise ValueError(
             f"Batch size {config.batch_size} must be divisible by the number of devices {jax.device_count()}."
@@ -724,14 +760,18 @@ def main(config: DistillTrainConfig):
         student_config,
         student_init_rng,
         mesh,
-        resume=resuming,
+        resume=resuming or config.resume_from is not None,
     )
     jax.block_until_ready(student_state)
     if resuming:
         student_state = _checkpoints.restore_state(checkpoint_manager, student_state)
+    elif config.resume_from is not None:
+        logging.info("Restoring full training state read-only from %s", config.resume_from)
+        student_state = _restore_from_checkpoint(config.resume_from, student_state)
 
     start_step = int(student_state.step)
-    data_start_batch = _data_start_batch(config, start_step, resuming=resuming)
+    logging.info("Starting at optimizer step %d; target step %d", start_step, config.num_train_steps)
+    data_start_batch = _data_start_batch(config, start_step, resuming=resuming or config.resume_from is not None)
     data_loader = _create_paired_data_loader(
         config,
         student_config,
