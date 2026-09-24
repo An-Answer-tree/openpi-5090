@@ -28,6 +28,7 @@
 | student | H9 ACPD-v2 20K--30K | `student/acpd-v2-h9-20k-30k-trajectory/` | 25K完成；5K→20K续训运行中 |
 | student | H9/SFT 10K--15K 早期轨迹 | `student/acpd-v2-h9-early-trajectory/` | 10K 正式比较完成；SFT 15K完成，H9 15K等待checkpoint |
 | ablation | H13 loss-only BS64 | `ablation/acpd-v2-h13-injection-ablation/` | 5K 训练和验证完成；支持显式注入 |
+| ablation | H17 非零 contribution 衰减 | `ablation/acpd-v2-h17-contribution-decay/` | 10K→20K训练134422排队；验证134423、配对分析134424等待依赖 |
 | ablation | ACL-only BS64 | 尚未创建协议 | 待运行 |
 
 H11 已归档，不进入正式 checkpoint 集合，也不继续训练。

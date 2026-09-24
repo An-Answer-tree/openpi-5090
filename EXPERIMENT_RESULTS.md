@@ -41,6 +41,7 @@
 | H9-trajectory | 定位 30K 后最佳 checkpoint | H9 从 30K 精确续训至 60K；验证 35K/40K/50K/60K | 132390/132720/132724/134371--134376 | 35K完成；40K验证排队；50K/60K等待训练 | 35K pooled `61.05%`；比 30K 高 `3.05` 点，95% CI `[+0.60, +5.50]` |
 | H9-recovery | 恢复 H9 的中期 checkpoint | 与 H9-scale-b 相同，从完整 `4999` 精确续训至 20K | 130704/132198/132398 | 5K 完整；续训中 | 尚无新的任务成功率结论 |
 | H13 | 判断 contribution 注入是否有效 | H9 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
+| H17 | 检验后期 contribution 权重是否过强 | H9 10K完整状态→20K；BS64；10K–15K权重0.2→0.05，ACL=0.5 | 134422/134423/134424 | 训练排队；20K全量验证与配对分析已设依赖 | 尚无结论 |
 
 ## 当前机制实验
 
@@ -158,6 +159,9 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | ACPD-v2 loss问题定位 | `experiments/student/acpd-v2-h9-batch-scaling-30k/analysis.md` |
 | H12 分析 | `experiments/baseline/sft-backview-bs64-5k/analysis.md` |
 | H13 分析 | `experiments/ablation/acpd-v2-h13-injection-ablation/analysis.md` |
+| H17 协议与任务记录 | `experiments/ablation/acpd-v2-h17-contribution-decay/` 内 `protocol.md`、`execution.md` |
+| H17 checkpoint | `/opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_h17_contribution_decay/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_h17_decay_bs64_20k` |
+| H17 验证与配对分析 | `/opt/liutong/openpi-5090-evals/acpd-v2-h17-contribution-decay/19999/` |
 | H14 多视角结果 | `experiments/baseline/sft-multiview-bs64-30k/analysis.md` |
 | SFT 验证目录 | `/opt/liutong/openpi-5090-evals/` |
 | ACPD 验证目录 | `/opt/liutong/openpi-5090-evals/acpd-*` |

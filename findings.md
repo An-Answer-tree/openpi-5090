@@ -71,4 +71,6 @@ cosine 中位数仍为正。该结果否定了优先测试 conflict-aware 梯度
 - ACPD-v2 相对匹配 SFT 的早期优势在 20K 是否仍然存在？
 - 公平 BS64 ACL-only 训练到 30K 后，ACPD-v2 的增益是否仍然成立？
 - 10K 后将 contribution 权重平滑降至非零下限，能否保留早期收益并解除后期约束？
+  H17 已提交：从完整 10K 状态继续到 20K，10K–15K 权重 0.2→0.05，之后保持
+  0.05；主比较为同源 H9 20K 的 2000 回合配对验证，尚无结论。
 - 为 detached contribution 增加只接收 flow 梯度的小型 adapter，能否提高注入的后期收益？

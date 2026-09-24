@@ -7,6 +7,23 @@ project:
 current_execution:
   checked_at: "2026-09-24 10:24 CST"
   jobs:
+    - id: 134422
+      experiment: h17_contribution_decay_10k_to_20k
+      state: pending_priority
+      resources: 4gpu_32cpu_96g
+      time_limit: 5-00:00:00
+      submitted_at: "2026-09-24 11:03 CST"
+    - id: 134423
+      experiment: h17_20k_full_eval
+      state: dependency
+      depends_on: 134422
+      resources: 4x1gpu_array
+      episodes: 2000
+    - id: 134424
+      experiment: h17_20k_paired_analysis
+      state: dependency
+      depends_on: [134423, 134008]
+      resources: 1cpu_2g
     - id: 132791
       experiment: backview_sft_bs64_resume_30k_to_60k
       state: pending
@@ -410,6 +427,29 @@ formal_matrix:
           step_30k: 0.3795
         supports_late_gradient_conflict: false
   ablation:
+    h17_contribution_decay:
+      status: submitted_pending
+      protocol: experiments/ablation/acpd-v2-h17-contribution-decay/protocol.md
+      protocol_commit: 0401d01
+      implementation_commit: 5036842
+      train_job: 134422
+      eval_job: 134423
+      analysis_job: 134424
+      source_checkpoint: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/trajectory_recovery_20k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_20k_keep_all/9999
+      checkpoint_dir: /opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_h17_contribution_decay/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_h17_decay_bs64_20k
+      eval_dir: /opt/liutong/openpi-5090-evals/acpd-v2-h17-contribution-decay/19999
+      start_step: 10000
+      end_step: 20000
+      physical_global_batch: 64
+      accumulation: 1
+      gpus: 4
+      contribution_weight: {initial: 0.2, final: 0.05, decay_start: 10000, decay_steps: 5000, schedule: cosine}
+      acl_weight: 0.5
+      lr_schedule: original_30k_cosine
+      save_interval: 5000
+      keep_period: 1
+      cpu_tests_passed: 16
+      gpu_training_verified: false
     backview_loss_only_bs64:
       checkpoints: [4999]
       status: 5k_complete
@@ -431,7 +471,7 @@ formal_matrix:
 evidence_gaps:
   - "Matched H9 and SFT 20K evaluations must locate whether the ACPD-v2 early advantage remains at 20K."
   - "ACL-only must be rerun at BS64 for the final fair ablation."
-  - "A 10K-to-20K branch with a nonzero lower contribution weight is needed to test the late orthogonal-constraint hypothesis."
+  - "H17 nonzero contribution decay is queued; its paired 20K comparison must test the late orthogonal-constraint hypothesis."
   - "A flow-trained adapter after the detached contribution is needed only if lowering the contribution weight does not help."
 
 constraints:
