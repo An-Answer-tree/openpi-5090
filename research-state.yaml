@@ -5,7 +5,7 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-24 01:05 CST"
+  checked_at: "2026-09-24 10:03 CST"
   jobs:
     - id: 132791
       experiment: backview_sft_bs64_resume_30k_to_60k
@@ -24,20 +24,15 @@ current_execution:
       resources: 4gpu_32cpu_96g
       time_limit: 4-00:00:00
       recommended_time_limit: 8-00:00:00
-      time_extension_status: requires_admin
-      latest_logged_metric_step: 39700
-    - id: 132391
-      experiment: h9_40k_50k_60k_eval
-      state: dependency
-      depends_on: 132390
-      resources: 2gpu_16cpu_48g
+      time_extension_status: requires_admin_password
+      latest_logged_metric_step: 42300
     - id: 132398
       experiment: h9_resume_5k_to_20k
       state: running
       node: gpu04
       resources: 4gpu_32cpu_96g
       time_limit: 5-00:00:00
-      latest_logged_metric_step: 14400
+      latest_logged_metric_step: 17300
     - id: 134008
       experiment: h9_early_trajectory_full_acpdv2_20k
       state: dependency
@@ -51,8 +46,7 @@ current_execution:
       resources: 1cpu_1g
     - id: 132732
       experiment: h9_early_trajectory_full_acpdv2_15k
-      state: dependency
-      depends_on: 132703
+      state: two_suites_complete_two_pending
       resources: 4x1gpu_array_max2
       episodes: 2000
     - id: 132735
@@ -60,10 +54,26 @@ current_execution:
       state: dependency
       depends_on: 132732
       resources: 1cpu_1g
-    - id: 132703
-      experiment: wait_for_h9_15k_checkpoint
-      state: running
+    - id: 134371
+      experiment: h9_40k_eval
+      state: pending_priority
+      resources: 4x1gpu_array_max2
+      episodes: 2000
+    - id: 134372
+      experiment: h9_40k_eval_summary
+      state: dependency
+      depends_on: 134371
       resources: 1cpu_1g
+    - id: [134373, 134375]
+      experiment: h9_50k_60k_eval
+      state: dependency
+      depends_on: 132390
+      resources: 4x1gpu_array_max2_each
+      episodes_per_checkpoint: 2000
+    - id: [134374, 134376]
+      experiment: h9_50k_60k_eval_summary
+      state: dependency
+      resources: 1cpu_1g_each
   recently_completed:
     - id: 132720
       experiment: h9_35k_eval
@@ -183,6 +193,9 @@ current_execution:
       experiment: h13_loss_only_5k
       checkpoint: 4999
   recently_cancelled:
+    - id: 132391
+      experiment: h9_40k_50k_60k_eval
+      state: replaced_by_checkpoint_specific_evals
     - id: [132547, 132548, 132699, 132700]
       experiment: h9_early_trajectory_quick_eval
       state: cancelled_before_start_for_full_eval
@@ -330,7 +343,13 @@ formal_matrix:
       cancelled_20k_eval_job: 131861
       cancelled_60k_jobs: [131642, 131643]
       resume_60k_job: 132390
-      eval_40k_50k_60k_job: 132391
+      cancelled_eval_40k_50k_60k_job: 132391
+      eval_40k_job: 134371
+      eval_40k_summary_job: 134372
+      eval_50k_job: 134373
+      eval_50k_summary_job: 134374
+      eval_60k_job: 134375
+      eval_60k_summary_job: 134376
       eval_35k_job: 132720
       eval_35k_summary_job: 132724
       trajectory_60k_status: running
