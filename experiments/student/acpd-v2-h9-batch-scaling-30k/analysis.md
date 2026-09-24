@@ -120,7 +120,7 @@ flow 的 contribution 梯度主要把共享 LoRA 参数推向与当前 flow 改�
 `ExactContributionHead.fuse()` 与 Gemma 内部注入都对预测 residual 使用
 `stop_gradient`。因此：
 
-- contribution predictor 和 layer-10 表征由 contribution MSE 训练；
+- contribution predictor 只能由 contribution MSE 训练；layer-10 共享表征还同时接收主任务梯度；
 - 注入 residual 的方向不能通过 supervised flow loss 调整；
 - 只有一个全局标量 gate 能根据任务 loss 调整注入强度。
 
