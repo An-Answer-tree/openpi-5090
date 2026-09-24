@@ -23,7 +23,7 @@ experiment_names:
   note: "Display aliases only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-24 10:24 CST"
+  checked_at: "2026-09-24 14:18 CST"
   jobs:
     - id: 134422
       experiment: h17_contribution_decay_10k_to_20k
@@ -58,14 +58,14 @@ current_execution:
       node: gpu05
       resources: 4gpu_32cpu_96g
       time_limit: 8-00:00:00
-      latest_logged_metric_step: 42400
+      latest_logged_metric_step: 43500
     - id: 132398
       experiment: h9_resume_5k_to_20k
       state: running
       node: gpu04
       resources: 4gpu_32cpu_96g
       time_limit: 5-00:00:00
-      latest_logged_metric_step: 17400
+      latest_logged_metric_step: 18600
     - id: 134008
       experiment: h9_early_trajectory_full_acpdv2_20k
       state: dependency
