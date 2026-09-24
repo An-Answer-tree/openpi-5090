@@ -23,7 +23,7 @@ experiment_names:
   note: "Display aliases only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-24 23:17 CST"
+  checked_at: "2026-09-24 23:37 CST"
   jobs:
     - id: 135001
       experiment: h9_fixed_45k_exploratory_full_eval
@@ -39,6 +39,7 @@ current_execution:
     - id: 134992
       experiment: backview_sft_bs64_35k_early_full_eval
       state: pending_priority
+      nice: -773
       checkpoint: 35000
       resources: 4x1gpu_array_max2
       episodes: 2000
@@ -85,12 +86,6 @@ current_execution:
       state: dependency
       depends_on: 134008
       resources: 1cpu_1g
-    - id: 132732
-      experiment: h9_early_trajectory_full_acpdv2_15k
-      state: complete
-      resources: 4x1gpu_array_max2
-      episodes: 2000
-      pooled_success: 0.4660
     - id: 134371
       experiment: h9_40k_eval
       state: one_suite_complete_three_pending
@@ -102,6 +97,11 @@ current_execution:
       depends_on: 134371
       resources: 1cpu_1g
   recently_completed:
+    - id: 132732
+      experiment: h9_early_trajectory_full_acpdv2_15k
+      state: complete
+      episodes: 2000
+      pooled_success: 0.4660
     - id: 132390
       experiment: h9_resume_30k_to_60k
       state: cancelled_by_user_after_45k_checkpoint
@@ -259,10 +259,13 @@ formal_matrix:
       status: complete
   baseline:
     backview_bs64:
-      checkpoints: [4999, 10000, 15000, 20000, 25000, 29999]
-      status: resume_60k_pending
+      checkpoints: [4999, 10000, 15000, 20000, 25000, 29999, 35000]
+      status: resume_60k_running
       resume_60k_job: 132791
-      eval_35k_40k_50k_60k_job: 132792
+      cancelled_eval_35k_40k_50k_60k_job: 132792
+      eval_35k_job: 134992
+      eval_35k_summary_job: 134995
+      eval_40k_50k_60k_job: 134998
       eval_20k_job: 132452
       eval_20k_summary_job: 132453
       eval_20k_status: complete
@@ -322,12 +325,14 @@ formal_matrix:
     backview_acpdv2_layer10_bs64:
       display_name: H9-Fixed
       checkpoints: [4999, 24999, 29999]
-      status: 5k_recovered_25k_30k_eval_complete
+      recovery_checkpoints: [9999, 14999, 19999]
+      extended_checkpoints: [34999, 39999, 44999]
+      status: 45k_checkpoint_complete_40k_45k_eval_pending
       recovery_target: 4999
       recovery_job: 130704
       recovery_watchdog_job: 132198
       recovery_resume_20k_job: 132398
-      recovery_resume_20k_status: running
+      recovery_resume_20k_status: complete
       early_trajectory_quick:
         protocol: experiments/student/acpd-v2-h9-early-trajectory/protocol.md
         trials_per_task: 10
@@ -360,6 +365,7 @@ formal_matrix:
         acpdv2_minus_sft_10k_pooled: 0.1420
         acpdv2_minus_sft_10k_ci95: [0.1190, 0.1660]
         sft_15k_full_pooled: 0.4090
+        acpdv2_15k_full_pooled: 0.4660
       eval_30k_job: 130773
       eval_25k_job: 132082
       eval_25k_summary_job: 132084

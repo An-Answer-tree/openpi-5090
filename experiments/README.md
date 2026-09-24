@@ -24,13 +24,13 @@
 | 类别 | 实验 | 协议/分析 | 状态 |
 |---|---|---|---|
 | baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 10K/15K/20K/25K/30K 正式验证完成 |
-| baseline | backview BS64 30K--60K | `baseline/sft-backview-bs64-trajectory-60k/` | 续训排队；35K/40K/50K/60K验证已提交依赖 |
+| baseline | backview BS64 30K--60K | `baseline/sft-backview-bs64-trajectory-60k/` | 续训运行；35K验证排队，40K/50K/60K验证等待续训 |
 | baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 全部完成 |
-| student | H9-Fixed 主实验（原H9-scale-b） | `student/acpd-v2-h9-batch-scaling-30k/` | 固定contribution=0.2；5K/10K/25K/30K/35K有正式结果 |
+| student | H9-Fixed 主实验（原H9-scale-b） | `student/acpd-v2-h9-batch-scaling-30k/` | 固定contribution=0.2；5K/10K/15K/25K/30K/35K有正式结果 |
 | mechanism | H15a ACPD-v2 梯度冲突诊断 | `mechanism/acpd-v2-h15a-gradient-conflict/` | 完成；不支持后期梯度冲突假设 |
-| student | H9-Fixed 延长训练30K--60K | `student/acpd-v2-h9-trajectory-60k/` | 续训运行；35K为`61.05%`，40K验证排队，50K/60K等待训练 |
-| student | H9-Fixed 中期轨迹20K--30K | `student/acpd-v2-h9-20k-30k-trajectory/` | 25K完成；5K→20K恢复训练运行中 |
-| student | H9-Fixed/SFT 早期轨迹10K--15K | `student/acpd-v2-h9-early-trajectory/` | 10K 正式比较完成；SFT 15K完成，H9-Fixed 15K部分验证完成 |
+| student | H9-Fixed 延长轨迹 | `student/acpd-v2-h9-trajectory-60k/` | 45K checkpoint完整后停训；35K为`61.05%`，40K/45K验证排队；50K/60K未训练 |
+| student | H9-Fixed 中期轨迹20K--30K | `student/acpd-v2-h9-20k-30k-trajectory/` | 恢复训练到20K；25K验证完成，20K验证排队 |
+| student | H9-Fixed/SFT 早期轨迹10K--15K | `student/acpd-v2-h9-early-trajectory/` | 10K/15K正式比较完成 |
 | ablation | H13-LossOnly BS64 | `ablation/acpd-v2-h13-injection-ablation/` | 5K 训练和验证完成；支持显式注入 |
 | ablation | H17-Decay BS64 | `ablation/acpd-v2-h17-contribution-decay/` | 从H9-Fixed 10K分支；训练134422排队，验证134423、配对分析134424等待依赖 |
 | ablation | ACL-only BS64 | 尚未创建协议 | 待运行 |
@@ -51,12 +51,13 @@ H9-Fixed 的恢复、早中期验证及延长训练是同一方法的不同执�
 | baseline/topview_bs64 | C | C | C | C | C | C |
 | baseline/leftview_bs64 | C | C | C | C | C | C |
 | baseline/rightview_bs64 | C | C | C | C | C | C |
-| student/backview_acpdv2_layer10_bs64（H9-Fixed） | C | C | C | R | Y | C |
+| student/backview_acpdv2_layer10_bs64（H9-Fixed） | C | C | C | C | Y | C |
 | ablation/H17-Decay | - | 起点为H9-Fixed 10K | Q | Q | - | - |
 | ablation/backview_loss_only_bs64 | C | P | P | P | P | P |
 | ablation/backview_acl_only_bs64 | P | P | P | P | P | P |
 
-原目录中的 checkpoint 本次不移动、不删除。旧 BS16/BS32 checkpoint 不进入该表，仍保留在原路径。
+H9-Fixed 35K/40K/45K checkpoint 已完整写入但未归档。原目录中的 checkpoint
+本次不移动、不删除。旧 BS16/BS32 checkpoint 不进入该表，仍保留在原路径。
 
 ## 归档规则
 
