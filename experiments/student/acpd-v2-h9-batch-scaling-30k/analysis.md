@@ -89,6 +89,59 @@ Gate 在 step 11,900 达到观测峰值 `0.0054`，step 29,900 为 `0.0040`；�
 contribution `60.25%`、加权 ACL `16.46%`。这些比例只描述标量 loss，不能替代
 各参数组梯度或任务验证结果。
 
+## 问题定位
+
+### 10K 后 contribution 学习快速进入平台
+
+| 区间 | Supervised | Contribution cosine | Gate | 加权辅助/监督 |
+|---|---:|---:|---:|---:|
+| 25K--30K | 0.018822 | 0.7972 | 0.00412 | 3.31 |
+| 30K--35K | 0.018034 | 0.8007 | 0.00386 | 3.33 |
+| 35K--40K | 0.017476 | 0.8026 | 0.00366 | 3.35 |
+| 40K--42.3K | 0.017283 | 0.8038 | 0.00351 | 3.35 |
+
+从 25K--30K 到 35K--40K，supervised loss 继续下降 `7.15%`，但 contribution
+cosine 只增加 `0.0054`，gate 同时下降 `11.25%`。因此，35K 相对 30K 的任务提升
+更可能来自额外的低学习率任务训练，而不是新获得了大量 privileged contribution。
+这需要匹配的 SFT 35K 结果才能最终区分。
+
+### Contribution 梯度不冲突，但持续施加较强的近正交约束
+
+H15a 正式 BS32 诊断显示：30K 时加权 contribution 梯度范数中位数是 flow 梯度的
+`1.175` 倍，但两者 cosine 中位数仅为 `0.0957`；ACL 对应值为 `0.851` 倍和
+`0.9012`。组合辅助梯度与 flow 的 cosine 为 `0.5920`，没有负冲突。
+
+这排除了“辅助梯度直接反向破坏 flow”的解释，但没有排除容量和轨迹约束：强度接近
+flow 的 contribution 梯度主要把共享 LoRA 参数推向与当前 flow 改善近乎正交的方向。
+对容量有限的 LoRA，这可能保持早期正则化收益，同时限制后期任务最优解。
+
+### 当前注入接口只让 gate 接收任务梯度
+
+`ExactContributionHead.fuse()` 与 Gemma 内部注入都对预测 residual 使用
+`stop_gradient`。因此：
+
+- contribution predictor 和 layer-10 表征由 contribution MSE 训练；
+- 注入 residual 的方向不能通过 supervised flow loss 调整；
+- 只有一个全局标量 gate 能根据任务 loss 调整注入强度。
+
+H13 已证明这种注入在 5K 带来 `+2.55` 点，但 gate 在约 12K 后持续下降。结合上述
+梯度路径，当前最符合数据的工作假设是：预测 contribution 早期提供有用的表示偏置，
+后期却缺少任务自适应接口；模型只能通过减小 gate 来降低不再稳定有益的注入。
+
+### 仍不能确定的部分
+
+- 15K 目前只完成 Spatial/Object；两套合计 ACPD-v2 为 `56.90%`，SFT 为
+  `50.80%`，临时差值 `+6.10` 点。Goal/LIBERO-10 完成前不作正式结论。
+- 现有 BS64 消融没有单独的 ACL-only，因此 H13 相对 SFT 的收益不能严格拆分为
+  contribution loss 与 ACL 两部分。
+- 上述“后期过约束”和“注入缺少任务适配”仍是由数据支持的工作假设，不是因果结论。
+
+最小可证伪实验应从完整 10K 状态继续到 20K：保持 ACL `0.5` 和非零 contribution
+信号，只把 contribution 权重从 `0.2` 平滑降到 `0.05`。若 20K 成功率提高且
+contribution cosine 没有明显崩溃，则支持后期 contribution 过约束；若无改善，再测试
+在 detached contribution 后增加一个只接收 flow 梯度的小型零初始化 adapter，使注入
+方向可任务适配而不破坏 contribution target。
+
 ## 证据
 
 | 内容 | 路径 |
@@ -98,6 +151,9 @@ contribution `60.25%`、加权 ACL `16.46%`。这些比例只描述标量 loss�
 | 4-GPU BS32 log | `slurm-log/pi05-bv-acpdv2-l10-pbs32-5k_129710.out` |
 | 4-GPU BS64 log | `slurm-log/pi05-bv-acpdv2-l10-fsdp4-bs64-30k_129728.out` |
 | 4-GPU BS64 GPU log | `slurm-log/pi05-bv-acpdv2-l10-fsdp4-bs64-30k_129728_gpu.csv` |
+| 30K--60K 续训 log | `slurm-log/pi05-bv-acpdv2-l10-bs64-r60k_132390.out` |
+| H15a 正式梯度分析 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/analysis.md` |
+| 注入实现 | `src/openpi/models/pi0_distill_acpd.py`、`src/openpi/models/gemma.py` |
 | 30K 验证结果 | `/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/29999/summary.txt` |
 | SFT/ACPD-v2 loss 图 | `artifacts/pi05_backview_sft_vs_acpdv2_loss.png` |
 | SFT/ACPD-v2 loss 指标 | `results/loss_comparison.json` |

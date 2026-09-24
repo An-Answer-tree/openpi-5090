@@ -23,6 +23,8 @@
 | ACPD-v2 是否降低训练 flow MSE | 299 个对齐点与 SFT 的相关系数为 `0.9985`，全程平均 MSE 几乎相同 | 5K 成功率增益不是更低训练 MSE 的结果；内部表示改变是待验证的机制解释。 |
 | 辅助目标在后期是否仍有数值权重 | 首末窗口中 contribution/ACL 占总目标约 `61.39/16.69%` 与 `60.29/16.52%` | 辅助目标未自然消失；loss 占比不能判断其对成功率的因果作用。 |
 | 后期辅助梯度是否更冲突 | 正式 BS32 中组合冲突率在 5K/30K 均为 `0%`，cosine 中位数为 `0.6279/0.5920` | 不支持后期辅助梯度冲突解释，不优先运行梯度投影。 |
+| Contribution 是否可能形成后期约束 | 30K时其加权梯度范数为flow的`1.175`倍，cosine仅`0.0957`；25K--40K cosine仅从`0.7972`升至`0.8026` | 不产生负冲突，但强近正交梯度可能限制LoRA后期任务最优解；尚需权重消融验证。 |
+| 注入是否由任务loss充分优化 | predicted residual使用`stop_gradient`，只有全局gate接收flow梯度；gate约12K达峰后持续下降 | 当前注入缺少任务自适应方向，是后期优势消失的主要工作假设之一。 |
 | 单视角 baseline 是否受视角影响 | left/right/top/backview 30K pooled 分别为 `78.65/77.00/71.55/60.45%` | 视角差异大；ACPD 必须使用相同 student 视角的 SFT 对照。 |
 
 ## 方法判断
@@ -48,6 +50,13 @@ cosine 中位数仍为正。该结果否定了优先测试 conflict-aware 梯度
 相对自身 30K 有显著提高，但尚未显著优于 SFT 30K；当前继续验证 15K、20K 与
 40K--60K，分别定位早期优势消失区间和后期最佳点。
 
+进一步检查梯度路径发现，contribution predictor 的注入 residual 被
+`stop_gradient`，supervised flow loss 只能更新一个全局标量 gate，不能把预测向量
+调整为更有利于动作输出的方向。与此同时，30K contribution 梯度强度仍接近 flow，
+但方向接近正交；contribution cosine 在 25K 后几乎饱和，gate 继续下降。当前最符合
+数据的解释不是优化冲突，而是“不可完全恢复的逐样本特权目标持续约束共享LoRA，加上
+注入缺少任务自适应方向”。该解释必须通过非零低权重续训和task-adapter消融验证。
+
 ## 工程约束
 
 - 最终论文对照除 teacher 外统一使用 4 GPU、physical global BS64。
@@ -61,3 +70,5 @@ cosine 中位数仍为正。该结果否定了优先测试 conflict-aware 梯度
 
 - ACPD-v2 相对匹配 SFT 的早期优势在 20K 是否仍然存在？
 - 公平 BS64 ACL-only 训练到 30K 后，ACPD-v2 的增益是否仍然成立？
+- 10K 后将 contribution 权重平滑降至非零下限，能否保留早期收益并解除后期约束？
+- 为 detached contribution 增加只接收 flow 梯度的小型 adapter，能否提高注入的后期收益？

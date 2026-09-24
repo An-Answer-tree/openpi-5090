@@ -5,13 +5,13 @@ project:
   started: "2026-09-11"
 
 current_execution:
-  checked_at: "2026-09-24 10:03 CST"
+  checked_at: "2026-09-24 10:24 CST"
   jobs:
     - id: 132791
       experiment: backview_sft_bs64_resume_30k_to_60k
       state: pending
       resources: 4gpu_32cpu_96g
-      time_limit: 3-00:00:00
+      time_limit: 8-00:00:00
     - id: 132792
       experiment: backview_sft_bs64_35k_40k_50k_60k_eval
       state: dependency
@@ -22,17 +22,15 @@ current_execution:
       state: running
       node: gpu05
       resources: 4gpu_32cpu_96g
-      time_limit: 4-00:00:00
-      recommended_time_limit: 8-00:00:00
-      time_extension_status: requires_admin_password
-      latest_logged_metric_step: 42300
+      time_limit: 8-00:00:00
+      latest_logged_metric_step: 42400
     - id: 132398
       experiment: h9_resume_5k_to_20k
       state: running
       node: gpu04
       resources: 4gpu_32cpu_96g
       time_limit: 5-00:00:00
-      latest_logged_metric_step: 17300
+      latest_logged_metric_step: 17400
     - id: 134008
       experiment: h9_early_trajectory_full_acpdv2_20k
       state: dependency
@@ -433,6 +431,8 @@ formal_matrix:
 evidence_gaps:
   - "Matched H9 and SFT 20K evaluations must locate whether the ACPD-v2 early advantage remains at 20K."
   - "ACL-only must be rerun at BS64 for the final fair ablation."
+  - "A 10K-to-20K branch with a nonzero lower contribution weight is needed to test the late orthogonal-constraint hypothesis."
+  - "A flow-trained adapter after the detached contribution is needed only if lowering the contribution weight does not help."
 
 constraints:
   - "Do not move or delete datasets or checkpoints."

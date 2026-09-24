@@ -23,6 +23,7 @@
 | ACPD-v2 是否通过降低训练 MSE 获益 | 没有该证据。与 SFT 对齐的 299 个监督 loss 点相关系数为 `0.9985`，全程均值几乎相同；5K 成功率增益不能由更低训练 MSE 解释。 | H9/H12 loss 对齐 |
 | 辅助目标在 30K 前是否自然消失 | 没有。加权 contribution/ACL 从首个到末个窗口下降 `53.42/53.04%`，但在总目标中的窗口占比保持约 `59--61%/16--17%`。 | H9 0--30K loss |
 | 后期是否出现明显辅助梯度冲突 | 不支持。正式 BS32 中组合冲突率在 5K/30K 均为 `0%`，cosine 中位数为 `0.6279/0.5920`。 | H15a，200 个成对 batches |
+| 当前最可能的后期瓶颈 | 工作假设是 contribution 对共享LoRA形成强近正交约束，且注入方向被`stop_gradient`阻断任务适配；这不是已验证的因果结论。 | 30K contribution梯度/flow范数比`1.175`、cosine `0.0957`；gate在约12K后下降 |
 
 ## 正式 BS64 实验
 
@@ -154,6 +155,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H15a 快速诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/fast_protocol.md` |
 | H15a 快速诊断分析 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/analysis.md` |
 | H15a 结果目录 | `/opt/liutong/openpi-5090-research/acpd-v2-gradient-conflict/` |
+| ACPD-v2 loss问题定位 | `experiments/student/acpd-v2-h9-batch-scaling-30k/analysis.md` |
 | H12 分析 | `experiments/baseline/sft-backview-bs64-5k/analysis.md` |
 | H13 分析 | `experiments/ablation/acpd-v2-h13-injection-ablation/analysis.md` |
 | H14 多视角结果 | `experiments/baseline/sft-multiview-bs64-30k/analysis.md` |
