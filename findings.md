@@ -4,8 +4,9 @@
 
 如何利用 teacher 的 `agentview+wrist` 特权视觉信息，提高只看弱视角的 pi0.5 student？
 
-正式 BS64 原始方法称为 **H9-Fixed（固定权重）**；从其10K状态分支的权重消融
-称为 **H17-Decay（非零权重衰减）**；无注入消融称为 **H13-LossOnly**。
+正式 BS64 原始方法称为 **ACPD-v2-Fixed（固定权重）**，历史简称 H9-Fixed；从其
+10K状态分支的权重消融称为 **ACPD-v2-Decay**，历史简称 H17-Decay；无注入消融称为
+**ACPD-v2-NoInjection**，历史简称 H13-LossOnly。
 下文历史 H9 BS32 单独注明。恢复与延长训练属于 H9-Fixed，不是新方法。
 
 ## 当前认识

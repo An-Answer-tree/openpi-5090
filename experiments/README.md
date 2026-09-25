@@ -8,6 +8,26 @@
 权重衰减）、H13-LossOnly（无注入）。详细配置对照见结果台账；旧 ID、目录和任务名
 保留用于检索。“Decay”只表示 contribution 权重衰减，两组 LR 均为原30K cosine。
 
+## 学术命名
+
+论文和汇报使用下表的规范名称；H 编号、Slurm job 和文件路径只作为历史索引。
+
+| 规范名称 | 含义 | 历史索引 |
+|---|---|---|
+| `SFT-View(BV/LV/RV/TV)` | 对应相机视角的 LoRA SFT 基线 | H12、H14 |
+| `ACPD-v2-Fixed` | layer 10，固定 contribution 权重 0.2，保留 residual 注入 | H9-Fixed、H9-scale-b |
+| `ACPD-v2-Decay` | 10K 后 contribution 权重由 0.2 衰减到 0.05 | H17-Decay |
+| `ACPD-v2-NoInjection` | 保留 contribution 监督，关闭 residual 注入 | H13-LossOnly |
+| `ACL-only` | 仅保留 action-level consistency loss，不学习或注入 contribution | ACL-only BS64 |
+| `Contribution-Recovery-Probe` | 测量不同 transformer 层的 teacher contribution 可恢复性 | H7/H7.1 |
+| `Gradient-Compatibility-Diagnostic` | 测量 flow、contribution、ACL 梯度的方向关系 | H15a |
+| `Component-Sweep-BS32` | 早期 flow/ACL/contribution 组件筛选 | H4/H5/H8/H9（BS32） |
+| `LoRA-FSDP5090-Infrastructure` | 5090 上的训练可行性和显存基线 | H1/H2 |
+
+`ACPD` 在正文首次出现时写作 **Attention Contribution Privileged
+Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch size、
+训练步数或验证规模的实验不能仅因名称相近而合并。
+
 ## 目录
 
 | 分类 | 内容 |
@@ -18,6 +38,8 @@
 | `mechanism/` | exact attention contribution probe 与层扫描 |
 | `infrastructure/` | 5090、FSDP、LoRA 可行性验证 |
 | `archive/` | 已结束且不进入最终 checkpoint 集合的实验 |
+
+改进路线与低成本实验决策树见 [`acpd-v2-research-roadmap.md`](acpd-v2-research-roadmap.md)。
 
 ## 正式实验
 

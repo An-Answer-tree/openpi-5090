@@ -7,19 +7,21 @@
 
 ## 当前结论
 
-本文正式 BS64 结果中的 H9 统一称为 **H9-Fixed（ACPD-v2 固定权重）**。
-新实验称为 **H17-Decay（ACPD-v2 非零权重衰减）**；两者关系如下。
+本文正式 BS64 结果中的 H9 统一称为 **ACPD-v2-Fixed（Attention Contribution
+Privileged Distillation，固定权重）**。新实验称为 **ACPD-v2-Decay**；两者关系如下。
 
-| 简称 | 实验身份 | Contribution 权重 | ACL 权重 | 区别 |
+| 规范名称 | 历史简称 | Contribution 权重 | ACL 权重 | 区别 |
 |---|---|---|---:|---|
-| H9-Fixed | 原 H9-scale-b，BS64 对照 | 全程 0.2 | 0.5 | 原始 ACPD-v2 |
-| H17-Decay | 从 H9-Fixed recovery 10K 分支 | 10K–15K：0.2→0.05；之后 0.05 | 0.5 | 只改变 contribution 权重，训练至20K |
-| H13-LossOnly | BS64 注入消融 | 全程 0.2 | 0.5 | 去除 residual 注入，保留两个蒸馏 loss |
+| ACPD-v2-Fixed | H9-Fixed / H9-scale-b | 全程 0.2 | 0.5 | 原始 ACPD-v2 |
+| ACPD-v2-Decay | H17-Decay | 10K–15K：0.2→0.05；之后 0.05 | 0.5 | 只改变 contribution 权重，训练至20K |
+| ACPD-v2-NoInjection | H13-LossOnly | 全程 0.2 | 0.5 | 去除 residual 注入，保留两个蒸馏 loss |
 
 上述三组均为 backview、layer 10；“Fixed/Decay”指 contribution loss 权重，
 不是学习率。H9-Fixed 与 H17-Decay 均沿用原 30K cosine LR。
 H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、验证和续训，
 不是新的方法。早期 BS32 的 H9 保留原编号，并明确标注 BS32。
+
+规范命名总表见 [`experiments/README.md`](experiments/README.md#学术命名)。
 
 | 问题 | 结论 | 证据 |
 |---|---|---|

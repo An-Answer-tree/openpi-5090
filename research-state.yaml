@@ -6,21 +6,21 @@ project:
 
 experiment_names:
   h9_fixed:
-    display_name: "H9-Fixed / ACPD-v2 固定权重"
+    display_name: "ACPD-v2-Fixed / 固定 contribution 权重"
     legacy_id: H9-scale-b
     batch_size: 64
     contribution_weight: 0.2
     execution_labels: [H9-recovery, H9-mid-trajectory, H9-trajectory]
   h17_decay:
-    display_name: "H17-Decay / ACPD-v2 非零权重衰减"
+    display_name: "ACPD-v2-Decay / 非零 contribution 权重衰减"
     legacy_id: H17
     parent: h9_fixed
     branch_step: 10000
     primary_control: h9_fixed_recovery_20k
   h13_loss_only:
-    display_name: "H13-LossOnly / ACPD-v2 无注入"
+    display_name: "ACPD-v2-NoInjection / contribution residual 无注入"
     legacy_id: H13
-  note: "Display aliases only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
+  note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
   checked_at: "2026-09-25 19:00 CST"
