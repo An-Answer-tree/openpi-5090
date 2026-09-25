@@ -52,7 +52,7 @@ smoke 只筛选实现，不声明方法有效。
 ## 决策树
 
 1. `ACPD-v2-Decay` 提升 20K：先测试 decay-to-zero，不做大规模权重扫描。
-2. Decay 无提升而 `ACPD-v2-TaskAdapt` smoke 稳定：正式验证 TaskAdapt。
+2. Decay 无提升而 `ACPD-v2-TDCA` smoke 稳定：正式验证 TDCA。
 3. 两者均无提升：进行 confidence-weighted contribution 单卡短跑；仍无提升则将结论
    收敛为 ACPD 主要提供 early-learning curriculum，而非最终上限提升。
 4. ACL-only BS64 35K 和 Decay 结果出来前，不再提交新的 4 卡大规模 sweep。

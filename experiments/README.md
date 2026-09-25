@@ -18,6 +18,7 @@
 | `ACPD-v2-Fixed` | layer 10，固定 contribution 权重 0.2，保留 residual 注入 | H9-Fixed、H9-scale-b |
 | `ACPD-v2-Decay` | 10K 后 contribution 权重由 0.2 衰减到 0.05 | H17-Decay |
 | `ACPD-v2-NoInjection` | 保留 contribution 监督，关闭 residual 注入 | H13-LossOnly |
+| `ACPD-v2-TDCA` | 任务驱动贡献适配；训练时允许动作损失更新 contribution predictor | 原 TaskAdapt 提案 |
 | `ACL-only` | 仅保留 action-level consistency loss，不学习或注入 contribution | ACL-only BS64 |
 | `Contribution-Recovery-Probe` | 测量不同 transformer 层的 teacher contribution 可恢复性 | H7/H7.1 |
 | `Gradient-Compatibility-Diagnostic` | 测量 flow、contribution、ACL 梯度的方向关系 | H15a |
@@ -54,6 +55,7 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 | student | H9-Fixed 中期轨迹20K--30K | `student/acpd-v2-h9-20k-30k-trajectory/` | 恢复训练到20K；25K验证完成，20K验证运行中 |
 | student | H9-Fixed/SFT 早期轨迹10K--15K | `student/acpd-v2-h9-early-trajectory/` | 10K/15K正式比较完成 |
 | ablation | H13-LossOnly BS64 | `ablation/acpd-v2-h13-injection-ablation/` | 5K 训练和验证完成；支持显式注入 |
+| ablation | ACPD-v2-TDCA 5K | `ablation/acpd-v2-tdca-5k/protocol.md` | 训练135943排队；全量验证135944等待依赖；尚无结论 |
 | ablation | H17-Decay BS64 | `ablation/acpd-v2-h17-contribution-decay/` | 从H9-Fixed 10K分支；训练134422运行，验证134423、配对分析134424等待依赖 |
 | ablation | ACL-only BS64 35K | `ablation/acpd-v2-acl-only-bs64-35k/protocol.md` | 训练135724排队；30K/35K全量验证135725/135726、分析135729/135728等待依赖；尚无结论 |
 

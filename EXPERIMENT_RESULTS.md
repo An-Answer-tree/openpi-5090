@@ -15,6 +15,7 @@ Privileged Distillation，固定权重）**。新实验称为 **ACPD-v2-Decay**�
 | ACPD-v2-Fixed | H9-Fixed / H9-scale-b | 全程 0.2 | 0.5 | 原始 ACPD-v2 |
 | ACPD-v2-Decay | H17-Decay | 10K–15K：0.2→0.05；之后 0.05 | 0.5 | 只改变 contribution 权重，训练至20K |
 | ACPD-v2-NoInjection | H13-LossOnly | 全程 0.2 | 0.5 | 去除 residual 注入，保留两个蒸馏 loss |
+| ACPD-v2-TDCA | TaskAdapt（新规范名） | 全程 0.2 | 0.5 | 训练时允许动作损失更新 contribution predictor |
 
 上述三组均为 backview、layer 10；“Fixed/Decay”指 contribution loss 权重，
 不是学习率。H9-Fixed 与 H17-Decay 均沿用原 30K cosine LR。
@@ -56,6 +57,7 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 完成 | 30K pooled `77.00%` |
 | H9-Fixed | 固定权重 ACPD-v2 对照 | layer 10，BS64，contribution=0.2，ACL=0.5 | 129728/130773 | 30K完成；恢复与续训见下表 | 5K `23.15%`；10K `37.45%`；25K `55.75%`；30K `58.00%`；35K `61.05%` |
 | H13-LossOnly | 判断 contribution 注入是否有效 | H9-Fixed 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9-Fixed 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
+| ACPD-v2-TDCA | 检验动作损失是否能改善 contribution 注入适配 | backview，layer 10，BS64，flow=1.0、contribution=0.2、ACL=0.5；仅开放 predictor 的动作梯度，训练至5K | 135943；验证135944 | 训练排队；全量验证等待依赖 | 尚无结论 |
 | ACL-only BS64 | 检验 contribution 学习和注入在 ACL 之外的增益 | backview，layer 10，BS64，flow=1.0、ACL=0.5、contribution=0、关闭注入；训练至35K | 135724；30K/35K验证135725/135726；分析135729/135728 | 训练排队；两点全量验证等待依赖 | 尚无结论 |
 | H17-Decay | 检验后期 contribution 权重是否过强 | H9-Fixed 10K完整状态→20K；BS64；10K–15K权重0.2→0.05，ACL=0.5 | 134422/134423/134424 | 训练运行中；20K全量验证与配对分析等待依赖 | 尚无结论 |
 
@@ -202,6 +204,9 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | ACL-only BS64 协议 | `experiments/ablation/acpd-v2-acl-only-bs64-35k/protocol.md` |
 | ACL-only BS64 checkpoint（待生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_acl_only_bs64_35k/pi05_libero_backview_acl_only_bs64_35k/pi05_libero_backview_acl_only_lora_fsdp4_bs64_35k/` |
 | ACL-only BS64 验证（待运行） | `/opt/liutong/openpi-5090-evals/acpd-v2-acl-only-bs64-35k/29999/`、`34999/` |
+| ACPD-v2-TDCA 协议 | `experiments/ablation/acpd-v2-tdca-5k/protocol.md` |
+| ACPD-v2-TDCA checkpoint（待生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_tdca_5k/pi05_libero_backview_acpd_v2_tdca/pi05_libero_backview_acpd_v2_tdca_lora_fsdp4_bs64_5k/4999` |
+| ACPD-v2-TDCA 验证（待运行） | `/opt/liutong/openpi-5090-evals/acpd-v2-tdca-5k/4999/` |
 | H14 多视角结果 | `experiments/baseline/sft-multiview-bs64-30k/analysis.md` |
 | SFT 验证目录 | `/opt/liutong/openpi-5090-evals/` |
 | ACPD 验证目录 | `/opt/liutong/openpi-5090-evals/acpd-*` |

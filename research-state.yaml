@@ -20,11 +20,27 @@ experiment_names:
   h13_loss_only:
     display_name: "ACPD-v2-NoInjection / contribution residual 无注入"
     legacy_id: H13
+  tdca_5k:
+    display_name: "ACPD-v2-TDCA / 任务驱动贡献适配"
+    legacy_id: TaskAdapt
+    parent: h9_fixed
+    target_step: 5000
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
   checked_at: "2026-09-25 19:00 CST"
   jobs:
+    - id: 135943
+      experiment: acpd_v2_tdca_5k
+      state: pending_priority
+      resources: 4gpu_32cpu_96g
+      time_limit: 3-00:00:00
+    - id: 135944
+      experiment: acpd_v2_tdca_5k_full_eval
+      state: dependency
+      depends_on: 135943
+      resources: 2gpu_16cpu_48g
+      episodes: 2000
     - id: 135724
       experiment: backview_acl_only_bs64_35k
       state: pending_priority
@@ -546,6 +562,24 @@ formal_matrix:
       injection: false
       save_interval: 5000
       keep_period: 1
+    backview_tdca_5k:
+      status: queued
+      target: 5k
+      protocol: experiments/ablation/acpd-v2-tdca-5k/protocol.md
+      protocol_commit: 5ac09a1
+      implementation_commit: b18cb10
+      train_job: 135943
+      eval_job: 135944
+      checkpoint_dir: /opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_tdca_5k/pi05_libero_backview_acpd_v2_tdca/pi05_libero_backview_acpd_v2_tdca_lora_fsdp4_bs64_5k/4999
+      eval_dir: /opt/liutong/openpi-5090-evals/acpd-v2-tdca-5k/4999
+      physical_global_batch: 64
+      accumulation: 1
+      gpus: 4
+      contribution_weight: 0.2
+      acl_weight: 0.5
+      task_gradient_to_predictor: true
+      save_interval: 5000
+      keep_period: 5000
 
 evidence_gaps:
   - "Matched H9 and SFT 20K evaluations must locate whether the ACPD-v2 early advantage remains at 20K."
