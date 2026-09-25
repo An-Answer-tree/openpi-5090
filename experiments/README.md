@@ -33,7 +33,7 @@
 | student | H9-Fixed/SFT 早期轨迹10K--15K | `student/acpd-v2-h9-early-trajectory/` | 10K/15K正式比较完成 |
 | ablation | H13-LossOnly BS64 | `ablation/acpd-v2-h13-injection-ablation/` | 5K 训练和验证完成；支持显式注入 |
 | ablation | H17-Decay BS64 | `ablation/acpd-v2-h17-contribution-decay/` | 从H9-Fixed 10K分支；训练134422运行，验证134423、配对分析134424等待依赖 |
-| ablation | ACL-only BS64 | 尚未创建协议 | 待运行 |
+| ablation | ACL-only BS64 35K | `ablation/acpd-v2-acl-only-bs64-35k/protocol.md` | 训练135724排队；30K/35K全量验证135725/135726、分析135729/135728等待依赖；尚无结论 |
 
 H11 已归档，不进入正式 checkpoint 集合，也不继续训练。
 H9-Fixed 的恢复、早中期验证及延长训练是同一方法的不同执行阶段，不作为独立消融。
@@ -54,7 +54,7 @@ H9-Fixed 的恢复、早中期验证及延长训练是同一方法的不同执�
 | student/backview_acpdv2_layer10_bs64（H9-Fixed） | C | C | C | C | Y | C |
 | ablation/H17-Decay | - | 起点为H9-Fixed 10K | Q | Q | - | - |
 | ablation/backview_loss_only_bs64 | C | P | P | P | P | P |
-| ablation/backview_acl_only_bs64 | P | P | P | P | P | P |
+| ablation/backview_acl_only_bs64 | Q | Q | Q | Q | Q | Q |
 
 H9-Fixed 35K/40K/45K checkpoint 已完整写入但未归档。原目录中的 checkpoint
 本次不移动、不删除。旧 BS16/BS32 checkpoint 不进入该表，仍保留在原路径。

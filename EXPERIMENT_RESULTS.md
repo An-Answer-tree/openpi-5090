@@ -54,6 +54,7 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 完成 | 30K pooled `77.00%` |
 | H9-Fixed | 固定权重 ACPD-v2 对照 | layer 10，BS64，contribution=0.2，ACL=0.5 | 129728/130773 | 30K完成；恢复与续训见下表 | 5K `23.15%`；10K `37.45%`；25K `55.75%`；30K `58.00%`；35K `61.05%` |
 | H13-LossOnly | 判断 contribution 注入是否有效 | H9-Fixed 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9-Fixed 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
+| ACL-only BS64 | 检验 contribution 学习和注入在 ACL 之外的增益 | backview，layer 10，BS64，flow=1.0、ACL=0.5、contribution=0、关闭注入；训练至35K | 135724；30K/35K验证135725/135726；分析135729/135728 | 训练排队；两点全量验证等待依赖 | 尚无结论 |
 | H17-Decay | 检验后期 contribution 权重是否过强 | H9-Fixed 10K完整状态→20K；BS64；10K–15K权重0.2→0.05，ACL=0.5 | 134422/134423/134424 | 训练运行中；20K全量验证与配对分析等待依赖 | 尚无结论 |
 
 ### H9-Fixed 轨迹任务
@@ -148,7 +149,7 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | baseline | rightview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
 | student | backview ACPD-v2 layer 10 BS64 | `24999` | 恢复轨迹至20K、延长轨迹至45K的 checkpoint 完整；40K验证完成，45K验证已取消 |
 | ablation | backview loss-only BS64 | - | 5K checkpoint 和验证完整；之后补至 30K |
-| ablation | backview ACL-only BS64 | - | 尚未运行 |
+| ablation | backview ACL-only BS64 | - | 35K训练排队；30K/35K验证等待依赖；尚无结论 |
 
 H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，也不进入正式索引。
 
@@ -196,6 +197,9 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H17 协议与任务记录 | `experiments/ablation/acpd-v2-h17-contribution-decay/` 内 `protocol.md`、`execution.md` |
 | H17 checkpoint | `/opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_h17_contribution_decay/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_h17_decay_bs64_20k` |
 | H17 验证与配对分析 | `/opt/liutong/openpi-5090-evals/acpd-v2-h17-contribution-decay/19999/` |
+| ACL-only BS64 协议 | `experiments/ablation/acpd-v2-acl-only-bs64-35k/protocol.md` |
+| ACL-only BS64 checkpoint（待生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_acl_only_bs64_35k/pi05_libero_backview_acl_only_bs64_35k/pi05_libero_backview_acl_only_lora_fsdp4_bs64_35k/` |
+| ACL-only BS64 验证（待运行） | `/opt/liutong/openpi-5090-evals/acpd-v2-acl-only-bs64-35k/29999/`、`34999/` |
 | H14 多视角结果 | `experiments/baseline/sft-multiview-bs64-30k/analysis.md` |
 | SFT 验证目录 | `/opt/liutong/openpi-5090-evals/` |
 | ACPD 验证目录 | `/opt/liutong/openpi-5090-evals/acpd-*` |

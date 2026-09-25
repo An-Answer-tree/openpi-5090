@@ -23,8 +23,35 @@ experiment_names:
   note: "Display aliases only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-25 16:26 CST"
+  checked_at: "2026-09-25 19:00 CST"
   jobs:
+    - id: 135724
+      experiment: backview_acl_only_bs64_35k
+      state: pending_priority
+      resources: 4gpu_32cpu_96g
+      time_limit: 10-00:00:00
+    - id: 135725
+      experiment: backview_acl_only_bs64_30k_full_eval
+      state: dependency
+      depends_on: 135724
+      resources: 4x1gpu_array_max2
+      episodes: 2000
+    - id: 135726
+      experiment: backview_acl_only_bs64_35k_full_eval
+      state: dependency
+      depends_on: 135724
+      resources: 4x1gpu_array_max2
+      episodes: 2000
+    - id: 135729
+      experiment: backview_acl_only_bs64_30k_paired_analysis
+      state: dependency
+      depends_on: 135725
+      resources: 1cpu_2g
+    - id: 135728
+      experiment: backview_acl_only_bs64_35k_paired_analysis
+      state: dependency
+      depends_on: 135726
+      resources: 1cpu_2g
     - id: 134998
       experiment: backview_sft_bs64_40k_50k_60k_eval
       state: pending_priority
@@ -501,8 +528,24 @@ formal_matrix:
         ci95: [0.0040, 0.0470]
       target: 30k
     backview_acl_only_bs64:
-      status: not_started
-      target: 30k
+      status: queued
+      target: 35k
+      protocol: experiments/ablation/acpd-v2-acl-only-bs64-35k/protocol.md
+      protocol_commit: 5efb035
+      implementation_commit: 7e40858
+      train_job: 135724
+      eval_jobs: {30k: 135725, 35k: 135726}
+      analysis_jobs: {30k: 135729, 35k: 135728}
+      checkpoint_dir: /opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_acl_only_bs64_35k/pi05_libero_backview_acl_only_bs64_35k/pi05_libero_backview_acl_only_lora_fsdp4_bs64_35k
+      eval_dir: /opt/liutong/openpi-5090-evals/acpd-v2-acl-only-bs64-35k
+      physical_global_batch: 64
+      accumulation: 1
+      gpus: 4
+      contribution_weight: 0.0
+      acl_weight: 0.5
+      injection: false
+      save_interval: 5000
+      keep_period: 1
 
 evidence_gaps:
   - "Matched H9 and SFT 20K evaluations must locate whether the ACPD-v2 early advantage remains at 20K."
