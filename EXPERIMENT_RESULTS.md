@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-09-24（CST）
+更新时间：2026-09-25（CST）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -33,6 +33,8 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | ACPD-v2 从 5K 继续训练是否有效 | 同一 H9-scale-b 训练在 30K 达到 `58.00%`，比 5K 高 `34.85` 点；匹配 SFT 30K 为 `60.45%`，尚未证明最终优势。 | 4×500 episodes |
 | H9 25K 是否早于 30K 达峰 | 不支持。25K 为 `55.75%`，30K 为 `58.00%`；25K-30K 为 `-2.25` 点，95% CI `[-4.70, +0.20]`。 | 相同 2,000 episodes |
 | H9 在 30K 后是否继续提高 | 35K 为 `61.05%`，比 30K 高 `3.05` 点，配对 95% CI `[+0.60, +5.50]`。但相对 SFT 30K 仅高 `0.60` 点，95% CI `[-1.90, +3.05]`，尚不能证明最终优于 SFT。 | 相同 2,000 episodes |
+| H9 与同进度 SFT 在 35K 的比较 | H9 `61.05%`，SFT `57.15%`；探索性配对差值 `+3.90` 点，95% CI `[+1.45, +6.35]`。SFT 35K 比自身 30K 低 `3.30` 点，不能据此断言 H9 提高了最终上限。 | 相同 2,000 episodes |
+| H9 40K 是否继续高于 35K | 40K `59.45%`，35K `61.05%`；探索性配对差值 `-1.60` 点，95% CI `[-4.05, +0.80]`，未检测到确定的下降。 | 相同 2,000 episodes |
 | 显式 contribution 注入是否有效 | 有正向证据。H9 为 `23.15%`，H13 loss-only 为 `20.60%`；差值 `+2.55` 点，配对 95% CI `[+0.40, +4.70]`。 | H13 |
 | ACPD-v2 是否通过降低训练 MSE 获益 | 没有该证据。与 SFT 对齐的 299 个监督 loss 点相关系数为 `0.9985`，全程均值几乎相同；5K 成功率增益不能由更低训练 MSE 解释。 | H9/H12 loss 对齐 |
 | 辅助目标在 30K 前是否自然消失 | 没有。加权 contribution/ACL 从首个到末个窗口下降 `53.42/53.04%`，但在总目标中的窗口占比保持约 `59--61%/16--17%`。 | H9 0--30K loss |
@@ -46,21 +48,21 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | ID | 目的 | 实际配置 | Job | 状态 | 结果 |
 |---|---|---|---:|---|---|
 | Teacher | 提供 agentview+wrist 特权信息 | 全量 SFT，30K | 历史任务 | 完成 | checkpoint `29999` |
-| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 30K | 130285/130491/130762/130889/132083/132085/132452 | 30K完成；35K验证已提前提交，40K--60K续训中 | 5K `13.85%`；20K `47.20%`；25K `55.80%`；30K `60.45%`；35K尚无结论 |
+| H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 60K | 130285/130491/130762/132791；35K验证134992/134995 | 60K训练完成；40K/50K/60K验证排队 | 5K `13.85%`；20K `47.20%`；25K `55.80%`；30K `60.45%`；35K `57.15%` |
 | H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669/130890 | 完成 | 30K pooled `71.55%` |
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 完成 | 30K pooled `78.65%` |
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 完成 | 30K pooled `77.00%` |
 | H9-Fixed | 固定权重 ACPD-v2 对照 | layer 10，BS64，contribution=0.2，ACL=0.5 | 129728/130773 | 30K完成；恢复与续训见下表 | 5K `23.15%`；10K `37.45%`；25K `55.75%`；30K `58.00%`；35K `61.05%` |
 | H13-LossOnly | 判断 contribution 注入是否有效 | H9-Fixed 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9-Fixed 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
-| H17-Decay | 检验后期 contribution 权重是否过强 | H9-Fixed 10K完整状态→20K；BS64；10K–15K权重0.2→0.05，ACL=0.5 | 134422/134423/134424 | 训练排队；20K全量验证与配对分析已设依赖 | 尚无结论 |
+| H17-Decay | 检验后期 contribution 权重是否过强 | H9-Fixed 10K完整状态→20K；BS64；10K–15K权重0.2→0.05，ACL=0.5 | 134422/134423/134424 | 训练运行中；20K全量验证与配对分析等待依赖 | 尚无结论 |
 
 ### H9-Fixed 轨迹任务
 
 | 阶段（原标签） | 作用 | Job | 状态/已得结论 |
 |---|---|---|---|
 | 恢复（H9-recovery） | 重建被清理的早期 checkpoint，提供 H17 的同源10K起点与20K对照 | 130704/132198/132398 | 10K、15K、20K checkpoint 完整 |
-| 中期验证（H9-mid-trajectory） | 测量10K/15K/20K/25K优势变化 | 132731/132732/134008/134009/132082/132084 | 10K相对SFT +14.20点；15K +5.70点；25K -0.05点；20K待验证 |
-| 延长训练（H9-trajectory） | 原计划30K→60K；45K checkpoint完整后停训，验证35K/40K | 132390/132720/132724/134371/134372；取消135001/135002 | 35K为61.05%；40K全量验证排队；45K验证已取消，尚无结论；50K/60K未训练 |
+| 中期验证（H9-mid-trajectory） | 测量10K/15K/20K/25K优势变化 | 132731/132732/134008/134009/132082/132084 | 10K相对SFT +14.20点；15K +5.70点；25K -0.05点；20K验证运行中 |
+| 延长训练（H9-trajectory） | 原计划30K→60K；45K checkpoint完整后停训，验证35K/40K | 132390/132720/132724/134371/134372；取消135001/135002 | 35K为61.05%；40K为59.45%；45K验证已取消，尚无结论；50K/60K未训练 |
 
 H17-Decay 的主比较为同源 **H9-Fixed recovery 20K**，次比较为 SFT BS64 20K。
 H17 尚无验证结果，现有 H9 数值不属于 H17。
@@ -121,10 +123,12 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | H9-Fixed backview BS64 25K | 63.20% | 69.40% | 62.00% | 28.40% | 55.75% |
 | H9-Fixed backview BS64 30K | 64.00% | 73.00% | 61.80% | 33.20% | 58.00% |
 | H9-Fixed backview BS64 35K | 73.20% | 73.80% | 63.60% | 33.60% | 61.05% |
+| H9-Fixed backview BS64 40K | 68.20% | 76.00% | 60.00% | 33.60% | 59.45% |
 | H13-LossOnly backview BS64 5K | 19.40% | 35.60% | 25.00% | 2.40% | 20.60% |
 | SFT backview BS64 20K | 50.60% | 62.60% | 54.40% | 21.20% | 47.20% |
 | SFT backview BS64 25K | 64.00% | 64.00% | 65.60% | 29.60% | 55.80% |
 | SFT backview BS64 30K | 70.00% | 69.80% | 68.20% | 33.80% | 60.45% |
+| SFT backview BS64 35K | 65.80% | 68.40% | 64.60% | 29.80% | 57.15% |
 | SFT topview BS64 30K | 81.00% | 80.60% | 79.20% | 45.40% | 71.55% |
 | SFT leftview BS64 30K | 84.00% | 79.60% | 79.40% | 71.60% | 78.65% |
 | SFT rightview BS64 30K | 85.00% | 84.80% | 84.00% | 54.20% | 77.00% |
@@ -138,11 +142,11 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | 分类 | 模型 | 已归档 | 状态 |
 |---|---|---|---|
 | teacher | agentview+wrist | `29999` | 完整 |
-| baseline | backview BS64 | `4999` | 5K--30K checkpoint 完整；20K、25K 和 30K 验证完成 |
+| baseline | backview BS64 | `4999` | 5K--60K checkpoint 完整；20K、25K、30K、35K 验证完成，40K/50K/60K 待验证 |
 | baseline | topview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
 | baseline | leftview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
 | baseline | rightview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
-| student | backview ACPD-v2 layer 10 BS64 | `24999` | 恢复轨迹至20K、延长轨迹至45K的 checkpoint 完整；45K后停训，40K待验证；45K验证已取消 |
+| student | backview ACPD-v2 layer 10 BS64 | `24999` | 恢复轨迹至20K、延长轨迹至45K的 checkpoint 完整；40K验证完成，45K验证已取消 |
 | ablation | backview loss-only BS64 | - | 5K checkpoint 和验证完整；之后补至 30K |
 | ablation | backview ACL-only BS64 | - | 尚未运行 |
 
@@ -162,7 +166,10 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H9早期轨迹快速验证 | `/opt/liutong/openpi-5090-evals/h9-early-trajectory-quick/` |
 | H9/SFT 10K 正式验证 | `/opt/liutong/openpi-5090-evals/h9-early-trajectory-full/` |
 | H9 15K 正式验证 | `/opt/liutong/openpi-5090-evals/h9-early-trajectory-full/14999/summary.txt` |
-| SFT 35K 提前验证（待结果） | `/opt/liutong/openpi-5090-evals/sft-backview-bs64-training-trajectory/35000/`；job 134992/134995 |
+| SFT 35K 验证 | `/opt/liutong/openpi-5090-evals/sft-backview-bs64-training-trajectory/35000/summary.txt`；job 134992/134995 |
+| SFT 35K/30K 配对分析 | `experiments/baseline/sft-backview-bs64-trajectory-60k/results/sft_35k_vs_30k_paired_analysis.json` |
+| H9/SFT 35K 配对分析 | `experiments/student/acpd-v2-h9-trajectory-60k/results/h9_35k_vs_sft_35k_paired_analysis.json` |
+| H9 40K/35K 配对分析 | `experiments/student/acpd-v2-h9-trajectory-60k/results/h9_40k_vs_h9_35k_paired_analysis.json` |
 | H9/SFT 10K 配对分析 | `experiments/student/acpd-v2-h9-early-trajectory/results/h9_vs_sft_10k_paired_analysis.json` |
 | H9/H12 loss 对齐指标 | `experiments/student/acpd-v2-h9-batch-scaling-30k/results/loss_comparison.json` |
 | H9/H12 loss 对齐图 | `artifacts/pi05_backview_sft_vs_acpdv2_loss.png` |
@@ -175,6 +182,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H9 25K 协议 | `experiments/student/acpd-v2-h9-20k-30k-trajectory/protocol.md` |
 | H9 30K--60K 协议 | `experiments/student/acpd-v2-h9-trajectory-60k/protocol.md` |
 | H9 35K 验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/summary.txt` |
+| H9 40K 验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/39999/summary.txt` |
 | H9 45K checkpoint（验证已取消） | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/44999` |
 | H9 35K/30K 配对分析 | `experiments/student/acpd-v2-h9-trajectory-60k/results/h9_35k_vs_h9_30k_paired_analysis.json` |
 | H9 35K/SFT 30K 配对分析 | `experiments/student/acpd-v2-h9-trajectory-60k/results/h9_35k_vs_sft_30k_paired_analysis.json` |

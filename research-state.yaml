@@ -23,28 +23,16 @@ experiment_names:
   note: "Display aliases only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-24 23:57 CST"
+  checked_at: "2026-09-25 16:26 CST"
   jobs:
-    - id: 134992
-      experiment: backview_sft_bs64_35k_early_full_eval
-      state: pending_priority
-      nice: -773
-      checkpoint: 35000
-      resources: 4x1gpu_array_max2
-      episodes: 2000
-    - id: 134995
-      experiment: backview_sft_bs64_35k_early_summary
-      state: dependency
-      depends_on: 134992
-      resources: 1cpu_1g
     - id: 134998
       experiment: backview_sft_bs64_40k_50k_60k_eval
-      state: dependency
-      depends_on: 132791
+      state: pending_priority
       resources: 2gpu_16cpu_48g
     - id: 134422
       experiment: h17_contribution_decay_10k_to_20k
-      state: pending_priority
+      state: running
+      node: gpu01
       resources: 4gpu_32cpu_96g
       time_limit: 5-00:00:00
       submitted_at: "2026-09-24 11:03 CST"
@@ -59,15 +47,9 @@ current_execution:
       state: dependency
       depends_on: [134423, 134008]
       resources: 1cpu_2g
-    - id: 132791
-      experiment: backview_sft_bs64_resume_30k_to_60k
-      state: running
-      node: gpu02
-      resources: 4gpu_32cpu_96g
-      time_limit: 8-00:00:00
     - id: 134008
       experiment: h9_early_trajectory_full_acpdv2_20k
-      state: pending_priority
+      state: running
       resources: 4x1gpu_array
       episodes: 2000
     - id: 134009
@@ -75,17 +57,29 @@ current_execution:
       state: dependency
       depends_on: 134008
       resources: 1cpu_1g
-    - id: 134371
-      experiment: h9_40k_eval
-      state: one_suite_complete_three_pending
-      resources: 4x1gpu_array_max2
-      episodes: 2000
-    - id: 134372
-      experiment: h9_40k_eval_summary
-      state: dependency
-      depends_on: 134371
-      resources: 1cpu_1g
   recently_completed:
+    - id: 132791
+      experiment: backview_sft_bs64_resume_30k_to_60k
+      state: complete
+      last_complete_checkpoint: 59999
+    - id: [134992, 134995]
+      experiment: backview_sft_bs64_35k_full_eval
+      state: complete
+      episodes: 2000
+      spatial: 0.658
+      object: 0.684
+      goal: 0.646
+      libero_10: 0.298
+      pooled_success: 0.5715
+    - id: [134371, 134372]
+      experiment: h9_40k_full_eval
+      state: complete
+      episodes: 2000
+      spatial: 0.682
+      object: 0.760
+      goal: 0.600
+      libero_10: 0.336
+      pooled_success: 0.5945
     - id: 132732
       experiment: h9_early_trajectory_full_acpdv2_15k
       state: complete
@@ -252,8 +246,8 @@ formal_matrix:
       status: complete
   baseline:
     backview_bs64:
-      checkpoints: [4999, 10000, 15000, 20000, 25000, 29999, 35000]
-      status: resume_60k_running
+      checkpoints: [4999, 10000, 15000, 20000, 25000, 29999, 35000, 40000, 45000, 50000, 55000, 59999]
+      status: training_60k_complete_eval_40k_50k_60k_pending
       resume_60k_job: 132791
       cancelled_eval_35k_40k_50k_60k_job: 132792
       eval_35k_job: 134992
@@ -284,6 +278,15 @@ formal_matrix:
         goal: 0.682
         libero_10: 0.338
         pooled: 0.6045
+      eval_35k:
+        spatial: 0.658
+        object: 0.684
+        goal: 0.646
+        libero_10: 0.298
+        pooled: 0.5715
+      eval_35k_minus_30k:
+        pooled: -0.0330
+        ci95: [-0.0575, -0.0085]
     topview_bs64:
       status: complete
       checkpoints: [5000, 10000, 15000, 20000, 25000, 29999]
@@ -320,7 +323,7 @@ formal_matrix:
       checkpoints: [4999, 24999, 29999]
       recovery_checkpoints: [9999, 14999, 19999]
       extended_checkpoints: [34999, 39999, 44999]
-      status: 45k_checkpoint_complete_40k_eval_pending
+      status: stopped_at_45k_checkpoint_40k_eval_complete
       recovery_target: 4999
       recovery_job: 130704
       recovery_watchdog_job: 132198
@@ -395,6 +398,20 @@ formal_matrix:
       eval_35k_minus_sft_30k:
         pooled: 0.0060
         ci95: [-0.0190, 0.0305]
+      eval_35k_minus_sft_35k:
+        pooled: 0.0390
+        ci95: [0.0145, 0.0635]
+        status: exploratory
+      eval_40k:
+        spatial: 0.682
+        object: 0.760
+        goal: 0.600
+        libero_10: 0.336
+        pooled: 0.5945
+      eval_40k_minus_35k:
+        pooled: -0.0160
+        ci95: [-0.0405, 0.0080]
+        status: exploratory
       eval_30k:
         spatial: 0.640
         object: 0.730
@@ -446,7 +463,7 @@ formal_matrix:
       display_name: H17-Decay
       parent_experiment: H9-Fixed
       primary_control: H9-Fixed_recovery_20k
-      status: submitted_pending
+      status: running
       protocol: experiments/ablation/acpd-v2-h17-contribution-decay/protocol.md
       protocol_commit: 0401d01
       implementation_commit: 5036842
@@ -467,7 +484,7 @@ formal_matrix:
       save_interval: 5000
       keep_period: 1
       cpu_tests_passed: 16
-      gpu_training_verified: false
+      gpu_training_verified: true
     backview_loss_only_bs64:
       display_name: H13-LossOnly
       checkpoints: [4999]
