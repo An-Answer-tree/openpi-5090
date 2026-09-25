@@ -110,8 +110,16 @@ class ExactContributionHead(nnx.Module):
         prediction = self.predictor(student_hidden.astype(jnp.float32))
         return einops.rearrange(prediction, "b h (v d) -> b v h d", v=2, d=self.hidden_dim)
 
-    def fuse(self, final_hidden: at.Array, student_hidden: at.Array) -> at.Array:
-        predicted = jax.lax.stop_gradient(self.predict(student_hidden))
+    def fuse(
+        self,
+        final_hidden: at.Array,
+        student_hidden: at.Array,
+        *,
+        detach_prediction: bool = True,
+    ) -> at.Array:
+        predicted = self.predict(student_hidden)
+        if detach_prediction:
+            predicted = jax.lax.stop_gradient(predicted)
         predicted_residual = jnp.sum(predicted, axis=1).astype(final_hidden.dtype)
         gate = jnp.tanh(self.gate.value).astype(final_hidden.dtype)
         return final_hidden + gate * predicted_residual
@@ -125,6 +133,7 @@ class AcpdPi0Config(pi0_config.Pi0Config):
     create_acpd_heads: bool = True
     exact_contribution_fusion: bool = False
     exact_contribution_injection: bool = True
+    exact_contribution_task_gradient: bool = False
     exact_contribution_fusion_location: Literal["final", "aligned_attention"] = "final"
 
     @override
@@ -145,6 +154,7 @@ class AcpdPi0(pi0.Pi0):
         self.action_expert_depth = action_expert_config.depth
         self.exact_contribution_fusion = config.exact_contribution_fusion
         self.exact_contribution_injection = config.exact_contribution_injection
+        self.exact_contribution_task_gradient = config.exact_contribution_task_gradient
         self.exact_contribution_fusion_location = config.exact_contribution_fusion_location
         if config.create_acpd_heads:
             self.acpd_aux_heads = nnx.Dict(
@@ -239,7 +249,11 @@ class AcpdPi0(pi0.Pi0):
             and self.exact_contribution_injection
             and self.exact_contribution_fusion_location == "final"
         ):
-            final_hidden = self.exact_contribution_head.fuse(final_hidden, hiddens[0])
+            final_hidden = self.exact_contribution_head.fuse(
+                final_hidden,
+                hiddens[0],
+                detach_prediction=not (train and self.exact_contribution_task_gradient),
+            )
         v_t = self.action_out_proj(final_hidden)
         privileged_visual_tokens = jnp.concatenate(
             [image_tokens["base_0_rgb"], image_tokens["left_wrist_0_rgb"]], axis=1

@@ -105,6 +105,19 @@ def test_exact_contribution_head_is_zero_gated_and_detaches_flow_gradient():
     assert float(optax.global_norm(gradients["gate"])) > 0.0
 
 
+def test_exact_contribution_head_can_receive_task_gradient():
+    head = ExactContributionHead(4, rngs=nnx.Rngs(0))
+    student_hidden = jnp.ones((2, 3, 4), dtype=jnp.float32)
+    final_hidden = jnp.arange(24, dtype=jnp.float32).reshape(2, 3, 4)
+    head.gate.value = jnp.asarray(0.5, dtype=jnp.float32)
+
+    def flow_loss(model):
+        return jnp.mean(model.fuse(final_hidden, student_hidden, detach_prediction=False))
+
+    _, gradients = nnx.value_and_grad(flow_loss)(head)
+    assert float(optax.global_norm(gradients["predictor"])) > 0.0
+
+
 def test_exact_contribution_head_has_stable_graph_metadata():
     first = nnx.graphdef(ExactContributionHead(4, rngs=nnx.Rngs(0)))
     second = nnx.graphdef(ExactContributionHead(4, rngs=nnx.Rngs(1)))

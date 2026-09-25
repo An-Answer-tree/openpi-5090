@@ -74,6 +74,7 @@ class DistillTrainConfig:
     acpd_detach_query: bool = True
     exact_contribution_fusion: bool = False
     exact_contribution_injection: bool = True
+    exact_contribution_task_gradient: bool = False
     exact_contribution_fusion_location: Literal["final", "aligned_attention"] = "final"
 
     assets_dir: str = tyro.MISSING
@@ -256,6 +257,7 @@ def _make_distill_model_config(
         create_acpd_heads=create_acpd_heads,
         exact_contribution_fusion=exact_contribution_fusion,
         exact_contribution_injection=config.exact_contribution_injection,
+        exact_contribution_task_gradient=config.exact_contribution_task_gradient,
         exact_contribution_fusion_location=config.exact_contribution_fusion_location,
     )
 
