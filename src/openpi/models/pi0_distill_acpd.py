@@ -125,6 +125,30 @@ class ExactContributionHead(nnx.Module):
         return final_hidden + gate * predicted_residual
 
 
+def _zero_kernel_init(key, shape, dtype=jnp.float32):
+    del key
+    return jnp.zeros(shape, dtype=dtype)
+
+
+class ActionReadoutHead(nnx.Module):
+    """Maps the final hidden state and predicted contributions to a correction."""
+
+    def __init__(self, hidden_dim: int, action_dim: int, hidden_width: int, *, rngs: nnx.Rngs):
+        self.fc1 = nnx.Linear(3 * hidden_dim, hidden_width, rngs=rngs)
+        self.fc2 = nnx.Linear(
+            hidden_width,
+            action_dim,
+            kernel_init=_zero_kernel_init,
+            bias_init=_zero_kernel_init,
+            rngs=rngs,
+        )
+
+    def __call__(self, final_hidden: at.Array, predicted_contributions: at.Array) -> at.Array:
+        predicted_contributions = einops.rearrange(predicted_contributions, "b v h d -> b h (v d)")
+        features = jnp.concatenate([final_hidden, predicted_contributions], axis=-1).astype(jnp.float32)
+        return self.fc2(nnx.silu(self.fc1(features)))
+
+
 @dataclasses.dataclass(frozen=True)
 class AcpdPi0Config(pi0_config.Pi0Config):
     align_layers: int | tuple[int, ...] = (6, 12)
@@ -135,6 +159,8 @@ class AcpdPi0Config(pi0_config.Pi0Config):
     exact_contribution_injection: bool = True
     exact_contribution_task_gradient: bool = False
     exact_contribution_fusion_location: Literal["final", "aligned_attention"] = "final"
+    action_readout_input: Literal["none", "contribution"] = "none"
+    action_readout_hidden_dim: int = 128
 
     @override
     def create(self, rng: at.KeyArrayLike) -> "AcpdPi0":
@@ -156,6 +182,7 @@ class AcpdPi0(pi0.Pi0):
         self.exact_contribution_injection = config.exact_contribution_injection
         self.exact_contribution_task_gradient = config.exact_contribution_task_gradient
         self.exact_contribution_fusion_location = config.exact_contribution_fusion_location
+        self.action_readout_input = config.action_readout_input
         if config.create_acpd_heads:
             self.acpd_aux_heads = nnx.Dict(
                 {
@@ -176,6 +203,29 @@ class AcpdPi0(pi0.Pi0):
                 action_expert_config.width,
                 rngs=rngs,
             )
+        if self.action_readout_input != "none":
+            if not self.exact_contribution_fusion:
+                raise ValueError("Action readout requires exact contribution fusion.")
+            if self.exact_contribution_fusion_location != "final":
+                raise ValueError("Action readout currently requires final contribution fusion.")
+            self.action_readout_head = ActionReadoutHead(
+                action_expert_config.width,
+                config.action_dim,
+                config.action_readout_hidden_dim,
+                rngs=rngs,
+            )
+
+    def _apply_action_readout(
+        self,
+        velocity: at.Array,
+        final_hidden: at.Array,
+        student_hidden: at.Array,
+    ) -> at.Array:
+        if self.action_readout_input == "none":
+            return velocity
+        predicted = jax.lax.stop_gradient(self.exact_contribution_head.predict(student_hidden))
+        correction = self.action_readout_head(final_hidden, predicted)
+        return velocity + correction.astype(velocity.dtype)
 
     @staticmethod
     def _layer_index(layer: int, depth: int) -> int:
@@ -255,7 +305,11 @@ class AcpdPi0(pi0.Pi0):
                 hiddens[0],
                 detach_prediction=not (train and self.exact_contribution_task_gradient),
             )
-        v_t = self.action_out_proj(final_hidden)
+        v_t = self._apply_action_readout(
+            self.action_out_proj(final_hidden),
+            final_hidden,
+            hiddens[0],
+        )
         privileged_visual_tokens = jnp.concatenate(
             [image_tokens["base_0_rgb"], image_tokens["left_wrist_0_rgb"]], axis=1
         )
@@ -312,7 +366,11 @@ class AcpdPi0(pi0.Pi0):
             suffix_out[:, -self.action_horizon :],
             student_hidden,
         )
-        return self.action_out_proj(final_hidden)
+        return self._apply_action_readout(
+            self.action_out_proj(final_hidden),
+            final_hidden,
+            student_hidden,
+        )
 
     @at.typecheck
     def compute_attention_contributions(

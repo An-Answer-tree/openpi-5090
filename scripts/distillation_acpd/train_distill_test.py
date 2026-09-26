@@ -9,6 +9,7 @@ import optax
 
 from openpi.models.pi0_distill_acpd import AcpdHead
 from openpi.models.pi0_distill_acpd import AcpdPi0Config
+from openpi.models.pi0_distill_acpd import ActionReadoutHead
 from openpi.models.pi0_distill_acpd import ExactContributionHead
 from openpi.training import checkpoints
 from openpi.training import config as training_config
@@ -125,6 +126,17 @@ def test_exact_contribution_head_has_stable_graph_metadata():
     assert jax.tree_util.tree_structure(first) == jax.tree_util.tree_structure(second)
 
 
+def test_action_readout_head_is_zero_initialized():
+    head = ActionReadoutHead(4, 7, 8, rngs=nnx.Rngs(0))
+    final_hidden = jnp.ones((2, 3, 4), dtype=jnp.float32)
+    contributions = jnp.ones((2, 2, 3, 4), dtype=jnp.float32)
+
+    output = head(final_hidden, contributions)
+
+    assert output.shape == (2, 3, 7)
+    np.testing.assert_allclose(output, 0.0, atol=1e-6)
+
+
 def test_exact_contribution_loss_is_zero_for_equal_targets():
     target = jnp.arange(48, dtype=jnp.float32).reshape(2, 2, 3, 4) + 1.0
 
@@ -141,6 +153,7 @@ def test_acpd_v2_policy_configs_deploy_selected_layer():
         ("pi05_libero_backview_acpd_v2_layer10_lora", 10, "final", True),
         ("pi05_libero_backview_acpd_v2_layer10_aligned_lora", 10, "aligned_attention", True),
         ("pi05_libero_backview_acpd_v2_layer10_loss_only_lora", 10, "final", False),
+        ("pi05_libero_backview_acpd_v2_layer10_action_readout_lora", 10, "final", True),
     ):
         config = training_config.get_config(config_name)
 
@@ -150,6 +163,8 @@ def test_acpd_v2_policy_configs_deploy_selected_layer():
         assert config.model.exact_contribution_injection == injection
         assert config.model.exact_contribution_fusion_location == fusion_location
         assert not config.model.create_acpd_heads
+        if "action_readout" in config_name:
+            assert config.model.action_readout_input == "contribution"
 
 
 def test_acpd_v2_train_and_eval_models_have_matching_parameter_trees():
@@ -158,6 +173,7 @@ def test_acpd_v2_train_and_eval_models_have_matching_parameter_trees():
         ("pi05_libero_backview_acpd_v2_layer10_lora", 10, "final", True),
         ("pi05_libero_backview_acpd_v2_layer10_aligned_lora", 10, "aligned_attention", True),
         ("pi05_libero_backview_acpd_v2_layer10_loss_only_lora", 10, "final", False),
+        ("pi05_libero_backview_acpd_v2_layer10_action_readout_lora", 10, "final", True),
     ):
         distill_config = DistillTrainConfig(
             student_init_params="base/params",
@@ -168,6 +184,7 @@ def test_acpd_v2_train_and_eval_models_have_matching_parameter_trees():
             exact_contribution_fusion=True,
             exact_contribution_injection=injection,
             exact_contribution_fusion_location=fusion_location,
+            action_readout_input="contribution" if "action_readout" in config_name else "none",
         )
 
         student_config = _make_student_train_config(distill_config, create_acpd_heads=False)
