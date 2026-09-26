@@ -32,6 +32,7 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | 哪层 exact contribution 最可恢复 | layer 10；overall gap `0.3992`，比次优 layer 11 高 `0.0485`。 | H7/H7.1 |
 | ACPD-v2 是否优于匹配 BS64 SFT | 5K 时提升 `9.30` 点；30K 时为 `58.00%` 对 `60.45%`，差值 `-2.45` 点，95% CI `[-5.00, 0.00]`。早期优势未保持到 30K。 | H9-scale-b、H12 |
 | ACPD-v2 的早期优势在 10K 是否仍存在 | 存在。H9 为 `37.45%`，SFT 为 `23.25%`；差值 `+14.20` 点，配对 95% CI `[+11.90, +16.60]`。 | 相同 2,000 episodes |
+| ACPD-v2 在 15K 是否仍优于 SFT | H9-Fixed 为 `46.60%`，SFT 为 `40.90%`；差值 `+5.70` 点，配对 95% CI `[+3.25, +8.15]`。 | 相同 2,000 episodes |
 | ACPD-v2 的早期优势何时消失 | 25K 时 ACPD-v2 为 `55.75%`，SFT 为 `55.80%`；差值 `-0.05` 点，95% CI `[-2.50, +2.45]`。25K 已无可检测优势。 | 相同 2,000 episodes |
 | ACPD-v2 从 5K 继续训练是否有效 | 同一 H9-scale-b 训练在 30K 达到 `58.00%`，比 5K 高 `34.85` 点；匹配 SFT 30K 为 `60.45%`，尚未证明最终优势。 | 4×500 episodes |
 | H9 25K 是否早于 30K 达峰 | 不支持。25K 为 `55.75%`，30K 为 `58.00%`；25K-30K 为 `-2.25` 点，95% CI `[-4.70, +0.20]`。 | 相同 2,000 episodes |
@@ -171,6 +172,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H9早期轨迹快速验证 | `/opt/liutong/openpi-5090-evals/h9-early-trajectory-quick/` |
 | H9/SFT 10K 正式验证 | `/opt/liutong/openpi-5090-evals/h9-early-trajectory-full/` |
 | H9 15K 正式验证 | `/opt/liutong/openpi-5090-evals/h9-early-trajectory-full/14999/summary.txt` |
+| H9/SFT 15K 配对分析 | `experiments/student/acpd-v2-h9-early-trajectory/results/h9_vs_sft_15k_paired_analysis.json` |
 | SFT 35K 验证 | `/opt/liutong/openpi-5090-evals/sft-backview-bs64-training-trajectory/35000/summary.txt`；job 134992/134995 |
 | SFT 35K/30K 配对分析 | `experiments/baseline/sft-backview-bs64-trajectory-60k/results/sft_35k_vs_30k_paired_analysis.json` |
 | H9/SFT 35K 配对分析 | `experiments/student/acpd-v2-h9-trajectory-60k/results/h9_35k_vs_sft_35k_paired_analysis.json` |

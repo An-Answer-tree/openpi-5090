@@ -1,0 +1,13 @@
+{
+  "baseline_dir": "/opt/liutong/openpi-5090-evals/h9-early-trajectory-full/sft/15000",
+  "treatment_dir": "/opt/liutong/openpi-5090-evals/h9-early-trajectory-full/14999",
+  "bootstrap_samples": 10000,
+  "seed": 42,
+  "suites": {
+    "spatial": {"tasks": 10, "episodes": 500, "baseline_success": 0.436, "treatment_success": 0.494, "difference": 0.058, "ci95_lower": 0.0, "ci95_upper": 0.114},
+    "object": {"tasks": 10, "episodes": 500, "baseline_success": 0.58, "treatment_success": 0.644, "difference": 0.064, "ci95_lower": 0.014, "ci95_upper": 0.114},
+    "goal": {"tasks": 10, "episodes": 500, "baseline_success": 0.474, "treatment_success": 0.536, "difference": 0.062, "ci95_lower": 0.016, "ci95_upper": 0.108},
+    "libero_10": {"tasks": 10, "episodes": 500, "baseline_success": 0.146, "treatment_success": 0.19, "difference": 0.044, "ci95_lower": 0.0, "ci95_upper": 0.088}
+  },
+  "pooled": {"tasks": 40, "episodes": 2000, "baseline_success": 0.409, "treatment_success": 0.466, "difference": 0.057, "ci95_lower": 0.0325, "ci95_upper": 0.0815}
+}
