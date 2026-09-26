@@ -11,7 +11,7 @@
 | 2026-09-13 | 结果 | H4 未发现 Cue 或 ACL 改善 2K supervised-loss 收敛；相对 Flow-only 的差异均未达到预设 1% 阈值。 |
 | 2026-09-14 | 结果 | H5 支持 Full ACPD：5K pooled success 为 6.50%，Flow-only 为 4.45%，差值 +2.05 点，配对 95% CI `[+0.90, +3.25]`。 |
 | 2026-09-14 | 方法 | H7 改用 teacher 真实 Q/K/V attention contribution、held-out episode 和同 query 的 shuffled-view 负对照，先检验 privileged cue 是否可恢复。 |
-| 2026-09-14 | 结果 | H7 支持可恢复性：layer 9 和 12 通过，layer 6 因 explained variance 为负而失败；粗扫描选择 layer 9。 |
+| 2026-09-14 | 结果 | H7 用 explained variance 比较候选层：layer 6 低于均值基线，layer 9 和 12 可恢复；这是层选择结果，不是工程故障。后续 H7.1 选择 layer 10。 |
 | 2026-09-16 | 结果 | H8 ACL-only 为 6.35%，Full ACPD 仅高 0.15 点，95% CI `[-1.15, +1.40]`；旧 Cue 没有检测到额外收益。 |
 | 2026-09-16 | 结果 | H7.1 完成 layer 6--12 局部扫描；layer 10 overall gap 为 0.3992，比次优 layer 11 高 0.0485，因此 ACPD-v2 选择 layer 10。 |
 | 2026-09-17 | 方法 | H9 使用 layer-10 exact contribution、ACL、最终 hidden gated injection，FSDP4 physical BS32，无梯度累积。 |
