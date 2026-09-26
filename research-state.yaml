@@ -95,6 +95,11 @@ current_execution:
       state: dependency
       depends_on: 136119
       resources: 1cpu_2g
+    - id: 136123
+      experiment: h17_15k_paired_analysis
+      state: dependency
+      depends_on: 136120
+      resources: 1cpu_2g
     - id: 134424
       experiment: h17_20k_paired_analysis
       state: dependency
