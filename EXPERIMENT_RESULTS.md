@@ -59,7 +59,7 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | H13-LossOnly | 判断 contribution 注入是否有效 | H9-Fixed 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9-Fixed 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
 | ACPD-v2-TDCA | 检验动作损失是否能改善 contribution 注入适配 | backview，layer 10，BS64，flow=1.0、contribution=0.2、ACL=0.5；仅开放 predictor 的动作梯度，训练至5K | 135943；验证135944 | 训练排队；全量验证等待依赖 | 尚无结论 |
 | ACL-only BS64 | 检验 contribution 学习和注入在 ACL 之外的增益 | backview，layer 10，BS64，flow=1.0、ACL=0.5、contribution=0、关闭注入；训练至35K | 135724；30K/35K验证135725/135726；分析135729/135728 | 训练排队；两点全量验证等待依赖 | 尚无结论 |
-| H17-Decay | 检验后期 contribution 权重是否过强 | H9-Fixed 10K完整状态→20K；BS64；10K–15K权重0.2→0.05，ACL=0.5 | 134422/136113/136114/134423/134424 | 训练运行中；15K验证已提交，20K验证等待训练完成 | 尚无结论 |
+| H17-Decay | 检验后期 contribution 权重是否过强 | H9-Fixed 10K完整状态→20K；BS64；10K–15K权重0.2→0.05，ACL=0.5 | 134422/136119/136120/134423/134424 | 训练运行中；15K验证重新提交，20K验证等待训练完成 | 尚无结论 |
 
 ### H9-Fixed 轨迹任务
 

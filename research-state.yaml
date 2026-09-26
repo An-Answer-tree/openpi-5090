@@ -85,15 +85,15 @@ current_execution:
       depends_on: 134422
       resources: 4x1gpu_array
       episodes: 2000
-    - id: 136113
+    - id: 136119
       experiment: h17_15k_full_eval
       state: pending
       resources: 4x1gpu_array
       episodes: 2000
-    - id: 136114
+    - id: 136120
       experiment: h17_15k_summary
       state: dependency
-      depends_on: 136113
+      depends_on: 136119
       resources: 1cpu_2g
     - id: 134424
       experiment: h17_20k_paired_analysis
