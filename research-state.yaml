@@ -37,10 +37,11 @@ current_execution:
   jobs:
     - id: 136130
       experiment: h18_action_readout
-      state: pending_priority
+      state: complete_exploratory_negative
       resources: 1gpu_8cpu_24g
       smoke_job: 136129
       purpose: frozen H9 30K action-readout diagnostic
+      result: contribution_vs_h9_mse_reduction_0.00813; paired_ci_crosses_zero; no_simulation
     - id: 136129
       experiment: h18_action_readout_smoke
       state: complete

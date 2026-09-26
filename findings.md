@@ -89,4 +89,11 @@ H17-Decay只改变该权重；它不能同时证明不可恢复信息、LoRA容�
 
 H18-ActionReadout 将该问题拆成冻结 H9 30K 的低成本接口诊断：hidden-only、
 hidden-layer10 和 hidden-contribution 三个小型动作修正头共用冻结前向，仅比较 episode-held-out
-flow MSE。它不更新 LoRA，不加载 teacher，不是闭环成功率实验；正式任务 `136130` 尚无结果。
+flow MSE。它不更新 LoRA，不加载 teacher，不是闭环成功率实验。
+
+H18 已完成：hidden-contribution 相对冻结 H9 的 episode mean flow MSE 下降 `0.813%`，
+但按冻结 H9 归一化的配对95% CI 为 `[-1.804%, +0.031%]`；相对 hidden-layer10 对照反而变差 `0.029%`，
+且区间跨0。该结果不支持直接增加动作修正 head，也不支持立即增加 contribution predictor
+复杂度。它只说明当前 contribution 接口没有可检测的独立动作收益，不否定 H7/H9 已观察到的
+contribution 可恢复性或 H9 早期仿真收益。详见
+`experiments/mechanism/acpd-v2-h18-action-readout/analysis.md`。
