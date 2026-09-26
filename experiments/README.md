@@ -51,6 +51,7 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 | baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 全部完成 |
 | student | H9-Fixed 主实验（原H9-scale-b） | `student/acpd-v2-h9-batch-scaling-30k/` | 固定contribution=0.2；5K/10K/15K/25K/30K/35K有正式结果 |
 | mechanism | H15a ACPD-v2 梯度冲突诊断 | `mechanism/acpd-v2-h15a-gradient-conflict/` | 完成；不支持后期梯度冲突假设 |
+| mechanism | H18-ActionReadout 冻结贡献动作读出诊断 | `mechanism/acpd-v2-h18-action-readout/` | smoke `136129` 完成；正式单卡诊断 `136130` 排队，尚无任务成功率结论 |
 | student | H9-Fixed 延长轨迹 | `student/acpd-v2-h9-trajectory-60k/` | 45K checkpoint完整后停训；35K为`61.05%`，40K为`59.45%`，45K验证已取消；50K/60K未训练 |
 | student | H9-Fixed 中期轨迹20K--30K | `student/acpd-v2-h9-20k-30k-trajectory/` | 恢复训练到20K；25K验证完成，20K验证运行中 |
 | student | H9-Fixed/SFT 早期轨迹10K--15K | `student/acpd-v2-h9-early-trajectory/` | 10K/15K正式比较完成 |

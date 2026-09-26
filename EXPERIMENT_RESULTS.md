@@ -80,6 +80,7 @@ H17 15K只有Spatial/Object部分结果，无四套pooled；详见
 | ID | 目的 | 实际配置 | Job | 状态 | 结论 |
 |---|---|---|---:|---|---|
 | H15a | 判断 ACPD-v2 后期是否存在辅助梯度干扰 | H9 5K/30K；每点200个相同BS32 batch；不更新参数 | smoke 132308；快速 132311；正式 132250 | 完成 | 5K/30K 组合冲突率均为 `0%`；不支持后期梯度冲突解释 |
+| H18-ActionReadout | 检查冻结 H9 的 contribution 是否能被小型动作修正头有效使用 | H9 BS64 30K 冻结；hidden-only、hidden-layer10、hidden-contribution 三组；单卡500步、BS8 | smoke 136129；正式136130 | 正式诊断排队；尚无任务成功率结果 | 尚无结论；仅预注册离线 flow-MSE 筛选 |
 
 ## 探索性快速轨迹
 

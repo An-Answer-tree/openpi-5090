@@ -86,3 +86,7 @@ H17-Decay只改变该权重；它不能同时证明不可恢复信息、LoRA容�
   H17-Decay 已提交：从完整 10K 状态继续到 20K，10K–15K 权重 0.2→0.05，之后保持
   0.05；主比较为同源 H9 20K 的 2000 回合配对验证，尚无结论。
 - 为 detached contribution 增加只接收 flow 梯度的小型 adapter，能否提高注入的后期收益？
+
+H18-ActionReadout 将该问题拆成冻结 H9 30K 的低成本接口诊断：hidden-only、
+hidden-layer10 和 hidden-contribution 三个小型动作修正头共用冻结前向，仅比较 episode-held-out
+flow MSE。它不更新 LoRA，不加载 teacher，不是闭环成功率实验；正式任务 `136130` 尚无结果。

@@ -25,11 +25,27 @@ experiment_names:
     legacy_id: TaskAdapt
     parent: h9_fixed
     target_step: 5000
+  h18_action_readout:
+    display_name: "ACPD-v2-ActionReadout / 冻结贡献动作读出诊断"
+    legacy_id: H18
+    parent: h9_fixed
+    status: submitted_single_gpu_diagnostic
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
   checked_at: "2026-09-26 (Slurm query)"
   jobs:
+    - id: 136130
+      experiment: h18_action_readout
+      state: pending_priority
+      resources: 1gpu_8cpu_24g
+      smoke_job: 136129
+      purpose: frozen H9 30K action-readout diagnostic
+    - id: 136129
+      experiment: h18_action_readout_smoke
+      state: complete
+      resources: 1gpu_debug01_8cpu_24g
+      result: real checkpoint and fixed_dataset loaded; 2 steps completed without NaN
     - id: 135943
       experiment: acpd_v2_tdca_5k
       state: pending_priority
