@@ -21,6 +21,7 @@ mkdir -p "${eval_root}"
 submit_when_ready() {
   local step=$1
   local label=$2
+  local num_trials=$3
   local checkpoint_dir="${checkpoint_root}/${step}"
   local eval_dir="${eval_root}/${label}"
   local submitted_marker="${eval_dir}/.submitted"
@@ -43,10 +44,10 @@ submit_when_ready() {
     "${eval_dir}" \
     "${policy_config}" \
     backview_image \
-    250)
+    "${num_trials}")
   printf '%s\n' "${job_id}" >"${submitted_marker}"
   printf 'Submitted H19 %s evaluation as %s\n' "${label}" "${job_id}"
 }
 
-submit_when_ready 4999 5k
-submit_when_ready 9999 10k
+submit_when_ready 4999 5k 250
+submit_when_ready 9999 10k 500
