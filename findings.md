@@ -35,6 +35,11 @@
 
 ## 方法判断
 
+H17-Decay在15K完成Spatial/Object，成功率为41.80%/59.00%，比H9-Fixed低
+7.60/5.40点。其余评测根据已观察结果提前停止；这是探索性部分结果，不支持
+10K–15K权重0.2→0.05的中期收益，不证明所有调度无效。20K主比较仍未完成。
+证据：`experiments/ablation/acpd-v2-h17-contribution-decay/analysis-15k.md`。
+
 ACPD-v2 使用 teacher 真实 Q/K/V、完整 attention softmax、输出投影和 residual gate，
 分别提取 agentview 与 wrist 对 action token 的贡献。Student 在 layer 10 预测两个
 贡献向量，训练时使用 contribution loss，并在最终 hidden 上进行门控注入。

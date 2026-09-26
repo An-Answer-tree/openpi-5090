@@ -60,7 +60,7 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | H13-LossOnly | 判断 contribution 注入是否有效 | H9-Fixed 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9-Fixed 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
 | ACPD-v2-TDCA | 检验动作损失是否能改善 contribution 注入适配 | backview，layer 10，BS64，flow=1.0、contribution=0.2、ACL=0.5；仅开放 predictor 的动作梯度，训练至5K | 135943；验证135944 | 训练排队；全量验证等待依赖 | 尚无结论 |
 | ACL-only BS64 | 检验 contribution 学习和注入在 ACL 之外的增益 | backview，layer 10，BS64，flow=1.0、ACL=0.5、contribution=0、关闭注入；训练至35K | 135724；30K/35K验证135725/135726；分析135729/135728 | 训练排队；两点全量验证等待依赖 | 尚无结论 |
-| H17-Decay | 检验后期 contribution 权重是否过强 | H9-Fixed 10K完整状态→20K；BS64；10K–15K权重0.2→0.05，ACL=0.5 | 134422/136119/136120/136123/134423/134424 | 训练运行中；15K验证与配对分析已排队，20K验证等待训练完成 | 尚无结论 |
+| H17-Decay | 检验后期 contribution 权重是否过强 | H9-Fixed 10K完整状态→20K；BS64；10K–15K权重0.2→0.05，ACL=0.5 | 134422/136119/134423/134424 | 15K仅Spatial/Object完成后按用户要求停止；训练和20K验证链保留 | 15K两套41.80%/59.00%，比H9低7.60/5.40点；探索性部分结果，不支持该调度的中期收益；20K尚无结论 |
 
 ### H9-Fixed 轨迹任务
 
@@ -71,7 +71,9 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | 延长训练（H9-trajectory） | 原计划30K→60K；45K checkpoint完整后停训，验证35K/40K | 132390/132720/132724/134371/134372；取消135001/135002 | 35K为61.05%；40K为59.45%；45K验证已取消，尚无结论；50K/60K未训练 |
 
 H17-Decay 的主比较为同源 **H9-Fixed recovery 20K**，次比较为 SFT BS64 20K。
-H17 尚无验证结果，现有 H9 数值不属于 H17。
+H17 15K只有Spatial/Object部分结果，无四套pooled；详见
+`experiments/ablation/acpd-v2-h17-contribution-decay/analysis-15k.md`。
+20K主比较尚无结论，现有H9数值不属于H17。
 
 ## 当前机制实验
 

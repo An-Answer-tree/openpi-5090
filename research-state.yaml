@@ -87,17 +87,20 @@ current_execution:
       episodes: 2000
     - id: 136119
       experiment: h17_15k_full_eval
-      state: pending
+      state: stopped_by_user_after_spatial_object
+      completed_suites: {spatial: 0.418, object: 0.590}
+      completed_episodes: 1000
+      full_pooled_available: false
       resources: 4x1gpu_array
       episodes: 2000
     - id: 136120
       experiment: h17_15k_summary
-      state: dependency
+      state: cancelled_by_user
       depends_on: 136119
       resources: 1cpu_2g
     - id: 136123
       experiment: h17_15k_paired_analysis
-      state: dependency
+      state: cancelled_by_user
       depends_on: 136120
       resources: 1cpu_2g
     - id: 134424
