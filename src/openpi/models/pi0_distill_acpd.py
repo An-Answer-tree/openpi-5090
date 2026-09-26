@@ -194,6 +194,7 @@ class AcpdPi0(pi0.Pi0):
         timestep: at.Float[at.Array, " b"],
         *,
         train: bool = False,
+        include_final_hidden: bool = False,
     ) -> tuple[
         at.Float[at.Array, "b ah ad"],
         at.Float[at.Array, "b s ve"],
@@ -258,6 +259,8 @@ class AcpdPi0(pi0.Pi0):
         privileged_visual_tokens = jnp.concatenate(
             [image_tokens["base_0_rgb"], image_tokens["left_wrist_0_rgb"]], axis=1
         )
+        if include_final_hidden:
+            hiddens.append(suffix_out[:, -self.action_horizon :])
         return v_t, privileged_visual_tokens, hiddens
 
     @override
