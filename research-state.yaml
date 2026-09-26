@@ -28,7 +28,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-25 19:00 CST"
+  checked_at: "2026-09-26 (Slurm query)"
   jobs:
     - id: 135943
       experiment: acpd_v2_tdca_5k
@@ -85,6 +85,16 @@ current_execution:
       depends_on: 134422
       resources: 4x1gpu_array
       episodes: 2000
+    - id: 136113
+      experiment: h17_15k_full_eval
+      state: pending
+      resources: 4x1gpu_array
+      episodes: 2000
+    - id: 136114
+      experiment: h17_15k_summary
+      state: dependency
+      depends_on: 136113
+      resources: 1cpu_2g
     - id: 134424
       experiment: h17_20k_paired_analysis
       state: dependency
