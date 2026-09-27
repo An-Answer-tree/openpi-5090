@@ -8,8 +8,9 @@ import numpy as np
 import optax
 
 from openpi.models.pi0_distill_acpd import AcpdHead
+from openpi.models.pi0_distill_acpd import AcpdPi0
 from openpi.models.pi0_distill_acpd import AcpdPi0Config
-from openpi.models.pi0_distill_acpd import ActionReadoutHead
+from openpi.models.pi0_distill_acpd import ContributionFeatureFusion
 from openpi.models.pi0_distill_acpd import ExactContributionHead
 from openpi.training import checkpoints
 from openpi.training import config as training_config
@@ -126,15 +127,68 @@ def test_exact_contribution_head_has_stable_graph_metadata():
     assert jax.tree_util.tree_structure(first) == jax.tree_util.tree_structure(second)
 
 
-def test_action_readout_head_is_zero_initialized():
-    head = ActionReadoutHead(4, 7, 8, rngs=nnx.Rngs(0))
+def test_contribution_feature_fusion_starts_small_and_receives_task_gradient():
+    head = ContributionFeatureFusion(4, 8, rngs=nnx.Rngs(0))
     final_hidden = jnp.ones((2, 3, 4), dtype=jnp.float32)
     contributions = jnp.ones((2, 2, 3, 4), dtype=jnp.float32)
 
     output = head(final_hidden, contributions)
 
-    assert output.shape == (2, 3, 7)
-    np.testing.assert_allclose(output, 0.0, atol=1e-6)
+    assert output.shape == final_hidden.shape
+    assert float(jnp.linalg.norm(output - final_hidden)) < 0.05
+
+    def flow_loss(model):
+        return jnp.mean(jnp.square(model(final_hidden, contributions)))
+
+    _, gradients = nnx.value_and_grad(flow_loss)(head)
+    assert float(optax.global_norm(gradients["fc1"])) > 0.0
+    assert float(optax.global_norm(gradients["fc2"])) > 0.0
+
+
+def test_contribution_feature_fusion_matches_inference_and_detaches_predictor():
+    model = types.SimpleNamespace(
+        exact_contribution_fusion_location="final",
+        contribution_feature_fusion=True,
+        exact_contribution_task_gradient=False,
+        exact_contribution_head=ExactContributionHead(4, rngs=nnx.Rngs(0)),
+        contribution_feature_fusion_head=ContributionFeatureFusion(4, 8, rngs=nnx.Rngs(1)),
+    )
+    final_hidden = jnp.ones((2, 3, 4), dtype=jnp.float32)
+    student_hidden = jnp.ones((2, 3, 4), dtype=jnp.float32)
+    fuse_hidden = AcpdPi0._fuse_final_hidden  # noqa: SLF001
+
+    train_output = fuse_hidden(model, final_hidden, student_hidden, train=True)
+    eval_output = fuse_hidden(model, final_hidden, student_hidden, train=False)
+
+    np.testing.assert_allclose(train_output, eval_output)
+
+    def flow_loss(hidden):
+        fused = fuse_hidden(model, final_hidden, hidden, train=True)
+        return jnp.mean(jnp.square(fused))
+
+    np.testing.assert_allclose(jax.grad(flow_loss)(student_hidden), 0.0)
+
+
+def test_contribution_feature_fusion_is_used_when_decoding_actions():
+    suffix_output = jnp.arange(12, dtype=jnp.float32).reshape(1, 3, 4)
+    model = types.SimpleNamespace(
+        exact_contribution_fusion=True,
+        exact_contribution_injection=False,
+        contribution_feature_fusion=True,
+        exact_contribution_fusion_location="final",
+        action_horizon=3,
+        align_layers=(10,),
+        PaliGemma=types.SimpleNamespace(
+            llm=lambda *args, **kwargs: ((None, suffix_output), None, jnp.stack([suffix_output] * 18))
+        ),
+        _layer_index=lambda layer, depth: layer - 1,
+        _fuse_final_hidden=lambda hidden, student_hidden, train: hidden + 1,
+        action_out_proj=lambda hidden: hidden,
+    )
+
+    velocity = AcpdPi0._decode_action_velocity(model, suffix_output, None, None, None, None)  # noqa: SLF001
+
+    np.testing.assert_allclose(velocity, suffix_output + 1)
 
 
 def test_exact_contribution_loss_is_zero_for_equal_targets():
@@ -153,7 +207,7 @@ def test_acpd_v2_policy_configs_deploy_selected_layer():
         ("pi05_libero_backview_acpd_v2_layer10_lora", 10, "final", True),
         ("pi05_libero_backview_acpd_v2_layer10_aligned_lora", 10, "aligned_attention", True),
         ("pi05_libero_backview_acpd_v2_layer10_loss_only_lora", 10, "final", False),
-        ("pi05_libero_backview_acpd_v2_layer10_action_readout_lora", 10, "final", True),
+        ("pi05_libero_backview_acpd_v2_layer10_feature_fusion_lora", 10, "final", False),
     ):
         config = training_config.get_config(config_name)
 
@@ -163,8 +217,7 @@ def test_acpd_v2_policy_configs_deploy_selected_layer():
         assert config.model.exact_contribution_injection == injection
         assert config.model.exact_contribution_fusion_location == fusion_location
         assert not config.model.create_acpd_heads
-        if "action_readout" in config_name:
-            assert config.model.action_readout_input == "contribution"
+        assert config.model.contribution_feature_fusion == ("feature_fusion" in config_name)
 
 
 def test_acpd_v2_train_and_eval_models_have_matching_parameter_trees():
@@ -173,7 +226,7 @@ def test_acpd_v2_train_and_eval_models_have_matching_parameter_trees():
         ("pi05_libero_backview_acpd_v2_layer10_lora", 10, "final", True),
         ("pi05_libero_backview_acpd_v2_layer10_aligned_lora", 10, "aligned_attention", True),
         ("pi05_libero_backview_acpd_v2_layer10_loss_only_lora", 10, "final", False),
-        ("pi05_libero_backview_acpd_v2_layer10_action_readout_lora", 10, "final", True),
+        ("pi05_libero_backview_acpd_v2_layer10_feature_fusion_lora", 10, "final", False),
     ):
         distill_config = DistillTrainConfig(
             student_init_params="base/params",
@@ -184,7 +237,7 @@ def test_acpd_v2_train_and_eval_models_have_matching_parameter_trees():
             exact_contribution_fusion=True,
             exact_contribution_injection=injection,
             exact_contribution_fusion_location=fusion_location,
-            action_readout_input="contribution" if "action_readout" in config_name else "none",
+            contribution_feature_fusion="feature_fusion" in config_name,
         )
 
         student_config = _make_student_train_config(distill_config, create_acpd_heads=False)

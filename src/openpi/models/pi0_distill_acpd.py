@@ -125,28 +125,23 @@ class ExactContributionHead(nnx.Module):
         return final_hidden + gate * predicted_residual
 
 
-def _zero_kernel_init(key, shape, dtype=jnp.float32):
-    del key
-    return jnp.zeros(shape, dtype=dtype)
+class ContributionFeatureFusion(nnx.Module):
+    """Updates the action hidden state using predicted visual contributions."""
 
-
-class ActionReadoutHead(nnx.Module):
-    """Maps the final hidden state and predicted contributions to a correction."""
-
-    def __init__(self, hidden_dim: int, action_dim: int, hidden_width: int, *, rngs: nnx.Rngs):
+    def __init__(self, hidden_dim: int, hidden_width: int, *, rngs: nnx.Rngs):
         self.fc1 = nnx.Linear(3 * hidden_dim, hidden_width, rngs=rngs)
         self.fc2 = nnx.Linear(
             hidden_width,
-            action_dim,
-            kernel_init=_zero_kernel_init,
-            bias_init=_zero_kernel_init,
+            hidden_dim,
+            kernel_init=_exact_contribution_kernel_init,
             rngs=rngs,
         )
 
     def __call__(self, final_hidden: at.Array, predicted_contributions: at.Array) -> at.Array:
         predicted_contributions = einops.rearrange(predicted_contributions, "b v h d -> b h (v d)")
         features = jnp.concatenate([final_hidden, predicted_contributions], axis=-1).astype(jnp.float32)
-        return self.fc2(nnx.silu(self.fc1(features)))
+        update = self.fc2(nnx.silu(self.fc1(features)))
+        return final_hidden + update.astype(final_hidden.dtype)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -159,8 +154,8 @@ class AcpdPi0Config(pi0_config.Pi0Config):
     exact_contribution_injection: bool = True
     exact_contribution_task_gradient: bool = False
     exact_contribution_fusion_location: Literal["final", "aligned_attention"] = "final"
-    action_readout_input: Literal["none", "contribution"] = "none"
-    action_readout_hidden_dim: int = 128
+    contribution_feature_fusion: bool = False
+    feature_fusion_hidden_dim: int = 128
 
     @override
     def create(self, rng: at.KeyArrayLike) -> "AcpdPi0":
@@ -182,7 +177,7 @@ class AcpdPi0(pi0.Pi0):
         self.exact_contribution_injection = config.exact_contribution_injection
         self.exact_contribution_task_gradient = config.exact_contribution_task_gradient
         self.exact_contribution_fusion_location = config.exact_contribution_fusion_location
-        self.action_readout_input = config.action_readout_input
+        self.contribution_feature_fusion = config.contribution_feature_fusion
         if config.create_acpd_heads:
             self.acpd_aux_heads = nnx.Dict(
                 {
@@ -203,29 +198,38 @@ class AcpdPi0(pi0.Pi0):
                 action_expert_config.width,
                 rngs=rngs,
             )
-        if self.action_readout_input != "none":
-            if not self.exact_contribution_fusion:
-                raise ValueError("Action readout requires exact contribution fusion.")
+        if self.contribution_feature_fusion:
+            if not self.exact_contribution_fusion or self.exact_contribution_injection:
+                raise ValueError("Feature fusion requires contribution prediction without gate injection.")
             if self.exact_contribution_fusion_location != "final":
-                raise ValueError("Action readout currently requires final contribution fusion.")
-            self.action_readout_head = ActionReadoutHead(
+                raise ValueError("Feature fusion requires the final action hidden state.")
+            self.contribution_feature_fusion_head = ContributionFeatureFusion(
                 action_expert_config.width,
-                config.action_dim,
-                config.action_readout_hidden_dim,
+                config.feature_fusion_hidden_dim,
                 rngs=rngs,
             )
 
-    def _apply_action_readout(
+    def _fuse_final_hidden(
         self,
-        velocity: at.Array,
         final_hidden: at.Array,
         student_hidden: at.Array,
+        *,
+        train: bool,
     ) -> at.Array:
-        if self.action_readout_input == "none":
-            return velocity
-        predicted = jax.lax.stop_gradient(self.exact_contribution_head.predict(student_hidden))
-        correction = self.action_readout_head(final_hidden, predicted)
-        return velocity + correction.astype(velocity.dtype)
+        if self.exact_contribution_fusion_location != "final":
+            return final_hidden
+        if self.contribution_feature_fusion:
+            predicted = self.exact_contribution_head.predict(student_hidden)
+            if not (train and self.exact_contribution_task_gradient):
+                predicted = jax.lax.stop_gradient(predicted)
+            return self.contribution_feature_fusion_head(final_hidden, predicted)
+        if self.exact_contribution_fusion and self.exact_contribution_injection:
+            return self.exact_contribution_head.fuse(
+                final_hidden,
+                student_hidden,
+                detach_prediction=not (train and self.exact_contribution_task_gradient),
+            )
+        return final_hidden
 
     @staticmethod
     def _layer_index(layer: int, depth: int) -> int:
@@ -295,21 +299,8 @@ class AcpdPi0(pi0.Pi0):
                 hidden = hidden_intermediates[self._layer_index(layer, depth)][:, -self.action_horizon :]
                 hiddens.append(hidden if attention_intermediates is not None else _prenorm(hidden))
         final_hidden = suffix_out[:, -self.action_horizon :]
-        if (
-            self.exact_contribution_fusion
-            and self.exact_contribution_injection
-            and self.exact_contribution_fusion_location == "final"
-        ):
-            final_hidden = self.exact_contribution_head.fuse(
-                final_hidden,
-                hiddens[0],
-                detach_prediction=not (train and self.exact_contribution_task_gradient),
-            )
-        v_t = self._apply_action_readout(
-            self.action_out_proj(final_hidden),
-            final_hidden,
-            hiddens[0],
-        )
+        final_hidden = self._fuse_final_hidden(final_hidden, hiddens[0], train=train)
+        v_t = self.action_out_proj(final_hidden)
         privileged_visual_tokens = jnp.concatenate(
             [image_tokens["base_0_rgb"], image_tokens["left_wrist_0_rgb"]], axis=1
         )
@@ -326,7 +317,9 @@ class AcpdPi0(pi0.Pi0):
         kv_cache: gemma.KVCache,
         adarms_cond: at.Array | None,
     ) -> at.Array:
-        if not self.exact_contribution_fusion or not self.exact_contribution_injection:
+        if not self.exact_contribution_fusion or (
+            not self.exact_contribution_injection and not self.contribution_feature_fusion
+        ):
             return super()._decode_action_velocity(
                 suffix_tokens,
                 full_attn_mask,
@@ -362,15 +355,8 @@ class AcpdPi0(pi0.Pi0):
         assert prefix_out is None
         layer_index = self._layer_index(self.align_layers[0], action_intermediates.shape[0])
         student_hidden = _prenorm(action_intermediates[layer_index][:, -self.action_horizon :])
-        final_hidden = self.exact_contribution_head.fuse(
-            suffix_out[:, -self.action_horizon :],
-            student_hidden,
-        )
-        return self._apply_action_readout(
-            self.action_out_proj(final_hidden),
-            final_hidden,
-            student_hidden,
-        )
+        final_hidden = self._fuse_final_hidden(suffix_out[:, -self.action_horizon :], student_hidden, train=False)
+        return self.action_out_proj(final_hidden)
 
     @at.typecheck
     def compute_attention_contributions(

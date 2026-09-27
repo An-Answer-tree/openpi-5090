@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# H19-AR: train ACPD-v2 with a zero-initialized action readout head.
+# H19: fuse predicted visual contributions in the final action hidden state.
 # Extra arguments are appended to the training command for debug smoke tests.
-#SBATCH --job-name=pi05-bv-acpdv2-action-readout-bs64-30k
+#SBATCH --job-name=pi05-bv-acpdv2-feature-fusion-bs64-30k
 #SBATCH --partition=batch
 #SBATCH --exclude=gpu03
 #SBATCH --nodes=1
@@ -10,7 +10,7 @@
 #SBATCH --mem=96G
 #SBATCH --gres=gpu:4
 #SBATCH --time=5-00:00:00
-#SBATCH --output=/opt/liutong/openpi-5090-research/acpd-v2-h19-action-readout/slurm-log/%x_%j.out
+#SBATCH --output=/opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion/slurm-log/%x_%j.out
 
 set -euo pipefail
 
@@ -38,19 +38,19 @@ export XLA_PYTHON_CLIENT_PREALLOCATE=false
 
 mkdir -p /opt/liutong/openpi-slurm-tmp
 mkdir -p "${TMPDIR}"
-mkdir -p /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/action_readout_30k
+mkdir -p /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k
 
 nvidia-smi \
   --query-gpu=timestamp,index,uuid,memory.used,utilization.gpu \
   --format=csv,noheader,nounits \
-  --loop=5 > "/opt/liutong/openpi-5090-research/acpd-v2-h19-action-readout/slurm-log/${SLURM_JOB_NAME}_${SLURM_JOB_ID}_gpu.csv" &
+  --loop=5 > "/opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion/slurm-log/${SLURM_JOB_NAME}_${SLURM_JOB_ID}_gpu.csv" &
 gpu_monitor_pid=$!
 trap 'kill "${gpu_monitor_pid}" 2>/dev/null || true' EXIT
 
 cd /home/liutong/Projects/openpi-5090
 python -m scripts.distillation_acpd.train_distill \
-  --name=pi05_libero_backview_acpd_v2_action_readout \
-  --exp-name=pi05_libero_backview_acpd_v2_action_readout_lora_fsdp4_bs64_30k \
+  --name=pi05_libero_backview_acpd_v2_feature_fusion \
+  --exp-name=pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k \
   --student-config-name=pi05_libero_backview_lora \
   --student-init-params=/home/liutong/.cache/openpi-5090/pi05_base/params \
   --teacher-params=/opt/liutong/openpi_checkpoints/fixed_dataset/sft/agentview_wrist/29999/params \
@@ -64,11 +64,12 @@ python -m scripts.distillation_acpd.train_distill \
   --action-corr-loss-weight=0.5 \
   --align-layers 10 \
   --exact-contribution-fusion \
-  --action-readout-input=contribution \
-  --action-readout-hidden-dim=128 \
+  --no-exact-contribution-injection \
+  --contribution-feature-fusion \
+  --feature-fusion-hidden-dim=128 \
   --assets-dir=/home/liutong/Projects/openpi/assets/pi05_libero_agentview_wrist \
   --asset-id=libero_multiview \
-  --checkpoint-base-dir=/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/action_readout_30k \
+  --checkpoint-base-dir=/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k \
   --seed=42 \
   --batch-size=64 \
   --gradient-accumulation-steps=1 \

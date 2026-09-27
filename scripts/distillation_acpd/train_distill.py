@@ -76,8 +76,8 @@ class DistillTrainConfig:
     exact_contribution_injection: bool = True
     exact_contribution_task_gradient: bool = False
     exact_contribution_fusion_location: Literal["final", "aligned_attention"] = "final"
-    action_readout_input: Literal["none", "contribution"] = "none"
-    action_readout_hidden_dim: int = 128
+    contribution_feature_fusion: bool = False
+    feature_fusion_hidden_dim: int = 128
 
     assets_dir: str = tyro.MISSING
     asset_id: str = "libero_multiview"
@@ -128,7 +128,10 @@ class AcpdCheckpointWeightLoader:
         flat_loaded = traverse_util.flatten_dict(loaded_params, sep="/")
         flat_ref = traverse_util.flatten_dict(params, sep="/")
         for key, value in flat_ref.items():
-            if key.startswith(("acpd_aux_heads/", "exact_contribution_head/", "action_readout_head/")) and key not in flat_loaded:
+            if (
+                key.startswith(("acpd_aux_heads/", "exact_contribution_head/", "contribution_feature_fusion_head/"))
+                and key not in flat_loaded
+            ):
                 flat_loaded[key] = value
         return traverse_util.unflatten_dict(flat_loaded, sep="/")
 
@@ -247,7 +250,7 @@ def _make_distill_model_config(
     *,
     create_acpd_heads: bool,
     exact_contribution_fusion: bool,
-    action_readout_input: Literal["none", "contribution"] | None = None,
+    contribution_feature_fusion: bool | None = None,
 ) -> pi0_distill_acpd.AcpdPi0Config:
     if not isinstance(model_config, pi0_config.Pi0Config):
         raise ValueError(f"ACPD only supports Pi0Config, got {type(model_config).__name__}.")
@@ -262,8 +265,10 @@ def _make_distill_model_config(
         exact_contribution_injection=config.exact_contribution_injection,
         exact_contribution_task_gradient=config.exact_contribution_task_gradient,
         exact_contribution_fusion_location=config.exact_contribution_fusion_location,
-        action_readout_input=config.action_readout_input if action_readout_input is None else action_readout_input,
-        action_readout_hidden_dim=config.action_readout_hidden_dim,
+        contribution_feature_fusion=(
+            config.contribution_feature_fusion if contribution_feature_fusion is None else contribution_feature_fusion
+        ),
+        feature_fusion_hidden_dim=config.feature_fusion_hidden_dim,
     )
 
 
@@ -330,7 +335,7 @@ def _make_teacher_train_config(
             config,
             create_acpd_heads=False,
             exact_contribution_fusion=False,
-            action_readout_input="none",
+            contribution_feature_fusion=False,
         ),
         weight_loader=_weight_loaders.CheckpointWeightLoader(config.teacher_params),
     )
