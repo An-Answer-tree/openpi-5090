@@ -85,3 +85,4 @@
 | 2026-09-26 | 提交 | 将 TaskAdapt 规范命名为 ACPD-v2-TDCA（任务驱动贡献适配），预注册协议为5ac09a1，实现为b18cb10；训练135943（4卡BS64，5K）排队，完整验证135944等待训练成功。尚无结论。 |
 | 2026-09-27 | 方法 | 锁定 H18-ActionReadout：冻结 H9 BS64 30K，仅训练 hidden-only、hidden-layer10、hidden-contribution 三个匹配小型动作修正头；smoke `136129` 使用真实 checkpoint/fixed_dataset 通过，正式单卡诊断 `136130` 已提交。TDCA 保留，二者起点和假设不同。 |
 | 2026-09-27 | 结果 | H18 完成：hidden-contribution 相对冻结 H9 的 episode mean flow MSE 下降 `0.813%`，95% CI `[-1.804%, +0.031%]`；相对 hidden-layer10 变差 `0.029%`，未通过预设1%筛选，不进行该 head 的35K续训或仿真。 |
+| 2026-09-27 | 管理 | TDCA 5K checkpoint `4999` 完整；将等待2卡的验证135944替换为四套各500回合的单卡数组136221，汇总136222等待全部成功。旧验证已取消，任务成功率尚无结论。 |
