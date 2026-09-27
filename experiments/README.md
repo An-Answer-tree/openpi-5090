@@ -19,6 +19,7 @@
 | `ACPD-v2-Decay` | 10K 后 contribution 权重由 0.2 衰减到 0.05 | H17-Decay |
 | `ACPD-v2-NoInjection` | 保留 contribution 监督，关闭 residual 注入 | H13-LossOnly |
 | `ACPD-v2-TDCA` | 任务驱动贡献适配；训练时允许动作损失更新 contribution predictor | 原 TaskAdapt 提案 |
+| `ACPD-v2-FeatureFusion` | 预测两路贡献与最终 action hidden 融合，再使用原动作输出层 | H19 |
 | `ACL-only` | 仅保留 action-level consistency loss，不学习或注入 contribution | ACL-only BS64 |
 | `Contribution-Recovery-Probe` | 测量不同 transformer 层的 teacher contribution 可恢复性 | H7/H7.1 |
 | `Gradient-Compatibility-Diagnostic` | 测量 flow、contribution、ACL 梯度的方向关系 | H15a |
@@ -50,6 +51,7 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 | baseline | backview BS64 30K--60K | `baseline/sft-backview-bs64-trajectory-60k/` | 续训完成；35K为`57.15%`，40K/50K/60K验证排队 |
 | baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 全部完成 |
 | student | H9-Fixed 主实验（原H9-scale-b） | `student/acpd-v2-h9-batch-scaling-30k/` | 固定contribution=0.2；5K/10K/15K/25K/30K/35K有正式结果 |
+| student | H19-FeatureFusion BS64 30K | `student/acpd-v2-h19-feature-fusion-30k/protocol.md` | smoke `136339` 完成；正式训练 `136345` 排队，尚无验证结论 |
 | mechanism | H15a ACPD-v2 梯度冲突诊断 | `mechanism/acpd-v2-h15a-gradient-conflict/` | 完成；不支持后期梯度冲突假设 |
 | mechanism | H18-ActionReadout 冻结贡献动作读出诊断 | `mechanism/acpd-v2-h18-action-readout/` | smoke `136129` 完成；正式单卡诊断 `136130` 排队，尚无任务成功率结论 |
 | student | H9-Fixed 延长轨迹 | `student/acpd-v2-h9-trajectory-60k/` | 45K checkpoint完整后停训；35K为`61.05%`，40K为`59.45%`，45K验证已取消；50K/60K未训练 |

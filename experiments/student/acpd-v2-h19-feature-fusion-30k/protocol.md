@@ -22,6 +22,7 @@ flow loss 更新融合网络，但不经该路径直接更新预测器。
 | 训练 | 4×5090，FSDP LoRA，global BS64，累积 1，seed 42 |
 | 学习率 | warmup 1K，peak 2.5e-5，cosine 到 30K，末端 2.5e-6 |
 | Checkpoint | 每 5K 保存，`keep_period=1` |
+| 执行 | debug smoke `136339` 完成两步；正式训练 `136345` 排队 |
 
 ## 验证与判定
 

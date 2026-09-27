@@ -16,8 +16,9 @@ Privileged Distillation，固定权重）**。新实验称为 **ACPD-v2-Decay**�
 | ACPD-v2-Decay | H17-Decay | 10K–15K：0.2→0.05；之后 0.05 | 0.5 | 只改变 contribution 权重，训练至20K |
 | ACPD-v2-NoInjection | H13-LossOnly | 全程 0.2 | 0.5 | 去除 residual 注入，保留两个蒸馏 loss |
 | ACPD-v2-TDCA | TaskAdapt（新规范名） | 全程 0.2 | 0.5 | 训练时允许动作损失更新 contribution predictor |
+| ACPD-v2-FeatureFusion | H19 | 全程 0.2 | 0.5 | 预测两路贡献与最终 action hidden 融合，替代 scalar gate 注入 |
 
-上述三组均为 backview、layer 10；“Fixed/Decay”指 contribution loss 权重，
+上述实验均为 backview、layer 10；“Fixed/Decay”指 contribution loss 权重，
 不是学习率。H9-Fixed 与 H17-Decay 均沿用原 30K cosine LR。
 H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、验证和续训，
 不是新的方法。早期 BS32 的 H9 保留原编号，并明确标注 BS32。
@@ -57,6 +58,7 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 完成 | 30K pooled `78.65%` |
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 完成 | 30K pooled `77.00%` |
 | H9-Fixed | 固定权重 ACPD-v2 对照 | layer 10，BS64，contribution=0.2，ACL=0.5 | 129728/130773 | 30K完成；恢复与续训见下表 | 5K `23.15%`；10K `37.45%`；25K `55.75%`；30K `58.00%`；35K `61.05%` |
+| H19-FeatureFusion | 检验预测视觉贡献在动作输出前的特征融合能否提高最终成功率 | backview，layer 10，从 pi0.5 base 开始；4卡 FSDP LoRA，BS64，flow/contribution/ACL=1/0.2/0.5；30K，每5K保留checkpoint | smoke 136339；正式136345 | smoke完成两步；正式任务排队 | 尚无结论 |
 | H13-LossOnly | 判断 contribution 注入是否有效 | H9-Fixed 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9-Fixed 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
 | ACPD-v2-TDCA | 检验动作损失是否能改善 contribution 注入适配 | backview，layer 10，BS64，flow=1.0、contribution=0.2、ACL=0.5；仅开放 predictor 的动作梯度，训练至5K | 135943；验证136221；汇总136222 | 5K checkpoint完整；四套各500回合单卡验证排队 | 尚无结论 |
 | ACL-only BS64 | 检验 contribution 学习和注入在 ACL 之外的增益 | backview，layer 10，BS64，flow=1.0、ACL=0.5、contribution=0、关闭注入；训练至35K | 135724；30K/35K验证135725/135726；分析135729/135728 | 训练排队；两点全量验证等待依赖 | 尚无结论 |
@@ -198,6 +200,9 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H9 35K/SFT 30K 配对分析 | `experiments/student/acpd-v2-h9-trajectory-60k/results/h9_35k_vs_sft_30k_paired_analysis.json` |
 | H15a 梯度诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/protocol.md` |
 | H18 ActionReadout 协议与分析 | `experiments/mechanism/acpd-v2-h18-action-readout/`；原始结果 `/opt/liutong/openpi-5090-research/acpd-v2-h18-action-readout/results/136130/summary.json` |
+| H19-FeatureFusion 协议 | `experiments/student/acpd-v2-h19-feature-fusion-30k/protocol.md` |
+| H19-FeatureFusion checkpoint（待生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/` |
+| H19-FeatureFusion 训练日志 | `/opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion/slurm-log/pi05-bv-acpdv2-feature-fusion-bs64-30k_136345.out` |
 | H15a 快速诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/fast_protocol.md` |
 | H15a 快速诊断分析 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/analysis.md` |
 | H15a 结果目录 | `/opt/liutong/openpi-5090-research/acpd-v2-gradient-conflict/` |

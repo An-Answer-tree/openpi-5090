@@ -30,11 +30,11 @@ experiment_names:
     legacy_id: H18
     parent: h9_fixed
     status: submitted_single_gpu_diagnostic
-  h19_action_readout_trajectory:
-    display_name: "ACPD-v2-ActionReadout / 端到端动作读出轨迹"
-    legacy_id: H19-AR
-    parent: h9_fixed
-    action_readout_input: contribution
+  h19_feature_fusion_trajectory:
+    display_name: "ACPD-v2-FeatureFusion / 预测贡献的动作特征融合"
+    legacy_id: H19
+    comparison: [h9_fixed, backview_sft_bs64]
+    contribution_feature_fusion: true
     target_steps: [5000, 10000, 30000]
     status: submitted_pending
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
@@ -54,24 +54,18 @@ current_execution:
       state: complete
       resources: 1gpu_debug01_8cpu_24g
       result: real checkpoint and fixed_dataset loaded; 2 steps completed without NaN
-    - id: 136138
-      experiment: h19_action_readout_smoke
+    - id: 136339
+      experiment: h19_feature_fusion_smoke
       state: complete
       resources: 1gpu_debug01_8cpu_32g
-      result: real base and teacher loaded; 2 steps completed without NaN; checkpoint writing disabled
-    - id: 136147
-      experiment: h19_action_readout_trajectory
+      result: real_base_teacher_and_fixed_dataset; 2_optimizer_steps_without_nan; no_checkpoint
+    - id: 136345
+      experiment: h19_feature_fusion_trajectory
       state: pending_priority
       resources: 4gpu_32cpu_96g
       time_limit: 5-00:00:00
       target_steps: [5000, 10000, 30000]
-      purpose: end-to-end action readout from pi0.5 base with ACPD-v2 layer10
-    - id: 136164
-      experiment: h19_action_readout_checkpoint_watcher
-      state: running_cpu_poll
-      resources: 1cpu_2g
-      depends_on: 136147_checkpoint_paths
-      purpose: submit 5K and 10K evaluations after complete checkpoint markers appear
+      purpose: feature_fusion_from_pi05_base_with_acpd_v2_layer10
     - id: 135943
       experiment: acpd_v2_tdca_5k
       state: complete_checkpoint_4999
