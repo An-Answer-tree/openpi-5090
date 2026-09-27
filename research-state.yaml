@@ -116,14 +116,13 @@ current_execution:
       resources: 2gpu_16cpu_48g
     - id: 134422
       experiment: h17_contribution_decay_10k_to_20k
-      state: running
-      node: gpu01
+      state: complete
       resources: 4gpu_32cpu_96g
       time_limit: 5-00:00:00
       submitted_at: "2026-09-24 11:03 CST"
     - id: 134423
       experiment: h17_20k_full_eval
-      state: dependency
+      state: cancelled_by_user_after_partial_15k_negative
       depends_on: 134422
       resources: 4x1gpu_array
       episodes: 2000
@@ -147,7 +146,7 @@ current_execution:
       resources: 1cpu_2g
     - id: 134424
       experiment: h17_20k_paired_analysis
-      state: dependency
+      state: cancelled_by_user
       depends_on: [134423, 134008]
       resources: 1cpu_2g
     - id: 134008
