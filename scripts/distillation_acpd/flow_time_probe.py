@@ -1,6 +1,7 @@
 """Compares paired SFT and ACPD-v2 flow errors across fixed time bins."""
 
 import dataclasses
+import gc
 import json
 import logging
 import os
@@ -36,12 +37,10 @@ class FlowTimeProbeConfig:
     all_times_per_sample: bool = False
 
 
-def _paired_errors(rng, sft_state: FrozenModelState, acpd_state: FrozenModelState, batch, batch_index, time_index):
-    """Evaluates both models on the same noisy action and flow target."""
-    sft_model = nnx.merge(sft_state.model_def, sft_state.params)
-    acpd_model = nnx.merge(acpd_state.model_def, acpd_state.params)
-    sft_model.eval()
-    acpd_model.eval()
+def _model_errors(rng, model_state: FrozenModelState, batch, batch_index, time_index):
+    """Evaluates one frozen model on a deterministic noisy action and target."""
+    model = nnx.merge(model_state.model_def, model_state.params)
+    model.eval()
     _, observation, actions = batch
     preprocess_rng, noise_rng = jax.random.split(rng)
     noise = jax.random.normal(noise_rng, actions.shape)
@@ -50,25 +49,61 @@ def _paired_errors(rng, sft_state: FrozenModelState, acpd_state: FrozenModelStat
     flow_time = (time_bin.astype(jnp.float32) + 0.5) / 5.0
     noisy_actions = flow_time[:, None, None] * noise + (1 - flow_time[:, None, None]) * actions
     target = noise - actions
-    sft_velocity, _, _ = sft_model.compute_train_outputs(
-        preprocess_rng, observation, noisy_actions, flow_time, train=False
-    )
-    acpd_velocity, _, _ = acpd_model.compute_train_outputs(
-        preprocess_rng, observation, noisy_actions, flow_time, train=False
-    )
+    velocity, _, _ = model.compute_train_outputs(preprocess_rng, observation, noisy_actions, flow_time, train=False)
 
     def mse(velocity, action_dim):
         return jnp.mean(jnp.square(velocity[..., :action_dim] - target[..., :action_dim]), axis=(1, 2))
 
     return (
         time_bin,
-        mse(sft_velocity, 7),
-        mse(acpd_velocity, 7),
-        mse(sft_velocity, 32),
-        mse(acpd_velocity, 32),
-        _centered_action_cosine(sft_velocity, target),
-        _centered_action_cosine(acpd_velocity, target),
+        mse(velocity, 7),
+        mse(velocity, 32),
+        _centered_action_cosine(velocity, target),
     )
+
+
+def _evaluate_model(
+    config: FlowTimeProbeConfig,
+    model_config,
+    params_path: str,
+    init_rng: jax.Array,
+    sample_rng: jax.Array,
+    mesh: jax.sharding.Mesh,
+    data_sharding: jax.sharding.Sharding,
+    replicated: jax.sharding.Sharding,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Runs one model pass, returning host-side metrics and sample identifiers."""
+    state, state_sharding = _init_frozen_model_state(model_config, init_rng, mesh, params_path)
+    jax.block_until_ready(state)
+    loader = _create_paired_data_loader(
+        config, model_config, sharding_=data_sharding, shuffle=True, include_episode_index=True
+    )
+    model_errors = jax.jit(
+        _model_errors,
+        in_shardings=(replicated, state_sharding, data_sharding, replicated, replicated),
+    )
+    time_rows, error_rows, episode_rows = [], [], []
+    with sharding.set_mesh(mesh):
+        for batch_index, (*batch, episode_ids) in zip(range(config.num_batches), loader, strict=False):
+            for time_index in range(5) if config.all_times_per_sample else (-1,):
+                values = model_errors(
+                    jax.random.fold_in(sample_rng, batch_index),
+                    state,
+                    tuple(batch),
+                    jnp.asarray(batch_index),
+                    jnp.asarray(time_index),
+                )
+                time_bin, *errors = jax.device_get(values)
+                time_rows.append(np.asarray(time_bin))
+                error_rows.append(np.stack(errors, axis=-1))
+                episode_rows.append(np.asarray(jax.device_get(episode_ids)).reshape(-1))
+            if (batch_index + 1) % 16 == 0:
+                logging.info("Evaluated %d/%d batches", batch_index + 1, config.num_batches)
+
+    del model_errors, loader, state
+    jax.clear_caches()
+    gc.collect()
+    return np.concatenate(time_rows), np.concatenate(error_rows), np.concatenate(episode_rows)
 
 
 def _centered_action_cosine(velocity: jax.Array, target: jax.Array) -> jax.Array:
@@ -140,38 +175,26 @@ def main(config: FlowTimeProbeConfig) -> None:
     replicated = jax.sharding.NamedSharding(mesh, jax.sharding.PartitionSpec())
     rng = jax.random.key(config.seed)
     sft_rng, acpd_rng, sample_rng = jax.random.split(rng, 3)
-    sft_state, sft_sharding = _init_frozen_model_state(sft_train_config, sft_rng, mesh, config.sft_params)
-    acpd_state, acpd_sharding = _init_frozen_model_state(acpd_train_config, acpd_rng, mesh, config.acpd_params)
-    jax.block_until_ready((sft_state, acpd_state))
-    loader = _create_paired_data_loader(
-        acpd_config, acpd_train_config, sharding_=data_sharding, shuffle=True, include_episode_index=True
+    sft_time_bins, sft_metrics, sft_episodes = _evaluate_model(
+        acpd_config, sft_train_config, config.sft_params, sft_rng, sample_rng, mesh, data_sharding, replicated
     )
-    paired_errors = jax.jit(
-        _paired_errors,
-        in_shardings=(replicated, sft_sharding, acpd_sharding, data_sharding, replicated, replicated),
+    acpd_time_bins, acpd_metrics, acpd_episodes = _evaluate_model(
+        acpd_config, acpd_train_config, config.acpd_params, acpd_rng, sample_rng, mesh, data_sharding, replicated
     )
-    rows, episode_rows, time_rows = [], [], []
-    with sharding.set_mesh(mesh):
-        for batch_index, (*batch, episode_ids) in zip(range(config.num_batches), loader, strict=False):
-            for time_index in range(5) if config.all_times_per_sample else (-1,):
-                values = paired_errors(
-                    jax.random.fold_in(sample_rng, batch_index),
-                    sft_state,
-                    acpd_state,
-                    tuple(batch),
-                    jnp.asarray(batch_index),
-                    jnp.asarray(time_index),
-                )
-                time_bin, *errors = jax.device_get(values)
-                time_rows.append(np.asarray(time_bin))
-                rows.append(np.stack(errors, axis=-1))
-                episode_rows.append(np.asarray(jax.device_get(episode_ids)).reshape(-1))
-            if (batch_index + 1) % 16 == 0:
-                logging.info("Paired batches %d/%d", batch_index + 1, config.num_batches)
-
-    time_bins = np.concatenate(time_rows)
-    errors = np.concatenate(rows)
-    episodes = np.concatenate(episode_rows)
+    if not (np.array_equal(sft_time_bins, acpd_time_bins) and np.array_equal(sft_episodes, acpd_episodes)):
+        raise RuntimeError("SFT and ACPD passes did not replay the same sample order.")
+    time_bins = sft_time_bins
+    episodes = sft_episodes
+    errors = np.column_stack(
+        [
+            sft_metrics[:, 0],
+            acpd_metrics[:, 0],
+            sft_metrics[:, 1],
+            acpd_metrics[:, 1],
+            sft_metrics[:, 2],
+            acpd_metrics[:, 2],
+        ]
+    )
     if not np.isfinite(errors).all():
         raise FloatingPointError("Non-finite flow errors in probe.")
     summary = {
