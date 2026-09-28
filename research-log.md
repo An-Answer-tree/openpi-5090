@@ -105,3 +105,5 @@
 | 2026-09-29 | 提交 | 修复动作方向诊断的显存占用和配置接口后，debug smoke `136895` 使用真实5K checkpoint、2个batch完成并exit 0；正式5K/10K数组 `136897_[0-1%1]` 依赖该 smoke 提交，结果尚未产生。 |
 | 2026-09-29 | 提交 | Teacher-Action-MSE 5K 消融 `136914` 已提交：4×5090、FSDP、physical BS64、teacher-action MSE 权重0.1；四套全量验证 `136916`、汇总 `136917` 和配对分析 `136918` 已建立依赖链。 |
 | 2026-09-29 | 复核 | 修正 `136918` 配对分析脚本中的两个历史 baseline 路径，改为实际存在的 H9 5K `acpd-v2-injection-location-5k/final-hidden/4999` 与 SFT 5K `sft-backview-bs64-5k/4999`；验证脚本语法、目录和 YAML 状态均通过。 |
+| 2026-09-29 | 复核 | 发现旧 gate oracle 分析生成时 10K/30K 输入顺序颠倒；按 checkpoint 路径重算 `reliability-analysis.json` 并同步台账。实际为10K相关性`-0.8791`、30K`-0.8943`，不影响原始 on/off MSE。 |
+| 2026-09-29 | 结果 | 用既有 gate probe 的 episode MSE 计算不可部署的理想 on/off 选择上限：10K相对关闭注入降低`0.00005999`（95%区间`[-0.00007270,-0.00004780]`），30K降低`0.00004081`（`[-0.00004926,-0.00003281]`）；支持继续测试可观测可靠性 gate。 |

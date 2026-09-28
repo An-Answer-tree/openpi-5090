@@ -65,6 +65,10 @@ experiment_names:
       step_10k: [-0.00001628865, 0.00003203806]
       step_30k: [-0.00001384337, 0.00001951568]
     mean_sample_velocity_delta_ratio: {step_10k: 0.00289575, step_30k: 0.00187224}
+    oracle_policy_mse_minus_off: {step_10k: -0.00005999, step_30k: -0.00004081}
+    oracle_policy_ci95:
+      step_10k: [-0.00007270, -0.00004780]
+      step_30k: [-0.00004926, -0.00003281]
   h9_gate_observable_reliability:
     display_name: "ACPD-v2 可观测视角一致性可靠性诊断"
     protocol: experiments/mechanism/acpd-v2-gate-effect/observable-reliability-protocol.md
