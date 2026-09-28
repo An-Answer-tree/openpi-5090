@@ -45,6 +45,18 @@
 | H9推理注入是否改善局部动作MSE | 同checkpoint离线ON−OFF：10K `+0.00000834`、30K `+0.00000261`，按episode配对区间均跨0；注入速度变化比均值为`0.290%/0.187%` | 注入只造成小幅速度改变，未检测到局部MSE改善；不能从离线结果推断闭环成功率，等待10K同checkpoint仿真消融。 |
 | 单视角 baseline 是否受视角影响 | left/right/top/backview 30K pooled 分别为 `78.65/77.00/71.55/60.45%` | 视角差异大；ACPD 必须使用相同 student 视角的 SFT 对照。 |
 
+## 文献约束
+
+Lopez-Paz et al. (2015) 将 privileged information 表述为只在训练阶段可见的
+额外描述，并讨论了“先重建特权描述、再拼回 student”的直接方案可能比直接
+蒸馏 teacher 输出更困难。Xiao et al. (NeurIPS 2024) 进一步形式化了部分可观测
+环境中的边界：相同 student 观测可能对应不同真实状态和不同 expert 动作，直接
+模仿不可辨识的 teacher 信息可能严格次优。它们与本项目的 H7/H18 结果相容：
+contribution 可以被预测，不代表预测 contribution 在动作接口中有独立收益。
+因此后续改进应优先检验与真实动作行为相关、且能由 student 观测解释的 teacher
+信号，而不是无条件增加内部 contribution predictor 的容量。文献笔记：
+`literature/privileged-distillation.md`。
+
 ## 方法判断
 
 H17-Decay在15K完成Spatial/Object，成功率为41.80%/59.00%，比H9-Fixed低

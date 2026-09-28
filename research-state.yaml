@@ -783,6 +783,7 @@ evidence_gaps:
   - "ACL-only must be rerun at BS64 for the final fair ablation."
   - "H17 nonzero contribution decay has partial negative 15K results; its 20K comparison was cancelled and remains unresolved."
   - "A flow-trained adapter after the detached contribution is needed only if lowering the contribution weight does not help."
+  - "Whether teacher contribution contains student-unidentifiable components is open; action-direction probe and same-checkpoint closed-loop injection are the next low-cost tests."
 
 constraints:
   - "Do not move or delete datasets or checkpoints."
