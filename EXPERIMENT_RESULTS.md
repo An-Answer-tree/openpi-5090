@@ -37,6 +37,7 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | ACPD-v2 在 15K 是否仍优于 SFT | H9-Fixed 为 `46.60%`，SFT 为 `40.90%`；差值 `+5.70` 点，配对 95% CI `[+3.25, +8.15]`。 | 相同 2,000 episodes |
 | ACPD-v2 的早期优势何时消失 | 20K 时差值 `+2.40` 点，95% CI `[-0.15, +5.00]`，已无可检测 pooled 优势；25K 为 `-0.05` 点，95% CI `[-2.50, +2.45]`。 | 相同 2,000 episodes |
 | ACPD-v2 在20K的任务差异 | Object 比 SFT 高 `9.60` 点，Goal 低 `8.20` 点；两项配对区间均不跨0。pooled 的 `+2.40` 点区间跨0。 | H9/SFT 20K 配对分析 |
+| 20K差异是否集中在少数任务 | Object 20K 有8/10任务为正，30K为5/10；Spatial 20K与30K逐任务差值Spearman `-0.881`。方向随训练变化，固定任务路由缺乏依据。 | 20/25/30K逐任务日志分析 |
 | ACPD-v2 从 5K 继续训练是否有效 | 同一 H9-scale-b 训练在 30K 达到 `58.00%`，比 5K 高 `34.85` 点；匹配 SFT 30K 为 `60.45%`，尚未证明最终优势。 | 4×500 episodes |
 | H9 25K 是否早于 30K 达峰 | 不支持。25K 为 `55.75%`，30K 为 `58.00%`；25K-30K 为 `-2.25` 点，95% CI `[-4.70, +0.20]`。 | 相同 2,000 episodes |
 | H9 在 30K 后是否继续提高 | 35K 为 `61.05%`，比 30K 高 `3.05` 点，配对 95% CI `[+0.60, +5.50]`。但相对 SFT 30K 仅高 `0.60` 点，95% CI `[-1.90, +3.05]`，尚不能证明最终优于 SFT。 | 相同 2,000 episodes |
@@ -89,6 +90,7 @@ H17 15K只有Spatial/Object部分结果，无四套pooled；详见
 | H18-ActionReadout | 检查冻结 H9 的 contribution 是否能被小型动作修正头有效使用 | H9 BS64 30K 冻结；hidden-only、hidden-layer10、hidden-contribution 三组；单卡500步、BS8 | smoke 136129；正式136130 | 完成；无仿真 | contribution 相对冻结 H9 MSE 下降 `0.813%`，95% CI `[-1.804%, +0.031%]`；相对 layer10 对照变差 `0.029%`，未通过1%筛选 |
 | Flow-time 5K | 检查早期优势是否对应特定时间段的 flow 误差 | 冻结 SFT/H9 5K；首轮512样本，复核128样本且每样本5个 t；单卡只读 | 136591、136595 | 完成；无仿真 | 首轮整体无差异；首轮 t=0.1 信号在同样本复核中未复现（差值 `+0.00283`，95% CI 跨0）；不支持启动时间重采样训练 |
 | H9 10K 推理期注入消融 | 同一个 H9 checkpoint 仅在推理时关闭 contribution 注入，判断部署时是否依赖该分支 | 四套各500回合；与原H9结果配对 | 136866、136867 | 验证排队；分析等待依赖 | 尚无结论 |
+| 中期逐任务差异 | 检查20/25/30K的H9−SFT差异是否稳定 | 只读三组全量验证日志，每任务50回合 | 无新Slurm任务 | 完成；探索性 | Object 20K 8/10任务为正，30K仅5/10；Goal三点均负的任务有4个；不能由套件均值推断普遍收益 |
 
 ## 探索性快速轨迹
 
@@ -237,6 +239,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | ACPD-v2-TDCA 与 H9 5K 配对分析 | `experiments/ablation/acpd-v2-tdca-5k/results/tdca_vs_h9_5k_paired_analysis.json` |
 | Flow-time 5K 诊断协议、结果与日志 | `experiments/mechanism/acpd-v2-flow-time-5k/`；结果 `results/136591/summary.json`、`results/136595/summary.json` |
 | H9 10K 推理期注入消融 | `experiments/mechanism/acpd-v2-h9-inference-injection-10k/`；验证 `/opt/liutong/openpi-5090-evals/acpd-v2-h9-inference-ablation/9999/` |
+| ACPD-v2逐任务差异 | `experiments/mechanism/acpd-v2-task-heterogeneity/analysis.md`；原始三组日志路径见该文 |
 | H14 多视角结果 | `experiments/baseline/sft-multiview-bs64-30k/analysis.md` |
 | SFT 验证目录 | `/opt/liutong/openpi-5090-evals/` |
 | ACPD 验证目录 | `/opt/liutong/openpi-5090-evals/acpd-*` |

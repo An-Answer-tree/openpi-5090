@@ -50,6 +50,11 @@ experiment_names:
     status: submitted_pending
     eval_job_id: 136866
     analysis_job_id: 136867
+  h9_task_heterogeneity:
+    display_name: "ACPD-v2 20K--30K 逐任务差异"
+    protocol: experiments/mechanism/acpd-v2-task-heterogeneity/protocol.md
+    status: complete_exploratory
+    result: experiments/mechanism/acpd-v2-task-heterogeneity/analysis.md
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
