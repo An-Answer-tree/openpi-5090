@@ -133,7 +133,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-29 05:22 CST (observable gate reliability probe 136904 submitted)"
+  checked_at: "2026-09-29 05:54 CST (observable gate probe 136904 and dependent CPU summary 136913 submitted)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -214,6 +214,12 @@ current_execution:
       checkpoints: [9999, 29999]
       batches_per_checkpoint: 128
       purpose: held_out_episode_prediction_from_view_only_features
+    - id: 136913
+      experiment: h9_gate_observable_reliability_summary
+      state: dependency
+      resources: 1cpu_2g
+      depends_on: 136904
+      purpose: held_out_auc_and_policy_mse_summary
     - id: 135943
       experiment: acpd_v2_tdca_5k
       state: complete_checkpoint_4999
