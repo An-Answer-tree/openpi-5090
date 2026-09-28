@@ -60,7 +60,26 @@ def _paired_errors(rng, sft_state: FrozenModelState, acpd_state: FrozenModelStat
     def mse(velocity, action_dim):
         return jnp.mean(jnp.square(velocity[..., :action_dim] - target[..., :action_dim]), axis=(1, 2))
 
-    return time_bin, mse(sft_velocity, 7), mse(acpd_velocity, 7), mse(sft_velocity, 32), mse(acpd_velocity, 32)
+    return (
+        time_bin,
+        mse(sft_velocity, 7),
+        mse(acpd_velocity, 7),
+        mse(sft_velocity, 32),
+        mse(acpd_velocity, 32),
+        _centered_action_cosine(sft_velocity, target),
+        _centered_action_cosine(acpd_velocity, target),
+    )
+
+
+def _centered_action_cosine(velocity: jax.Array, target: jax.Array) -> jax.Array:
+    """Matches ACL's centered cosine on the real seven action dimensions."""
+    prediction = velocity[..., :7].astype(jnp.float32).reshape((velocity.shape[0], -1))
+    truth = target[..., :7].astype(jnp.float32).reshape((target.shape[0], -1))
+    prediction -= jnp.mean(prediction, axis=-1, keepdims=True)
+    truth -= jnp.mean(truth, axis=-1, keepdims=True)
+    prediction /= jnp.maximum(jnp.linalg.norm(prediction, axis=-1, keepdims=True), 1e-6)
+    truth /= jnp.maximum(jnp.linalg.norm(truth, axis=-1, keepdims=True), 1e-6)
+    return jnp.sum(prediction * truth, axis=-1)
 
 
 def _summarize_bin(rows: np.ndarray, episodes: np.ndarray, seed: int) -> dict[str, float | int | list[float]]:
@@ -68,8 +87,10 @@ def _summarize_bin(rows: np.ndarray, episodes: np.ndarray, seed: int) -> dict[st
     unique_episodes = np.unique(episodes)
     episode_means = np.stack([rows[episodes == episode].mean(axis=0) for episode in unique_episodes])
     difference = episode_means[:, 1] - episode_means[:, 0]
+    direction_difference = episode_means[:, 5] - episode_means[:, 4]
     indices = np.random.default_rng(seed).integers(len(unique_episodes), size=(2000, len(unique_episodes)))
     ci95 = np.percentile(difference[indices].mean(axis=1), [2.5, 97.5])
+    direction_ci95 = np.percentile(direction_difference[indices].mean(axis=1), [2.5, 97.5])
     return {
         "samples": len(rows),
         "episodes": len(unique_episodes),
@@ -79,6 +100,10 @@ def _summarize_bin(rows: np.ndarray, episodes: np.ndarray, seed: int) -> dict[st
         "paired_ci95": ci95.tolist(),
         "sft_mse32": float(episode_means[:, 2].mean()),
         "acpd_mse32": float(episode_means[:, 3].mean()),
+        "sft_target_cosine7": float(episode_means[:, 4].mean()),
+        "acpd_target_cosine7": float(episode_means[:, 5].mean()),
+        "acpd_minus_sft_target_cosine7": float(direction_difference.mean()),
+        "target_cosine7_ci95": direction_ci95.tolist(),
     }
 
 
@@ -89,23 +114,23 @@ def main(config: FlowTimeProbeConfig) -> None:
         raise ValueError("Flow-time probe requires one visible GPU.")
     output_dir = pathlib.Path(config.output_dir) / os.environ.get("SLURM_JOB_ID", "local")
     output_dir.mkdir(parents=True, exist_ok=False)
-    common = dict(
-        name="pi05_libero_backview_acpd_v2_layer10",
-        exp_name="flow_time_5k_probe",
-        student_init_params=config.acpd_params,
-        teacher_params=config.acpd_params,
-        dataset_repo_id=config.dataset_repo_id,
-        teacher_view_key="backview_image",
-        teacher_use_wrist_image=False,
-        assets_dir=config.assets_dir,
-        checkpoint_base_dir=config.output_dir,
-        align_layers=(10,),
-        batch_size=config.batch_size,
-        num_workers=0,
-        fsdp_devices=1,
-        seed=config.seed,
-        wandb_enabled=False,
-    )
+    common = {
+        "name": "pi05_libero_backview_acpd_v2_layer10",
+        "exp_name": "flow_time_5k_probe",
+        "student_init_params": config.acpd_params,
+        "teacher_params": config.acpd_params,
+        "dataset_repo_id": config.dataset_repo_id,
+        "teacher_view_key": "backview_image",
+        "teacher_use_wrist_image": False,
+        "assets_dir": config.assets_dir,
+        "checkpoint_base_dir": config.output_dir,
+        "align_layers": (10,),
+        "batch_size": config.batch_size,
+        "num_workers": 0,
+        "fsdp_devices": 1,
+        "seed": config.seed,
+        "wandb_enabled": False,
+    }
     acpd_config = DistillTrainConfig(**common, exact_contribution_fusion=True)
     sft_config = dataclasses.replace(acpd_config, exact_contribution_fusion=False)
     acpd_train_config = _make_student_train_config(acpd_config, create_acpd_heads=False)
@@ -154,7 +179,9 @@ def main(config: FlowTimeProbeConfig) -> None:
         "config": dataclasses.asdict(config),
         "pooled": _summarize_bin(errors, episodes, config.seed),
         "time_bins": {
-            str((index + 0.5) / 5): _summarize_bin(errors[time_bins == index], episodes[time_bins == index], config.seed)
+            str((index + 0.5) / 5): _summarize_bin(
+                errors[time_bins == index], episodes[time_bins == index], config.seed
+            )
             for index in range(5)
         },
     }

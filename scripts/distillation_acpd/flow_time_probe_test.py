@@ -2,15 +2,16 @@
 
 import numpy as np
 
+from scripts.distillation_acpd.flow_time_probe import _centered_action_cosine
 from scripts.distillation_acpd.flow_time_probe import _summarize_bin
 
 
 def test_summary_pairs_models_within_episode():
     rows = np.array(
         [
-            [1.0, 2.0, 3.0, 4.0],
-            [3.0, 4.0, 5.0, 6.0],
-            [5.0, 4.0, 7.0, 6.0],
+            [1.0, 2.0, 3.0, 4.0, 0.2, 0.4],
+            [3.0, 4.0, 5.0, 6.0, 0.4, 0.6],
+            [5.0, 4.0, 7.0, 6.0, 0.5, 0.3],
         ]
     )
     summary = _summarize_bin(rows, np.array([1, 1, 2]), seed=42)
@@ -20,3 +21,15 @@ def test_summary_pairs_models_within_episode():
     assert summary["sft_mse7"] == 3.5
     assert summary["acpd_mse7"] == 3.5
     assert summary["acpd_minus_sft_mse7"] == 0.0
+    assert np.isclose(summary["acpd_minus_sft_target_cosine7"], 0.0)
+
+
+def test_centered_action_cosine_ignores_offset_and_unused_dimensions():
+    target = np.zeros((1, 2, 32), dtype=np.float32)
+    target[0, 0, 0] = 1.0
+    prediction = target.copy() + 2.0
+    prediction[..., 7:] = -100.0
+
+    cosine = _centered_action_cosine(prediction, target)
+
+    assert np.isclose(float(cosine[0]), 1.0)
