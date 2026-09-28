@@ -110,6 +110,7 @@ def test_final_hidden_option_preserves_original_velocity(monkeypatch):
             self.exact_contribution_injection = True
             self.exact_contribution_task_gradient = False
             self.exact_contribution_fusion_location = "final"
+            self.contribution_feature_fusion = False
             self.exact_contribution_head = ExactContributionHead(4, rngs=nnx.Rngs(0))
             self.exact_contribution_head.gate.value = jnp.asarray(0.1)
             self.PaliGemma = nnx.Dict(llm=TinyLlm())
