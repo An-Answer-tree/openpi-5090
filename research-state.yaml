@@ -50,6 +50,13 @@ experiment_names:
     status: submitted_pending
     eval_job_id: 136866
     analysis_job_id: 136867
+  h9_agent_only_injection_10k:
+    display_name: "ACPD-v2 Agentview-only 推理注入 10K"
+    protocol: experiments/ablation/acpd-v2-agent-only-injection-10k/protocol.md
+    status: code_ready_not_submitted
+    checkpoint: 9999
+    view_mask: [true, false]
+    primary_metric: pooled_paired_success_vs_h9_full
   h9_gate_effect_probe:
     display_name: "ACPD-v2 注入对动作速度的离线影响"
     protocol: experiments/mechanism/acpd-v2-gate-effect/protocol.md

@@ -615,6 +615,7 @@ def _make_pi05_libero_acpd_v2_config(
     *,
     fusion_location: Literal["final", "aligned_attention"] = "final",
     injection: bool = True,
+    view_mask: tuple[bool, bool] = (True, True),
     feature_fusion: bool = False,
     feature_fusion_use_contribution: bool = True,
 ) -> TrainConfig:
@@ -628,6 +629,7 @@ def _make_pi05_libero_acpd_v2_config(
         exact_contribution_fusion=True,
         exact_contribution_injection=injection,
         exact_contribution_fusion_location=fusion_location,
+        exact_contribution_view_mask=view_mask,
         contribution_feature_fusion=feature_fusion,
         feature_fusion_use_contribution=feature_fusion_use_contribution,
     )
@@ -639,7 +641,12 @@ def _make_pi05_libero_acpd_v2_config(
     elif fusion_location == "aligned_attention":
         name = f"pi05_libero_backview_acpd_v2_layer{layer}_aligned_lora"
     else:
-        name = "pi05_libero_backview_acpd_v2_lora" if layer == 9 else f"pi05_libero_backview_acpd_v2_layer{layer}_lora"
+        if view_mask == (True, False):
+            name = f"pi05_libero_backview_acpd_v2_layer{layer}_agent_only_lora"
+        elif view_mask == (False, True):
+            name = f"pi05_libero_backview_acpd_v2_layer{layer}_wrist_only_lora"
+        else:
+            name = "pi05_libero_backview_acpd_v2_lora" if layer == 9 else f"pi05_libero_backview_acpd_v2_layer{layer}_lora"
     return dataclasses.replace(
         base,
         name=name,
@@ -856,6 +863,8 @@ _CONFIGS = [
     _make_pi05_libero_lora_config("backview"),
     _make_pi05_libero_acpd_v2_config(),
     _make_pi05_libero_acpd_v2_config(layer=10),
+    _make_pi05_libero_acpd_v2_config(layer=10, view_mask=(True, False)),
+    _make_pi05_libero_acpd_v2_config(layer=10, view_mask=(False, True)),
     _make_pi05_libero_acpd_v2_config(layer=10, fusion_location="aligned_attention"),
     _make_pi05_libero_acpd_v2_config(layer=10, injection=False),
     _make_pi05_libero_acpd_v2_config(layer=10, injection=False, feature_fusion=True),

@@ -107,3 +107,4 @@
 | 2026-09-29 | 复核 | 修正 `136918` 配对分析脚本中的两个历史 baseline 路径，改为实际存在的 H9 5K `acpd-v2-injection-location-5k/final-hidden/4999` 与 SFT 5K `sft-backview-bs64-5k/4999`；验证脚本语法、目录和 YAML 状态均通过。 |
 | 2026-09-29 | 复核 | 发现旧 gate oracle 分析生成时 10K/30K 输入顺序颠倒；按 checkpoint 路径重算 `reliability-analysis.json` 并同步台账。实际为10K相关性`-0.8791`、30K`-0.8943`，不影响原始 on/off MSE。 |
 | 2026-09-29 | 结果 | 用既有 gate probe 的 episode MSE 计算不可部署的理想 on/off 选择上限：10K相对关闭注入降低`0.00005999`（95%区间`[-0.00007270,-0.00004780]`），30K降低`0.00004081`（`[-0.00004926,-0.00003281]`）；支持继续测试可观测可靠性 gate。 |
+| 2026-09-29 | 方法 | 离线分支 probe 在10K/30K均显示 agentview-only MSE方向优于关闭、wrist-only方向相反，虽区间跨0；锁定低成本 H9 10K agentview-only 闭环消融，mask 只作用于推理，不修改 checkpoint。 |

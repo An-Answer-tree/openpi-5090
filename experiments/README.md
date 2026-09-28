@@ -54,6 +54,7 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 | student | H19-FeatureFusion BS64 30K | `student/acpd-v2-h19-feature-fusion-30k/protocol.md` | smoke `136339` 完成；正式训练 `136345` 排队，尚无验证结论 |
 | mechanism | H15a ACPD-v2 梯度冲突诊断 | `mechanism/acpd-v2-h15a-gradient-conflict/` | 完成；不支持后期梯度冲突假设 |
 | mechanism | H18-ActionReadout 冻结贡献动作读出诊断 | `mechanism/acpd-v2-h18-action-readout/` | 完成；离线MSE未检测到contribution独立收益，无仿真 |
+| ablation | H9 Agentview-only 注入 10K | `ablation/acpd-v2-agent-only-injection-10k/` | 冻结 H9 10K，仅屏蔽 wrist contribution；待闭环验证 |
 | student | H9-Fixed 延长轨迹 | `student/acpd-v2-h9-trajectory-60k/` | 45K checkpoint完整后停训；35K为`61.05%`，40K为`59.45%`，45K验证已取消；50K/60K未训练 |
 | student | H9-Fixed 中期轨迹20K--30K | `student/acpd-v2-h9-20k-30k-trajectory/` | 恢复训练到20K；20K/25K验证完成 |
 | student | H9-Fixed/SFT 早期轨迹10K--20K | `student/acpd-v2-h9-early-trajectory/` | 10K/15K/20K正式比较完成；20K pooled 优势区间跨0 |

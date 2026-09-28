@@ -77,6 +77,7 @@ class DistillTrainConfig:
     exact_contribution_injection: bool = True
     exact_contribution_task_gradient: bool = False
     exact_contribution_fusion_location: Literal["final", "aligned_attention"] = "final"
+    exact_contribution_view_mask: tuple[bool, bool] = (True, True)
     contribution_feature_fusion: bool = False
     feature_fusion_use_contribution: bool = True
     feature_fusion_hidden_dim: int = 128
@@ -267,6 +268,7 @@ def _make_distill_model_config(
         exact_contribution_injection=config.exact_contribution_injection,
         exact_contribution_task_gradient=config.exact_contribution_task_gradient,
         exact_contribution_fusion_location=config.exact_contribution_fusion_location,
+        exact_contribution_view_mask=config.exact_contribution_view_mask,
         contribution_feature_fusion=(
             config.contribution_feature_fusion if contribution_feature_fusion is None else contribution_feature_fusion
         ),
