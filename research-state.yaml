@@ -53,12 +53,18 @@ experiment_names:
   h9_gate_effect_probe:
     display_name: "ACPD-v2 注入对动作速度的离线影响"
     protocol: experiments/mechanism/acpd-v2-gate-effect/protocol.md
-    status: running_10k_30k_waiting_array_limit
+    status: complete_exploratory_offline
+    result: experiments/mechanism/acpd-v2-gate-effect/analysis.md
     smoke_job_id: 136878
     formal_array_job_id: 136879
     checkpoints: [9999, 29999]
     batches_per_checkpoint: 128
     batch_size: 8
+    on_minus_off_mse: {step_10k: 0.00000834465, step_30k: 0.00000260770}
+    episode_bootstrap_ci95:
+      step_10k: [-0.00001628865, 0.00003203806]
+      step_30k: [-0.00001384337, 0.00001951568]
+    mean_sample_velocity_delta_ratio: {step_10k: 0.00289575, step_30k: 0.00187224}
   h9_task_heterogeneity:
     display_name: "ACPD-v2 20K--30K 逐任务差异"
     protocol: experiments/mechanism/acpd-v2-task-heterogeneity/protocol.md
@@ -93,11 +99,11 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-29 02:39 CST (Slurm query and completed gate smoke)"
+  checked_at: "2026-09-29 03:06 CST (Slurm query and completed gate probe)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
-      state: running_10k_30k_waiting_array_limit
+      state: completed_exit_0_both_tasks
       resources: 2x1gpu_array_max1_8cpu_24g
       checkpoints: [9999, 29999]
       purpose: local_action_velocity_on_off_and_per_view_effect

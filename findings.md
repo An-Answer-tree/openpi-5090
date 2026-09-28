@@ -42,6 +42,7 @@
 | 后期辅助梯度是否更冲突 | 正式 BS32 中组合冲突率在 5K/30K 均为 `0%`，cosine 中位数为 `0.6279/0.5920` | 不支持后期辅助梯度冲突解释，不优先运行梯度投影。 |
 | Contribution 是否可能形成后期约束 | 30K时其加权梯度范数为flow的`1.175`倍，cosine仅`0.0957`；25K--40K预测cosine从`0.7972`升至`0.8026` | 近正交梯度是否限制后期成功率仍是假设；由H17-Decay测试。 |
 | 注入支路是否接收任务梯度 | predicted residual使用`stop_gradient`；flow不能经该支路更新predictor，能更新gate；共享主干仍接收flow梯度 | 注入缺少直接任务梯度是代码事实，是否导致后期优势消失尚无结论。 |
+| H9推理注入是否改善局部动作MSE | 同checkpoint离线ON−OFF：10K `+0.00000834`、30K `+0.00000261`，按episode配对区间均跨0；注入速度变化比均值为`0.290%/0.187%` | 注入只造成小幅速度改变，未检测到局部MSE改善；不能从离线结果推断闭环成功率，等待10K同checkpoint仿真消融。 |
 | 单视角 baseline 是否受视角影响 | left/right/top/backview 30K pooled 分别为 `78.65/77.00/71.55/60.45%` | 视角差异大；ACPD 必须使用相同 student 视角的 SFT 对照。 |
 
 ## 方法判断
@@ -114,3 +115,7 @@ H18 已完成：hidden-contribution 相对冻结 H9 的 episode mean flow MSE �
 复杂度。它只说明当前 contribution 接口没有可检测的独立动作收益，不否定 H7/H9 已观察到的
 contribution 可恢复性或 H9 早期仿真收益。详见
 `experiments/mechanism/acpd-v2-h18-action-readout/analysis.md`。
+
+同 checkpoint 离线注入诊断在10K/30K均未检测到7维flow MSE改善。它使“小gate
+未必改变动作”的疑问具体化：速度确实改变，但样本级改变量均值不足0.3%。
+该结果不能判定闭环增益是否来自训练期辅助目标；10K推理关闭注入的正式仿真仍待完成。
