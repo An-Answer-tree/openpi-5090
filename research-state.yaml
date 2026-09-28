@@ -61,6 +61,7 @@ experiment_names:
     status: complete_exploratory
     result: experiments/mechanism/acpd-v2-early-task-coverage/analysis.md
     positive_tasks_10k: 32
+    positive_tasks_10k_episode_bootstrap_ci95: [27, 34]
     positive_tasks_10k_retained_15k: 20
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 

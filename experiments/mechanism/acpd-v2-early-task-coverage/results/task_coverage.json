@@ -94,7 +94,7 @@
           "positive": 7,
           "negative": 2,
           "zero": 1,
-          "difference": 0.128
+          "difference": 0.12799999999999997
         },
         "goal": {
           "positive": 8,
@@ -106,7 +106,7 @@
           "positive": 8,
           "negative": 1,
           "zero": 1,
-          "difference": 0.07400000000000001
+          "difference": 0.074
         }
       },
       "task_differences": {
@@ -182,7 +182,7 @@
           "positive": 6,
           "negative": 3,
           "zero": 1,
-          "difference": 0.044
+          "difference": 0.044000000000000004
         }
       },
       "task_differences": {
@@ -228,6 +228,28 @@
         "spatial/pick up the black bowl on the wooden cabinet and place it on the plate": 0.0
       }
     }
+  },
+  "bootstrap": {
+    "seed": 42,
+    "resamples": 2000,
+    "positive_task_count_ci95": {
+      "5000": [
+        22.0,
+        29.0
+      ],
+      "10000": [
+        27.0,
+        34.0
+      ],
+      "15000": [
+        20.0,
+        28.0
+      ]
+    },
+    "positive_10k_retained_15k_ci95": [
+      14.0,
+      23.0
+    ]
   },
   "positive_10k_remaining_positive_15k": 20,
   "positive_10k_becoming_nonpositive_15k": 12,

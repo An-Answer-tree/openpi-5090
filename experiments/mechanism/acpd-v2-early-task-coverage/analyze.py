@@ -18,8 +18,8 @@ _SUITES = ("spatial", "object", "goal", "libero_10")
 _EPISODES = set(range(50))
 
 
-def _task_differences(paired_result: pathlib.Path) -> dict[str, float]:
-    """Returns treatment-minus-baseline success for each matched task."""
+def _task_episode_differences(paired_result: pathlib.Path) -> dict[str, np.ndarray]:
+    """Returns paired treatment-minus-baseline outcomes for each task."""
     config = json.loads(paired_result.read_text())
     baseline_dir = pathlib.Path(config["baseline_dir"]) / "logs"
     treatment_dir = pathlib.Path(config["treatment_dir"]) / "logs"
@@ -34,8 +34,10 @@ def _task_differences(paired_result: pathlib.Path) -> dict[str, float]:
             episodes = {episode for name, episode in baseline if name == task}
             if episodes != _EPISODES:
                 raise ValueError(f"Incomplete episodes for {suite}/{task}: {paired_result}")
-            delta = sum(int(treatment[task, episode]) - int(baseline[task, episode]) for episode in _EPISODES)
-            differences[f"{suite}/{task}"] = delta / len(_EPISODES)
+            differences[f"{suite}/{task}"] = np.array(
+                [int(treatment[task, episode]) - int(baseline[task, episode]) for episode in sorted(_EPISODES)],
+                dtype=np.int8,
+            )
     return differences
 
 
@@ -47,9 +49,35 @@ def _counts(differences: dict[str, float]) -> dict[str, int]:
     }
 
 
+def _bootstrap_coverage(by_step: dict[int, dict[str, np.ndarray]], tasks: list[str]) -> dict:
+    """Resamples matched episode indices across checkpoints."""
+    steps = (5000, 10000, 15000)
+    outcomes = np.stack([[by_step[step][task] for task in tasks] for step in steps])
+    rng = np.random.default_rng(42)
+    indices = rng.integers(len(_EPISODES), size=(2_000, len(tasks), len(_EPISODES)))
+    sampled = np.take_along_axis(outcomes[:, None], indices[None], axis=-1).mean(axis=-1)
+    positive = sampled > 0
+
+    def interval(values: np.ndarray) -> list[float]:
+        return [float(value) for value in np.percentile(values, [2.5, 97.5])]
+
+    return {
+        "seed": 42,
+        "resamples": 2_000,
+        "positive_task_count_ci95": {
+            str(step): interval(positive[index].sum(axis=-1)) for index, step in enumerate(steps)
+        },
+        "positive_10k_retained_15k_ci95": interval((positive[1] & positive[2]).sum(axis=-1)),
+    }
+
+
 def analyze() -> dict:
     """Compares task-level gains at 5K, 10K, and 15K."""
-    by_step = {step: _task_differences(path) for step, path in _PAIRED_RESULTS.items()}
+    outcomes = {step: _task_episode_differences(path) for step, path in _PAIRED_RESULTS.items()}
+    by_step = {
+        step: {task: float(np.mean(values)) for task, values in task_outcomes.items()}
+        for step, task_outcomes in outcomes.items()
+    }
     keys = set(by_step[10000])
     if any(set(differences) != keys for differences in by_step.values()):
         raise ValueError("Task sets differ between checkpoints")
@@ -78,6 +106,7 @@ def analyze() -> dict:
     largest_change = max(changes, key=lambda key: abs(changes[key]))
     return {
         "steps": steps,
+        "bootstrap": _bootstrap_coverage(outcomes, ordered),
         "positive_10k_remaining_positive_15k": sum(early[key] > 0 and later[key] > 0 for key in keys),
         "positive_10k_becoming_nonpositive_15k": sum(early[key] > 0 and later[key] <= 0 for key in keys),
         "spearman_10k_15k": float(
