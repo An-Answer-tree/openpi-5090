@@ -98,4 +98,5 @@
 | 2026-09-29 | 提交 | debug smoke `136890`（debug01，5K，2 batches）因三张卡均被占用而等待资源；正式数组 `136892_[0-1%1]` 以 `afterok:136890` 依赖提交，分别读取5K/10K，尚无结果。 |
 | 2026-09-29 | 文献反思 | 阅读 Lopez-Paz et al. (2015) 与 Xiao et al. (2024) 原文：特权内部描述可恢复不等于可改善 student 动作；部分可观测时直接模仿不可辨识的 teacher 信息可能严格次优。后续优先区分行为相关信号与不可辨识内部特征，文献笔记见 `literature/privileged-distillation.md`。 |
 | 2026-09-29 | 结果 | 复核 H9 训练日志的 7 个记录点：teacher task loss 始终低于 student，`teacher_better_ratio` 为 `0.9958--1.0000`。该训练诊断支持动作级 teacher 信号具有任务相关性，但不是 SFT 对照或闭环因果证据；详见 `experiments/mechanism/acpd-v2-teacher-action-diagnostic/analysis.md`。 |
+| 2026-09-29 | 结果 | H9 窗口 task-loss 比显示 student/teacher 从 `10.89×` 降至 `5.49×`，但 H9 相对 SFT 的成功率优势在25K--30K消失；该负面证据将后续重点从“增强 teacher 目标”转向“改善特权信息到动作的转换接口”。 |
 | 2026-09-29 | 提交 | 修复动作方向诊断的显存占用和配置接口后，debug smoke `136895` 使用真实5K checkpoint、2个batch完成并exit 0；正式5K/10K数组 `136897_[0-1%1]` 依赖该 smoke 提交，结果尚未产生。 |

@@ -44,6 +44,7 @@
 | 注入支路是否接收任务梯度 | predicted residual使用`stop_gradient`；flow不能经该支路更新predictor，能更新gate；共享主干仍接收flow梯度 | 注入缺少直接任务梯度是代码事实，是否导致后期优势消失尚无结论。 |
 | H9推理注入是否改善局部动作MSE | 同checkpoint离线ON−OFF：10K `+0.00000834`、30K `+0.00000261`，按episode配对区间均跨0；注入速度变化比均值为`0.290%/0.187%` | 注入只造成小幅速度改变，未检测到局部MSE改善；不能从离线结果推断闭环成功率，等待10K同checkpoint仿真消融。 |
 | H9训练中的teacher动作目标是否可靠 | 训练日志七个记录点的`teacher_better_ratio`为`0.9958--1.0000`，且`teacher_task_loss`始终低于`student_task_loss` | 提供动作级 teacher 信号有效的正向机制证据；统计来自训练 batch，未与SFT配对，也不能证明注入的因果收益。 |
+| teacher信号强但后期成功率优势消失说明什么 | H9窗口中student/teacher task-loss比从`10.89×`降至`5.49×`，而H9相对SFT的成功率优势在25K--30K消失 | teacher目标质量不是唯一瓶颈；应优先改进特权信息到最终动作的转换接口，不能只增加teacher或contribution loss权重。 |
 | 单视角 baseline 是否受视角影响 | left/right/top/backview 30K pooled 分别为 `78.65/77.00/71.55/60.45%` | 视角差异大；ACPD 必须使用相同 student 视角的 SFT 对照。 |
 
 ## 文献约束
