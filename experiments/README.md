@@ -61,6 +61,7 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 | ablation | ACPD-v2-TDCA 5K | `ablation/acpd-v2-tdca-5k/` | 完成；pooled `21.35%`，相对 H9-Fixed `-1.80` 点，95% CI 跨零 |
 | ablation | H17-Decay BS64 | `ablation/acpd-v2-h17-contribution-decay/` | 从H9-Fixed 10K分支；训练134422运行，验证134423、配对分析134424等待依赖 |
 | ablation | ACL-only BS64 35K | `ablation/acpd-v2-acl-only-bs64-35k/protocol.md` | 训练135724运行；30K/35K全量验证135725/135726、分析135729/135728等待依赖；尚无结论 |
+| mechanism | 5K flow 时间段误差 | `mechanism/acpd-v2-flow-time-5k/` | 单卡只读诊断136591完成；整体 MSE 无差异，详见 analysis |
 
 H11 已归档，不进入正式 checkpoint 集合，也不继续训练。
 H9-Fixed 的恢复、早中期验证及延长训练是同一方法的不同执行阶段，不作为独立消融。

@@ -1,11 +1,14 @@
 # 执行状态
 
-2026-09-28 14:00 CST：协议已锁定，单卡只读探针和 `debug01` Slurm 脚本
-已完成静态检查、CLI 检查及纯数值单元测试（3 passed）；**尚未提交或运行 GPU
-诊断，尚无实验结果**。两个 checkpoint、资产目录和 fixed_dataset 路径均已确认存在。
+2026-09-28：协议已锁定，单卡只读探针和 `debug01` Slurm 脚本已完成静态检查、
+CLI 检查及纯数值单元测试（3 passed）。两个 checkpoint、资产目录和 fixed_dataset
+路径均已确认存在。
 
-当前 `debug01` 有 2/3 张 GPU 被 Slurm 任务占用，节点实际可用内存约 11G；
-唯一账面空闲 GPU 仍不能排除非 Slurm 进程占用。探针需要加载两个 pi0.5
-checkpoint，申请 24G 单卡会继续等待或有 OOM 风险，因此暂不提交，避免影响
-已有训练和排队任务。未修改训练任务、checkpoint 或数据集。后续仅在能确认
-分配到空闲 GPU 且有至少 24G 节点内存时执行协议。
+10:34 CST 的检查曾发现 GPU0 上有非 Slurm 进程，因此没有立即提交。
+13:57 CST 复核时，Slurm 作业分别占用 GPU0/GPU2，GPU1 空闲；Linux available
+内存约 316GiB（先前误将 `FreeMem` 当成可用内存）。`sbatch --test-only` 通过后，
+提交只读诊断 `136591`，已在 `debug01` GPU1 运行并开始恢复 SFT checkpoint。
+14:05 CST 完成，Slurm 状态 `COMPLETED`、退出码 `0:0`、用时 7 分 49 秒。
+日志：`slurm-log/probe-bv-flow-time-5k_136591.out`；原始结果：
+`results/136591/summary.json`、`results/136591/paired_errors.npz`。
+未修改已有训练、排队任务、checkpoint 或数据集。

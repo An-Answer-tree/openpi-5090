@@ -40,13 +40,20 @@ experiment_names:
   flow_time_5k_probe:
     display_name: "ACPD-v2/SFT 5K flow 时间段误差诊断"
     protocol: experiments/mechanism/acpd-v2-flow-time-5k/protocol.md
-    status: code_verified_not_submitted
-    reason: "debug01 GPU0 has a non-Slurm process; one-GPU allocation may overlap"
+    status: complete_exploratory
+    job_id: 136591
+    result: experiments/mechanism/acpd-v2-flow-time-5k/results/136591/summary.json
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-28 10:15 CST (Slurm query and TDCA summary)"
+  checked_at: "2026-09-28 14:05 CST (Slurm query and flow-time probe)"
   jobs:
+    - id: 136591
+      experiment: flow_time_5k_probe
+      state: completed_exit_0
+      resources: 1gpu_debug01_8cpu_24g
+      samples: 512
+      result: pooled_mse7_difference_minus_0.00001; low_t_difference_plus_0.01146; no_simulation
     - id: 136130
       experiment: h18_action_readout
       state: complete_exploratory_negative
