@@ -23,6 +23,13 @@ from scripts.distillation_acpd.train_distill import _make_student_train_config
 from scripts.train import init_logging
 
 _BRANCHES = ("off", "agent_only", "wrist_only", "on")
+_METRIC_NAMES = (
+    "velocity_delta_rms_ratio",
+    "delta_to_ideal_correction_cosine",
+    "view_delta_cosine",
+    "view_delta_disagreement",
+    "view_norm_imbalance",
+)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -68,10 +75,18 @@ def _measure(rng, state: FrozenModelState, batch):
     correction = target - velocity_off
     delta_norm = jnp.linalg.norm(delta, axis=(1, 2))
     correction_norm = jnp.linalg.norm(correction, axis=(1, 2))
+    agent_delta = velocity_agent - velocity_off
+    wrist_delta = velocity_wrist - velocity_off
+    agent_delta_norm = jnp.linalg.norm(agent_delta, axis=(1, 2))
+    wrist_delta_norm = jnp.linalg.norm(wrist_delta, axis=(1, 2))
+    view_norm = jnp.maximum(agent_delta_norm + wrist_delta_norm, 1e-8)
     metrics = jnp.stack(
         [
             delta_norm / jnp.maximum(jnp.linalg.norm(velocity_off, axis=(1, 2)), 1e-8),
             jnp.sum(delta * correction, axis=(1, 2)) / jnp.maximum(delta_norm * correction_norm, 1e-8),
+            jnp.sum(agent_delta * wrist_delta, axis=(1, 2)) / jnp.maximum(agent_delta_norm * wrist_delta_norm, 1e-8),
+            jnp.linalg.norm(agent_delta - wrist_delta, axis=(1, 2)) / view_norm,
+            jnp.abs(agent_delta_norm - wrist_delta_norm) / view_norm,
         ],
         axis=1,
     )
@@ -91,11 +106,13 @@ def _analyze(errors: np.ndarray, metrics: np.ndarray, episodes: np.ndarray, *, s
         difference = means[index] - means[0]
         ci95 = np.percentile(resampled[:, index] - resampled[:, 0], [2.5, 97.5])
         comparisons[name] = {"mse_difference_vs_off": float(difference), "paired_ci95": ci95.tolist()}
+    metric_means = episode_metrics.mean(axis=0)
     return {
         "episode_mean_mse": dict(zip(_BRANCHES, means.tolist(), strict=True)),
         "branch_vs_off": comparisons,
-        "velocity_delta_rms_ratio": float(episode_metrics[:, 0].mean()),
-        "delta_to_ideal_correction_cosine": float(episode_metrics[:, 1].mean()),
+        "velocity_delta_rms_ratio": float(metric_means[0]),
+        "delta_to_ideal_correction_cosine": float(metric_means[1]),
+        "metric_means": dict(zip(_METRIC_NAMES[: metrics.shape[1]], metric_means.tolist(), strict=True)),
         "validation_episodes_sampled": len(episode_ids),
         "benchmark_success_available": False,
     }
@@ -167,7 +184,13 @@ def main(config: GateEffectProbeConfig) -> None:
         {"config": dataclasses.asdict(config), "gate": float(gate), "slurm_job_id": os.environ.get("SLURM_JOB_ID")}
     )
     (output_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
-    np.savez(output_dir / "per_sample.npz", errors=errors, metrics=metrics, episode_index=episodes)
+    np.savez(
+        output_dir / "per_sample.npz",
+        errors=errors,
+        metrics=metrics,
+        metric_names=np.asarray(_METRIC_NAMES),
+        episode_index=episodes,
+    )
     logging.info("Gate effect: %s", summary["branch_vs_off"]["on"])
 
 
