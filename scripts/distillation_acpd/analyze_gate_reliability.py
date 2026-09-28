@@ -27,14 +27,18 @@ def _group_summary(delta: np.ndarray, cosine: np.ndarray, aligned: np.ndarray) -
 def analyze_reliability(errors: np.ndarray, metrics: np.ndarray, episode_index: np.ndarray) -> dict:
     """Returns sample and episode correlations for the oracle correction cosine."""
     delta = errors[:, 3] - errors[:, 0]
+    magnitude_ratio = metrics[:, 0]
     oracle_cosine = metrics[:, 1]
     episode_delta = _episode_means(delta, episode_index)
+    episode_magnitude = _episode_means(magnitude_ratio, episode_index)
     episode_cosine = _episode_means(oracle_cosine, episode_index)
     return {
         "samples": len(delta),
         "episodes": len(episode_delta),
         "sample_cosine_delta_correlation": float(np.corrcoef(oracle_cosine, delta)[0, 1]),
         "episode_cosine_delta_correlation": float(np.corrcoef(episode_cosine, episode_delta)[0, 1]),
+        "sample_magnitude_delta_correlation": float(np.corrcoef(magnitude_ratio, delta)[0, 1]),
+        "episode_magnitude_delta_correlation": float(np.corrcoef(episode_magnitude, episode_delta)[0, 1]),
         "episode_groups": {
             "oracle_aligned_cosine_ge_0": _group_summary(episode_delta, episode_cosine, episode_cosine >= 0),
             "oracle_misaligned_cosine_lt_0": _group_summary(episode_delta, episode_cosine, episode_cosine < 0),

@@ -101,4 +101,5 @@
 | 2026-09-29 | 结果 | H9 窗口 task-loss 比显示 student/teacher 从 `10.89×` 降至 `5.49×`，但 H9 相对 SFT 的成功率优势在25K--30K消失；该负面证据将后续重点从“增强 teacher 目标”转向“改善特权信息到动作的转换接口”。 |
 | 2026-09-29 | 结果 | 复用 H9 10K/30K gate probe 的逐样本数组：完整注入使约54.12%/52.06% episode 的离线MSE下降，同时使45.88%/47.94%上升，均值接近0。支持条件化 gate 的机制动机，但尚无可预测性或闭环收益证据。 |
 | 2026-09-29 | 结果 | 新增 CPU oracle 分析脚本 `scripts/distillation_acpd/analyze_gate_reliability.py`：真实 correction cosine 与 `on-off` MSE 的 episode correlation 为10K `-0.8943`、30K `-0.8791`；aligned组82.5%--90.3%受益，misaligned组仅2.7%--3.7%受益。该量不可用于推理，下一步检验可观测可靠性估计。 |
+| 2026-09-29 | 结果 | 同一脚本显示注入改变量大小与 `on-off` MSE 的 episode correlation 仅为10K `0.0158`、30K `-0.0951`；不支持仅按 contribution/速度范数调 gate。 |
 | 2026-09-29 | 提交 | 修复动作方向诊断的显存占用和配置接口后，debug smoke `136895` 使用真实5K checkpoint、2个batch完成并exit 0；正式5K/10K数组 `136897_[0-1%1]` 依赖该 smoke 提交，结果尚未产生。 |

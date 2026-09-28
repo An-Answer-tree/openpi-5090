@@ -58,6 +58,7 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | H9 两路预测贡献是否存在稳定的局部误差差异 | wrist单路−agentview单路 MSE：10K `+0.00002726`，95% CI `[+0.00000761,+0.00004680]`；30K `+0.00001012`，区间跨0 | 探索性分路分析；10K有微小差异，30K未复现，两路交互未检出；不能据此确定分路gate有闭环收益。 |
 | H9 gate 作用是否存在 episode 异质性 | 复用10K/30K逐样本 `on-off` MSE，按194个 episode 统计正负方向 | 无新Slurm任务 | 完成；探索性 | 10K约54.12% episode受益、45.88%变差；30K约52.06%受益、47.94%变差；支持条件化 gate 假设但不证明动态 gate 有效 |
 | H9 gate 可靠性 oracle 诊断 | 复用 gate probe 的真实 flow target，按 oracle correction cosine 分组 | 无新Slurm任务 | 完成；探索性 | episode correlation 为10K `-0.8943`、30K `-0.8791`；cosine≥0时 `90.3%/82.5%` episode受益，cosine<0时 `3.7%/2.7%`受益；支持学习可靠性 gate 的下一步 |
+| H9 gate 幅度代理诊断 | 复用 gate probe 的速度改变量大小与 `on-off` MSE | 无新Slurm任务 | 完成；探索性 | episode correlation 仅为10K `0.0158`、30K `-0.0951`；不支持仅按贡献范数调 gate |
 
 ## 正式 BS64 实验
 
