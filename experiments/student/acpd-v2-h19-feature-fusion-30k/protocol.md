@@ -20,7 +20,9 @@ contribution 的对照，才能将收益归因于特权信息，而不是模型�
 
 代码已加入容量匹配对照开关 `--no-feature-fusion-use-contribution`：保持同一个
 `3×1024→128→1024` 融合网络和参数量，但将两路 contribution 输入置零。该对照尚未
-提交，待 H19 结果出来后再决定是否运行；默认值为使用 contribution，不改变当前 H19。
+提交，待 H19 结果出来后再决定是否运行；对应评测配置为
+`pi05_libero_backview_acpd_v2_layer10_feature_fusion_capacity_control_lora`。默认值为
+使用 contribution，不改变当前 H19。
 
 | 项目 | 设置 |
 |---|---|

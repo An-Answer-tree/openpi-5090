@@ -222,12 +222,19 @@ def test_exact_contribution_loss_is_zero_for_equal_targets():
 
 
 def test_acpd_v2_policy_configs_deploy_selected_layer():
-    for config_name, layer, fusion_location, injection in (
-        ("pi05_libero_backview_acpd_v2_lora", 9, "final", True),
-        ("pi05_libero_backview_acpd_v2_layer10_lora", 10, "final", True),
-        ("pi05_libero_backview_acpd_v2_layer10_aligned_lora", 10, "aligned_attention", True),
-        ("pi05_libero_backview_acpd_v2_layer10_loss_only_lora", 10, "final", False),
-        ("pi05_libero_backview_acpd_v2_layer10_feature_fusion_lora", 10, "final", False),
+    for config_name, layer, fusion_location, injection, use_contribution in (
+        ("pi05_libero_backview_acpd_v2_lora", 9, "final", True, True),
+        ("pi05_libero_backview_acpd_v2_layer10_lora", 10, "final", True, True),
+        ("pi05_libero_backview_acpd_v2_layer10_aligned_lora", 10, "aligned_attention", True, True),
+        ("pi05_libero_backview_acpd_v2_layer10_loss_only_lora", 10, "final", False, True),
+        ("pi05_libero_backview_acpd_v2_layer10_feature_fusion_lora", 10, "final", False, True),
+        (
+            "pi05_libero_backview_acpd_v2_layer10_feature_fusion_capacity_control_lora",
+            10,
+            "final",
+            False,
+            False,
+        ),
     ):
         config = training_config.get_config(config_name)
 
@@ -238,15 +245,23 @@ def test_acpd_v2_policy_configs_deploy_selected_layer():
         assert config.model.exact_contribution_fusion_location == fusion_location
         assert not config.model.create_acpd_heads
         assert config.model.contribution_feature_fusion == ("feature_fusion" in config_name)
+        assert config.model.feature_fusion_use_contribution == use_contribution
 
 
 def test_acpd_v2_train_and_eval_models_have_matching_parameter_trees():
-    for config_name, layer, fusion_location, injection in (
-        ("pi05_libero_backview_acpd_v2_lora", 9, "final", True),
-        ("pi05_libero_backview_acpd_v2_layer10_lora", 10, "final", True),
-        ("pi05_libero_backview_acpd_v2_layer10_aligned_lora", 10, "aligned_attention", True),
-        ("pi05_libero_backview_acpd_v2_layer10_loss_only_lora", 10, "final", False),
-        ("pi05_libero_backview_acpd_v2_layer10_feature_fusion_lora", 10, "final", False),
+    for config_name, layer, fusion_location, injection, use_contribution in (
+        ("pi05_libero_backview_acpd_v2_lora", 9, "final", True, True),
+        ("pi05_libero_backview_acpd_v2_layer10_lora", 10, "final", True, True),
+        ("pi05_libero_backview_acpd_v2_layer10_aligned_lora", 10, "aligned_attention", True, True),
+        ("pi05_libero_backview_acpd_v2_layer10_loss_only_lora", 10, "final", False, True),
+        ("pi05_libero_backview_acpd_v2_layer10_feature_fusion_lora", 10, "final", False, True),
+        (
+            "pi05_libero_backview_acpd_v2_layer10_feature_fusion_capacity_control_lora",
+            10,
+            "final",
+            False,
+            False,
+        ),
     ):
         distill_config = DistillTrainConfig(
             student_init_params="base/params",
@@ -258,6 +273,7 @@ def test_acpd_v2_train_and_eval_models_have_matching_parameter_trees():
             exact_contribution_injection=injection,
             exact_contribution_fusion_location=fusion_location,
             contribution_feature_fusion="feature_fusion" in config_name,
+            feature_fusion_use_contribution=use_contribution,
         )
 
         student_config = _make_student_train_config(distill_config, create_acpd_heads=False)
