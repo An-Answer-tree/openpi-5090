@@ -103,7 +103,7 @@ H17 15K只有Spatial/Object部分结果，无四套pooled；详见
 | H18-ActionReadout | 检查冻结 H9 的 contribution 是否能被小型动作修正头有效使用 | H9 BS64 30K 冻结；hidden-only、hidden-layer10、hidden-contribution 三组；单卡500步、BS8 | smoke 136129；正式136130 | 完成；无仿真 | contribution 相对冻结 H9 MSE 下降 `0.813%`，95% CI `[-1.804%, +0.031%]`；相对 layer10 对照变差 `0.029%`，未通过1%筛选 |
 | Flow-time 5K | 检查早期优势是否对应特定时间段的 flow 误差 | 冻结 SFT/H9 5K；首轮512样本，复核128样本且每样本5个 t；单卡只读 | 136591、136595 | 完成；无仿真 | 首轮整体无差异；首轮 t=0.1 信号在同样本复核中未复现（差值 `+0.00283`，95% CI 跨0）；不支持启动时间重采样训练 |
 | H9 10K 推理期注入消融 | 同一个 H9 checkpoint 仅在推理时关闭 contribution 注入，判断部署时是否依赖该分支 | 四套各500回合；与原H9结果配对 | 136866、136867 | 验证排队；分析等待依赖 | 尚无结论 |
-| H9 Agentview-only 注入 10K | 检验离线 probe 中 agentview-only 优于 wrist-only 的方向能否复现到闭环 | H9 10K `9999`；推理时保留 agentview、屏蔽 wrist；四套各500回合 | 待提交 | 尚无结论 | 预注册阈值：相对完整 H9 提升至少1.5点且配对区间下界>0才扩展30K |
+| H9 Agentview-only 注入 10K | 检验离线 probe 中 agentview-only 优于 wrist-only 的方向能否复现到闭环 | H9 10K `9999`；推理时保留 agentview、屏蔽 wrist；四套各500回合 | 136920；汇总136921 | 排队；尚无结论 | 预注册阈值：相对完整 H9 提升至少1.5点且配对区间下界>0才扩展30K |
 | ACPD-v2 注入离线动作影响 | 固定 H9 10K/30K，比较完整/关闭/分路注入的7维 flow MSE 与速度改变量 | 各128个BS8 batch；单卡冻结前向；按episode重采样 | smoke 136878；正式136879_[0-1%1] | 两点完成 | 完整注入−关闭MSE为`+0.00000834/+0.00000261`，两点区间均跨0；无离线改善证据，待闭环验证 |
 | 注入分路差异 | 复用 H9 10K/30K 四分支逐样本误差，比较 agentview、wrist 与两路交互 | 各1,024样本、194 episode；CPU配对重采样，无新仿真 | 无新Slurm任务 | 完成；探索性 | 10K wrist−agent MSE `+0.00002726`，30K区间跨0；未检测到稳定分路差异或交互，不能证明闭环收益 |
 | H9 teacher action signal 训练诊断 | 检查 teacher 动作目标是否持续优于 student 当前动作 | 复用 H9 训练日志的 0/5K/10K/15K/20K/25K/29.9K 记录，比较同一 batch 的 task loss | 无新Slurm任务 | 完成；训练诊断 | `teacher_better_ratio` 为 `0.9958--1.0000`，teacher task loss 始终低于 student；支持动作级 teacher 信号有效，但不是 benchmark 或因果结论 |
