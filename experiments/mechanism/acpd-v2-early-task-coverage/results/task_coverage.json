@@ -1,0 +1,239 @@
+{
+  "steps": {
+    "5000": {
+      "pooled_difference": 0.093,
+      "all_tasks": {
+        "positive": 28,
+        "negative": 6,
+        "zero": 6
+      },
+      "suites": {
+        "spatial": {
+          "positive": 9,
+          "negative": 1,
+          "zero": 0,
+          "difference": 0.16
+        },
+        "object": {
+          "positive": 10,
+          "negative": 0,
+          "zero": 0,
+          "difference": 0.14
+        },
+        "goal": {
+          "positive": 6,
+          "negative": 4,
+          "zero": 0,
+          "difference": 0.052000000000000005
+        },
+        "libero_10": {
+          "positive": 3,
+          "negative": 1,
+          "zero": 6,
+          "difference": 0.02
+        }
+      },
+      "task_differences": {
+        "goal/open the middle drawer of the cabinet": -0.02,
+        "goal/open the top drawer and put the bowl inside": 0.04,
+        "goal/push the plate to the front of the stove": 0.34,
+        "goal/put the bowl on the plate": -0.02,
+        "goal/put the bowl on the stove": -0.08,
+        "goal/put the bowl on top of the cabinet": 0.14,
+        "goal/put the cream cheese in the bowl": -0.02,
+        "goal/put the wine bottle on the rack": 0.06,
+        "goal/put the wine bottle on top of the cabinet": 0.02,
+        "goal/turn on the stove": 0.06,
+        "libero_10/pick up the book and place it in the back compartment of the caddy": -0.06,
+        "libero_10/put both moka pots on the stove": 0.0,
+        "libero_10/put both the alphabet soup and the cream cheese box in the basket": 0.0,
+        "libero_10/put both the alphabet soup and the tomato sauce in the basket": 0.0,
+        "libero_10/put both the cream cheese box and the butter in the basket": 0.0,
+        "libero_10/put the black bowl in the bottom drawer of the cabinet and close it": 0.02,
+        "libero_10/put the white mug on the left plate and put the yellow and white mug on the right plate": 0.0,
+        "libero_10/put the white mug on the plate and put the chocolate pudding to the right of the plate": 0.0,
+        "libero_10/put the yellow and white mug in the microwave and close it": 0.2,
+        "libero_10/turn on the stove and put the moka pot on it": 0.04,
+        "object/pick up the alphabet soup and place it in the basket": 0.06,
+        "object/pick up the bbq sauce and place it in the basket": 0.02,
+        "object/pick up the butter and place it in the basket": 0.06,
+        "object/pick up the chocolate pudding and place it in the basket": 0.32,
+        "object/pick up the cream cheese and place it in the basket": 0.1,
+        "object/pick up the ketchup and place it in the basket": 0.36,
+        "object/pick up the milk and place it in the basket": 0.2,
+        "object/pick up the orange juice and place it in the basket": 0.16,
+        "object/pick up the salad dressing and place it in the basket": 0.04,
+        "object/pick up the tomato sauce and place it in the basket": 0.08,
+        "spatial/pick up the black bowl between the plate and the ramekin and place it on the plate": 0.06,
+        "spatial/pick up the black bowl from table center and place it on the plate": 0.14,
+        "spatial/pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate": 0.26,
+        "spatial/pick up the black bowl next to the cookie box and place it on the plate": 0.38,
+        "spatial/pick up the black bowl next to the plate and place it on the plate": 0.08,
+        "spatial/pick up the black bowl next to the ramekin and place it on the plate": 0.1,
+        "spatial/pick up the black bowl on the cookie box and place it on the plate": 0.14,
+        "spatial/pick up the black bowl on the ramekin and place it on the plate": 0.12,
+        "spatial/pick up the black bowl on the stove and place it on the plate": -0.02,
+        "spatial/pick up the black bowl on the wooden cabinet and place it on the plate": 0.34
+      }
+    },
+    "10000": {
+      "pooled_difference": 0.142,
+      "all_tasks": {
+        "positive": 32,
+        "negative": 6,
+        "zero": 2
+      },
+      "suites": {
+        "spatial": {
+          "positive": 9,
+          "negative": 1,
+          "zero": 0,
+          "difference": 0.182
+        },
+        "object": {
+          "positive": 7,
+          "negative": 2,
+          "zero": 1,
+          "difference": 0.128
+        },
+        "goal": {
+          "positive": 8,
+          "negative": 2,
+          "zero": 0,
+          "difference": 0.18400000000000002
+        },
+        "libero_10": {
+          "positive": 8,
+          "negative": 1,
+          "zero": 1,
+          "difference": 0.07400000000000001
+        }
+      },
+      "task_differences": {
+        "goal/open the middle drawer of the cabinet": -0.12,
+        "goal/open the top drawer and put the bowl inside": 0.16,
+        "goal/push the plate to the front of the stove": 0.46,
+        "goal/put the bowl on the plate": 0.16,
+        "goal/put the bowl on the stove": 0.46,
+        "goal/put the bowl on top of the cabinet": 0.38,
+        "goal/put the cream cheese in the bowl": 0.12,
+        "goal/put the wine bottle on the rack": 0.14,
+        "goal/put the wine bottle on top of the cabinet": 0.1,
+        "goal/turn on the stove": -0.02,
+        "libero_10/pick up the book and place it in the back compartment of the caddy": 0.18,
+        "libero_10/put both moka pots on the stove": -0.02,
+        "libero_10/put both the alphabet soup and the cream cheese box in the basket": 0.04,
+        "libero_10/put both the alphabet soup and the tomato sauce in the basket": 0.0,
+        "libero_10/put both the cream cheese box and the butter in the basket": 0.06,
+        "libero_10/put the black bowl in the bottom drawer of the cabinet and close it": 0.08,
+        "libero_10/put the white mug on the left plate and put the yellow and white mug on the right plate": 0.02,
+        "libero_10/put the white mug on the plate and put the chocolate pudding to the right of the plate": 0.14,
+        "libero_10/put the yellow and white mug in the microwave and close it": 0.02,
+        "libero_10/turn on the stove and put the moka pot on it": 0.22,
+        "object/pick up the alphabet soup and place it in the basket": 0.16,
+        "object/pick up the bbq sauce and place it in the basket": 0.38,
+        "object/pick up the butter and place it in the basket": 0.1,
+        "object/pick up the chocolate pudding and place it in the basket": -0.02,
+        "object/pick up the cream cheese and place it in the basket": -0.06,
+        "object/pick up the ketchup and place it in the basket": 0.04,
+        "object/pick up the milk and place it in the basket": 0.0,
+        "object/pick up the orange juice and place it in the basket": 0.18,
+        "object/pick up the salad dressing and place it in the basket": 0.2,
+        "object/pick up the tomato sauce and place it in the basket": 0.3,
+        "spatial/pick up the black bowl between the plate and the ramekin and place it on the plate": 0.16,
+        "spatial/pick up the black bowl from table center and place it on the plate": 0.32,
+        "spatial/pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate": 0.38,
+        "spatial/pick up the black bowl next to the cookie box and place it on the plate": 0.24,
+        "spatial/pick up the black bowl next to the plate and place it on the plate": 0.24,
+        "spatial/pick up the black bowl next to the ramekin and place it on the plate": 0.2,
+        "spatial/pick up the black bowl on the cookie box and place it on the plate": 0.3,
+        "spatial/pick up the black bowl on the ramekin and place it on the plate": 0.04,
+        "spatial/pick up the black bowl on the stove and place it on the plate": -0.14,
+        "spatial/pick up the black bowl on the wooden cabinet and place it on the plate": 0.08
+      }
+    },
+    "15000": {
+      "pooled_difference": 0.05700000000000001,
+      "all_tasks": {
+        "positive": 25,
+        "negative": 10,
+        "zero": 5
+      },
+      "suites": {
+        "spatial": {
+          "positive": 5,
+          "negative": 3,
+          "zero": 2,
+          "difference": 0.057999999999999996
+        },
+        "object": {
+          "positive": 7,
+          "negative": 2,
+          "zero": 1,
+          "difference": 0.064
+        },
+        "goal": {
+          "positive": 7,
+          "negative": 2,
+          "zero": 1,
+          "difference": 0.06200000000000001
+        },
+        "libero_10": {
+          "positive": 6,
+          "negative": 3,
+          "zero": 1,
+          "difference": 0.044
+        }
+      },
+      "task_differences": {
+        "goal/open the middle drawer of the cabinet": 0.06,
+        "goal/open the top drawer and put the bowl inside": -0.18,
+        "goal/push the plate to the front of the stove": -0.32,
+        "goal/put the bowl on the plate": 0.1,
+        "goal/put the bowl on the stove": 0.2,
+        "goal/put the bowl on top of the cabinet": 0.26,
+        "goal/put the cream cheese in the bowl": 0.14,
+        "goal/put the wine bottle on the rack": 0.0,
+        "goal/put the wine bottle on top of the cabinet": 0.34,
+        "goal/turn on the stove": 0.02,
+        "libero_10/pick up the book and place it in the back compartment of the caddy": -0.08,
+        "libero_10/put both moka pots on the stove": 0.16,
+        "libero_10/put both the alphabet soup and the cream cheese box in the basket": 0.02,
+        "libero_10/put both the alphabet soup and the tomato sauce in the basket": 0.06,
+        "libero_10/put both the cream cheese box and the butter in the basket": 0.02,
+        "libero_10/put the black bowl in the bottom drawer of the cabinet and close it": 0.0,
+        "libero_10/put the white mug on the left plate and put the yellow and white mug on the right plate": 0.16,
+        "libero_10/put the white mug on the plate and put the chocolate pudding to the right of the plate": -0.04,
+        "libero_10/put the yellow and white mug in the microwave and close it": 0.24,
+        "libero_10/turn on the stove and put the moka pot on it": -0.1,
+        "object/pick up the alphabet soup and place it in the basket": 0.12,
+        "object/pick up the bbq sauce and place it in the basket": 0.08,
+        "object/pick up the butter and place it in the basket": -0.16,
+        "object/pick up the chocolate pudding and place it in the basket": 0.0,
+        "object/pick up the cream cheese and place it in the basket": 0.14,
+        "object/pick up the ketchup and place it in the basket": 0.02,
+        "object/pick up the milk and place it in the basket": -0.08,
+        "object/pick up the orange juice and place it in the basket": 0.08,
+        "object/pick up the salad dressing and place it in the basket": 0.4,
+        "object/pick up the tomato sauce and place it in the basket": 0.04,
+        "spatial/pick up the black bowl between the plate and the ramekin and place it on the plate": 0.06,
+        "spatial/pick up the black bowl from table center and place it on the plate": 0.18,
+        "spatial/pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate": 0.0,
+        "spatial/pick up the black bowl next to the cookie box and place it on the plate": 0.38,
+        "spatial/pick up the black bowl next to the plate and place it on the plate": -0.24,
+        "spatial/pick up the black bowl next to the ramekin and place it on the plate": 0.04,
+        "spatial/pick up the black bowl on the cookie box and place it on the plate": 0.36,
+        "spatial/pick up the black bowl on the ramekin and place it on the plate": -0.06,
+        "spatial/pick up the black bowl on the stove and place it on the plate": -0.14,
+        "spatial/pick up the black bowl on the wooden cabinet and place it on the plate": 0.0
+      }
+    }
+  },
+  "positive_10k_remaining_positive_15k": 20,
+  "positive_10k_becoming_nonpositive_15k": 12,
+  "spearman_10k_15k": 0.12292343836087193,
+  "largest_change": {
+    "task": "goal/push the plate to the front of the stove",
+    "difference": -0.78
+  }
+}

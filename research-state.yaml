@@ -55,6 +55,13 @@ experiment_names:
     protocol: experiments/mechanism/acpd-v2-task-heterogeneity/protocol.md
     status: complete_exploratory
     result: experiments/mechanism/acpd-v2-task-heterogeneity/analysis.md
+  h9_early_task_coverage:
+    display_name: "ACPD-v2 5K--15K 逐任务收益覆盖"
+    protocol: experiments/mechanism/acpd-v2-early-task-coverage/protocol.md
+    status: complete_exploratory
+    result: experiments/mechanism/acpd-v2-early-task-coverage/analysis.md
+    positive_tasks_10k: 32
+    positive_tasks_10k_retained_15k: 20
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
