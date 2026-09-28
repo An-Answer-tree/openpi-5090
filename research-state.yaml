@@ -65,6 +65,15 @@ experiment_names:
       step_10k: [-0.00001628865, 0.00003203806]
       step_30k: [-0.00001384337, 0.00001951568]
     mean_sample_velocity_delta_ratio: {step_10k: 0.00289575, step_30k: 0.00187224}
+  h9_gate_observable_reliability:
+    display_name: "ACPD-v2 可观测视角一致性可靠性诊断"
+    protocol: experiments/mechanism/acpd-v2-gate-effect/observable-reliability-protocol.md
+    status: submitted_pending
+    job_id: 136904
+    checkpoints: [9999, 29999]
+    batches_per_checkpoint: 128
+    batch_size: 8
+    primary_metric: held_out_episode_auc
   h9_view_branch_analysis:
     display_name: "ACPD-v2 agentview/wrist 注入分路离线差异"
     protocol: experiments/mechanism/acpd-v2-gate-effect/view-branch-protocol.md
@@ -124,7 +133,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-29 04:37 CST (action-direction smoke 136895 passed; formal 136897 submitted)"
+  checked_at: "2026-09-29 05:22 CST (observable gate reliability probe 136904 submitted)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -198,6 +207,13 @@ current_execution:
       checkpoints: [5000, 10000]
       batches_per_checkpoint: 128
       depends_on: 136895
+    - id: 136904
+      experiment: h9_gate_observable_reliability
+      state: submitted_pending
+      resources: 1gpu_array_max1_8cpu_24g
+      checkpoints: [9999, 29999]
+      batches_per_checkpoint: 128
+      purpose: held_out_episode_prediction_from_view_only_features
     - id: 135943
       experiment: acpd_v2_tdca_5k
       state: complete_checkpoint_4999
