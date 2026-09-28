@@ -68,6 +68,7 @@ class DistillTrainConfig:
     acpd_loss_decay_steps: int = 5_000
     acpd_variance_loss_weight: float = 0.1
     action_corr_loss_weight: float = 0.5
+    teacher_action_loss_weight: float = 0.0
     align_layers: tuple[int, ...] = (6, 12)
     acpd_memory_dim: int = 1024
     acpd_projector_hidden_dim: int = 2048
@@ -480,6 +481,13 @@ def _action_corr_loss(student_v_t: at.Array, teacher_v_t: at.Array, *, task_acti
     return 1.0 - jnp.mean(jnp.sum(student * teacher, axis=-1))
 
 
+def _teacher_action_loss(student_v_t: at.Array, teacher_v_t: at.Array, *, task_action_dim: int = 7) -> at.Array:
+    """Matches the student's task action velocity to the frozen teacher output."""
+    student = student_v_t[..., :task_action_dim].astype(jnp.float32)
+    teacher = jax.lax.stop_gradient(teacher_v_t[..., :task_action_dim].astype(jnp.float32))
+    return jnp.mean(jnp.square(student - teacher))
+
+
 def _per_sample_prediction_error(prediction: at.Array, target: at.Array) -> at.Array:
     """Computes mean squared prediction error for each batch item."""
     return jnp.mean(
@@ -587,6 +595,7 @@ def compute_gradients(
         teacher_v_t = jax.lax.stop_gradient(teacher_v_t)
         supervised_loss = jnp.mean(jnp.square(student_v_t - target_v_t))
         action_corr_loss = _action_corr_loss(student_v_t, teacher_v_t)
+        teacher_action_loss = _teacher_action_loss(student_v_t, teacher_v_t)
         student_task_error = _per_sample_prediction_error(student_v_t[..., :7], target_v_t[..., :7])
         teacher_task_error = _per_sample_prediction_error(teacher_v_t[..., :7], target_v_t[..., :7])
 
@@ -646,6 +655,7 @@ def compute_gradients(
             config.supervised_loss_weight * supervised_loss
             + weighted_acpd_loss
             + config.action_corr_loss_weight * action_corr_loss
+            + config.teacher_action_loss_weight * teacher_action_loss
         )
         objective_loss = total_loss
         if loss_weights is not None:
@@ -660,6 +670,8 @@ def compute_gradients(
             "weighted_acpd_loss": weighted_acpd_loss,
             "acpd_loss_weight": jnp.asarray(acpd_weight, dtype=jnp.float32),
             "action_corr_loss": action_corr_loss,
+            "teacher_action_loss": teacher_action_loss,
+            "weighted_teacher_action_loss": config.teacher_action_loss_weight * teacher_action_loss,
             "student_task_loss": jnp.mean(student_task_error),
             "teacher_task_loss": jnp.mean(teacher_task_error),
             "teacher_better_ratio": jnp.mean((teacher_task_error < student_task_error).astype(jnp.float32)),

@@ -99,6 +99,12 @@ experiment_names:
     source_log: slurm-log/pi05-bv-acpdv2-l10-fsdp4-bs64-30k_129728.out
     logged_steps: [0, 5000, 10000, 15000, 20000, 25000, 29900]
     teacher_better_ratio_range: [0.9958, 1.0]
+  teacher_action_mse_5k:
+    display_name: "ACPD-v2-TeacherActionMSE / 直接动作蒸馏消融"
+    protocol: experiments/ablation/acpd-v2-teacher-action-mse-5k/protocol.md
+    status: protocol_ready_not_submitted
+    teacher_action_loss_weight: 0.1
+    target_steps: [5000]
   h9_task_heterogeneity:
     display_name: "ACPD-v2 20K--30K 逐任务差异"
     protocol: experiments/mechanism/acpd-v2-task-heterogeneity/protocol.md
@@ -814,6 +820,7 @@ evidence_gaps:
   - "H17 nonzero contribution decay has partial negative 15K results; its 20K comparison was cancelled and remains unresolved."
   - "A flow-trained adapter after the detached contribution is needed only if lowering the contribution weight does not help."
   - "Whether teacher contribution contains student-unidentifiable components is open; action-direction probe and same-checkpoint closed-loop injection are the next low-cost tests."
+  - "Whether direct teacher-action MSE improves over ACL at 5K is open; protocol is ready but the task is not submitted while the current GPU queue is occupied."
 
 constraints:
   - "Do not move or delete datasets or checkpoints."

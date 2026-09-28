@@ -30,6 +30,7 @@ from scripts.distillation_acpd.train_distill import _micro_step_train_rng
 from scripts.distillation_acpd.train_distill import _per_sample_prediction_error
 from scripts.distillation_acpd.train_distill import _restore_from_checkpoint
 from scripts.distillation_acpd.train_distill import _scale_gradients
+from scripts.distillation_acpd.train_distill import _teacher_action_loss
 from scripts.distillation_acpd.train_distill import compute_gradients
 
 
@@ -298,6 +299,15 @@ def test_action_corr_loss_ignores_libero_padding_dimensions():
     teacher = jnp.asarray([[[1.0, 2.0, -5.0], [3.0, 4.0, 7.0]]])
 
     np.testing.assert_allclose(_action_corr_loss(student, teacher, task_action_dim=2), 0.0, atol=1e-6)
+
+
+def test_teacher_action_loss_matches_only_task_dimensions_and_detaches_teacher():
+    student = jnp.asarray([[[1.0, 3.0, 9.0], [5.0, 7.0, 9.0]]])
+    teacher = jnp.asarray([[[0.0, 1.0, -5.0], [1.0, 3.0, 7.0]]])
+
+    np.testing.assert_allclose(_teacher_action_loss(student, teacher, task_action_dim=2), 9.25, atol=1e-6)
+    teacher_grad = jax.grad(lambda value: _teacher_action_loss(student, value, task_action_dim=2))(teacher)
+    np.testing.assert_allclose(teacher_grad, 0.0, atol=1e-6)
 
 
 def test_per_sample_prediction_error_reduces_non_batch_dimensions():
