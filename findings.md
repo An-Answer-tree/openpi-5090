@@ -43,6 +43,7 @@
 | Contribution 是否可能形成后期约束 | 30K时其加权梯度范数为flow的`1.175`倍，cosine仅`0.0957`；25K--40K预测cosine从`0.7972`升至`0.8026` | 近正交梯度是否限制后期成功率仍是假设；由H17-Decay测试。 |
 | 注入支路是否接收任务梯度 | predicted residual使用`stop_gradient`；flow不能经该支路更新predictor，能更新gate；共享主干仍接收flow梯度 | 注入缺少直接任务梯度是代码事实，是否导致后期优势消失尚无结论。 |
 | H9推理注入是否改善局部动作MSE | 同checkpoint离线ON−OFF：10K `+0.00000834`、30K `+0.00000261`，按episode配对区间均跨0；注入速度变化比均值为`0.290%/0.187%` | 注入只造成小幅速度改变，未检测到局部MSE改善；不能从离线结果推断闭环成功率，等待10K同checkpoint仿真消融。 |
+| H9训练中的teacher动作目标是否可靠 | 训练日志七个记录点的`teacher_better_ratio`为`0.9958--1.0000`，且`teacher_task_loss`始终低于`student_task_loss` | 提供动作级 teacher 信号有效的正向机制证据；统计来自训练 batch，未与SFT配对，也不能证明注入的因果收益。 |
 | 单视角 baseline 是否受视角影响 | left/right/top/backview 30K pooled 分别为 `78.65/77.00/71.55/60.45%` | 视角差异大；ACPD 必须使用相同 student 视角的 SFT 对照。 |
 
 ## 文献约束
@@ -92,6 +93,12 @@ SFT最高观测点60K的62.05%。
 H9-Fixed 的 contribution 梯度后期仍较强且接近正交，注入支路又对预测向量使用
 `stop_gradient`。主干表征仍随任务训练变化，所以不能把这一代码事实解释为预测向量
 完全无法适应任务，也不能由gate下降推断实际注入量必然下降。
+
+H9训练日志还显示，teacher action target 在七个记录点的 task loss 均低于 student，
+`teacher_better_ratio` 为 `0.9958--1.0000`。这说明 teacher 的动作级信号在当前训练
+batch 上具有稳定的任务相关性，是继续测试动作方向或动作特征融合的依据；但它不是
+SFT对照、闭环验证或因果证据，不能单独解释 H9 的成功率变化。详见
+`experiments/mechanism/acpd-v2-teacher-action-diagnostic/analysis.md`。
 当前优先检验的假设是：固定contribution权重在后期形成不利约束。
 H17-Decay只改变该权重；它不能同时证明不可恢复信息、LoRA容量或stop-gradient
 就是唯一原因。学习率、loss数值及gate趋势均不能替代成功率验证。

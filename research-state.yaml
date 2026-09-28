@@ -83,6 +83,13 @@ experiment_names:
     batch_size: 8
     primary_metric: centered_target_cosine7
     result: pending
+  h9_teacher_action_diagnostic:
+    display_name: "H9 teacher 动作目标训练诊断"
+    result: experiments/mechanism/acpd-v2-teacher-action-diagnostic/analysis.md
+    status: complete_posthoc_training_diagnostic
+    source_log: slurm-log/pi05-bv-acpdv2-l10-fsdp4-bs64-30k_129728.out
+    logged_steps: [0, 5000, 10000, 15000, 20000, 25000, 29900]
+    teacher_better_ratio_range: [0.9958, 1.0]
   h9_task_heterogeneity:
     display_name: "ACPD-v2 20K--30K 逐任务差异"
     protocol: experiments/mechanism/acpd-v2-task-heterogeneity/protocol.md
