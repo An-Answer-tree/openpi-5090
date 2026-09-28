@@ -58,9 +58,9 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 | student | H9-Fixed 中期轨迹20K--30K | `student/acpd-v2-h9-20k-30k-trajectory/` | 恢复训练到20K；25K验证完成，20K验证运行中 |
 | student | H9-Fixed/SFT 早期轨迹10K--15K | `student/acpd-v2-h9-early-trajectory/` | 10K/15K正式比较完成 |
 | ablation | H13-LossOnly BS64 | `ablation/acpd-v2-h13-injection-ablation/` | 5K 训练和验证完成；支持显式注入 |
-| ablation | ACPD-v2-TDCA 5K | `ablation/acpd-v2-tdca-5k/protocol.md` | 训练135943排队；全量验证135944等待依赖；尚无结论 |
+| ablation | ACPD-v2-TDCA 5K | `ablation/acpd-v2-tdca-5k/` | 完成；pooled `21.35%`，相对 H9-Fixed `-1.80` 点，95% CI 跨零 |
 | ablation | H17-Decay BS64 | `ablation/acpd-v2-h17-contribution-decay/` | 从H9-Fixed 10K分支；训练134422运行，验证134423、配对分析134424等待依赖 |
-| ablation | ACL-only BS64 35K | `ablation/acpd-v2-acl-only-bs64-35k/protocol.md` | 训练135724排队；30K/35K全量验证135725/135726、分析135729/135728等待依赖；尚无结论 |
+| ablation | ACL-only BS64 35K | `ablation/acpd-v2-acl-only-bs64-35k/protocol.md` | 训练135724运行；30K/35K全量验证135725/135726、分析135729/135728等待依赖；尚无结论 |
 
 H11 已归档，不进入正式 checkpoint 集合，也不继续训练。
 H9-Fixed 的恢复、早中期验证及延长训练是同一方法的不同执行阶段，不作为独立消融。

@@ -37,10 +37,15 @@ experiment_names:
     contribution_feature_fusion: true
     target_steps: [5000, 10000, 30000]
     status: submitted_pending
+  flow_time_5k_probe:
+    display_name: "ACPD-v2/SFT 5K flow 时间段误差诊断"
+    protocol: experiments/mechanism/acpd-v2-flow-time-5k/protocol.md
+    status: code_verified_not_submitted
+    reason: "debug01 GPU0 has a non-Slurm process; one-GPU allocation may overlap"
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-27 (Slurm query)"
+  checked_at: "2026-09-28 10:15 CST (Slurm query and TDCA summary)"
   jobs:
     - id: 136130
       experiment: h18_action_readout
@@ -79,17 +84,20 @@ current_execution:
       episodes: 2000
     - id: 136221
       experiment: acpd_v2_tdca_5k_full_eval_array
-      state: pending_priority
+      state: complete_summary_available
       resources: 4x1gpu_8cpu_24g
       episodes: 2000
     - id: 136222
       experiment: acpd_v2_tdca_5k_full_eval_summary
-      state: dependency
+      state: complete_summary_available
       depends_on: 136221
       resources: 1cpu_2g
+      pooled_success: 0.2135
+      difference_vs_h9_5k: -0.018
+      paired_ci95: [-0.039, 0.0035]
     - id: 135724
       experiment: backview_acl_only_bs64_35k
-      state: pending_priority
+      state: running_step_17300_of_35000
       resources: 4gpu_32cpu_96g
       time_limit: 10-00:00:00
     - id: 135725
@@ -607,7 +615,7 @@ formal_matrix:
         ci95: [0.0040, 0.0470]
       target: 30k
     backview_acl_only_bs64:
-      status: queued
+      status: running
       target: 35k
       protocol: experiments/ablation/acpd-v2-acl-only-bs64-35k/protocol.md
       protocol_commit: 5efb035
@@ -626,7 +634,7 @@ formal_matrix:
       save_interval: 5000
       keep_period: 1
     backview_tdca_5k:
-      status: 5k_complete_eval_queued
+      status: 5k_complete_eval_complete
       target: 5k
       protocol: experiments/ablation/acpd-v2-tdca-5k/protocol.md
       protocol_commit: 5ac09a1
@@ -643,13 +651,15 @@ formal_matrix:
       contribution_weight: 0.2
       acl_weight: 0.5
       task_gradient_to_predictor: true
+      eval_5k: {spatial: 0.182, object: 0.350, goal: 0.284, libero_10: 0.038, pooled: 0.2135}
+      difference_vs_h9_5k: {pooled: -0.018, paired_ci95: [-0.039, 0.0035]}
       save_interval: 5000
       keep_period: 5000
 
 evidence_gaps:
   - "Matched H9 and SFT 20K evaluations must locate whether the ACPD-v2 early advantage remains at 20K."
   - "ACL-only must be rerun at BS64 for the final fair ablation."
-  - "H17 nonzero contribution decay is queued; its paired 20K comparison must test the late orthogonal-constraint hypothesis."
+  - "H17 nonzero contribution decay has partial negative 15K results; its 20K comparison was cancelled and remains unresolved."
   - "A flow-trained adapter after the detached contribution is needed only if lowering the contribution weight does not help."
 
 constraints:

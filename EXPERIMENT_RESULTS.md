@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-09-27（CST）
+更新时间：2026-09-28（CST）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -41,6 +41,7 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | H9 与同进度 SFT 在 35K 的比较 | H9 `61.05%`，SFT `57.15%`；探索性配对差值 `+3.90` 点，95% CI `[+1.45, +6.35]`。SFT 35K 比自身 30K 低 `3.30` 点，不能据此断言 H9 提高了最终上限。 | 相同 2,000 episodes |
 | H9 40K 是否继续高于 35K | 40K `59.45%`，35K `61.05%`；探索性配对差值 `-1.60` 点，95% CI `[-4.05, +0.80]`，未检测到确定的下降。 | 相同 2,000 episodes |
 | 显式 contribution 注入是否有效 | 有正向证据。H9 为 `23.15%`，H13 loss-only 为 `20.60%`；差值 `+2.55` 点，配对 95% CI `[+0.40, +4.70]`。 | H13 |
+| 放开 contribution predictor 的动作梯度能否提高 5K 成功率 | TDCA 为 `21.35%`，H9-Fixed 为 `23.15%`；差值 `-1.80` 点，配对 95% CI `[-3.90, +0.35]`。未检测到提高。 | TDCA 5K，2,000 episodes |
 | ACPD-v2 是否通过降低训练 MSE 获益 | 没有该证据。与 SFT 对齐的 299 个监督 loss 点相关系数为 `0.9985`，全程均值几乎相同；5K 成功率增益不能由更低训练 MSE 解释。 | H9/H12 loss 对齐 |
 | 辅助目标在 30K 前是否自然消失 | 没有。加权 contribution/ACL 从首个到末个窗口下降 `53.42/53.04%`，但在总目标中的窗口占比保持约 `59--61%/16--17%`。 | H9 0--30K loss |
 | 后期是否出现明显辅助梯度冲突 | 不支持。正式 BS32 中组合冲突率在 5K/30K 均为 `0%`，cosine 中位数为 `0.6279/0.5920`。 | H15a，200 个成对 batches |
@@ -60,8 +61,8 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | H9-Fixed | 固定权重 ACPD-v2 对照 | layer 10，BS64，contribution=0.2，ACL=0.5 | 129728/130773 | 30K完成；恢复与续训见下表 | 5K `23.15%`；10K `37.45%`；25K `55.75%`；30K `58.00%`；35K `61.05%` |
 | H19-FeatureFusion | 检验预测视觉贡献在动作输出前的特征融合能否提高最终成功率 | backview，layer 10，从 pi0.5 base 开始；4卡 FSDP LoRA，BS64，flow/contribution/ACL=1/0.2/0.5；30K，每5K保留checkpoint | smoke 136339；正式136345 | smoke完成两步；正式任务排队 | 尚无结论 |
 | H13-LossOnly | 判断 contribution 注入是否有效 | H9-Fixed 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9-Fixed 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
-| ACPD-v2-TDCA | 检验动作损失是否能改善 contribution 注入适配 | backview，layer 10，BS64，flow=1.0、contribution=0.2、ACL=0.5；仅开放 predictor 的动作梯度，训练至5K | 135943；验证136221；汇总136222 | 5K checkpoint完整；四套各500回合单卡验证排队 | 尚无结论 |
-| ACL-only BS64 | 检验 contribution 学习和注入在 ACL 之外的增益 | backview，layer 10，BS64，flow=1.0、ACL=0.5、contribution=0、关闭注入；训练至35K | 135724；30K/35K验证135725/135726；分析135729/135728 | 训练排队；两点全量验证等待依赖 | 尚无结论 |
+| ACPD-v2-TDCA | 检验动作损失是否能改善 contribution 注入适配 | backview，layer 10，BS64，flow=1.0、contribution=0.2、ACL=0.5；仅开放 predictor 的动作梯度，训练至5K | 135943；验证136221；汇总136222 | 5K 训练及四套全量验证完成 | `21.35%`；比 H9-Fixed 低 `1.80` 点，95% CI `[-3.90, +0.35]`；不支持提升 |
+| ACL-only BS64 | 检验 contribution 学习和注入在 ACL 之外的增益 | backview，layer 10，BS64，flow=1.0、ACL=0.5、contribution=0、关闭注入；训练至35K | 135724；30K/35K验证135725/135726；分析135729/135728 | 训练运行中；两点全量验证等待依赖 | 尚无结论 |
 | H17-Decay | 检验后期 contribution 权重是否过强 | H9-Fixed 10K完整状态→20K；BS64；10K–15K权重0.2→0.05，ACL=0.5 | 134422/136119/134423/134424 | 15K仅Spatial/Object完成；根据部分结果取消20K验证及配对分析 | 15K两套41.80%/59.00%，比H9低7.60/5.40点；不支持该调度的中期收益；20K无最终结论 |
 
 ### H9-Fixed 轨迹任务
@@ -136,6 +137,7 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | H9-Fixed backview BS64 35K | 73.20% | 73.80% | 63.60% | 33.60% | 61.05% |
 | H9-Fixed backview BS64 40K | 68.20% | 76.00% | 60.00% | 33.60% | 59.45% |
 | H13-LossOnly backview BS64 5K | 19.40% | 35.60% | 25.00% | 2.40% | 20.60% |
+| ACPD-v2-TDCA backview BS64 5K | 18.20% | 35.00% | 28.40% | 3.80% | 21.35% |
 | SFT backview BS64 20K | 50.60% | 62.60% | 54.40% | 21.20% | 47.20% |
 | SFT backview BS64 25K | 64.00% | 64.00% | 65.60% | 29.60% | 55.80% |
 | SFT backview BS64 30K | 70.00% | 69.80% | 68.20% | 33.80% | 60.45% |
@@ -217,7 +219,8 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | ACL-only BS64 验证（待运行） | `/opt/liutong/openpi-5090-evals/acpd-v2-acl-only-bs64-35k/29999/`、`34999/` |
 | ACPD-v2-TDCA 协议 | `experiments/ablation/acpd-v2-tdca-5k/protocol.md` |
 | ACPD-v2-TDCA checkpoint | `/opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_tdca_5k/pi05_libero_backview_acpd_v2_tdca/pi05_libero_backview_acpd_v2_tdca_lora_fsdp4_bs64_5k/4999` |
-| ACPD-v2-TDCA 验证（待运行） | `/opt/liutong/openpi-5090-evals/acpd-v2-tdca-5k/4999/` |
+| ACPD-v2-TDCA 验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-tdca-5k/4999/summary.txt` |
+| ACPD-v2-TDCA 与 H9 5K 配对分析 | `experiments/ablation/acpd-v2-tdca-5k/results/tdca_vs_h9_5k_paired_analysis.json` |
 | H14 多视角结果 | `experiments/baseline/sft-multiview-bs64-30k/analysis.md` |
 | SFT 验证目录 | `/opt/liutong/openpi-5090-evals/` |
 | ACPD 验证目录 | `/opt/liutong/openpi-5090-evals/acpd-*` |
