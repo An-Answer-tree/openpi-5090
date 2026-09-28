@@ -24,18 +24,31 @@ cd /home/liutong/Projects/openpi-5090
 results_root=/opt/liutong/openpi-5090-research/acpd-v2-gate-effect/results
 output_path="${results_root}/${GATE_PROBE_JOB_ID}/observable-reliability.json"
 declare -A inputs=()
+declare -A seen_summaries=()
 
-while read -r child_id; do
-  summary_path="${results_root}/${child_id}/summary.json"
-  if [[ ! -f "${summary_path}" ]]; then
-    continue
-  fi
+record_summary() {
+  local summary_path="$1"
+  [[ -f "${summary_path}" ]] || return
+  [[ -n "${seen_summaries[${summary_path}]:-}" ]] && return
+  seen_summaries["${summary_path}"]=1
+  local checkpoint_path
   checkpoint_path=$(jq -r '.config.checkpoint_params' "${summary_path}")
   case "${checkpoint_path}" in
-    */9999/params) inputs[10k]="${results_root}/${child_id}/per_sample.npz" ;;
-    */29999/params) inputs[30k]="${results_root}/${child_id}/per_sample.npz" ;;
+    */9999/params) inputs[10k]="${summary_path%/*}/per_sample.npz" ;;
+    */29999/params) inputs[30k]="${summary_path%/*}/per_sample.npz" ;;
   esac
+}
+
+while read -r child_id; do
+  record_summary "${results_root}/${child_id}/summary.json"
 done < <(sacct -n -X -P -j "${GATE_PROBE_JOB_ID}" -o JobIDRaw | sed '/^[[:space:]]*$/d')
+
+# sacct may be temporarily unavailable; the array log names are deterministic.
+for task_id in 0 1; do
+  log_path="/opt/liutong/openpi-5090-research/acpd-v2-gate-effect/slurm-log/probe-bv-acpdv2-gate-effect_${GATE_PROBE_JOB_ID}_${task_id}.out"
+  output_dir=$(sed -n 's/.*Output directory: //p' "${log_path}" 2>/dev/null | tail -n 1)
+  [[ -n "${output_dir}" ]] && record_summary "${output_dir}/summary.json"
+done
 
 [[ -f "${inputs[10k]:-}" ]] || { echo "Missing 10K probe output" >&2; exit 1; }
 [[ -f "${inputs[30k]:-}" ]] || { echo "Missing 30K probe output" >&2; exit 1; }

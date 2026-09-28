@@ -125,6 +125,7 @@ def main(config: GateEffectProbeConfig) -> None:
         raise ValueError("The frozen gate probe requires one visible JAX device.")
     output_dir = pathlib.Path(config.output_dir) / os.environ.get("SLURM_JOB_ID", "local")
     output_dir.mkdir(parents=True, exist_ok=False)
+    logging.info("Output directory: %s", output_dir)
     distill_config = DistillTrainConfig(
         name="pi05_libero_backview_acpd_v2_layer10",
         exp_name="gate_effect_probe",
