@@ -53,7 +53,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-28 14:25 CST (Slurm query and flow-time probe replication)"
+  checked_at: "2026-09-29 01:21 CST (Slurm query and completed evaluation artifacts)"
   jobs:
     - id: 136866
       experiment: h9_inference_injection_10k
@@ -155,8 +155,9 @@ current_execution:
       resources: 1cpu_2g
     - id: 134998
       experiment: backview_sft_bs64_40k_50k_60k_eval
-      state: pending_priority
+      state: complete_summary_available
       resources: 2gpu_16cpu_48g
+      pooled_success: {step_40k: 0.6055, step_50k: 0.6130, step_60k: 0.6205}
     - id: 134422
       experiment: h17_contribution_decay_10k_to_20k
       state: complete
@@ -194,12 +195,13 @@ current_execution:
       resources: 1cpu_2g
     - id: 134008
       experiment: h9_early_trajectory_full_acpdv2_20k
-      state: running
+      state: complete_summary_available
       resources: 4x1gpu_array
       episodes: 2000
+      pooled_success: 0.4960
     - id: 134009
       experiment: h9_early_trajectory_full_acpdv2_20k_summary
-      state: dependency
+      state: complete_summary_available
       depends_on: 134008
       resources: 1cpu_1g
   recently_completed:
