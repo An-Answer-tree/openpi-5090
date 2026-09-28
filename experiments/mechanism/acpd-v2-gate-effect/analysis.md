@@ -57,9 +57,13 @@
 | 10K | `-0.8943` | `90.3%`（113 episodes） | `3.7%`（81 episodes） |
 | 30K | `-0.8791` | `82.5%`（120 episodes） | `2.7%`（74 episodes） |
 
-该结果说明注入方向本身具有可判别的“可靠/不可靠”状态；当前 gate 没有利用这个
-状态，才在全局平均上接近零。由于 oracle target 不可用于部署，下一步只能检验是否能
-用 student 可见的 hidden、contribution 范数或两路一致性预测该可靠性。
+该结果说明注入方向存在“可靠/不可靠”的条件差异；但这是一个 oracle sanity check，
+不是独立的预测能力证据。令 `v_off` 为关闭注入的速度、`delta` 为注入改变量、`y`
+为真实 target，则
+`MSE(v_off+delta)-MSE(v_off)=||delta||²-2<delta,y-v_off>`，而 oracle cosine
+正是第二项的方向部分。因此强相关在代数上是预期现象。由于 `y` 不可用于部署，
+下一步仍需检验 student 可见的 hidden、contribution 范数或两路一致性是否能预测
+该符号，且必须使用 held-out episode。
 
 仅使用注入改变量的大小不能替代方向判断：该大小与 `on-off` MSE 的 episode
 correlation 为 10K `0.0158`、30K `-0.0951`，接近零。后续不采用“范数越大 gate

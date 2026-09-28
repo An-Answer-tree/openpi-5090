@@ -44,7 +44,7 @@
 | 注入支路是否接收任务梯度 | predicted residual使用`stop_gradient`；flow不能经该支路更新predictor，能更新gate；共享主干仍接收flow梯度 | 注入缺少直接任务梯度是代码事实，是否导致后期优势消失尚无结论。 |
 | H9推理注入是否改善局部动作MSE | 同checkpoint离线ON−OFF：10K `+0.00000834`、30K `+0.00000261`，按episode配对区间均跨0；注入速度变化比均值为`0.290%/0.187%` | 注入只造成小幅速度改变，未检测到局部MSE改善；不能从离线结果推断闭环成功率，等待10K同checkpoint仿真消融。 |
 | gate作用是否在样本间异质 | 10K约54.12% episode受益、45.88%变差；30K约52.06%受益、47.94%变差，平均差值接近0 | 支持条件化 gate 的机制动机，但尚未证明 student 输入能预测正负方向；动态 gate 仍需 held-out 对照。 |
-| gate可靠性是否存在可判别信号 | oracle correction cosine 与 `on-off` MSE 的 episode correlation 为10K `-0.8943`、30K `-0.8791`；cosine≥0时82.5%--90.3% episode受益，cosine<0时仅2.7%--3.7%受益 | 注入方向存在稳定的可靠/不可靠状态；但 oracle 使用真实 flow target，不能直接用于推理，需学习可观测可靠性估计器。 |
+| gate可靠性是否存在可判别信号 | oracle correction cosine 与 `on-off` MSE 的 episode correlation 为10K `-0.8943`、30K `-0.8791`；cosine≥0时82.5%--90.3% episode受益，cosine<0时仅2.7%--3.7%受益 | 这是由MSE展开式得到的 oracle sanity check，不是独立预测证据；需学习不使用真实 target 的可观测可靠性估计器。 |
 | gate幅度是否足以作为可靠性代理 | 注入改变量大小与`on-off` MSE的episode correlation为10K `0.0158`、30K `-0.0951` | 贡献/速度改变量大小不能单独决定 gate；应估计方向可靠性或两路一致性。 |
 | H9训练中的teacher动作目标是否可靠 | 训练日志七个记录点的`teacher_better_ratio`为`0.9958--1.0000`，且`teacher_task_loss`始终低于`student_task_loss` | 提供动作级 teacher 信号有效的正向机制证据；统计来自训练 batch，未与SFT配对，也不能证明注入的因果收益。 |
 | teacher信号强但后期成功率优势消失说明什么 | H9窗口中student/teacher task-loss比从`10.89×`降至`5.49×`，而H9相对SFT的成功率优势在25K--30K消失 | teacher目标质量不是唯一瓶颈；应优先改进特权信息到最终动作的转换接口，不能只增加teacher或contribution loss权重。 |

@@ -43,7 +43,7 @@ def analyze_reliability(errors: np.ndarray, metrics: np.ndarray, episode_index: 
             "oracle_aligned_cosine_ge_0": _group_summary(episode_delta, episode_cosine, episode_cosine >= 0),
             "oracle_misaligned_cosine_lt_0": _group_summary(episode_delta, episode_cosine, episode_cosine < 0),
         },
-        "scope": "Oracle diagnostic: cosine uses the true flow target and is unavailable at inference.",
+        "scope": "Oracle algebraic sanity check: cosine uses the true flow target and is unavailable at inference.",
     }
 
 

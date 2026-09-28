@@ -22,7 +22,7 @@
         "mean_oracle_cosine": -0.07094844430685043
       }
     },
-    "scope": "Oracle diagnostic: cosine uses the true flow target and is unavailable at inference.",
+    "scope": "Oracle algebraic sanity check: cosine uses the true flow target and is unavailable at inference.",
     "source": "/opt/liutong/openpi-5090-research/acpd-v2-gate-effect/results/136879/per_sample.npz"
   },
   "30k": {
@@ -48,7 +48,7 @@
         "mean_oracle_cosine": -0.06171513348817825
       }
     },
-    "scope": "Oracle diagnostic: cosine uses the true flow target and is unavailable at inference.",
+    "scope": "Oracle algebraic sanity check: cosine uses the true flow target and is unavailable at inference.",
     "source": "/opt/liutong/openpi-5090-research/acpd-v2-gate-effect/results/136880/per_sample.npz"
   }
 }
