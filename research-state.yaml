@@ -44,11 +44,28 @@ experiment_names:
     job_id: 136591
     replication_job_id: 136595
     result: experiments/mechanism/acpd-v2-flow-time-5k/results/136591/summary.json
+  h9_inference_injection_10k:
+    display_name: "H9 10K 推理期 contribution 注入消融"
+    protocol: experiments/mechanism/acpd-v2-h9-inference-injection-10k/protocol.md
+    status: submitted_pending
+    eval_job_id: 136866
+    analysis_job_id: 136867
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
   checked_at: "2026-09-28 14:25 CST (Slurm query and flow-time probe replication)"
   jobs:
+    - id: 136866
+      experiment: h9_inference_injection_10k
+      state: submitted_pending
+      resources: 4x1gpu_8cpu_24g_array_max2
+      episodes: 2000
+      purpose: same_h9_10k_checkpoint_inference_injection_off
+    - id: 136867
+      experiment: h9_inference_injection_10k_paired_analysis
+      state: dependency
+      depends_on: 136866
+      resources: 1cpu_2g
     - id: 136591
       experiment: flow_time_5k_probe
       state: completed_exit_0
