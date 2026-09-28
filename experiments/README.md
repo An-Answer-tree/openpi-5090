@@ -65,6 +65,7 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 | mechanism | H9 10K 推理期注入消融 | `mechanism/acpd-v2-h9-inference-injection-10k/` | 单checkpoint配对验证136866排队，分析136867等待依赖；尚无结论 |
 | mechanism | ACPD-v2中期逐任务差异 | `mechanism/acpd-v2-task-heterogeneity/` | 完成探索性日志分析；Object早期广泛受益，但任务方向随step改变 |
 | mechanism | ACPD-v2早期逐任务收益覆盖 | `mechanism/acpd-v2-early-task-coverage/` | 完成探索性日志分析；10K有32/40任务正差，回合重采样区间[27,34]；15K仅20个保持 |
+| mechanism | ACPD-v2早期步数效率 | `mechanism/acpd-v2-step-efficiency/` | 完成三组跨step配对分析；5K H9与10K SFT pooled接近，另两组不满足±3点范围 |
 
 H11 已归档，不进入正式 checkpoint 集合，也不继续训练。
 H9-Fixed 的恢复、早中期验证及延长训练是同一方法的不同执行阶段，不作为独立消融。
