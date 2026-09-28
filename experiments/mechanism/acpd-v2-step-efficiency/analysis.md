@@ -23,5 +23,21 @@ LIBERO-10 `+2.20` 点。pooled 接近不表示每套都接近；本分析没有�
 ACPD 每步执行额外的 teacher 前向，且这些数字不是独立样本数或 GPU 小时。
 本实验不证明训练墙钟时间减半，也不证明30K以后成功率上限提高。
 
+## 实际训练耗时核对
+
+| 到达checkpoint | 日志记录的累计训练用时 | 资源 |
+|---|---:|---|
+| H9 5K | 13小时55分 | 4 GPU；原30K任务的前5K |
+| SFT 10K | 3小时18分 + 3小时17分 = 6小时35分 | 4 GPU；0--5K与5K--10K两段 |
+
+因此在这几次实际运行中，H9虽少一半步数，到约23%成功率的训练墙钟时间
+仍约为SFT的2.1倍。两方法都在`gpu01`运行，但日期、机器负载和checkpoint
+写入时机不同；这是历史运行耗时对照，不是受控吞吐基准，也不能将全部差异
+归因于teacher前向。该事实进一步限制了上述步数效率的工程解释。
+
+训练日志：`slurm-log/pi05-bv-acpdv2-l10-fsdp4-bs64-30k_129728.out`、
+`slurm-log/pi05-bv-sft-bs64-5k_130285.out`、
+`slurm-log/pi05-bv-sft-bs64-r30k_130762.out`。
+
 原始成对分析：`results/h9_5k_vs_sft_10k.json`、
 `results/h9_10k_vs_sft_15k.json`、`results/h9_15k_vs_sft_20k.json`。

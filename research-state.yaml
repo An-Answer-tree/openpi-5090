@@ -70,6 +70,7 @@ experiment_names:
     result: experiments/mechanism/acpd-v2-step-efficiency/analysis.md
     h9_5k_vs_sft_10k_difference: -0.001
     paired_ci95: [-0.022, 0.0205]
+    observed_training_elapsed_hours: {h9_5k: 13.92, sft_10k: 6.58}
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
