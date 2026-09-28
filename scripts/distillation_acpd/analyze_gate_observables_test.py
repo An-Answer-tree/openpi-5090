@@ -33,6 +33,8 @@ def test_observable_analysis_reports_held_out_auc():
     result = analyze_observables(errors, metrics, np.repeat(np.arange(4), 2))
     assert result["episodes"] == 4
     assert result["benefit_episodes"] == 2
+    assert result["oracle_policy"]["selected_on_fraction"] == 0.5
+    assert result["oracle_policy"]["mean_mse_minus_off"] == -0.25
     for values in result["observable_results"].values():
         assert len(values["held_out_auc_per_fold"]) == 2
         assert len(values["held_out_policy_per_fold"]) == 2

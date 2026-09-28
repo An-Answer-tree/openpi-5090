@@ -71,13 +71,20 @@ def analyze_observables(errors: np.ndarray, metrics: np.ndarray, episode_index: 
     episode_delta = episode_errors[:, 3] - episode_errors[:, 0]
     episode_metrics = _episode_means(metrics[:, 2:5], episode_index)
     labels = episode_delta < 0
+    oracle_error = np.minimum(episode_errors[:, 0], episode_errors[:, 3])
+    oracle_policy = {
+        "selected_on_fraction": float((episode_errors[:, 3] < episode_errors[:, 0]).mean()),
+        "mean_mse": float(oracle_error.mean()),
+        "mean_mse_minus_off": float(oracle_error.mean() - episode_errors[:, 0].mean()),
+        "mean_mse_minus_on": float(oracle_error.mean() - episode_errors[:, 3].mean()),
+    }
     results = {}
     for index, name in enumerate(_OBSERVABLE_NAMES):
         feature = episode_metrics[:, index]
         results[name] = {
             "episode_pearson_correlation_with_on_minus_off_mse": float(np.corrcoef(feature, episode_delta)[0, 1]),
-            "benefit_fraction_above_zero": float(feature[labels].mean()),
-            "benefit_fraction_below_zero": float(feature[~labels].mean()),
+            "mean_observable_for_benefit_episodes": float(feature[labels].mean()),
+            "mean_observable_for_harm_episodes": float(feature[~labels].mean()),
             "held_out_auc_per_fold": _cross_validated_auc(feature, labels),
             "held_out_policy_per_fold": _cross_validated_policy(feature, episode_errors, labels),
         }
@@ -85,6 +92,7 @@ def analyze_observables(errors: np.ndarray, metrics: np.ndarray, episode_index: 
         "episodes": len(episode_delta),
         "benefit_episodes": int(labels.sum()),
         "harm_episodes": int((~labels).sum()),
+        "oracle_policy": oracle_policy,
         "observable_results": results,
         "scope": "Features use only predicted view branches; labels use offline true flow targets.",
     }
