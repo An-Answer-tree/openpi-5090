@@ -42,11 +42,12 @@ experiment_names:
     protocol: experiments/mechanism/acpd-v2-flow-time-5k/protocol.md
     status: complete_exploratory
     job_id: 136591
+    replication_job_id: 136595
     result: experiments/mechanism/acpd-v2-flow-time-5k/results/136591/summary.json
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-28 14:05 CST (Slurm query and flow-time probe)"
+  checked_at: "2026-09-28 14:25 CST (Slurm query and flow-time probe replication)"
   jobs:
     - id: 136591
       experiment: flow_time_5k_probe
