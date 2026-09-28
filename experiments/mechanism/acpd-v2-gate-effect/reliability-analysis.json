@@ -1,0 +1,50 @@
+{
+  "10k": {
+    "samples": 1024,
+    "episodes": 194,
+    "sample_cosine_delta_correlation": -0.8409762160349186,
+    "episode_cosine_delta_correlation": -0.8943271342231495,
+    "episode_groups": {
+      "oracle_aligned_cosine_ge_0": {
+        "episodes": 113,
+        "fraction": 0.5824742268041238,
+        "mean_on_minus_off_mse": -6.605570524698123e-05,
+        "benefit_fraction": 0.9026548672566371,
+        "mean_oracle_cosine": 0.0772235319018364
+      },
+      "oracle_misaligned_cosine_lt_0": {
+        "episodes": 81,
+        "fraction": 0.4175257731958763,
+        "mean_on_minus_off_mse": 9.844546730164438e-05,
+        "benefit_fraction": 0.037037037037037035,
+        "mean_oracle_cosine": -0.07094844430685043
+      }
+    },
+    "scope": "Oracle diagnostic: cosine uses the true flow target and is unavailable at inference.",
+    "source": "/opt/liutong/openpi-5090-research/acpd-v2-gate-effect/results/136879/per_sample.npz"
+  },
+  "30k": {
+    "samples": 1024,
+    "episodes": 194,
+    "sample_cosine_delta_correlation": -0.8579330571278441,
+    "episode_cosine_delta_correlation": -0.8790608656036115,
+    "episode_groups": {
+      "oracle_aligned_cosine_ge_0": {
+        "episodes": 120,
+        "fraction": 0.6185567010309279,
+        "mean_on_minus_off_mse": -8.944081491790712e-05,
+        "benefit_fraction": 0.825,
+        "mean_oracle_cosine": 0.07185222953557968
+      },
+      "oracle_misaligned_cosine_lt_0": {
+        "episodes": 74,
+        "fraction": 0.38144329896907214,
+        "mean_on_minus_off_mse": 0.00016688606410752982,
+        "benefit_fraction": 0.02702702702702703,
+        "mean_oracle_cosine": -0.06171513348817825
+      }
+    },
+    "scope": "Oracle diagnostic: cosine uses the true flow target and is unavailable at inference.",
+    "source": "/opt/liutong/openpi-5090-research/acpd-v2-gate-effect/results/136880/per_sample.npz"
+  }
+}

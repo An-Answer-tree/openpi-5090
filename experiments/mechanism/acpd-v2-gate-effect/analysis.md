@@ -46,5 +46,17 @@
 这说明全局 gate 的近零平均值不是所有样本都没有影响，而是不同 episode 的作用
 方向互相抵消。它为“根据 student 可见状态预测 gate”的条件化方案提供了机制动机；
 但当前没有证据证明这些正负方向可以从 student 输入稳定预测，也不能把该异质性写成
-动态 gate 已经有效。后续若测试动态 gate，必须使用 held-out episode，并与相同参数量
-的静态 gate 对照。
+ 动态 gate 已经有效。后续若测试动态 gate，必须使用 held-out episode，并与相同参数量
+ 的静态 gate 对照。
+
+进一步使用 probe 保存的 `delta_to_ideal_correction_cosine` 做 oracle 分组。该量使用
+真实 flow target，仅用于机制诊断，推理时不可见：
+
+| Checkpoint | Oracle cosine 与 `on-off` MSE 的 episode correlation | cosine≥0 时 gate 受益比例 | cosine<0 时 gate 受益比例 |
+|---|---:|---:|---:|
+| 10K | `-0.8943` | `90.3%`（113 episodes） | `3.7%`（81 episodes） |
+| 30K | `-0.8791` | `82.5%`（120 episodes） | `2.7%`（74 episodes） |
+
+该结果说明注入方向本身具有可判别的“可靠/不可靠”状态；当前 gate 没有利用这个
+状态，才在全局平均上接近零。由于 oracle target 不可用于部署，下一步只能检验是否能
+用 student 可见的 hidden、contribution 范数或两路一致性预测该可靠性。
