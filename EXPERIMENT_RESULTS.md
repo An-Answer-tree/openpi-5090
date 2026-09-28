@@ -101,6 +101,7 @@ H17 15K只有Spatial/Object部分结果，无四套pooled；详见
 |---|---|---|---:|---|---|
 | H15a | 判断 ACPD-v2 后期是否存在辅助梯度干扰 | H9 5K/30K；每点200个相同BS32 batch；不更新参数 | smoke 132308；快速 132311；正式 132250 | 完成 | 5K/30K 组合冲突率均为 `0%`；不支持后期梯度冲突解释 |
 | H18-ActionReadout | 检查冻结 H9 的 contribution 是否能被小型动作修正头有效使用 | H9 BS64 30K 冻结；hidden-only、hidden-layer10、hidden-contribution 三组；单卡500步、BS8 | smoke 136129；正式136130 | 完成；无仿真 | contribution 相对冻结 H9 MSE 下降 `0.813%`，95% CI `[-1.804%, +0.031%]`；相对 layer10 对照变差 `0.029%`，未通过1%筛选 |
+| H18-ActionReadout-Oracle | 判断不同状态是否需要不同动作读出接口 | 复用 H18 的 1,024 个样本、194 个 episode；逐 episode 用真实 flow target 选择四种读出头中的最优者；CPU bootstrap 2,000次 | 无新 Slurm 任务 | 完成；不可部署上限 | episode-level 理想选择相对最佳固定 hidden-layer10 降低 MSE `2.131%`，95% CI `[-2.264%, -1.492%]`；支持条件路由假设，不是仿真成功率结论 |
 | Flow-time 5K | 检查早期优势是否对应特定时间段的 flow 误差 | 冻结 SFT/H9 5K；首轮512样本，复核128样本且每样本5个 t；单卡只读 | 136591、136595 | 完成；无仿真 | 首轮整体无差异；首轮 t=0.1 信号在同样本复核中未复现（差值 `+0.00283`，95% CI 跨0）；不支持启动时间重采样训练 |
 | H9 10K 推理期注入消融 | 同一个 H9 checkpoint 仅在推理时关闭 contribution 注入，判断部署时是否依赖该分支 | 四套各500回合；与原H9结果配对 | 136866、136867 | 验证排队；分析等待依赖 | 尚无结论 |
 | H9 Agentview-only 注入 10K | 检验离线 probe 中 agentview-only 优于 wrist-only 的方向能否复现到闭环 | H9 10K `9999`；推理时保留 agentview、屏蔽 wrist；四套各500回合 | 136920；汇总136921 | 排队；尚无结论 | 预注册阈值：相对完整 H9 提升至少1.5点且配对区间下界>0才扩展30K |
@@ -240,6 +241,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H9 35K/SFT 30K 配对分析 | `experiments/student/acpd-v2-h9-trajectory-60k/results/h9_35k_vs_sft_30k_paired_analysis.json` |
 | H15a 梯度诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/protocol.md` |
 | H18 ActionReadout 协议与分析 | `experiments/mechanism/acpd-v2-h18-action-readout/`；原始结果 `/opt/liutong/openpi-5090-research/acpd-v2-h18-action-readout/results/136130/summary.json` |
+| H18 动作读出条件路由上限 | `experiments/mechanism/acpd-v2-h18-action-readout/oracle-routing-protocol.md`、`oracle-routing-analysis.md`；结果 `/opt/liutong/openpi-5090-research/acpd-v2-h18-action-readout/results/136130/oracle_routing.json` |
 | H19-FeatureFusion 协议 | `experiments/student/acpd-v2-h19-feature-fusion-30k/protocol.md` |
 | H19-FeatureFusion checkpoint（待生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/` |
 | H19-FeatureFusion 训练日志 | `/opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion/slurm-log/pi05-bv-acpdv2-feature-fusion-bs64-30k_136345.out` |

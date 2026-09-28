@@ -21,3 +21,4 @@ def test_oracle_detects_complementary_episode_winners(tmp_path):
     assert result["best_fixed_arm"] == "hidden_only"
     assert result["episode_winner_fraction"]["hidden_layer10"] == 0.5
     assert result["episode_oracle_mean_mse"] < result["fixed_episode_mean_mse"]["hidden_only"]
+    assert result["episode_oracle_minus_best_fixed"] < 0.0

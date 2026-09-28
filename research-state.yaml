@@ -29,7 +29,9 @@ experiment_names:
     display_name: "ACPD-v2-ActionReadout / 冻结贡献动作读出诊断"
     legacy_id: H18
     parent: h9_fixed
-    status: submitted_single_gpu_diagnostic
+    status: complete_with_conditional_oracle
+    oracle_analysis: experiments/mechanism/acpd-v2-h18-action-readout/oracle-routing-analysis.md
+    oracle_result: episode_level_mse_reduction_0.02131_ci95_negative
   h19_feature_fusion_trajectory:
     display_name: "ACPD-v2-FeatureFusion / 预测贡献的动作特征融合"
     legacy_id: H19
@@ -201,6 +203,12 @@ current_execution:
       smoke_job: 136129
       purpose: frozen H9 30K action-readout diagnostic
       result: contribution_vs_h9_mse_reduction_0.00813; paired_ci_crosses_zero; no_simulation
+    - id: offline_h18_action_readout_oracle
+      experiment: h18_action_readout_oracle_routing
+      state: complete_exploratory_positive_mechanism
+      resources: cpu_only
+      source: /opt/liutong/openpi-5090-research/acpd-v2-h18-action-readout/results/136130/validation_errors.npz
+      result: episode_oracle_vs_best_fixed_mse_reduction_0.02131; ci95_negative; not_deployable
     - id: 136129
       experiment: h18_action_readout_smoke
       state: complete

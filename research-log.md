@@ -110,3 +110,4 @@
 | 2026-09-29 | 方法 | 离线分支 probe 在10K/30K均显示 agentview-only MSE方向优于关闭、wrist-only方向相反，虽区间跨0；锁定低成本 H9 10K agentview-only 闭环消融，mask 只作用于推理，不修改 checkpoint。 |
 | 2026-09-29 | 提交 | Agentview-only 10K 闭环 array `136920_[0-3%2]` 与汇总 `136921` 已提交；复用 H9 `9999` checkpoint，四套各500回合，预注册相对完整注入至少+1.5点且配对区间下界>0才扩展30K。 |
 | 2026-09-29 | 工程复核 | Agentview-only debug smoke `136923_0` 在debug01完成真实 Spatial 20回合，成功率8/20；checkpoint加载、推理和视频写入正常，无NaN。该数值不纳入正式结论。 |
+| 2026-09-29 | 结果 | 复用 H18 冻结动作读出误差做 CPU 条件路由上限分析：逐 episode 用真实 flow target 选择最佳读出头，相对固定 hidden-layer10 降低 MSE `2.131%`，95%区间 `[-2.264%,-1.492%]`；四种读出头均在部分 episode 获胜。该结果支持可观测条件路由假设，但不属于可部署或仿真成功率结果。 |

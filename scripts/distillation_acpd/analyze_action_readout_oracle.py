@@ -20,17 +20,15 @@ def _episode_means(errors: np.ndarray, episode_index: np.ndarray) -> tuple[np.nd
 
 
 def _bootstrap_delta(
-    episode_means: np.ndarray,
-    baseline: np.ndarray,
-    oracle: np.ndarray,
+    episode_delta: np.ndarray,
     *,
     samples: int,
     seed: int,
 ) -> tuple[float, list[float]]:
     """Bootstraps oracle minus fixed-baseline episode MSE."""
     rng = np.random.default_rng(seed)
-    indices = rng.integers(0, episode_means.shape[0], size=(samples, episode_means.shape[0]))
-    deltas = (episode_means[indices, oracle] - episode_means[indices, baseline]).mean(axis=1)
+    indices = rng.integers(0, episode_delta.size, size=(samples, episode_delta.size))
+    deltas = episode_delta[indices].mean(axis=1)
     return float(deltas.mean()), np.percentile(deltas, [2.5, 97.5]).tolist()
 
 
@@ -48,10 +46,9 @@ def analyze(path: Path, *, bootstrap_samples: int, seed: int) -> dict:
     episode_oracle_means = episode_means[np.arange(episode_means.shape[0]), episode_oracle]
     sample_oracle = np.argmin(errors, axis=1)
     sample_oracle_mean = float(errors[np.arange(errors.shape[0]), sample_oracle].mean())
+    episode_delta = episode_oracle_means - episode_means[:, best_fixed]
     bootstrap_mean, bootstrap_ci = _bootstrap_delta(
-        episode_means,
-        np.full(episode_means.shape[0], best_fixed),
-        episode_oracle,
+        episode_delta,
         samples=bootstrap_samples,
         seed=seed,
     )
