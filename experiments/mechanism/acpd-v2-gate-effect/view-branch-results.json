@@ -1,0 +1,58 @@
+{
+  "10k": {
+    "samples": 1024,
+    "episodes": 194,
+    "contrasts": {
+      "wrist_minus_agent": {
+        "mean": 2.7258620320935734e-05,
+        "paired_ci95": [
+          7.607970155731892e-06,
+          4.679966141338808e-05
+        ]
+      },
+      "on_minus_agent": {
+        "mean": 1.8264199752593413e-05,
+        "paired_ci95": [
+          -3.0939458781631393e-07,
+          3.6353821724333044e-05
+        ]
+      },
+      "interaction": {
+        "mean": 9.365936648464412e-07,
+        "paired_ci95": [
+          -1.4551627214132167e-05,
+          1.616851573089661e-05
+        ]
+      }
+    },
+    "source": "/opt/liutong/openpi-5090-research/acpd-v2-gate-effect/results/136880/per_sample.npz"
+  },
+  "30k": {
+    "samples": 1024,
+    "episodes": 194,
+    "contrasts": {
+      "wrist_minus_agent": {
+        "mean": 1.0120636943611316e-05,
+        "paired_ci95": [
+          -3.815344575741619e-06,
+          2.518944988878501e-05
+        ]
+      },
+      "on_minus_agent": {
+        "mean": 8.087175956461579e-06,
+        "paired_ci95": [
+          -5.7510953183737e-06,
+          2.2748090941604426e-05
+        ]
+      },
+      "interaction": {
+        "mean": 3.4252939258294646e-06,
+        "paired_ci95": [
+          -4.137247572089109e-06,
+          1.151937970007566e-05
+        ]
+      }
+    },
+    "source": "/opt/liutong/openpi-5090-research/acpd-v2-gate-effect/results/136879/per_sample.npz"
+  }
+}

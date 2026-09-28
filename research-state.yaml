@@ -65,6 +65,13 @@ experiment_names:
       step_10k: [-0.00001628865, 0.00003203806]
       step_30k: [-0.00001384337, 0.00001951568]
     mean_sample_velocity_delta_ratio: {step_10k: 0.00289575, step_30k: 0.00187224}
+  h9_view_branch_analysis:
+    display_name: "ACPD-v2 agentview/wrist 注入分路离线差异"
+    protocol: experiments/mechanism/acpd-v2-gate-effect/view-branch-protocol.md
+    status: complete_exploratory_reanalysis
+    result: experiments/mechanism/acpd-v2-gate-effect/view-branch-analysis.md
+    wrist_minus_agent_mse: {step_10k: 0.00002726, step_30k: 0.00001012}
+    consistent_across_checkpoints: false
   h9_task_heterogeneity:
     display_name: "ACPD-v2 20K--30K 逐任务差异"
     protocol: experiments/mechanism/acpd-v2-task-heterogeneity/protocol.md
