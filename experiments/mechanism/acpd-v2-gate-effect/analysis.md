@@ -33,3 +33,18 @@
 `/opt/liutong/openpi-5090-research/acpd-v2-gate-effect/results/136880/summary.json`
 和 `/opt/liutong/openpi-5090-research/acpd-v2-gate-effect/results/136879/summary.json`；
 逐样本误差及 episode 编号见各自同目录 `per_sample.npz`。
+
+## Episode 异质性补充分析
+
+对逐样本 `on - off` MSE 按 episode 求均值后，完整 gate 的正负作用接近抵消：
+
+| Checkpoint | gate 使 MSE 降低的 episode | gate 使 MSE 增大的 episode | `on-off` episode 差值分位数 |
+|---|---:|---:|---|
+| 10K | 54.12% | 45.88% | `[-0.000355, -0.000007, 0.000647]`（min/median/max） |
+| 30K | 52.06% | 47.94% | `[-0.000473, -0.000004, 0.000715]`（min/median/max） |
+
+这说明全局 gate 的近零平均值不是所有样本都没有影响，而是不同 episode 的作用
+方向互相抵消。它为“根据 student 可见状态预测 gate”的条件化方案提供了机制动机；
+但当前没有证据证明这些正负方向可以从 student 输入稳定预测，也不能把该异质性写成
+动态 gate 已经有效。后续若测试动态 gate，必须使用 held-out episode，并与相同参数量
+的静态 gate 对照。
