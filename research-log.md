@@ -103,3 +103,5 @@
 | 2026-09-29 | 结果 | CPU oracle 分析显示相关性为10K `-0.8943`、30K `-0.8791`；复核后确认该相关性由`MSE(v+delta)-MSE(v)`展开式中的同一内积项预期得到，只能作为公式一致性检查，不能作为动态 gate 已有效的证据。 |
 | 2026-09-29 | 结果 | 同一脚本显示注入改变量大小与 `on-off` MSE 的 episode correlation 仅为10K `0.0158`、30K `-0.0951`；不支持仅按 contribution/速度范数调 gate。 |
 | 2026-09-29 | 提交 | 修复动作方向诊断的显存占用和配置接口后，debug smoke `136895` 使用真实5K checkpoint、2个batch完成并exit 0；正式5K/10K数组 `136897_[0-1%1]` 依赖该 smoke 提交，结果尚未产生。 |
+| 2026-09-29 | 提交 | Teacher-Action-MSE 5K 消融 `136914` 已提交：4×5090、FSDP、physical BS64、teacher-action MSE 权重0.1；四套全量验证 `136916`、汇总 `136917` 和配对分析 `136918` 已建立依赖链。 |
+| 2026-09-29 | 复核 | 修正 `136918` 配对分析脚本中的两个历史 baseline 路径，改为实际存在的 H9 5K `acpd-v2-injection-location-5k/final-hidden/4999` 与 SFT 5K `sft-backview-bs64-5k/4999`；验证脚本语法、目录和 YAML 状态均通过。 |
