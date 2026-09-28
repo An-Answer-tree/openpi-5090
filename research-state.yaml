@@ -139,7 +139,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-29 05:54 CST (observable gate probe 136904 and dependent CPU summary 136913 submitted)"
+  checked_at: "2026-09-29 06:06 CST (teacher-action MSE 5K ablation 136914 submitted)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -226,6 +226,14 @@ current_execution:
       resources: 1cpu_2g
       depends_on: 136904
       purpose: held_out_auc_and_policy_mse_summary
+    - id: 136914
+      experiment: teacher_action_mse_5k
+      state: pending_priority
+      resources: 4gpu_32cpu_96g
+      time_limit: 2-00:00:00
+      teacher_action_loss_weight: 0.1
+      target_steps: 5000
+      purpose: direct_privileged_teacher_action_distillation_vs_h9_5k
     - id: 135943
       experiment: acpd_v2_tdca_5k
       state: complete_checkpoint_4999
