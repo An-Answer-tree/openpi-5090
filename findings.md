@@ -53,6 +53,7 @@
 | H9训练中的teacher动作目标是否可靠 | 训练日志七个记录点的`teacher_better_ratio`为`0.9958--1.0000`，且`teacher_task_loss`始终低于`student_task_loss` | 提供动作级 teacher 信号有效的正向机制证据；统计来自训练 batch，未与SFT配对，也不能证明注入的因果收益。 |
 | teacher信号强但后期成功率优势消失说明什么 | H9窗口中student/teacher task-loss比从`10.89×`降至`5.49×`，而H9相对SFT的成功率优势在25K--30K消失 | teacher目标质量不是唯一瓶颈；应优先改进特权信息到最终动作的转换接口，不能只增加teacher或contribution loss权重。 |
 | 不同动作读出接口是否对不同状态互补 | 复用H18冻结验证误差，episode-level理想选择相对最佳固定hidden-layer10降低MSE`2.131%`，95%区间`[-2.264%,-1.492%]`；四种读出头的episode获胜比例为`19.59/31.44/18.04/30.93%` | 支持“不同状态需要不同信息接口”的条件路由假设；oracle使用真实flow target，不是可部署或仿真成功率证据。 |
+| Student 可见特征能否恢复动作读出路由 | Job136935提取相同H18划分的可见特征，奇偶episode两折ridge路由；相对固定hidden-layer10变化`+0.00010792`，相对变差`0.127%`，MSE差值95%区间`[-0.00029520,+0.00053006]` | 理想路由上限不能由当前简单线性Student-only路由恢复；不继续堆叠小gate，优先检验端到端融合或teacher-action蒸馏。 |
 | 单视角 baseline 是否受视角影响 | left/right/top/backview 30K pooled 分别为 `78.65/77.00/71.55/60.45%` | 视角差异大；ACPD 必须使用相同 student 视角的 SFT 对照。 |
 
 ## 文献约束
@@ -152,6 +153,12 @@ episode mean flow MSE 额外下降 `2.131%`，95%区间为`[-2.264%,-1.492%]`。
 更具体的假设是，student 需要根据自身可见特征选择或融合不同读出路径。由于 oracle
 使用真实 target，该结果只能作为机制上限，后续必须测试不访问 target 的路由器。
 详见 `experiments/mechanism/acpd-v2-h18-action-readout/oracle-routing-analysis.md`。
+
+随后使用不含真实 flow target 的 Student-only ridge 路由器进行两折测试。路由器只看
+final hidden、layer10 hidden 和 predicted contribution 的压缩特征，结果相对固定
+hidden-layer10 变差 `0.127%`，95%区间跨0。该结果说明 oracle 上限并不能通过简单
+线性 gate 获得；路由方向仍可能存在，但需要更强的可观测状态表示或训练期端到端
+融合。详见 `experiments/mechanism/acpd-v2-h18-action-readout/observable-routing-analysis.md`。
 
 同 checkpoint 离线注入诊断在10K/30K均未检测到7维flow MSE改善。它使“小gate
 未必改变动作”的疑问具体化：速度确实改变，但样本级改变量均值不足0.3%。

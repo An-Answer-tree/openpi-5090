@@ -32,6 +32,12 @@ experiment_names:
     status: complete_with_conditional_oracle
     oracle_analysis: experiments/mechanism/acpd-v2-h18-action-readout/oracle-routing-analysis.md
     oracle_result: episode_level_mse_reduction_0.02131_ci95_negative
+  h18_observable_router:
+    display_name: "ACPD-v2-ObservableRouter / Student-only 动作读出路由"
+    parent: h18_action_readout
+    status: complete_exploratory_negative
+    job_id: 136935
+    result: experiments/mechanism/acpd-v2-h18-action-readout/observable-routing-analysis.md
   h19_feature_fusion_trajectory:
     display_name: "ACPD-v2-FeatureFusion / 预测贡献的动作特征融合"
     legacy_id: H19
@@ -209,6 +215,11 @@ current_execution:
       resources: cpu_only
       source: /opt/liutong/openpi-5090-research/acpd-v2-h18-action-readout/results/136130/validation_errors.npz
       result: episode_oracle_vs_best_fixed_mse_reduction_0.02131; ci95_negative; not_deployable
+    - id: 136935
+      experiment: h18_observable_action_router_features
+      state: complete_exploratory_negative
+      resources: 1gpu_debug01_8cpu_24g_then_cpu
+      result: routed_vs_fixed_layer10_relative_minus_0.00127; ci_crosses_zero; no_simulation
     - id: 136129
       experiment: h18_action_readout_smoke
       state: complete
