@@ -124,7 +124,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-29 04:01 CST (action-direction probe submitted)"
+  checked_at: "2026-09-29 04:18 CST (teacher action diagnostic documented; Slurm rechecked)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
