@@ -59,6 +59,8 @@ experiment_names:
     primary_metric: pooled_paired_success_vs_h9_full
     eval_array_job: 136920
     summary_job: 136921
+    smoke_job: 136923
+    smoke_result: spatial_20_episodes_8_success; config_loaded_and_completed
   h9_gate_effect_probe:
     display_name: "ACPD-v2 注入对动作速度的离线影响"
     protocol: experiments/mechanism/acpd-v2-gate-effect/protocol.md
