@@ -71,10 +71,20 @@ experiment_names:
     h9_5k_vs_sft_10k_difference: -0.001
     paired_ci95: [-0.022, 0.0205]
     observed_training_elapsed_hours: {h9_5k: 13.92, sft_10k: 6.58}
+  h9_learning_curve_area:
+    display_name: "ACPD-v2 5K--30K 检查点序列成功率面积"
+    protocol: experiments/mechanism/acpd-v2-learning-curve-area/protocol.md
+    status: complete_exploratory
+    result: experiments/mechanism/acpd-v2-learning-curve-area/analysis.md
+    area_difference_5k_30k: 0.05135
+    paired_episode_bootstrap_ci95: [0.0408, 0.0621]
+    area_difference_10k_30k: 0.0348125
+    positive_tasks: 30
+    h9_sequence: original_5k_25k_30k_plus_matched_recovery_10k_15k_20k
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-29 01:21 CST (Slurm query and completed evaluation artifacts)"
+  checked_at: "2026-09-29 02:16 CST (Slurm query and completed evaluation artifacts)"
   jobs:
     - id: 136866
       experiment: h9_inference_injection_10k
@@ -149,7 +159,7 @@ current_execution:
       paired_ci95: [-0.039, 0.0035]
     - id: 135724
       experiment: backview_acl_only_bs64_35k
-      state: running_step_17300_of_35000
+      state: running_step_20400_of_35000
       resources: 4gpu_32cpu_96g
       time_limit: 10-00:00:00
     - id: 135725

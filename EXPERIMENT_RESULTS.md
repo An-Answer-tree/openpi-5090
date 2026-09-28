@@ -36,6 +36,7 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | ACPD-v2 是否优于匹配 BS64 SFT | 5K 时提升 `9.30` 点；30K 时为 `58.00%` 对 `60.45%`，差值 `-2.45` 点，95% CI `[-5.00, 0.00]`。早期优势未保持到 30K。 | H9-scale-b、H12 |
 | ACPD-v2 的早期优势在 10K 是否仍存在 | 存在。H9 为 `37.45%`，SFT 为 `23.25%`；差值 `+14.20` 点，配对 95% CI `[+11.90, +16.60]`。 | 相同 2,000 episodes |
 | ACPD-v2 能否少用训练步数达到早期成功率 | H9 5K `23.15%` 对 SFT 10K `23.25%`，差值 `-0.10` 点、配对95%区间 `[-2.20,+2.05]` 点，落入探索性±3点范围；其余两组不满足。历史训练用时约13小时55分对6小时35分，未体现GPU时间优势。 | 三组跨step配对验证与训练日志 |
+| ACPD-v2 的检查点序列平均成功率是否更高 | 5K–30K 六点梯形平均为 H9 `45.995%`、SFT `40.860%`，差值 `+5.135` 点，配对回合重采样95%区间 `[+4.080,+6.210]` 点；10K–30K差值仍为`+3.481`点。H9中段为同配置重建，不是单次连续运行；探索性，不代表最终上限或GPU时间收益。 | `experiments/mechanism/acpd-v2-learning-curve-area/analysis.md` |
 | ACPD-v2 在 15K 是否仍优于 SFT | H9-Fixed 为 `46.60%`，SFT 为 `40.90%`；差值 `+5.70` 点，配对 95% CI `[+3.25, +8.15]`。 | 相同 2,000 episodes |
 | ACPD-v2 的早期优势何时消失 | 20K 时差值 `+2.40` 点，95% CI `[-0.15, +5.00]`，已无可检测 pooled 优势；25K 为 `-0.05` 点，95% CI `[-2.50, +2.45]`。 | 相同 2,000 episodes |
 | ACPD-v2 在20K的任务差异 | Object 比 SFT 高 `9.60` 点，Goal 低 `8.20` 点；两项配对区间均不跨0。pooled 的 `+2.40` 点区间跨0。 | H9/SFT 20K 配对分析 |
@@ -93,6 +94,7 @@ H17 15K只有Spatial/Object部分结果，无四套pooled；详见
 | H18-ActionReadout | 检查冻结 H9 的 contribution 是否能被小型动作修正头有效使用 | H9 BS64 30K 冻结；hidden-only、hidden-layer10、hidden-contribution 三组；单卡500步、BS8 | smoke 136129；正式136130 | 完成；无仿真 | contribution 相对冻结 H9 MSE 下降 `0.813%`，95% CI `[-1.804%, +0.031%]`；相对 layer10 对照变差 `0.029%`，未通过1%筛选 |
 | Flow-time 5K | 检查早期优势是否对应特定时间段的 flow 误差 | 冻结 SFT/H9 5K；首轮512样本，复核128样本且每样本5个 t；单卡只读 | 136591、136595 | 完成；无仿真 | 首轮整体无差异；首轮 t=0.1 信号在同样本复核中未复现（差值 `+0.00283`，95% CI 跨0）；不支持启动时间重采样训练 |
 | H9 10K 推理期注入消融 | 同一个 H9 checkpoint 仅在推理时关闭 contribution 注入，判断部署时是否依赖该分支 | 四套各500回合；与原H9结果配对 | 136866、136867 | 验证排队；分析等待依赖 | 尚无结论 |
+| 5K–30K 检查点序列面积 | 比较 H9 与匹配 SFT 六点平均成功率 | 5K/25K/30K为原H9训练，10K/15K/20K为同配置重建；40任务×50回合，10,000次配对回合重采样 | 无新Slurm任务 | 完成；探索性 | H9高`5.135`点，区间`[+4.080,+6.210]`点；30/40任务面积差为正；不是单次连续轨迹或GPU时间收益 |
 | 中期逐任务差异 | 检查20/25/30K的H9−SFT差异是否稳定 | 只读三组全量验证日志，每任务50回合 | 无新Slurm任务 | 完成；探索性 | Object 20K 8/10任务为正，30K仅5/10；Goal三点均负的任务有4个；不能由套件均值推断普遍收益 |
 | 早期逐任务收益覆盖 | 检查10K优势是否广泛、10K到15K任务收益是否稳定 | 只读5/10/15K全量验证日志；每任务50回合、2,000次配对重采样 | 无新Slurm任务 | 完成；探索性 | 10K有32/40任务为正，重采样区间[27,34]；15K其中仅20个保持，不支持直接使用固定任务路由 |
 | 早期步数效率 | 比较H9比SFT少训练5K步时的成功率 | 只读5K对10K、10K对15K、15K对20K正式验证日志；各2,000回合配对 | 无新Slurm任务 | 完成；探索性 | 5K H9与10K SFT差值-0.10点，区间[-2.20,+2.05]点；另两组未达到±3点范围，不支持全程固定领先 |
@@ -247,6 +249,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | ACPD-v2逐任务差异 | `experiments/mechanism/acpd-v2-task-heterogeneity/analysis.md`；原始三组日志路径见该文 |
 | ACPD-v2早期逐任务收益 | `experiments/mechanism/acpd-v2-early-task-coverage/analysis.md`；逐任务原始计数见同目录 `results/task_coverage.json` |
 | ACPD-v2早期步数效率 | `experiments/mechanism/acpd-v2-step-efficiency/analysis.md`；三组成对结果见同目录 `results/` |
+| ACPD-v2训练轨迹面积 | `experiments/mechanism/acpd-v2-learning-curve-area/analysis.md`；原始计算结果见同目录 `results/learning_curve_area.json` |
 | H14 多视角结果 | `experiments/baseline/sft-multiview-bs64-30k/analysis.md` |
 | SFT 验证目录 | `/opt/liutong/openpi-5090-evals/` |
 | ACPD 验证目录 | `/opt/liutong/openpi-5090-evals/acpd-*` |

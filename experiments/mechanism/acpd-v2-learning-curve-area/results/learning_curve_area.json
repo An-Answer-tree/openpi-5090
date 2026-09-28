@@ -1,0 +1,113 @@
+{
+  "steps": [
+    5000,
+    10000,
+    15000,
+    20000,
+    25000,
+    30000
+  ],
+  "tasks": 40,
+  "episodes_per_task_per_step": 50,
+  "bootstrap_resamples": 10000,
+  "bootstrap_seed": 42,
+  "pooled_5k_30k": {
+    "difference": 0.05135000000000001,
+    "ci95": [
+      0.0408,
+      0.0621
+    ]
+  },
+  "pooled_10k_30k": {
+    "difference": 0.0348125,
+    "ci95": [
+      0.0229375,
+      0.0469375
+    ]
+  },
+  "suites_5k_30k": {
+    "spatial": {
+      "difference": 0.06559999999999999,
+      "ci95": [
+        0.04260000000000001,
+        0.0884
+      ]
+    },
+    "object": {
+      "difference": 0.0856,
+      "ci95": [
+        0.0638,
+        0.10759999999999999
+      ]
+    },
+    "goal": {
+      "difference": 0.024400000000000005,
+      "ci95": [
+        0.004200000000000002,
+        0.044800000000000006
+      ]
+    },
+    "libero_10": {
+      "difference": 0.029800000000000004,
+      "ci95": [
+        0.011000000000000003,
+        0.048600000000000004
+      ]
+    }
+  },
+  "task_area_counts": {
+    "positive": 30,
+    "negative": 10,
+    "zero": 0
+  },
+  "task_areas": {
+    "goal/open the middle drawer of the cabinet": -0.04,
+    "goal/open the top drawer and put the bowl inside": -0.09,
+    "goal/push the plate to the front of the stove": -0.004000000000000001,
+    "goal/put the bowl on the plate": 0.044000000000000004,
+    "goal/put the bowl on the stove": 0.034000000000000016,
+    "goal/put the bowl on top of the cabinet": 0.16799999999999998,
+    "goal/put the cream cheese in the bowl": -0.038000000000000006,
+    "goal/put the wine bottle on the rack": 0.07400000000000001,
+    "goal/put the wine bottle on top of the cabinet": 0.08,
+    "goal/turn on the stove": 0.016000000000000004,
+    "libero_10/pick up the book and place it in the back compartment of the caddy": -0.052000000000000005,
+    "libero_10/put both moka pots on the stove": 0.034,
+    "libero_10/put both the alphabet soup and the cream cheese box in the basket": 0.016,
+    "libero_10/put both the alphabet soup and the tomato sauce in the basket": 0.026000000000000002,
+    "libero_10/put both the cream cheese box and the butter in the basket": 0.046,
+    "libero_10/put the black bowl in the bottom drawer of the cabinet and close it": -0.009999999999999998,
+    "libero_10/put the white mug on the left plate and put the yellow and white mug on the right plate": 0.05800000000000001,
+    "libero_10/put the white mug on the plate and put the chocolate pudding to the right of the plate": -0.032,
+    "libero_10/put the yellow and white mug in the microwave and close it": 0.13000000000000003,
+    "libero_10/turn on the stove and put the moka pot on it": 0.08199999999999999,
+    "object/pick up the alphabet soup and place it in the basket": 0.076,
+    "object/pick up the bbq sauce and place it in the basket": 0.10800000000000001,
+    "object/pick up the butter and place it in the basket": -0.0019999999999999996,
+    "object/pick up the chocolate pudding and place it in the basket": 0.054000000000000006,
+    "object/pick up the cream cheese and place it in the basket": 0.072,
+    "object/pick up the ketchup and place it in the basket": 0.05800000000000001,
+    "object/pick up the milk and place it in the basket": 0.014000000000000002,
+    "object/pick up the orange juice and place it in the basket": 0.13200000000000003,
+    "object/pick up the salad dressing and place it in the basket": 0.22400000000000003,
+    "object/pick up the tomato sauce and place it in the basket": 0.12,
+    "spatial/pick up the black bowl between the plate and the ramekin and place it on the plate": 0.076,
+    "spatial/pick up the black bowl from table center and place it on the plate": 0.082,
+    "spatial/pick up the black bowl in the top drawer of the wooden cabinet and place it on the plate": 0.054000000000000006,
+    "spatial/pick up the black bowl next to the cookie box and place it on the plate": 0.132,
+    "spatial/pick up the black bowl next to the plate and place it on the plate": 0.03,
+    "spatial/pick up the black bowl next to the ramekin and place it on the plate": 0.026000000000000002,
+    "spatial/pick up the black bowl on the cookie box and place it on the plate": 0.178,
+    "spatial/pick up the black bowl on the ramekin and place it on the plate": -0.009999999999999998,
+    "spatial/pick up the black bowl on the stove and place it on the plate": -0.008000000000000005,
+    "spatial/pick up the black bowl on the wooden cabinet and place it on the plate": 0.096
+  },
+  "input_pairs": [
+    "experiments/baseline/sft-backview-bs64-5k/results/h9_vs_h12_paired_analysis.json",
+    "experiments/student/acpd-v2-h9-early-trajectory/results/h9_vs_sft_10k_paired_analysis.json",
+    "experiments/student/acpd-v2-h9-early-trajectory/results/h9_vs_sft_15k_paired_analysis.json",
+    "experiments/student/acpd-v2-h9-early-trajectory/results/h9_vs_sft_20k_paired_analysis.json",
+    "experiments/baseline/sft-backview-bs64-5k/results/h9_vs_h12_25k_paired_analysis.json",
+    "experiments/baseline/sft-backview-bs64-5k/results/h9_vs_h12_30k_paired_analysis.json"
+  ]
+}
