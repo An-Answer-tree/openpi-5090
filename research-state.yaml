@@ -102,9 +102,13 @@ experiment_names:
   teacher_action_mse_5k:
     display_name: "ACPD-v2-TeacherActionMSE / 直接动作蒸馏消融"
     protocol: experiments/ablation/acpd-v2-teacher-action-mse-5k/protocol.md
-    status: protocol_ready_not_submitted
+    status: submitted_pending
     teacher_action_loss_weight: 0.1
     target_steps: [5000]
+    train_job: 136914
+    eval_array_job: 136916
+    summary_job: 136917
+    paired_analysis_job: 136918
   h9_task_heterogeneity:
     display_name: "ACPD-v2 20K--30K 逐任务差异"
     protocol: experiments/mechanism/acpd-v2-task-heterogeneity/protocol.md
@@ -139,7 +143,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-29 06:06 CST (teacher-action MSE 5K ablation 136914 submitted)"
+  checked_at: "2026-09-29 06:13 CST (teacher-action MSE comparison 136918 submitted)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -234,6 +238,23 @@ current_execution:
       teacher_action_loss_weight: 0.1
       target_steps: 5000
       purpose: direct_privileged_teacher_action_distillation_vs_h9_5k
+    - id: 136916
+      experiment: teacher_action_mse_5k_full_eval
+      state: dependency
+      depends_on: 136914
+      resources: 4x1gpu_8cpu_24g
+      episodes: 2000
+    - id: 136917
+      experiment: teacher_action_mse_5k_eval_summary
+      state: dependency
+      depends_on: 136916
+      resources: 1cpu_2g
+    - id: 136918
+      experiment: teacher_action_mse_5k_paired_analysis
+      state: dependency
+      depends_on: 136916
+      resources: 1cpu_1g
+      purpose: compare treatment_with_h9_5k_and_sft_5k
     - id: 135943
       experiment: acpd_v2_tdca_5k
       state: complete_checkpoint_4999
