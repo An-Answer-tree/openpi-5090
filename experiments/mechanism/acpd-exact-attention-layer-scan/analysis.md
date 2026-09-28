@@ -14,5 +14,13 @@ H7.1 沿用 H7 的 teacher、student、数据划分、负对照、三个 probe s
 0.0485，超过预注册的 0.02 选择门槛，因此后续 ACPD-v2 选择 layer 10。该实验
 只证明 privileged contribution 可恢复，不证明任务成功率提升。
 
+## 证据边界
+
+上述选择依据是预注册的点估计门槛。现有结果只保存各层分别的 episode bootstrap
+区间，没有保存 layer 10 减 layer 11 的逐样本配对差值，因此不能把 `0.0485`
+解释为两层差异已达到统计显著。独立 seed 的完整复核应重新保存逐样本结果并对
+层间差值做配对 bootstrap；历史同类 probe 约需 6 小时、2 张 GPU。本轮正式训练
+占用资源期间不提交该长实验。
+
 原始结果：
 `/opt/liutong/openpi-5090-research/acpd-exact-attention-probe/results/metrics_128789.json`。

@@ -671,6 +671,7 @@ formal_matrix:
       keep_period: 5000
 
 evidence_gaps:
+  - "H7.1 layer 10 versus layer 11 needs an independent-seed paired probe if the layer choice must be claimed as statistically superior; current point-margin selection is sufficient only for engineering selection."
   - "Matched H9 and SFT 20K evaluations must locate whether the ACPD-v2 early advantage remains at 20K."
   - "ACL-only must be rerun at BS64 for the final fair ablation."
   - "H17 nonzero contribution decay has partial negative 15K results; its 20K comparison was cancelled and remains unresolved."
