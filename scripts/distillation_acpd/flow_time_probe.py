@@ -63,7 +63,8 @@ def _model_errors(rng, model_state: FrozenModelState, batch, batch_index, time_i
 
 
 def _evaluate_model(
-    config: FlowTimeProbeConfig,
+    probe_config: FlowTimeProbeConfig,
+    loader_config: DistillTrainConfig,
     model_config,
     params_path: str,
     init_rng: jax.Array,
@@ -76,7 +77,7 @@ def _evaluate_model(
     state, state_sharding = _init_frozen_model_state(model_config, init_rng, mesh, params_path)
     jax.block_until_ready(state)
     loader = _create_paired_data_loader(
-        config, model_config, sharding_=data_sharding, shuffle=True, include_episode_index=True
+        loader_config, model_config, sharding_=data_sharding, shuffle=True, include_episode_index=True
     )
     model_errors = jax.jit(
         _model_errors,
@@ -84,8 +85,8 @@ def _evaluate_model(
     )
     time_rows, error_rows, episode_rows = [], [], []
     with sharding.set_mesh(mesh):
-        for batch_index, (*batch, episode_ids) in zip(range(config.num_batches), loader, strict=False):
-            for time_index in range(5) if config.all_times_per_sample else (-1,):
+        for batch_index, (*batch, episode_ids) in zip(range(probe_config.num_batches), loader, strict=False):
+            for time_index in range(5) if probe_config.all_times_per_sample else (-1,):
                 values = model_errors(
                     jax.random.fold_in(sample_rng, batch_index),
                     state,
@@ -98,7 +99,7 @@ def _evaluate_model(
                 error_rows.append(np.stack(errors, axis=-1))
                 episode_rows.append(np.asarray(jax.device_get(episode_ids)).reshape(-1))
             if (batch_index + 1) % 16 == 0:
-                logging.info("Evaluated %d/%d batches", batch_index + 1, config.num_batches)
+                logging.info("Evaluated %d/%d batches", batch_index + 1, probe_config.num_batches)
 
     del model_errors, loader, state
     jax.clear_caches()
@@ -176,10 +177,18 @@ def main(config: FlowTimeProbeConfig) -> None:
     rng = jax.random.key(config.seed)
     sft_rng, acpd_rng, sample_rng = jax.random.split(rng, 3)
     sft_time_bins, sft_metrics, sft_episodes = _evaluate_model(
-        acpd_config, sft_train_config, config.sft_params, sft_rng, sample_rng, mesh, data_sharding, replicated
+        config, acpd_config, sft_train_config, config.sft_params, sft_rng, sample_rng, mesh, data_sharding, replicated
     )
     acpd_time_bins, acpd_metrics, acpd_episodes = _evaluate_model(
-        acpd_config, acpd_train_config, config.acpd_params, acpd_rng, sample_rng, mesh, data_sharding, replicated
+        config,
+        acpd_config,
+        acpd_train_config,
+        config.acpd_params,
+        acpd_rng,
+        sample_rng,
+        mesh,
+        data_sharding,
+        replicated,
     )
     if not (np.array_equal(sft_time_bins, acpd_time_bins) and np.array_equal(sft_episodes, acpd_episodes)):
         raise RuntimeError("SFT and ACPD passes did not replay the same sample order.")
