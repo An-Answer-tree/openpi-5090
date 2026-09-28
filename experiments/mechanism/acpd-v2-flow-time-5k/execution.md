@@ -11,4 +11,7 @@ CLI 检查及纯数值单元测试（3 passed）。两个 checkpoint、资产目
 14:05 CST 完成，Slurm 状态 `COMPLETED`、退出码 `0:0`、用时 7 分 49 秒。
 日志：`slurm-log/probe-bv-flow-time-5k_136591.out`；原始结果：
 `results/136591/summary.json`、`results/136591/paired_errors.npz`。
+14:19 CST，复核任务 `136595` 也完成，退出码 `0:0`；原始结果：
+`results/136595/summary.json`、`results/136595/paired_errors.npz`。同样本全时间点
+复核未复现首轮低时间段差异，因此不启动时间重采样训练。
 未修改已有训练、排队任务、checkpoint 或数据集。

@@ -54,6 +54,12 @@ current_execution:
       resources: 1gpu_debug01_8cpu_24g
       samples: 512
       result: pooled_mse7_difference_minus_0.00001; low_t_difference_plus_0.01146; no_simulation
+    - id: 136595
+      experiment: flow_time_5k_paired_time_replication
+      state: completed_exit_0
+      resources: 1gpu_debug01_8cpu_24g
+      samples: 128_per_time_bin
+      result: low_t_difference_plus_0.00283_ci_crosses_zero; pooled_difference_plus_0.00341_ci_crosses_zero; no_resampling_training
     - id: 136130
       experiment: h18_action_readout
       state: complete_exploratory_negative

@@ -1,0 +1,94 @@
+{
+  "scope": "Training-set offline fit audit; not held-out validation or benchmark success.",
+  "config": {
+    "sft_params": "/opt/liutong/openpi_checkpoints/fixed_dataset/sft/backview_bs64_5k/pi05_libero_backview_lora/pi05_libero_backview_lora_fsdp4_bs64_5k/4999/params",
+    "acpd_params": "/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/trajectory_recovery_20k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_20k_keep_all/4999/params",
+    "assets_dir": "/home/liutong/Projects/openpi/assets/pi05_libero_agentview_wrist",
+    "output_dir": "/home/liutong/Projects/openpi-5090/experiments/mechanism/acpd-v2-flow-time-5k/results",
+    "dataset_repo_id": "libero_multiview_tuned_6view_lerobot",
+    "batch_size": 8,
+    "num_batches": 16,
+    "seed": 43,
+    "all_times_per_sample": true
+  },
+  "pooled": {
+    "samples": 640,
+    "episodes": 121,
+    "sft_mse7": 0.1505955308675766,
+    "acpd_mse7": 0.1540098786354065,
+    "acpd_minus_sft_mse7": 0.0034143354278057814,
+    "paired_ci95": [
+      -0.005495592171791941,
+      0.014591437531635163
+    ],
+    "sft_mse32": 0.033074043691158295,
+    "acpd_mse32": 0.034057796001434326
+  },
+  "time_bins": {
+    "0.1": {
+      "samples": 128,
+      "episodes": 121,
+      "sft_mse7": 0.2429220825433731,
+      "acpd_mse7": 0.2457531839609146,
+      "acpd_minus_sft_mse7": 0.0028310941997915506,
+      "paired_ci95": [
+        -0.0018139689578674733,
+        0.007302451075520361
+      ],
+      "sft_mse32": 0.05345648154616356,
+      "acpd_mse32": 0.0546865239739418
+    },
+    "0.3": {
+      "samples": 128,
+      "episodes": 121,
+      "sft_mse7": 0.14761188626289368,
+      "acpd_mse7": 0.14862707257270813,
+      "acpd_minus_sft_mse7": 0.0010151859605684876,
+      "paired_ci95": [
+        -0.005495115951634944,
+        0.007472377794329077
+      ],
+      "sft_mse32": 0.032399311661720276,
+      "acpd_mse32": 0.032813794910907745
+    },
+    "0.5": {
+      "samples": 128,
+      "episodes": 121,
+      "sft_mse7": 0.12882620096206665,
+      "acpd_mse7": 0.12903553247451782,
+      "acpd_minus_sft_mse7": 0.00020933247287757695,
+      "paired_ci95": [
+        -0.005506036733277142,
+        0.005905039620120078
+      ],
+      "sft_mse32": 0.028265343979001045,
+      "acpd_mse32": 0.02843470498919487
+    },
+    "0.7": {
+      "samples": 128,
+      "episodes": 121,
+      "sft_mse7": 0.12616124749183655,
+      "acpd_mse7": 0.13194388151168823,
+      "acpd_minus_sft_mse7": 0.005782640539109707,
+      "paired_ci95": [
+        -0.017428330797702073,
+        0.04059051489457488
+      ],
+      "sft_mse32": 0.027674922719597816,
+      "acpd_mse32": 0.029073597863316536
+    },
+    "0.9": {
+      "samples": 128,
+      "episodes": 121,
+      "sft_mse7": 0.10745623707771301,
+      "acpd_mse7": 0.1146896481513977,
+      "acpd_minus_sft_mse7": 0.0072334082797169685,
+      "paired_ci95": [
+        -0.012638702522963285,
+        0.0298311747610569
+      ],
+      "sft_mse32": 0.02357415482401848,
+      "acpd_mse32": 0.025280332192778587
+    }
+  }
+}
