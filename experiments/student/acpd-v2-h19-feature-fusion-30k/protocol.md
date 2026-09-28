@@ -18,6 +18,10 @@ flow loss 更新融合网络，但不经该路径直接更新预测器。
 predictor。若 H19 的成功率提高，后续必须使用同样参数量但不输入 predicted
 contribution 的对照，才能将收益归因于特权信息，而不是模型容量增加。
 
+代码已加入容量匹配对照开关 `--no-feature-fusion-use-contribution`：保持同一个
+`3×1024→128→1024` 融合网络和参数量，但将两路 contribution 输入置零。该对照尚未
+提交，待 H19 结果出来后再决定是否运行；默认值为使用 contribution，不改变当前 H19。
+
 | 项目 | 设置 |
 |---|---|
 | 学生/教师视角 | backview / agentview+wrist |

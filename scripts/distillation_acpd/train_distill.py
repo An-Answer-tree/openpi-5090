@@ -77,6 +77,7 @@ class DistillTrainConfig:
     exact_contribution_task_gradient: bool = False
     exact_contribution_fusion_location: Literal["final", "aligned_attention"] = "final"
     contribution_feature_fusion: bool = False
+    feature_fusion_use_contribution: bool = True
     feature_fusion_hidden_dim: int = 128
 
     assets_dir: str = tyro.MISSING
@@ -268,6 +269,7 @@ def _make_distill_model_config(
         contribution_feature_fusion=(
             config.contribution_feature_fusion if contribution_feature_fusion is None else contribution_feature_fusion
         ),
+        feature_fusion_use_contribution=config.feature_fusion_use_contribution,
         feature_fusion_hidden_dim=config.feature_fusion_hidden_dim,
     )
 

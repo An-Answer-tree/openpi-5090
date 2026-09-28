@@ -150,6 +150,7 @@ def test_contribution_feature_fusion_matches_inference_and_detaches_predictor():
         exact_contribution_fusion_location="final",
         contribution_feature_fusion=True,
         exact_contribution_task_gradient=False,
+        feature_fusion_use_contribution=True,
         exact_contribution_head=ExactContributionHead(4, rngs=nnx.Rngs(0)),
         contribution_feature_fusion_head=ContributionFeatureFusion(4, 8, rngs=nnx.Rngs(1)),
     )
@@ -167,6 +168,25 @@ def test_contribution_feature_fusion_matches_inference_and_detaches_predictor():
         return jnp.mean(jnp.square(fused))
 
     np.testing.assert_allclose(jax.grad(flow_loss)(student_hidden), 0.0)
+
+
+def test_contribution_feature_fusion_can_zero_contribution_inputs():
+    head = ExactContributionHead(4, rngs=nnx.Rngs(0))
+    fusion = ContributionFeatureFusion(4, 8, rngs=nnx.Rngs(1))
+    final_hidden = jnp.ones((2, 3, 4), dtype=jnp.float32)
+    student_hidden = jnp.ones((2, 3, 4), dtype=jnp.float32)
+    model = types.SimpleNamespace(
+        exact_contribution_fusion_location="final",
+        contribution_feature_fusion=True,
+        feature_fusion_use_contribution=False,
+        exact_contribution_task_gradient=False,
+        exact_contribution_head=head,
+        contribution_feature_fusion_head=fusion,
+    )
+
+    output = AcpdPi0._fuse_final_hidden(model, final_hidden, student_hidden, train=True)  # noqa: SLF001
+    expected = fusion(final_hidden, jnp.zeros((2, 2, 3, 4), dtype=jnp.float32))
+    np.testing.assert_allclose(output, expected)
 
 
 def test_contribution_feature_fusion_is_used_when_decoding_actions():

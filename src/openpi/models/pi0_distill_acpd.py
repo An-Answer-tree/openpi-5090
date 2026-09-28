@@ -155,6 +155,7 @@ class AcpdPi0Config(pi0_config.Pi0Config):
     exact_contribution_task_gradient: bool = False
     exact_contribution_fusion_location: Literal["final", "aligned_attention"] = "final"
     contribution_feature_fusion: bool = False
+    feature_fusion_use_contribution: bool = True
     feature_fusion_hidden_dim: int = 128
 
     @override
@@ -178,6 +179,7 @@ class AcpdPi0(pi0.Pi0):
         self.exact_contribution_task_gradient = config.exact_contribution_task_gradient
         self.exact_contribution_fusion_location = config.exact_contribution_fusion_location
         self.contribution_feature_fusion = config.contribution_feature_fusion
+        self.feature_fusion_use_contribution = config.feature_fusion_use_contribution
         if config.create_acpd_heads:
             self.acpd_aux_heads = nnx.Dict(
                 {
@@ -220,6 +222,8 @@ class AcpdPi0(pi0.Pi0):
             return final_hidden
         if self.contribution_feature_fusion:
             predicted = self.exact_contribution_head.predict(student_hidden)
+            if not self.feature_fusion_use_contribution:
+                predicted = jnp.zeros_like(predicted)
             if not (train and self.exact_contribution_task_gradient):
                 predicted = jax.lax.stop_gradient(predicted)
             return self.contribution_feature_fusion_head(final_hidden, predicted)
