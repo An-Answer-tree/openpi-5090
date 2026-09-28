@@ -33,9 +33,10 @@ class FlowTimeProbeConfig:
     batch_size: int = 8
     num_batches: int = 64
     seed: int = 42
+    all_times_per_sample: bool = False
 
 
-def _paired_errors(rng, sft_state: FrozenModelState, acpd_state: FrozenModelState, batch, batch_index):
+def _paired_errors(rng, sft_state: FrozenModelState, acpd_state: FrozenModelState, batch, batch_index, time_index):
     """Evaluates both models on the same noisy action and flow target."""
     sft_model = nnx.merge(sft_state.model_def, sft_state.params)
     acpd_model = nnx.merge(acpd_state.model_def, acpd_state.params)
@@ -45,7 +46,7 @@ def _paired_errors(rng, sft_state: FrozenModelState, acpd_state: FrozenModelStat
     preprocess_rng, noise_rng = jax.random.split(rng)
     noise = jax.random.normal(noise_rng, actions.shape)
     sample_index = batch_index * actions.shape[0] + jnp.arange(actions.shape[0])
-    time_bin = sample_index % 5
+    time_bin = jnp.where(time_index < 0, sample_index % 5, time_index)
     flow_time = (time_bin.astype(jnp.float32) + 0.5) / 5.0
     noisy_actions = flow_time[:, None, None] * noise + (1 - flow_time[:, None, None]) * actions
     target = noise - actions
@@ -122,22 +123,24 @@ def main(config: FlowTimeProbeConfig) -> None:
     )
     paired_errors = jax.jit(
         _paired_errors,
-        in_shardings=(replicated, sft_sharding, acpd_sharding, data_sharding, replicated),
+        in_shardings=(replicated, sft_sharding, acpd_sharding, data_sharding, replicated, replicated),
     )
     rows, episode_rows, time_rows = [], [], []
     with sharding.set_mesh(mesh):
         for batch_index, (*batch, episode_ids) in zip(range(config.num_batches), loader, strict=False):
-            values = paired_errors(
-                jax.random.fold_in(sample_rng, batch_index),
-                sft_state,
-                acpd_state,
-                tuple(batch),
-                jnp.asarray(batch_index),
-            )
-            time_bin, *errors = jax.device_get(values)
-            time_rows.append(np.asarray(time_bin))
-            rows.append(np.stack(errors, axis=-1))
-            episode_rows.append(np.asarray(jax.device_get(episode_ids)).reshape(-1))
+            for time_index in range(5) if config.all_times_per_sample else (-1,):
+                values = paired_errors(
+                    jax.random.fold_in(sample_rng, batch_index),
+                    sft_state,
+                    acpd_state,
+                    tuple(batch),
+                    jnp.asarray(batch_index),
+                    jnp.asarray(time_index),
+                )
+                time_bin, *errors = jax.device_get(values)
+                time_rows.append(np.asarray(time_bin))
+                rows.append(np.stack(errors, axis=-1))
+                episode_rows.append(np.asarray(jax.device_get(episode_ids)).reshape(-1))
             if (batch_index + 1) % 16 == 0:
                 logging.info("Paired batches %d/%d", batch_index + 1, config.num_batches)
 
