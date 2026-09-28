@@ -94,6 +94,7 @@ H17 15K只有Spatial/Object部分结果，无四套pooled；详见
 | H18-ActionReadout | 检查冻结 H9 的 contribution 是否能被小型动作修正头有效使用 | H9 BS64 30K 冻结；hidden-only、hidden-layer10、hidden-contribution 三组；单卡500步、BS8 | smoke 136129；正式136130 | 完成；无仿真 | contribution 相对冻结 H9 MSE 下降 `0.813%`，95% CI `[-1.804%, +0.031%]`；相对 layer10 对照变差 `0.029%`，未通过1%筛选 |
 | Flow-time 5K | 检查早期优势是否对应特定时间段的 flow 误差 | 冻结 SFT/H9 5K；首轮512样本，复核128样本且每样本5个 t；单卡只读 | 136591、136595 | 完成；无仿真 | 首轮整体无差异；首轮 t=0.1 信号在同样本复核中未复现（差值 `+0.00283`，95% CI 跨0）；不支持启动时间重采样训练 |
 | H9 10K 推理期注入消融 | 同一个 H9 checkpoint 仅在推理时关闭 contribution 注入，判断部署时是否依赖该分支 | 四套各500回合；与原H9结果配对 | 136866、136867 | 验证排队；分析等待依赖 | 尚无结论 |
+| ACPD-v2 注入离线动作影响 | 固定 H9 10K/30K，比较完整/关闭/分路注入的7维 flow MSE 与速度改变量 | 各128个BS8 batch；单卡冻结前向；按episode重采样 | smoke 136878；正式136879_[0-1%1] | 10K运行中；30K等待数组并发 | 尚无结论；不能替代闭环验证 |
 | 5K–30K 检查点序列面积 | 比较 H9 与匹配 SFT 六点平均成功率 | 5K/25K/30K为原H9训练，10K/15K/20K为同配置重建；40任务×50回合，10,000次配对回合重采样 | 无新Slurm任务 | 完成；探索性 | H9高`5.135`点，区间`[+4.080,+6.210]`点；30/40任务面积差为正；不是单次连续轨迹或GPU时间收益 |
 | 中期逐任务差异 | 检查20/25/30K的H9−SFT差异是否稳定 | 只读三组全量验证日志，每任务50回合 | 无新Slurm任务 | 完成；探索性 | Object 20K 8/10任务为正，30K仅5/10；Goal三点均负的任务有4个；不能由套件均值推断普遍收益 |
 | 早期逐任务收益覆盖 | 检查10K优势是否广泛、10K到15K任务收益是否稳定 | 只读5/10/15K全量验证日志；每任务50回合、2,000次配对重采样 | 无新Slurm任务 | 完成；探索性 | 10K有32/40任务为正，重采样区间[27,34]；15K其中仅20个保持，不支持直接使用固定任务路由 |
@@ -246,6 +247,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | ACPD-v2-TDCA 与 H9 5K 配对分析 | `experiments/ablation/acpd-v2-tdca-5k/results/tdca_vs_h9_5k_paired_analysis.json` |
 | Flow-time 5K 诊断协议、结果与日志 | `experiments/mechanism/acpd-v2-flow-time-5k/`；结果 `results/136591/summary.json`、`results/136595/summary.json` |
 | H9 10K 推理期注入消融 | `experiments/mechanism/acpd-v2-h9-inference-injection-10k/`；验证 `/opt/liutong/openpi-5090-evals/acpd-v2-h9-inference-ablation/9999/` |
+| ACPD-v2 注入离线动作影响 | `experiments/mechanism/acpd-v2-gate-effect/protocol.md`；结果 `/opt/liutong/openpi-5090-research/acpd-v2-gate-effect/results/` |
 | ACPD-v2逐任务差异 | `experiments/mechanism/acpd-v2-task-heterogeneity/analysis.md`；原始三组日志路径见该文 |
 | ACPD-v2早期逐任务收益 | `experiments/mechanism/acpd-v2-early-task-coverage/analysis.md`；逐任务原始计数见同目录 `results/task_coverage.json` |
 | ACPD-v2早期步数效率 | `experiments/mechanism/acpd-v2-step-efficiency/analysis.md`；三组成对结果见同目录 `results/` |
