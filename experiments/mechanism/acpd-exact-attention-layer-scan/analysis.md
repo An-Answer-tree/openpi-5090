@@ -24,3 +24,15 @@ H7.1 沿用 H7 的 teacher、student、数据划分、负对照、三个 probe s
 
 原始结果：
 `/opt/liutong/openpi-5090-research/acpd-exact-attention-probe/results/metrics_128789.json`。
+
+## Layer 10 两路目标的描述性差异
+
+| 教师视角 | Correct-shuffled cosine gap | Explained variance | Contribution/总attention范数比 |
+|---|---:|---:|---:|
+| agentview | 0.4029 | 0.4722 | 0.3122 |
+| wrist | 0.3956 | 0.2389 | 0.5945 |
+
+wrist 目标在教师 attention 输出中的相对范数更大，但线性 probe 的恢复方差较低。
+这提示两路预测质量和尺度不同，为分别建模/融合提供设计动机；
+现有结果未保存逐样本视角间差值，不能声称两视角差异达到统计显著，
+也不能由 probe 指标推断 wrist 注入提高或降低闭环成功率。
