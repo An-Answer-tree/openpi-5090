@@ -44,6 +44,8 @@ class ActionReadoutProbeConfig:
     validation_fraction: float = 0.1
     hidden_width: int = 128
     learning_rate: float = 1e-3
+    readout_params: str | None = None
+    save_validation_features: bool = False
     log_interval: int = 50
     bootstrap_samples: int = 2000
     seed: int = 42
@@ -197,40 +199,48 @@ def main(config: ActionReadoutProbeConfig) -> None:
     state, state_sharding = _init_frozen_model_state(train_config, state_rng, mesh, config.student_params)
     jax.block_until_ready(state)
     logging.info("Frozen H9 checkpoint loaded in place; no teacher or optimizer state loaded.")
-    train_loader = _create_paired_data_loader(
-        distill_config, train_config, sharding_=data_sharding, shuffle=True, episodes=train_episodes
-    )
     hidden_dim = gemma.get_config(train_config.model.action_expert_variant).width
-    params = _init_heads(head_rng, 3 * hidden_dim, config.hidden_width)
-    optimizer = optax.adam(config.learning_rate)
-    opt_state = optimizer.init(params)
+    if config.readout_params is None:
+        train_loader = _create_paired_data_loader(
+            distill_config, train_config, sharding_=data_sharding, shuffle=True, episodes=train_episodes
+        )
+        params = _init_heads(head_rng, 3 * hidden_dim, config.hidden_width)
+        optimizer = optax.adam(config.learning_rate)
+        opt_state = optimizer.init(params)
+    else:
+        with np.load(config.readout_params, allow_pickle=False) as readout_data:
+            params = {key: jnp.asarray(readout_data[key]) for key in ("input_kernel", "input_bias", "output_kernel", "output_bias")}
+        train_loader = None
+        opt_state = None
+        logging.info("Loaded readout parameters from %s; skipping readout training.", config.readout_params)
     extract = jax.jit(_extract_features, in_shardings=(replicated, state_sharding, data_sharding))
-    train_step = jax.jit(functools.partial(_train_step, optimizer=optimizer))
     sample_errors = jax.jit(_sample_errors)
     training_rows = []
-    train_iterator = iter(train_loader)
     with sharding.set_mesh(mesh):
-        with (output_dir / "training.jsonl").open("w", encoding="utf-8") as log:
-            for step in range(config.num_train_steps):
-                inputs, velocity, target, _ = extract(jax.random.fold_in(train_rng, step), state, next(train_iterator))
-                if step == 0:
-                    corrections = np.asarray(jax.device_get(_corrections(params, inputs)))
-                    np.testing.assert_array_equal(corrections, np.zeros_like(corrections))
-                    logging.info(
-                        "Inputs %s; velocity %s; all readouts initially equal frozen H9.", inputs.shape, velocity.shape
-                    )
-                params, opt_state, losses = train_step(params, opt_state, inputs, velocity, target)
-                training_rows.append(np.asarray(jax.device_get(losses)))
-                if (step + 1) % config.log_interval == 0 or step == config.num_train_steps - 1:
-                    losses = np.mean(training_rows, axis=0)
-                    if not np.isfinite(losses).all():
-                        raise FloatingPointError(f"Non-finite readout loss at step {step + 1}: {losses}")
-                    row = {"step": step + 1, "elapsed_seconds": time.monotonic() - started}
-                    row.update(dict(zip(ARMS, losses.tolist(), strict=True)))
-                    log.write(json.dumps(row) + "\n")
-                    log.flush()
-                    training_rows.clear()
-                    logging.info("Step %d/%d: readout MSE=%s", step + 1, config.num_train_steps, losses)
+        if config.readout_params is None:
+            train_iterator = iter(train_loader)
+            train_step = jax.jit(functools.partial(_train_step, optimizer=optimizer))
+            with (output_dir / "training.jsonl").open("w", encoding="utf-8") as log:
+                for step in range(config.num_train_steps):
+                    inputs, velocity, target, _ = extract(jax.random.fold_in(train_rng, step), state, next(train_iterator))
+                    if step == 0:
+                        corrections = np.asarray(jax.device_get(_corrections(params, inputs)))
+                        np.testing.assert_array_equal(corrections, np.zeros_like(corrections))
+                        logging.info(
+                            "Inputs %s; velocity %s; all readouts initially equal frozen H9.", inputs.shape, velocity.shape
+                        )
+                    params, opt_state, losses = train_step(params, opt_state, inputs, velocity, target)
+                    training_rows.append(np.asarray(jax.device_get(losses)))
+                    if (step + 1) % config.log_interval == 0 or step == config.num_train_steps - 1:
+                        losses = np.mean(training_rows, axis=0)
+                        if not np.isfinite(losses).all():
+                            raise FloatingPointError(f"Non-finite readout loss at step {step + 1}: {losses}")
+                        row = {"step": step + 1, "elapsed_seconds": time.monotonic() - started}
+                        row.update(dict(zip(ARMS, losses.tolist(), strict=True)))
+                        log.write(json.dumps(row) + "\n")
+                        log.flush()
+                        training_rows.clear()
+                        logging.info("Step %d/%d: readout MSE=%s", step + 1, config.num_train_steps, losses)
 
         validation_loader = _create_paired_data_loader(
             distill_config,
@@ -242,6 +252,7 @@ def main(config: ActionReadoutProbeConfig) -> None:
         )
         validation_iterator = iter(validation_loader)
         error_rows, episode_rows, time_rows = [], [], []
+        input_rows, velocity_rows, target_rows = [], [], []
         for batch_index in range(config.num_validation_batches):
             *batch, episode_ids = next(validation_iterator)
             inputs, velocity, target, flow_time = extract(
@@ -252,6 +263,10 @@ def main(config: ActionReadoutProbeConfig) -> None:
             error_rows.append(np.asarray(jax.device_get(errors)))
             episode_rows.append(np.asarray(jax.device_get(episode_ids)).reshape(-1))
             time_rows.append(np.asarray(jax.device_get(flow_time)))
+            if config.save_validation_features:
+                input_rows.append(np.asarray(jax.device_get(inputs)))
+                velocity_rows.append(np.asarray(jax.device_get(velocity)))
+                target_rows.append(np.asarray(jax.device_get(target)))
             if (batch_index + 1) % 32 == 0:
                 logging.info("Held-out batches %d/%d", batch_index + 1, config.num_validation_batches)
 
@@ -264,6 +279,15 @@ def main(config: ActionReadoutProbeConfig) -> None:
     np.savez(
         output_dir / "validation_errors.npz", errors=errors, episode_index=episodes, flow_time=np.concatenate(time_rows)
     )
+    if config.save_validation_features:
+        np.savez(
+            output_dir / "validation_features.npz",
+            inputs=np.concatenate(input_rows, axis=1),
+            velocity=np.concatenate(velocity_rows, axis=0),
+            target=np.concatenate(target_rows, axis=0),
+            episode_index=episodes,
+            flow_time=np.concatenate(time_rows),
+        )
     np.savez(output_dir / "readout_params.npz", **jax.device_get(params))
     logging.info(
         "Offline screen=%s; saved only readouts and metrics to %s", summary["passes_offline_screen"], output_dir
