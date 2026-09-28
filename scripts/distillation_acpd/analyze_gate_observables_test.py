@@ -35,3 +35,4 @@ def test_observable_analysis_reports_held_out_auc():
     assert result["benefit_episodes"] == 2
     for values in result["observable_results"].values():
         assert len(values["held_out_auc_per_fold"]) == 2
+        assert len(values["held_out_policy_per_fold"]) == 2

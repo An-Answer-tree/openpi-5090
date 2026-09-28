@@ -38,9 +38,37 @@ def _cross_validated_auc(feature: np.ndarray, labels: np.ndarray) -> list[float]
     return scores
 
 
+def _cross_validated_policy(
+    feature: np.ndarray,
+    episode_errors: np.ndarray,
+    labels: np.ndarray,
+) -> list[dict[str, float]]:
+    """Evaluates a two-fold threshold policy that selects injection or off."""
+    results = []
+    for held_out_parity in (0, 1):
+        train = np.arange(len(feature)) % 2 != held_out_parity
+        test = ~train
+        train_feature = feature[train]
+        train_labels = labels[train]
+        orientation = 1.0 if train_feature[train_labels].mean() >= train_feature[~train_labels].mean() else -1.0
+        train_score = orientation * train_feature
+        threshold = 0.5 * (np.median(train_score[train_labels]) + np.median(train_score[~train_labels]))
+        use_on = orientation * feature[test] >= threshold
+        test_delta = episode_errors[test, 3] - episode_errors[test, 0]
+        results.append(
+            {
+                "selected_on_fraction": float(use_on.mean()),
+                "selected_minus_off_mse": float(np.mean(np.where(use_on, test_delta, 0.0))),
+                "selected_minus_on_mse": float(np.mean(np.where(use_on, 0.0, -test_delta))),
+            }
+        )
+    return results
+
+
 def analyze_observables(errors: np.ndarray, metrics: np.ndarray, episode_index: np.ndarray) -> dict:
     """Reports held-out episode predictability of view-only observables."""
-    episode_delta = _episode_means(errors[:, 3] - errors[:, 0], episode_index)
+    episode_errors = _episode_means(errors, episode_index)
+    episode_delta = episode_errors[:, 3] - episode_errors[:, 0]
     episode_metrics = _episode_means(metrics[:, 2:5], episode_index)
     labels = episode_delta < 0
     results = {}
@@ -51,6 +79,7 @@ def analyze_observables(errors: np.ndarray, metrics: np.ndarray, episode_index: 
             "benefit_fraction_above_zero": float(feature[labels].mean()),
             "benefit_fraction_below_zero": float(feature[~labels].mean()),
             "held_out_auc_per_fold": _cross_validated_auc(feature, labels),
+            "held_out_policy_per_fold": _cross_validated_policy(feature, episode_errors, labels),
         }
     return {
         "episodes": len(episode_delta),
