@@ -193,7 +193,7 @@ current_execution:
       result: results/136895/summary.json
     - id: 136897
       experiment: h9_action_direction_probe
-      state: pending_dependency
+      state: pending_priority_after_smoke
       resources: 1gpu_array_max1_8cpu_24g
       checkpoints: [5000, 10000]
       batches_per_checkpoint: 128
