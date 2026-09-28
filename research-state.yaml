@@ -72,6 +72,17 @@ experiment_names:
     result: experiments/mechanism/acpd-v2-gate-effect/view-branch-analysis.md
     wrist_minus_agent_mse: {step_10k: 0.00002726, step_30k: 0.00001012}
     consistent_across_checkpoints: false
+  h9_action_direction_probe:
+    display_name: "ACPD-v2 早期动作方向诊断"
+    protocol: experiments/mechanism/acpd-v2-action-direction/protocol.md
+    status: submitted_smoke_and_dependent_formal
+    smoke_job: 136890
+    formal_array_job: 136892
+    checkpoints: [5000, 10000]
+    batches_per_checkpoint: 128
+    batch_size: 8
+    primary_metric: centered_target_cosine7
+    result: pending
   h9_task_heterogeneity:
     display_name: "ACPD-v2 20K--30K 逐任务差异"
     protocol: experiments/mechanism/acpd-v2-task-heterogeneity/protocol.md
@@ -106,7 +117,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-29 03:06 CST (Slurm query and completed gate probe)"
+  checked_at: "2026-09-29 04:01 CST (action-direction probe submitted)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -166,6 +177,19 @@ current_execution:
       time_limit: 5-00:00:00
       target_steps: [5000, 10000, 30000]
       purpose: feature_fusion_from_pi05_base_with_acpd_v2_layer10
+    - id: 136890
+      experiment: h9_action_direction_probe_smoke
+      state: pending_resources
+      resources: 1gpu_debug01_8cpu_24g
+      batches: 2
+      depends_on: none
+    - id: 136892
+      experiment: h9_action_direction_probe
+      state: pending_dependency
+      resources: 1gpu_array_max1_8cpu_24g
+      checkpoints: [5000, 10000]
+      batches_per_checkpoint: 128
+      depends_on: 136890
     - id: 135943
       experiment: acpd_v2_tdca_5k
       state: complete_checkpoint_4999
