@@ -11,6 +11,10 @@
         "episodes": 113,
         "fraction": 0.5824742268041238,
         "mean_on_minus_off_mse": -6.605570524698123e-05,
+        "mean_on_minus_off_mse_ci95": [
+          -7.896932747826213e-05,
+          -5.32216197825619e-05
+        ],
         "benefit_fraction": 0.9026548672566371,
         "mean_oracle_cosine": 0.0772235319018364
       },
@@ -18,6 +22,10 @@
         "episodes": 81,
         "fraction": 0.4175257731958763,
         "mean_on_minus_off_mse": 9.844546730164438e-05,
+        "mean_on_minus_off_mse_ci95": [
+          7.556767886853776e-05,
+          0.00012576587541843765
+        ],
         "benefit_fraction": 0.037037037037037035,
         "mean_oracle_cosine": -0.07094844430685043
       }
@@ -37,6 +45,10 @@
         "episodes": 120,
         "fraction": 0.6185567010309279,
         "mean_on_minus_off_mse": -8.944081491790712e-05,
+        "mean_on_minus_off_mse_ci95": [
+          -0.0001082422513718484,
+          -7.138968485378428e-05
+        ],
         "benefit_fraction": 0.825,
         "mean_oracle_cosine": 0.07185222953557968
       },
@@ -44,6 +56,10 @@
         "episodes": 74,
         "fraction": 0.38144329896907214,
         "mean_on_minus_off_mse": 0.00016688606410752982,
+        "mean_on_minus_off_mse_ci95": [
+          0.0001360592505079694,
+          0.00020073315281479153
+        ],
         "benefit_fraction": 0.02702702702702703,
         "mean_oracle_cosine": -0.06171513348817825
       }

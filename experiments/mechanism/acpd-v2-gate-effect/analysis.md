@@ -54,8 +54,8 @@
 
 | Checkpoint | Oracle cosine 与 `on-off` MSE 的 episode correlation | cosine≥0 时 gate 受益比例 | cosine<0 时 gate 受益比例 |
 |---|---:|---:|---:|
-| 10K | `-0.8943` | `90.3%`（113 episodes） | `3.7%`（81 episodes） |
-| 30K | `-0.8791` | `82.5%`（120 episodes） | `2.7%`（74 episodes） |
+| 10K | `-0.8943` | `90.3%`（113 episodes），均值 CI `[-7.90e-5,-5.32e-5]` | `3.7%`（81 episodes），均值 CI `[7.56e-5,1.26e-4]` |
+| 30K | `-0.8791` | `82.5%`（120 episodes），均值 CI `[-1.08e-4,-7.14e-5]` | `2.7%`（74 episodes），均值 CI `[1.36e-4,2.01e-4]` |
 
 该结果说明注入方向存在“可靠/不可靠”的条件差异；但这是一个 oracle sanity check，
 不是独立的预测能力证据。令 `v_off` 为关闭注入的速度、`delta` 为注入改变量、`y`

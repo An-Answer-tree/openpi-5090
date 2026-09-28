@@ -12,13 +12,21 @@ def _episode_means(values: np.ndarray, episode_index: np.ndarray) -> np.ndarray:
     return np.stack([values[episode_index == episode].mean(axis=0) for episode in np.unique(episode_index)])
 
 
-def _group_summary(delta: np.ndarray, cosine: np.ndarray, aligned: np.ndarray) -> dict[str, float | int]:
+def _group_summary(
+    delta: np.ndarray,
+    cosine: np.ndarray,
+    aligned: np.ndarray,
+    rng: np.random.Generator,
+) -> dict[str, float | int | list[float]]:
     """Summarizes gate benefit for one alignment group."""
     group_delta = delta[aligned]
+    indices = rng.integers(len(group_delta), size=(2000, len(group_delta)))
+    ci95 = np.percentile(group_delta[indices].mean(axis=1), [2.5, 97.5])
     return {
         "episodes": int(aligned.sum()),
         "fraction": float(aligned.mean()),
         "mean_on_minus_off_mse": float(group_delta.mean()),
+        "mean_on_minus_off_mse_ci95": ci95.tolist(),
         "benefit_fraction": float((group_delta < 0).mean()),
         "mean_oracle_cosine": float(cosine[aligned].mean()),
     }
@@ -32,6 +40,7 @@ def analyze_reliability(errors: np.ndarray, metrics: np.ndarray, episode_index: 
     episode_delta = _episode_means(delta, episode_index)
     episode_magnitude = _episode_means(magnitude_ratio, episode_index)
     episode_cosine = _episode_means(oracle_cosine, episode_index)
+    rng = np.random.default_rng(42)
     return {
         "samples": len(delta),
         "episodes": len(episode_delta),
@@ -40,8 +49,8 @@ def analyze_reliability(errors: np.ndarray, metrics: np.ndarray, episode_index: 
         "sample_magnitude_delta_correlation": float(np.corrcoef(magnitude_ratio, delta)[0, 1]),
         "episode_magnitude_delta_correlation": float(np.corrcoef(episode_magnitude, episode_delta)[0, 1]),
         "episode_groups": {
-            "oracle_aligned_cosine_ge_0": _group_summary(episode_delta, episode_cosine, episode_cosine >= 0),
-            "oracle_misaligned_cosine_lt_0": _group_summary(episode_delta, episode_cosine, episode_cosine < 0),
+            "oracle_aligned_cosine_ge_0": _group_summary(episode_delta, episode_cosine, episode_cosine >= 0, rng),
+            "oracle_misaligned_cosine_lt_0": _group_summary(episode_delta, episode_cosine, episode_cosine < 0, rng),
         },
         "scope": "Oracle algebraic sanity check: cosine uses the true flow target and is unavailable at inference.",
     }
