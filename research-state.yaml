@@ -68,7 +68,8 @@ experiment_names:
   h9_agent_only_injection_10k:
     display_name: "ACPD-v2 Agentview-only 推理注入 10K"
     protocol: experiments/ablation/acpd-v2-agent-only-injection-10k/protocol.md
-    status: submitted_pending
+    status: stopped_no_conclusion
+    stop_reason: "训练时使用两路 contribution，推理时只保留 agentview；存在分布不一致，不能作为独立分支因果证据"
     checkpoint: 9999
     view_mask: [true, false]
     primary_metric: pooled_paired_success_vs_h9_full
@@ -194,7 +195,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-29 11:30 CST (136866 running; 136992 queued; 136345 and 135724 active)"
+  checked_at: "2026-09-29 13:43 CST (136866 running; 136992/136993 stopped; 136345 and 135724 active)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -351,7 +352,7 @@ current_execution:
       resources: 1cpu_2g
     - id: 136992
       experiment: h9_agent_only_injection_10k_eval_rerun
-      state: pending_priority
+      state: cancelled_no_conclusion
       resources: 4x1gpu_8cpu_24g_array_max2
       checkpoint: 9999
       episodes: 2000
@@ -359,7 +360,7 @@ current_execution:
       purpose: retain_agentview_mask_wrist_contribution
     - id: 136993
       experiment: h9_agent_only_injection_10k_summary_rerun
-      state: dependency
+      state: cancelled_dependency
       depends_on: 136992
       resources: 1cpu_2g
     - id: 135943
