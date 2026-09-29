@@ -132,7 +132,9 @@ experiment_names:
   teacher_action_mse_5k:
     display_name: "ACPD-v2-TeacherActionMSE / 直接动作蒸馏消融"
     protocol: experiments/ablation/acpd-v2-teacher-action-mse-5k/protocol.md
-    status: submitted_pending
+    status: smoke_passed_formal_pending
+    smoke_job: 136967
+    smoke_config: "debug01, logical GPU1, BS1, 2 steps, no final checkpoint"
     teacher_action_loss_weight: 0.1
     target_steps: [5000]
     train_job: 136914

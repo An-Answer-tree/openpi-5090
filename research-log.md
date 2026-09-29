@@ -114,3 +114,4 @@
 | 2026-09-29 | 结果 | Job `136935` 提取 H18 的 Student-only 特征并做两折 ridge 路由；相对固定 hidden-layer10 变差 `0.127%`，MSE差值95%区间 `[-0.00029520,+0.00053006]`。理想路由上限不能由简单线性 gate 恢复，后续优先端到端融合或 teacher-action 蒸馏。 |
 | 2026-09-29 | 结果 | 复用 H18 特征测试固定动作融合：50% hidden-only 与 50% hidden-contribution 相对固定 layer10 变差 `0.036%`，区间跨0；两折 alpha 探索变差 `0.125%`。不继续扩展小型读出组合。 |
 | 2026-09-29 | 结果 | H18 episode-level oracle 的 episode 内交替 holdout 复核：179个episode，holdout oracle 相对固定 layer10 变差 `0.027%`，MSE差值95%区间 `[-0.00047134,+0.00055144]`。原 `2.131%` 主要是同样本选择上限，不支持稳定条件路由。 |
+| 2026-09-29 | 工程复核 | Teacher-Action-MSE smoke `136967` 在 debug01 的空闲逻辑 GPU1 完成真实 fixed_dataset、teacher checkpoint、2 个训练 step 和反向传播，exit 0；`teacher_action_loss` 与 `weighted_teacher_action_loss` 均为有限值。前序 smoke 失败分别由 debug01 GPU0 外部显存占用、shell 参数和 smoke checkpoint 保存主存不足导致，均未触及正式任务；正式训练 `136914` 配置不变。 |
