@@ -194,7 +194,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-29 10:57 CST (136866 and 136920 evaluation arrays running; 136987 queued)"
+  checked_at: "2026-09-29 11:30 CST (136866 running; 136992 queued; 136345 and 135724 active)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -209,7 +209,7 @@ current_execution:
       batches: 2
     - id: 136866
       experiment: h9_inference_injection_10k
-      state: running_array_tasks_1_2;_tasks_0_3_pending
+      state: running_array_tasks_2_3;_tasks_0_1_complete
       resources: 4x1gpu_8cpu_24g_array_max2
       episodes: 2000
       purpose: same_h9_10k_checkpoint_inference_injection_off
@@ -339,15 +339,28 @@ current_execution:
       purpose: compare treatment_with_h9_5k_and_sft_5k
     - id: 136920
       experiment: h9_agent_only_injection_10k_eval
-      state: running_array_tasks_0_1;_tasks_2_3_pending
+      state: failed_invalid_num_trials_500
       resources: 4x1gpu_8cpu_24g_array_max2
       checkpoint: 9999
       episodes: 2000
       purpose: retain_agentview_mask_wrist_contribution
     - id: 136921
       experiment: h9_agent_only_injection_10k_summary
-      state: dependency
+      state: cancelled_dependency_never_satisfied
       depends_on: 136920
+      resources: 1cpu_2g
+    - id: 136992
+      experiment: h9_agent_only_injection_10k_eval_rerun
+      state: pending_priority
+      resources: 4x1gpu_8cpu_24g_array_max2
+      checkpoint: 9999
+      episodes: 2000
+      trials_per_task: 50
+      purpose: retain_agentview_mask_wrist_contribution
+    - id: 136993
+      experiment: h9_agent_only_injection_10k_summary_rerun
+      state: dependency
+      depends_on: 136992
       resources: 1cpu_2g
     - id: 135943
       experiment: acpd_v2_tdca_5k
