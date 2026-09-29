@@ -106,7 +106,7 @@ H17 15K只有Spatial/Object部分结果，无四套pooled；详见
 | H18-ObservableRouter | 检验 Student 可见特征能否预测动作读出分支 | Job 136935 提取 H18 同一验证划分的特征；CPU ridge 路由，episode 奇偶两折，正则 `1e-2` | 136935 | 完成；未通过 | 相对固定 hidden-layer10 变差 `0.127%`，MSE差值95% CI `[-0.00029520, +0.00053006]`；简单 Student-only 路由不能恢复 oracle 上限 |
 | H18-ActionReadout-Ensemble | 检查读出头误差互补是否可由固定平均利用 | 复用 136935 特征；50% hidden-only + 50% hidden-contribution；另做两折 alpha 网格探索 | 无新 Slurm 任务 | 完成；未通过 | 固定平均相对 layer10 变差 `0.036%`，MSE差值95% CI `[-0.00029722,+0.00036291]`；不提交正式融合验证 |
 | Flow-time 5K | 检查早期优势是否对应特定时间段的 flow 误差 | 冻结 SFT/H9 5K；首轮512样本，复核128样本且每样本5个 t；单卡只读 | 136591、136595 | 完成；无仿真 | 首轮整体无差异；首轮 t=0.1 信号在同样本复核中未复现（差值 `+0.00283`，95% CI 跨0）；不支持启动时间重采样训练 |
-| H9 10K 推理期注入消融 | 同一个 H9 checkpoint 仅在推理时关闭 contribution 注入，判断部署时是否依赖该分支 | 四套各500回合；与原H9结果配对 | 136866、136867 | 2/4套完成，2/4套运行；分析等待依赖 | 尚无结论 |
+| H9 10K 推理期注入消融 | 同一个 H9 checkpoint 仅在推理时关闭 contribution 注入，判断部署时是否依赖该分支 | 四套各500回合；与原H9结果配对 | 136866、136867 | 完成 | 完整注入`37.45%`，关闭注入`36.05%`；差值`+1.40`点，配对95% CI `[-0.95,+3.70]`点；未检测到总体依赖 |
 | H9 可观测 gate 可靠性 | 检验 student-only 视角一致性特征能否预测 episode 是否应注入 | H9 10K/30K，各128个 BS8 batch、194个 episode，两折 episode-held-out AUROC | 136904_0/1；136974/136904 | 完成；探索性 | 10K两折 AUROC：cosine `0.5600/0.4906`、分歧度 `0.5795/0.4962`、不平衡度 `0.5769/0.5098`；30K：`0.5268/0.5387`、`0.5128/0.5241`、`0.5357/0.5041`，均未达到预注册`0.60`，不支持当前动态 gate |
 | H9 Agentview-only 注入 10K | 检验离线 probe 中 agentview-only 优于 wrist-only 的方向能否复现到闭环 | H9 10K `9999`；推理时保留 agentview、屏蔽 wrist；四套各500回合 | 136992；汇总136993 | 停止；无结论 | 训练使用双分支、推理屏蔽一支，存在分布不一致；不作为独立 contribution 因果证据 |
 | ACPD-v2 注入离线动作影响 | 固定 H9 10K/30K，比较完整/关闭/分路注入的7维 flow MSE 与速度改变量 | 各128个BS8 batch；单卡冻结前向；按episode重采样 | smoke 136878；正式136879_[0-1%1] | 两点完成 | 完整注入−关闭MSE为`+0.00000834/+0.00000261`，两点区间均跨0；无离线改善证据，待闭环验证 |
@@ -271,7 +271,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | ACPD-v2-TDCA 验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-tdca-5k/4999/summary.txt` |
 | ACPD-v2-TDCA 与 H9 5K 配对分析 | `experiments/ablation/acpd-v2-tdca-5k/results/tdca_vs_h9_5k_paired_analysis.json` |
 | Flow-time 5K 诊断协议、结果与日志 | `experiments/mechanism/acpd-v2-flow-time-5k/`；结果 `results/136591/summary.json`、`results/136595/summary.json` |
-| H9 10K 推理期注入消融 | `experiments/mechanism/acpd-v2-h9-inference-injection-10k/`；验证 `/opt/liutong/openpi-5090-evals/acpd-v2-h9-inference-ablation/9999/` |
+| H9 10K 推理期注入消融 | `experiments/mechanism/acpd-v2-h9-inference-injection-10k/analysis.md`；配对结果 `results/paired_analysis.json`；验证 `/opt/liutong/openpi-5090-evals/acpd-v2-h9-inference-ablation/9999/` |
 | ACPD-v2 注入离线动作影响 | `experiments/mechanism/acpd-v2-gate-effect/analysis.md`；原始结果 `/opt/liutong/openpi-5090-research/acpd-v2-gate-effect/results/{136880,136879}/` |
 | ACPD-v2逐任务差异 | `experiments/mechanism/acpd-v2-task-heterogeneity/analysis.md`；原始三组日志路径见该文 |
 | ACPD-v2早期逐任务收益 | `experiments/mechanism/acpd-v2-early-task-coverage/analysis.md`；逐任务原始计数见同目录 `results/task_coverage.json` |

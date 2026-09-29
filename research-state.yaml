@@ -62,9 +62,14 @@ experiment_names:
   h9_inference_injection_10k:
     display_name: "H9 10K 推理期 contribution 注入消融"
     protocol: experiments/mechanism/acpd-v2-h9-inference-injection-10k/protocol.md
-    status: submitted_pending
+    status: complete_no_detected_pooled_dependency
     eval_job_id: 136866
     analysis_job_id: 136867
+    result: experiments/mechanism/acpd-v2-h9-inference-injection-10k/results/paired_analysis.json
+    full_success: 0.3745
+    injection_off_success: 0.3605
+    paired_difference: 0.014
+    paired_ci95: [-0.0095, 0.037]
   h9_agent_only_injection_10k:
     display_name: "ACPD-v2 Agentview-only 推理注入 10K"
     protocol: experiments/ablation/acpd-v2-agent-only-injection-10k/protocol.md
@@ -195,7 +200,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-29 13:43 CST (136866 running; 136992/136993 stopped; 136345 and 135724 active)"
+  checked_at: "2026-09-29 19:07 CST (136866/136867 completed; 135724 running; 136345 pending)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -210,13 +215,13 @@ current_execution:
       batches: 2
     - id: 136866
       experiment: h9_inference_injection_10k
-      state: running_array_tasks_2_3;_tasks_0_1_complete
+      state: completed_all_four_suites
       resources: 4x1gpu_8cpu_24g_array_max2
       episodes: 2000
       purpose: same_h9_10k_checkpoint_inference_injection_off
     - id: 136867
       experiment: h9_inference_injection_10k_paired_analysis
-      state: dependency
+      state: completed_result_written
       depends_on: 136866
       resources: 1cpu_2g
     - id: 136591
