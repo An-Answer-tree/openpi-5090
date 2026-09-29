@@ -175,7 +175,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-29 06:34 CST (agent-only injection evaluation 136920 submitted)"
+  checked_at: "2026-09-29 10:18 CST (136967 smoke passed; 136866 injection-off object running)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -916,7 +916,7 @@ evidence_gaps:
   - "H17 nonzero contribution decay has partial negative 15K results; its 20K comparison was cancelled and remains unresolved."
   - "A flow-trained adapter after the detached contribution is needed only if lowering the contribution weight does not help."
   - "Whether teacher contribution contains student-unidentifiable components is open; action-direction probe and same-checkpoint closed-loop injection are the next low-cost tests."
-  - "Whether direct teacher-action MSE improves over ACL at 5K is open; protocol is ready but the task is not submitted while the current GPU queue is occupied."
+  - "Whether direct teacher-action MSE improves over ACL at 5K is open; smoke 136967 passed and formal training 136914 is queued."
 
 constraints:
   - "Do not move or delete datasets or checkpoints."
