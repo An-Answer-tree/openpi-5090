@@ -98,8 +98,11 @@ experiment_names:
   h9_gate_observable_reliability:
     display_name: "ACPD-v2 可观测视角一致性可靠性诊断"
     protocol: experiments/mechanism/acpd-v2-gate-effect/observable-reliability-protocol.md
-    status: submitted_pending
+    status: partial_10k_complete_30k_pending
     job_id: 136904
+    completed_subtask: 136974
+    result_10k: experiments/mechanism/acpd-v2-gate-effect/observable-reliability-analysis.md
+    result_json_10k: /opt/liutong/openpi-5090-research/acpd-v2-gate-effect/results/136974/observable_gate.json
     checkpoints: [9999, 29999]
     batches_per_checkpoint: 128
     batch_size: 8
