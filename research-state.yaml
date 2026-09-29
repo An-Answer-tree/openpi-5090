@@ -32,6 +32,8 @@ experiment_names:
     status: complete_with_conditional_oracle
     oracle_analysis: experiments/mechanism/acpd-v2-h18-action-readout/oracle-routing-analysis.md
     oracle_result: episode_level_mse_reduction_0.02131_ci95_negative
+    oracle_holdout_result: holdout_relative_minus_0.000274_ci_crosses_zero
+    oracle_holdout_analysis: experiments/mechanism/acpd-v2-h18-action-readout/oracle-holdout-analysis.md
   h18_observable_router:
     display_name: "ACPD-v2-ObservableRouter / Student-only 动作读出路由"
     parent: h18_action_readout
@@ -231,6 +233,12 @@ current_execution:
       resources: cpu_only
       source: /opt/liutong/openpi-5090-research/acpd-v2-h18-action-readout/results/136935/ensemble.json
       result: fixed_half_mix_relative_plus_0.00036; ci_crosses_zero; no_simulation
+    - id: offline_h18_action_readout_oracle_holdout
+      experiment: h18_action_readout_oracle_episode_holdout
+      state: complete_exploratory_negative
+      resources: cpu_only
+      source: /opt/liutong/openpi-5090-research/acpd-v2-h18-action-readout/results/136130/oracle_holdout.json
+      result: holdout_oracle_relative_minus_0.000274; ci_crosses_zero; no_simulation
     - id: 136129
       experiment: h18_action_readout_smoke
       state: complete

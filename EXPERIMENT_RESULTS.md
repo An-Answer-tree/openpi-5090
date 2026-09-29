@@ -102,6 +102,7 @@ H17 15K只有Spatial/Object部分结果，无四套pooled；详见
 | H15a | 判断 ACPD-v2 后期是否存在辅助梯度干扰 | H9 5K/30K；每点200个相同BS32 batch；不更新参数 | smoke 132308；快速 132311；正式 132250 | 完成 | 5K/30K 组合冲突率均为 `0%`；不支持后期梯度冲突解释 |
 | H18-ActionReadout | 检查冻结 H9 的 contribution 是否能被小型动作修正头有效使用 | H9 BS64 30K 冻结；hidden-only、hidden-layer10、hidden-contribution 三组；单卡500步、BS8 | smoke 136129；正式136130 | 完成；无仿真 | contribution 相对冻结 H9 MSE 下降 `0.813%`，95% CI `[-1.804%, +0.031%]`；相对 layer10 对照变差 `0.029%`，未通过1%筛选 |
 | H18-ActionReadout-Oracle | 判断不同状态是否需要不同动作读出接口 | 复用 H18 的 1,024 个样本、194 个 episode；逐 episode 用真实 flow target 选择四种读出头中的最优者；CPU bootstrap 2,000次 | 无新 Slurm 任务 | 完成；不可部署上限 | episode-level 理想选择相对最佳固定 hidden-layer10 降低 MSE `2.131%`，95% CI `[-2.264%, -1.492%]`；支持条件路由假设，不是仿真成功率结论 |
+| H18-ActionReadout-Oracle-Holdout | 检查 H18 oracle 是否能在未参与选择的样本上复现 | 每个 episode 交替一半样本选头、另一半测试，交换两半；179 个 episode；CPU bootstrap 2,000次 | 无新 Slurm 任务 | 完成；未通过 | holdout oracle 相对固定 layer10 变差 `0.027%`，MSE差值95% CI `[-0.00047134,+0.00055144]`；原 `2.131%` 主要是同样本选择上限 |
 | H18-ObservableRouter | 检验 Student 可见特征能否预测动作读出分支 | Job 136935 提取 H18 同一验证划分的特征；CPU ridge 路由，episode 奇偶两折，正则 `1e-2` | 136935 | 完成；未通过 | 相对固定 hidden-layer10 变差 `0.127%`，MSE差值95% CI `[-0.00029520, +0.00053006]`；简单 Student-only 路由不能恢复 oracle 上限 |
 | H18-ActionReadout-Ensemble | 检查读出头误差互补是否可由固定平均利用 | 复用 136935 特征；50% hidden-only + 50% hidden-contribution；另做两折 alpha 网格探索 | 无新 Slurm 任务 | 完成；未通过 | 固定平均相对 layer10 变差 `0.036%`，MSE差值95% CI `[-0.00029722,+0.00036291]`；不提交正式融合验证 |
 | Flow-time 5K | 检查早期优势是否对应特定时间段的 flow 误差 | 冻结 SFT/H9 5K；首轮512样本，复核128样本且每样本5个 t；单卡只读 | 136591、136595 | 完成；无仿真 | 首轮整体无差异；首轮 t=0.1 信号在同样本复核中未复现（差值 `+0.00283`，95% CI 跨0）；不支持启动时间重采样训练 |
@@ -244,6 +245,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H15a 梯度诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/protocol.md` |
 | H18 ActionReadout 协议与分析 | `experiments/mechanism/acpd-v2-h18-action-readout/`；原始结果 `/opt/liutong/openpi-5090-research/acpd-v2-h18-action-readout/results/136130/summary.json` |
 | H18 动作读出条件路由上限 | `experiments/mechanism/acpd-v2-h18-action-readout/oracle-routing-protocol.md`、`oracle-routing-analysis.md`；结果 `/opt/liutong/openpi-5090-research/acpd-v2-h18-action-readout/results/136130/oracle_routing.json` |
+| H18 oracle episode 内交叉复核 | `experiments/mechanism/acpd-v2-h18-action-readout/oracle-holdout-protocol.md`、`oracle-holdout-analysis.md`；结果 `/opt/liutong/openpi-5090-research/acpd-v2-h18-action-readout/results/136130/oracle_holdout.json` |
 | H18 可观测动作读出路由 | `experiments/mechanism/acpd-v2-h18-action-readout/observable-routing-protocol.md`、`observable-routing-analysis.md`；结果 `/opt/liutong/openpi-5090-research/acpd-v2-h18-action-readout/results/136935/observable_router.json` |
 | H18 动作读出固定融合 | `experiments/mechanism/acpd-v2-h18-action-readout/ensemble-protocol.md`、`ensemble-analysis.md`；结果 `/opt/liutong/openpi-5090-research/acpd-v2-h18-action-readout/results/136935/ensemble.json` |
 | H19-FeatureFusion 协议 | `experiments/student/acpd-v2-h19-feature-fusion-30k/protocol.md` |
