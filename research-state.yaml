@@ -38,6 +38,11 @@ experiment_names:
     status: complete_exploratory_negative
     job_id: 136935
     result: experiments/mechanism/acpd-v2-h18-action-readout/observable-routing-analysis.md
+  h18_action_readout_ensemble:
+    display_name: "ACPD-v2-ActionReadout-Ensemble / 固定动作读出融合"
+    parent: h18_action_readout
+    status: complete_exploratory_negative
+    result: experiments/mechanism/acpd-v2-h18-action-readout/ensemble-analysis.md
   h19_feature_fusion_trajectory:
     display_name: "ACPD-v2-FeatureFusion / 预测贡献的动作特征融合"
     legacy_id: H19
@@ -220,6 +225,12 @@ current_execution:
       state: complete_exploratory_negative
       resources: 1gpu_debug01_8cpu_24g_then_cpu
       result: routed_vs_fixed_layer10_relative_minus_0.00127; ci_crosses_zero; no_simulation
+    - id: offline_h18_action_readout_ensemble
+      experiment: h18_action_readout_fixed_ensemble
+      state: complete_exploratory_negative
+      resources: cpu_only
+      source: /opt/liutong/openpi-5090-research/acpd-v2-h18-action-readout/results/136935/ensemble.json
+      result: fixed_half_mix_relative_plus_0.00036; ci_crosses_zero; no_simulation
     - id: 136129
       experiment: h18_action_readout_smoke
       state: complete
