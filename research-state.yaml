@@ -133,8 +133,9 @@ experiment_names:
   h9_action_direction_all_times:
     display_name: "ACPD-v2 同样本 flow 时间动作方向复核"
     protocol: experiments/mechanism/acpd-v2-action-direction/protocol-all-times.md
-    status: submitted_pending
+    status: cancelled_no_result
     job_id: 136987
+    cancel_reason: user_cancelled_before_completion
     checkpoints: [5000, 10000]
     batches_per_checkpoint: 128
     all_times_per_sample: true
@@ -149,7 +150,7 @@ experiment_names:
   teacher_action_mse_5k:
     display_name: "ACPD-v2-TeacherActionMSE / 直接动作蒸馏消融"
     protocol: experiments/ablation/acpd-v2-teacher-action-mse-5k/protocol.md
-    status: smoke_passed_formal_pending
+    status: cancelled_no_result
     smoke_job: 136967
     smoke_config: "debug01, logical GPU1, BS1, 2 steps, no final checkpoint"
     teacher_action_loss_weight: 0.1
@@ -158,6 +159,7 @@ experiment_names:
     eval_array_job: 136916
     summary_job: 136917
     paired_analysis_job: 136918
+    cancel_reason: "GT flow/action target is already directly supervised; teacher action is an imperfect auxiliary target"
   h9_task_heterogeneity:
     display_name: "ACPD-v2 20K--30K 逐任务差异"
     protocol: experiments/mechanism/acpd-v2-task-heterogeneity/protocol.md
@@ -291,7 +293,7 @@ current_execution:
       depends_on: 136895
     - id: 136987
       experiment: h9_action_direction_all_times
-      state: submitted_pending
+      state: cancelled_no_result
       resources: 1gpu_array_max1_8cpu_24g
       checkpoints: [5000, 10000]
       batches_per_checkpoint: 128
@@ -312,7 +314,7 @@ current_execution:
       purpose: held_out_auc_and_policy_mse_summary
     - id: 136914
       experiment: teacher_action_mse_5k
-      state: pending_priority
+      state: cancelled_no_result
       resources: 4gpu_32cpu_96g
       time_limit: 2-00:00:00
       teacher_action_loss_weight: 0.1
@@ -320,18 +322,18 @@ current_execution:
       purpose: direct_privileged_teacher_action_distillation_vs_h9_5k
     - id: 136916
       experiment: teacher_action_mse_5k_full_eval
-      state: dependency
+      state: cancelled_dependency
       depends_on: 136914
       resources: 4x1gpu_8cpu_24g
       episodes: 2000
     - id: 136917
       experiment: teacher_action_mse_5k_eval_summary
-      state: dependency
+      state: cancelled_dependency
       depends_on: 136916
       resources: 1cpu_2g
     - id: 136918
       experiment: teacher_action_mse_5k_paired_analysis
-      state: dependency
+      state: cancelled_dependency
       depends_on: 136916
       resources: 1cpu_1g
       purpose: compare treatment_with_h9_5k_and_sft_5k
@@ -941,7 +943,7 @@ evidence_gaps:
   - "H17 nonzero contribution decay has partial negative 15K results; its 20K comparison was cancelled and remains unresolved."
   - "A flow-trained adapter after the detached contribution is needed only if lowering the contribution weight does not help."
   - "Whether teacher contribution contains student-unidentifiable components is open; action-direction probe and same-checkpoint closed-loop injection are the next low-cost tests."
-  - "Whether direct teacher-action MSE improves over ACL at 5K is open; smoke 136967 passed and formal training 136914 is queued."
+  - "Direct teacher-action MSE was cancelled: GT flow/action is already the direct supervision target, so teacher action was not prioritized as an additional MSE target; smoke 136967 remains engineering-only evidence."
 
 constraints:
   - "Do not move or delete datasets or checkpoints."
