@@ -117,14 +117,16 @@ experiment_names:
   h9_action_direction_probe:
     display_name: "ACPD-v2 早期动作方向诊断"
     protocol: experiments/mechanism/acpd-v2-action-direction/protocol.md
-    status: submitted_smoke_and_dependent_formal
+    status: partial_5k_complete_10k_running
     smoke_job: 136895
     formal_array_job: 136897
     checkpoints: [5000, 10000]
     batches_per_checkpoint: 128
     batch_size: 8
     primary_metric: centered_target_cosine7
-    result: pending
+    result_5k: experiments/mechanism/acpd-v2-action-direction/analysis-5k.md
+    result_json_5k: /opt/liutong/openpi-5090-research/acpd-v2-action-direction/results/136973/summary.json
+    result: 10k_pending
   h9_teacher_action_diagnostic:
     display_name: "H9 teacher 动作目标训练诊断"
     result: experiments/mechanism/acpd-v2-teacher-action-diagnostic/analysis.md
