@@ -192,7 +192,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-29 10:18 CST (136967 smoke passed; 136866 injection-off object running)"
+  checked_at: "2026-09-29 10:57 CST (136866 and 136920 evaluation arrays running; 136987 queued)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -207,7 +207,7 @@ current_execution:
       batches: 2
     - id: 136866
       experiment: h9_inference_injection_10k
-      state: submitted_pending
+      state: running_array_tasks_1_2;_tasks_0_3_pending
       resources: 4x1gpu_8cpu_24g_array_max2
       episodes: 2000
       purpose: same_h9_10k_checkpoint_inference_injection_off
@@ -284,7 +284,7 @@ current_execution:
       result: results/136895/summary.json
     - id: 136897
       experiment: h9_action_direction_probe
-      state: pending_priority_after_smoke
+      state: complete_exit_0
       resources: 1gpu_array_max1_8cpu_24g
       checkpoints: [5000, 10000]
       batches_per_checkpoint: 128
@@ -299,7 +299,7 @@ current_execution:
       purpose: remove_time_bin_sample_confound
     - id: 136904
       experiment: h9_gate_observable_reliability
-      state: submitted_pending
+      state: complete_exit_0
       resources: 1gpu_array_max1_8cpu_24g
       checkpoints: [9999, 29999]
       batches_per_checkpoint: 128
@@ -337,7 +337,7 @@ current_execution:
       purpose: compare treatment_with_h9_5k_and_sft_5k
     - id: 136920
       experiment: h9_agent_only_injection_10k_eval
-      state: pending_priority
+      state: running_array_tasks_0_1;_tasks_2_3_pending
       resources: 4x1gpu_8cpu_24g_array_max2
       checkpoint: 9999
       episodes: 2000
