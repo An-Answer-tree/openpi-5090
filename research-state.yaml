@@ -130,6 +130,15 @@ experiment_names:
     result_10k: experiments/mechanism/acpd-v2-action-direction/analysis-10k.md
     result_json_10k: /opt/liutong/openpi-5090-research/acpd-v2-action-direction/results/136897/summary.json
     result: pooled_cosine_not_significant;_t07_10k_positive
+  h9_action_direction_all_times:
+    display_name: "ACPD-v2 同样本 flow 时间动作方向复核"
+    protocol: experiments/mechanism/acpd-v2-action-direction/protocol-all-times.md
+    status: submitted_pending
+    job_id: 136987
+    checkpoints: [5000, 10000]
+    batches_per_checkpoint: 128
+    all_times_per_sample: true
+    primary_metric: same_sample_centered_target_cosine7
   h9_teacher_action_diagnostic:
     display_name: "H9 teacher 动作目标训练诊断"
     result: experiments/mechanism/acpd-v2-teacher-action-diagnostic/analysis.md
@@ -280,6 +289,14 @@ current_execution:
       checkpoints: [5000, 10000]
       batches_per_checkpoint: 128
       depends_on: 136895
+    - id: 136987
+      experiment: h9_action_direction_all_times
+      state: submitted_pending
+      resources: 1gpu_array_max1_8cpu_24g
+      checkpoints: [5000, 10000]
+      batches_per_checkpoint: 128
+      all_times_per_sample: true
+      purpose: remove_time_bin_sample_confound
     - id: 136904
       experiment: h9_gate_observable_reliability
       state: submitted_pending
