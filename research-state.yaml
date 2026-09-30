@@ -200,7 +200,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-29 19:07 CST (136866/136867 completed; 135724 running; 136345 pending)"
+  checked_at: "2026-09-30 14:05 CST (135724 and 136345 running; ACL-only 25K evaluation queued)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -394,9 +394,19 @@ current_execution:
       paired_ci95: [-0.039, 0.0035]
     - id: 135724
       experiment: backview_acl_only_bs64_35k
-      state: running_step_20400_of_35000
+      state: running_step_28300_of_35000
       resources: 4gpu_32cpu_96g
       time_limit: 10-00:00:00
+    - id: 137607
+      experiment: backview_acl_only_bs64_25k_full_eval
+      state: queued
+      resources: 4x1gpu_array_max4_8cpu_24g
+      episodes: 2000
+    - id: 137608
+      experiment: backview_acl_only_bs64_25k_summary
+      state: dependency
+      depends_on: 137607
+      resources: 1cpu_2g
     - id: 135725
       experiment: backview_acl_only_bs64_30k_full_eval
       state: dependency
@@ -920,7 +930,8 @@ formal_matrix:
       protocol_commit: 5efb035
       implementation_commit: 7e40858
       train_job: 135724
-      eval_jobs: {30k: 135725, 35k: 135726}
+      eval_jobs: {25k: 137607, 30k: 135725, 35k: 135726}
+      summary_jobs: {25k: 137608}
       analysis_jobs: {30k: 135729, 35k: 135728}
       checkpoint_dir: /opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_acl_only_bs64_35k/pi05_libero_backview_acl_only_bs64_35k/pi05_libero_backview_acl_only_lora_fsdp4_bs64_35k
       eval_dir: /opt/liutong/openpi-5090-evals/acpd-v2-acl-only-bs64-35k

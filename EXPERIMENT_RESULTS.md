@@ -79,7 +79,7 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | H19-FeatureFusion | 检验预测视觉贡献在动作输出前的特征融合能否提高最终成功率 | backview，layer 10，从 pi0.5 base 开始；4卡 FSDP LoRA，BS64，flow/contribution/ACL=1/0.2/0.5；30K，每5K保留checkpoint | smoke 136339；正式136345 | smoke完成两步；正式任务排队 | 尚无结论 |
 | H13-LossOnly | 判断 contribution 注入是否有效 | H9-Fixed 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9-Fixed 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
 | ACPD-v2-TDCA | 检验动作损失是否能改善 contribution 注入适配 | backview，layer 10，BS64，flow=1.0、contribution=0.2、ACL=0.5；仅开放 predictor 的动作梯度，训练至5K | 135943；验证136221；汇总136222 | 5K 训练及四套全量验证完成 | `21.35%`；比 H9-Fixed 低 `1.80` 点，95% CI `[-3.90, +0.35]`；不支持提升 |
-| ACL-only BS64 | 检验 contribution 学习和注入在 ACL 之外的增益 | backview，layer 10，BS64，flow=1.0、ACL=0.5、contribution=0、关闭注入；训练至35K | 135724；30K/35K验证135725/135726；分析135729/135728 | 训练运行中；两点全量验证等待依赖 | 尚无结论 |
+| ACL-only BS64 | 检验 contribution 学习和注入在 ACL 之外的增益 | backview，layer 10，BS64，flow=1.0、ACL=0.5、contribution=0、关闭注入；训练至35K | 135724；探索性25K验证137607、汇总137608；30K/35K验证135725/135726、分析135729/135728 | 25K checkpoint完整，四套验证排队；30K/35K验证等待训练完成 | 尚无结论 |
 | H17-Decay | 检验后期 contribution 权重是否过强 | H9-Fixed 10K完整状态→20K；BS64；10K–15K权重0.2→0.05，ACL=0.5 | 134422/136119/134423/134424 | 15K仅Spatial/Object完成；根据部分结果取消20K验证及配对分析 | 15K两套41.80%/59.00%，比H9低7.60/5.40点；不支持该调度的中期收益；20K无最终结论 |
 
 ### H9-Fixed 轨迹任务
@@ -264,8 +264,8 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H17 checkpoint | `/opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_h17_contribution_decay/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_h17_decay_bs64_20k` |
 | H17 验证与配对分析 | `/opt/liutong/openpi-5090-evals/acpd-v2-h17-contribution-decay/19999/` |
 | ACL-only BS64 协议 | `experiments/ablation/acpd-v2-acl-only-bs64-35k/protocol.md` |
-| ACL-only BS64 checkpoint（待生成） | `/opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_acl_only_bs64_35k/pi05_libero_backview_acl_only_bs64_35k/pi05_libero_backview_acl_only_lora_fsdp4_bs64_35k/` |
-| ACL-only BS64 验证（待运行） | `/opt/liutong/openpi-5090-evals/acpd-v2-acl-only-bs64-35k/29999/`、`34999/` |
+| ACL-only BS64 checkpoint（25K已完整） | `/opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_acl_only_bs64_35k/pi05_libero_backview_acl_only_bs64_35k/pi05_libero_backview_acl_only_lora_fsdp4_bs64_35k/` |
+| ACL-only BS64 验证（待运行） | `/opt/liutong/openpi-5090-evals/acpd-v2-acl-only-bs64-35k/24999/`、`29999/`、`34999/` |
 | ACPD-v2-TDCA 协议 | `experiments/ablation/acpd-v2-tdca-5k/protocol.md` |
 | ACPD-v2-TDCA checkpoint | `/opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_tdca_5k/pi05_libero_backview_acpd_v2_tdca/pi05_libero_backview_acpd_v2_tdca_lora_fsdp4_bs64_5k/4999` |
 | ACPD-v2-TDCA 验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-tdca-5k/4999/summary.txt` |
