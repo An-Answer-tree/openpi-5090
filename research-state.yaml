@@ -54,10 +54,10 @@ experiment_names:
     status: running_with_exploratory_evals
     train_job: 136345
     current_step_at_last_check: 24200
-    checkpoint_status: {4999: complete, 9999: complete}
-    eval_jobs: {5k: 138746, 10k: 138747}
-    summary_jobs: {5k: 138748, 10k: 138749}
-    eval_status: arrays_running_summaries_afterok
+    checkpoint_status: {4999: complete, 9999: complete, 24999: pending_training, 29999: pending_training}
+    eval_jobs: {5k: 138746, 10k: 138747, 25k: 138770, 30k: 138771}
+    summary_jobs: {5k: 138748, 10k: 138749, 25k: 138772, 30k: 138773}
+    eval_status: 5k_10k_arrays_running_25k_30k_afterok_train
   flow_time_5k_probe:
     display_name: "ACPD-v2/SFT 5K flow 时间段误差诊断"
     protocol: experiments/mechanism/acpd-v2-flow-time-5k/protocol.md
@@ -206,7 +206,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-04 12:01 CST (H19 136345 at 24.2K; H19 5K/10K eval arrays running; ACL-only complete)"
+  checked_at: "2026-10-04 12:35 CST (H19 136345 at 24.2K; H19 5K/10K eval arrays running; 25K/30K eval arrays afterok train; ACL-only complete)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -289,6 +289,34 @@ current_execution:
       time_limit: 7-00:00:00
       target_steps: [5000, 10000, 30000]
       purpose: feature_fusion_from_pi05_base_with_acpd_v2_layer10
+    - id: 138770
+      experiment: h19_feature_fusion_25k_full_eval
+      state: pending_dependency_136345
+      resources: 4x1gpu_8cpu_24g
+      depends_on: 136345
+      checkpoint: 24999
+      eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/24999
+      episodes_per_suite: 500
+    - id: 138772
+      experiment: h19_feature_fusion_25k_eval_summary
+      state: pending_dependency_138770
+      resources: 1cpu_2g
+      depends_on: 138770
+      eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/24999
+    - id: 138771
+      experiment: h19_feature_fusion_30k_full_eval
+      state: pending_dependency_136345
+      resources: 4x1gpu_8cpu_24g
+      depends_on: 136345
+      checkpoint: 29999
+      eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/29999
+      episodes_per_suite: 500
+    - id: 138773
+      experiment: h19_feature_fusion_30k_eval_summary
+      state: pending_dependency_138771
+      resources: 1cpu_2g
+      depends_on: 138771
+      eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/29999
     - id: 136895
       experiment: h9_action_direction_probe_smoke
       state: complete_exit_0
