@@ -53,7 +53,7 @@ experiment_names:
     target_steps: [5000, 10000, 30000]
     status: running_with_exploratory_evals
     train_job: 136345
-    current_step_at_last_check: 24100
+    current_step_at_last_check: 24200
     checkpoint_status: {4999: complete, 9999: complete}
     eval_jobs: {5k: 138746, 10k: 138747}
     summary_jobs: {5k: 138748, 10k: 138749}
@@ -206,7 +206,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-04 11:51 CST (H19 136345 at 24.1K; H19 5K/10K eval arrays running; ACL-only complete)"
+  checked_at: "2026-10-04 12:01 CST (H19 136345 at 24.2K; H19 5K/10K eval arrays running; ACL-only complete)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -284,9 +284,9 @@ current_execution:
       result: real_base_teacher_and_fixed_dataset; 2_optimizer_steps_without_nan; no_checkpoint
     - id: 136345
       experiment: h19_feature_fusion_trajectory
-      state: running_step_24100_of_30000
+      state: running_step_24200_of_30000
       resources: 4gpu_32cpu_96g
-      time_limit: 5-00:00:00
+      time_limit: 7-00:00:00
       target_steps: [5000, 10000, 30000]
       purpose: feature_fusion_from_pi05_base_with_acpd_v2_layer10
     - id: 136895
