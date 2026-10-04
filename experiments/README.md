@@ -51,7 +51,7 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 | baseline | backview BS64 30K--60K | `baseline/sft-backview-bs64-trajectory-60k/` | 续训与验证完成；30K `60.45%`，40K/50K/60K分别为`60.55/61.30/62.05%` |
 | baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 全部完成 |
 | student | H9-Fixed 主实验（原H9-scale-b） | `student/acpd-v2-h9-batch-scaling-30k/` | 固定contribution=0.2；5K/10K/15K/20K/25K/30K/35K/40K有正式结果 |
-| student | H19-FeatureFusion BS64 30K | `student/acpd-v2-h19-feature-fusion-30k/protocol.md` | smoke `136339` 完成；正式训练 `136345` 排队，尚无验证结论 |
+| student | H19-FeatureFusion BS64 30K | `student/acpd-v2-h19-feature-fusion-30k/protocol.md` | smoke `136339` 完成；正式训练 `136345` 约24K/30K运行；5K/10K全量验证 `138746`/`138747` 运行，尚无结论 |
 | mechanism | H15a ACPD-v2 梯度冲突诊断 | `mechanism/acpd-v2-h15a-gradient-conflict/` | 完成；不支持后期梯度冲突假设 |
 | mechanism | H18-ActionReadout 冻结贡献动作读出诊断 | `mechanism/acpd-v2-h18-action-readout/` | 完成；离线MSE未检测到contribution独立收益，无仿真 |
 | ablation | H9 Agentview-only 注入 10K | `ablation/acpd-v2-agent-only-injection-10k/` | 已停止，无结论；训练双分支、推理只保留一支，存在分布不一致 |
@@ -61,7 +61,7 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 | ablation | H13-LossOnly BS64 | `ablation/acpd-v2-h13-injection-ablation/` | 5K 训练和验证完成；支持显式注入 |
 | ablation | ACPD-v2-TDCA 5K | `ablation/acpd-v2-tdca-5k/` | 完成；pooled `21.35%`，相对 H9-Fixed `-1.80` 点，95% CI 跨零 |
 | ablation | H17-Decay BS64 | `ablation/acpd-v2-h17-contribution-decay/` | 20K训练完成；15K两套部分验证低于H9，20K验证已取消 |
-| ablation | ACL-only BS64 35K | `ablation/acpd-v2-acl-only-bs64-35k/protocol.md` | 训练135724运行；30K/35K全量验证135725/135726、分析135729/135728等待依赖；尚无结论 |
+| ablation | ACL-only BS64 35K | `ablation/acpd-v2-acl-only-bs64-35k/protocol.md` | 训练及25K/30K/35K全量验证完成；pooled分别为`52.90%/54.35%/59.35%` |
 | mechanism | 5K flow 时间段误差 | `mechanism/acpd-v2-flow-time-5k/` | 两次单卡只读诊断完成；首次低时间段信号未复现 |
 | mechanism | H9 10K 推理期注入消融 | `mechanism/acpd-v2-h9-inference-injection-10k/analysis.md` | 完成；完整注入高1.40点，配对95%区间跨0，未检测到总体依赖 |
 | mechanism | ACPD-v2中期逐任务差异 | `mechanism/acpd-v2-task-heterogeneity/` | 完成探索性日志分析；Object早期广泛受益，但任务方向随step改变 |
@@ -87,7 +87,7 @@ H9-Fixed 的恢复、早中期验证及延长训练是同一方法的不同执�
 | student/backview_acpdv2_layer10_bs64（H9-Fixed） | C | C | C | C | Y | C |
 | ablation/H17-Decay | - | 起点为H9-Fixed 10K | Q | Q | - | - |
 | ablation/backview_loss_only_bs64 | C | P | P | P | P | P |
-| ablation/backview_acl_only_bs64 | Q | Q | Q | Q | Q | Q |
+| ablation/backview_acl_only_bs64 | C | C | C | C | C | C |
 
 H9-Fixed 35K/40K/45K checkpoint 已完整写入但未归档。原目录中的 checkpoint
 本次不移动、不删除。旧 BS16/BS32 checkpoint 不进入该表，仍保留在原路径。

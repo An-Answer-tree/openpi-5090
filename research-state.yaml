@@ -51,7 +51,13 @@ experiment_names:
     comparison: [h9_fixed, backview_sft_bs64]
     contribution_feature_fusion: true
     target_steps: [5000, 10000, 30000]
-    status: submitted_pending
+    status: running_with_exploratory_evals
+    train_job: 136345
+    current_step_at_last_check: 24100
+    checkpoint_status: {4999: complete, 9999: complete}
+    eval_jobs: {5k: 138746, 10k: 138747}
+    summary_jobs: {5k: 138748, 10k: 138749}
+    eval_status: arrays_running_summaries_afterok
   flow_time_5k_probe:
     display_name: "ACPD-v2/SFT 5K flow 时间段误差诊断"
     protocol: experiments/mechanism/acpd-v2-flow-time-5k/protocol.md
@@ -200,7 +206,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-09-30 14:05 CST (135724 and 136345 running; ACL-only 25K evaluation queued)"
+  checked_at: "2026-10-04 11:51 CST (H19 136345 at 24.1K; H19 5K/10K eval arrays running; ACL-only complete)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -278,7 +284,7 @@ current_execution:
       result: real_base_teacher_and_fixed_dataset; 2_optimizer_steps_without_nan; no_checkpoint
     - id: 136345
       experiment: h19_feature_fusion_trajectory
-      state: pending_priority
+      state: running_step_24100_of_30000
       resources: 4gpu_32cpu_96g
       time_limit: 5-00:00:00
       target_steps: [5000, 10000, 30000]
@@ -394,39 +400,39 @@ current_execution:
       paired_ci95: [-0.039, 0.0035]
     - id: 135724
       experiment: backview_acl_only_bs64_35k
-      state: running_step_28300_of_35000
+      state: complete_step_35000_of_35000
       resources: 4gpu_32cpu_96g
       time_limit: 10-00:00:00
     - id: 137607
       experiment: backview_acl_only_bs64_25k_full_eval
-      state: queued
+      state: complete
       resources: 4x1gpu_array_max4_8cpu_24g
       episodes: 2000
     - id: 137608
       experiment: backview_acl_only_bs64_25k_summary
-      state: dependency
+      state: complete
       depends_on: 137607
       resources: 1cpu_2g
     - id: 135725
       experiment: backview_acl_only_bs64_30k_full_eval
-      state: dependency
+      state: complete
       depends_on: 135724
       resources: 4x1gpu_array_max2
       episodes: 2000
     - id: 135726
       experiment: backview_acl_only_bs64_35k_full_eval
-      state: dependency
+      state: complete
       depends_on: 135724
       resources: 4x1gpu_array_max2
       episodes: 2000
     - id: 135729
       experiment: backview_acl_only_bs64_30k_paired_analysis
-      state: dependency
+      state: complete
       depends_on: 135725
       resources: 1cpu_2g
     - id: 135728
       experiment: backview_acl_only_bs64_35k_paired_analysis
-      state: dependency
+      state: complete
       depends_on: 135726
       resources: 1cpu_2g
     - id: 134998
@@ -924,7 +930,7 @@ formal_matrix:
         ci95: [0.0040, 0.0470]
       target: 30k
     backview_acl_only_bs64:
-      status: running
+      status: complete_35k_and_full_eval
       target: 35k
       protocol: experiments/ablation/acpd-v2-acl-only-bs64-35k/protocol.md
       protocol_commit: 5efb035
@@ -933,6 +939,7 @@ formal_matrix:
       eval_jobs: {25k: 137607, 30k: 135725, 35k: 135726}
       summary_jobs: {25k: 137608}
       analysis_jobs: {30k: 135729, 35k: 135728}
+      pooled_success: {25k: 0.529, 30k: 0.5435, 35k: 0.5935}
       checkpoint_dir: /opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_acl_only_bs64_35k/pi05_libero_backview_acl_only_bs64_35k/pi05_libero_backview_acl_only_lora_fsdp4_bs64_35k
       eval_dir: /opt/liutong/openpi-5090-evals/acpd-v2-acl-only-bs64-35k
       physical_global_batch: 64
@@ -969,7 +976,6 @@ formal_matrix:
 evidence_gaps:
   - "H7.1 layer 10 versus layer 11 needs an independent-seed paired probe if the layer choice must be claimed as statistically superior; current point-margin selection is sufficient only for engineering selection."
   - "Matched H9 and SFT 20K evaluations must locate whether the ACPD-v2 early advantage remains at 20K."
-  - "ACL-only must be rerun at BS64 for the final fair ablation."
   - "H17 nonzero contribution decay has partial negative 15K results; its 20K comparison was cancelled and remains unresolved."
   - "A flow-trained adapter after the detached contribution is needed only if lowering the contribution weight does not help."
   - "Whether teacher contribution contains student-unidentifiable components is open; action-direction probe and same-checkpoint closed-loop injection are the next low-cost tests."
