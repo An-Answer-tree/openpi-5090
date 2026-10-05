@@ -33,23 +33,29 @@ contribution 的对照，才能将收益归因于特权信息，而不是模型�
 | 训练 | 4×5090，FSDP LoRA，global BS64，累积 1，seed 42 |
 | 学习率 | warmup 1K，peak 2.5e-5，cosine 到 30K，末端 2.5e-6 |
 | Checkpoint | 每 5K 保存，`keep_period=1` |
-| 执行 | debug smoke `136339` 完成两步；正式训练 `136345` 排队 |
+| 执行 | debug smoke `136339` 完成两步；正式训练 `136345` 已完成 30K，保存六个 checkpoint |
 
 ## 验证与判定
 
 5K、10K 原计划只观察训练轨迹；为检查早期收益是否出现，现追加两个探索性全量
 评测。25K 同样追加为探索性全量评测，用于观察 H19 后期相对 H9-Fixed 的变化。
-5K、10K、25K 各用四套 LIBERO benchmark、每套 500 回合，固定与 H9-Fixed、SFT
+每套 LIBERO benchmark 共 500 回合，即每个任务 50 回合；固定与 H9-Fixed、SFT
 相同的 episode seeds，不作为提前停训依据，也不替代 30K 主评测。30K 仍是主评测，
-使用四套 LIBERO benchmark、每套 500 回合，比较每套及 pooled 成功率，并计算配对区间。
+使用相同回合数，比较每套及 pooled 成功率，并计算配对区间。
 若优于 H9，还需同容量、无预测贡献输入的对照，才能将收益归因于特权贡献，而非
 新增网络容量。
+
+25K 四套评测任务为 `139046`，汇总任务为 `139049`；结果目录为
+`/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/24999-rerun-50-per-task`。
+四套结果和汇总已完成，pooled success 为 `55.35%`。30K 评测任务为数组 `138771`、
+汇总任务为 `138773`；数组首个子任务因评测索引错误退出，当前没有完整 30K 结果，
+因此 30K 只记为“尚无结论”。
 
 旧 H19 动作读出方案在正式训练前放弃：训练任务 136147 排队中取消，
 checkpoint 轮询任务 136164 取消；无 checkpoint 和 benchmark 结果。
 
 | 证据 | 路径 |
 |---|---|
-| Checkpoint | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k` |
+| Checkpoint | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/{4999,9999,14999,19999,24999,29999}` |
 | 训练日志 | `/opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion/slurm-log` |
 | 验证结果 | `/opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion/eval` |

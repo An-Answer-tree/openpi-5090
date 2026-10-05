@@ -51,13 +51,14 @@ experiment_names:
     comparison: [h9_fixed, backview_sft_bs64]
     contribution_feature_fusion: true
     target_steps: [5000, 10000, 30000]
-    status: running_with_exploratory_evals
+    status: training_complete_25k_eval_complete_30k_eval_blocked
     train_job: 136345
-    current_step_at_last_check: 24200
-    checkpoint_status: {4999: complete, 9999: complete, 24999: pending_training, 29999: pending_training}
-    eval_jobs: {5k: 138746, 10k: 138747, 25k: 138770, 30k: 138771}
-    summary_jobs: {5k: 138748, 10k: 138749, 25k: 138772, 30k: 138773}
-    eval_status: 5k_10k_arrays_running_25k_30k_afterok_train
+    current_step_at_last_check: 30000
+    checkpoint_status: {4999: complete, 9999: complete, 14999: complete, 19999: complete, 24999: complete, 29999: complete}
+    eval_jobs: {5k: 138746, 10k: 138747, 25k: 139046, 30k: 138771}
+    summary_jobs: {5k: 138748, 10k: 138749, 25k: 139049, 30k: 138773}
+    eval_status: 5k_10k_25k_complete_30k_array_blocked_after_index_error
+    pooled_success: {4999: 0.2120, 9999: 0.3655, 24999: 0.5535}
   flow_time_5k_probe:
     display_name: "ACPD-v2/SFT 5K flow 时间段误差诊断"
     protocol: experiments/mechanism/acpd-v2-flow-time-5k/protocol.md
@@ -206,7 +207,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-04 12:35 CST (H19 136345 at 24.2K; H19 5K/10K eval arrays running; 25K/30K eval arrays afterok train; ACL-only complete)"
+  checked_at: "2026-10-05 18:51 CST (H19 136345 completed 30K; 25K eval 139046/139049 complete with pooled 55.35%; 30K eval 138771 blocked by an evaluation index error, 138773 has no result)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -284,28 +285,29 @@ current_execution:
       result: real_base_teacher_and_fixed_dataset; 2_optimizer_steps_without_nan; no_checkpoint
     - id: 136345
       experiment: h19_feature_fusion_trajectory
-      state: running_step_24200_of_30000
+      state: complete_30000_checkpoints
       resources: 4gpu_32cpu_96g
       time_limit: 7-00:00:00
       target_steps: [5000, 10000, 30000]
       purpose: feature_fusion_from_pi05_base_with_acpd_v2_layer10
-    - id: 138770
-      experiment: h19_feature_fusion_25k_full_eval
-      state: pending_dependency_136345
+    - id: 139046
+      experiment: h19_feature_fusion_25k_full_eval_rerun
+      state: complete_all_four_suites
       resources: 4x1gpu_8cpu_24g
-      depends_on: 136345
       checkpoint: 24999
-      eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/24999
       episodes_per_suite: 500
-    - id: 138772
-      experiment: h19_feature_fusion_25k_eval_summary
-      state: pending_dependency_138770
+      episodes_per_task: 50
+      eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/24999-rerun-50-per-task
+    - id: 139049
+      experiment: h19_feature_fusion_25k_eval_rerun_summary
+      state: complete_result_written
       resources: 1cpu_2g
-      depends_on: 138770
-      eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/24999
+      depends_on: 139046
+      eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/24999-rerun-50-per-task
+      pooled_success: 0.5535
     - id: 138771
       experiment: h19_feature_fusion_30k_full_eval
-      state: pending_dependency_136345
+      state: blocked_evaluation_index_error
       resources: 4x1gpu_8cpu_24g
       depends_on: 136345
       checkpoint: 29999
@@ -313,7 +315,7 @@ current_execution:
       episodes_per_suite: 500
     - id: 138773
       experiment: h19_feature_fusion_30k_eval_summary
-      state: pending_dependency_138771
+      state: blocked_upstream_138771
       resources: 1cpu_2g
       depends_on: 138771
       eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/29999

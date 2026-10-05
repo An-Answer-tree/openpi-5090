@@ -51,7 +51,7 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 | baseline | backview BS64 30K--60K | `baseline/sft-backview-bs64-trajectory-60k/` | 续训与验证完成；30K `60.45%`，40K/50K/60K分别为`60.55/61.30/62.05%` |
 | baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 全部完成 |
 | student | H9-Fixed 主实验（原H9-scale-b） | `student/acpd-v2-h9-batch-scaling-30k/` | 固定contribution=0.2；5K/10K/15K/20K/25K/30K/35K/40K有正式结果 |
-| student | H19-FeatureFusion BS64 30K | `student/acpd-v2-h19-feature-fusion-30k/protocol.md` | smoke `136339` 完成；正式训练 `136345` 约24K/30K运行；5K/10K全量验证 `138746`/`138747` 运行；25K/30K全量验证 `138770`/`138771` 等待训练完成，尚无结论 |
+| student | H19-FeatureFusion BS64 30K | `student/acpd-v2-h19-feature-fusion-30k/protocol.md` | 30K checkpoint 已完成；5K/10K/25K 四套验证完成，pooled `21.20%/36.55%/55.35%`；30K 验证数组 `138771` 被评测索引错误阻塞，汇总 `138773` 尚未产生 |
 | mechanism | H15a ACPD-v2 梯度冲突诊断 | `mechanism/acpd-v2-h15a-gradient-conflict/` | 完成；不支持后期梯度冲突假设 |
 | mechanism | H18-ActionReadout 冻结贡献动作读出诊断 | `mechanism/acpd-v2-h18-action-readout/` | 完成；离线MSE未检测到contribution独立收益，无仿真 |
 | ablation | H9 Agentview-only 注入 10K | `ablation/acpd-v2-agent-only-injection-10k/` | 已停止，无结论；训练双分支、推理只保留一支，存在分布不一致 |

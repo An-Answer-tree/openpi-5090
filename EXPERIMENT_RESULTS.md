@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-04（CST）
+更新时间：2026-10-05（CST）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -34,6 +34,7 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | 哪层 exact contribution 最可恢复 | layer 10；overall gap `0.3992`，比次优 layer 11 高 `0.0485`。 | H7/H7.1 |
 | Layer 10 两路视觉贡献是否同样易恢复 | agentview/wrist explained variance 为 `0.4722/0.2389`，贡献范数比为 `0.3122/0.5945`；仅描述性证据，不代表任一路的任务收益。 | H7.1 原始指标 |
 | ACPD-v2 是否优于匹配 BS64 SFT | 5K 时提升 `9.30` 点；30K 时为 `58.00%` 对 `60.45%`，差值 `-2.45` 点，95% CI `[-5.00, 0.00]`。早期优势未保持到 30K。 | H9-scale-b、H12 |
+| ACPD-v2-FeatureFusion 在 25K 是否优于 H9 与 SFT | H19 为 `55.35%`，H9-Fixed 为 `55.75%`，SFT 为 `55.80%`；H19 相对 H9/SFT 分别为 `-0.40/-0.45` 点 | 25K 四套各500回合完整验证；不支持 FeatureFusion 在25K提高 pooled success |
 | ACPD-v2 的早期优势在 10K 是否仍存在 | 存在。H9 为 `37.45%`，SFT 为 `23.25%`；差值 `+14.20` 点，配对 95% CI `[+11.90, +16.60]`。 | 相同 2,000 episodes |
 | 10K 优势是否覆盖四个 benchmark suite | 是。Spatial/Object/Goal/LIBERO-10 分别高 `+18.2/+12.8/+18.4/+7.4` 点，四个 suite 的配对 95% CI 均严格高于 0：`[+12.6,+23.6]`、`[+7.2,+18.2]`、`[+13.8,+22.8]`、`[+4.6,+10.2]`。 | H9/SFT 10K 全量验证 |
 | 15K 优势是否仍覆盖四个 benchmark suite | 四套点估计均为正：`+5.8/+6.4/+6.2/+4.4` 点；Object 和 Goal 的区间严格高于 0，Spatial 与 LIBERO-10 下界为 0。 | H9/SFT 15K 全量验证 |
@@ -76,7 +77,7 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 完成 | 30K pooled `78.65%` |
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 完成 | 30K pooled `77.00%` |
 | H9-Fixed | 固定权重 ACPD-v2 对照 | layer 10，BS64，contribution=0.2，ACL=0.5 | 129728/130773 | 30K完成；恢复与续训见下表 | 5K `23.15%`；10K `37.45%`；15K `46.60%`；20K `49.60%`；25K `55.75%`；30K `58.00%`；35K `61.05%`；40K `59.45%` |
-| H19-FeatureFusion | 检验预测视觉贡献在动作输出前的特征融合能否提高最终成功率 | backview，layer 10，从 pi0.5 base 开始；4卡 FSDP LoRA，BS64，flow/contribution/ACL=1/0.2/0.5；30K，每5K保留checkpoint | smoke 136339；正式136345；5K验证138746/138748；10K验证138747/138749；25K验证138770/138772；30K验证138771/138773 | 正式训练约24K/30K运行中；5K/10K四套验证运行中；25K/30K验证等待训练完成 | 尚无结论 |
+| H19-FeatureFusion | 检验预测视觉贡献在动作输出前的特征融合能否提高最终成功率 | backview，layer 10，从 pi0.5 base 开始；4卡 FSDP LoRA，BS64，flow/contribution/ACL=1/0.2/0.5；30K，每5K保留checkpoint | smoke 136339；正式136345；5K验证138746/138748；10K验证138747/138749；25K验证139046/139049；30K验证138771/138773 | 30K checkpoint 已生成；5K/10K/25K 四套验证完成；30K 数组任务等待资源，首个已运行子任务因评测索引错误失败，需修复后重提 | 5K `21.20%`，10K `36.55%`，25K `55.35%`；相对 H9-Fixed 分别为 `-1.95/-0.90/-0.40` 点，相对 SFT 分别为 `+7.35/+13.30/-0.45` 点；30K 尚无结论 |
 | H13-LossOnly | 判断 contribution 注入是否有效 | H9-Fixed 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9-Fixed 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
 | ACPD-v2-TDCA | 检验动作损失是否能改善 contribution 注入适配 | backview，layer 10，BS64，flow=1.0、contribution=0.2、ACL=0.5；仅开放 predictor 的动作梯度，训练至5K | 135943；验证136221；汇总136222 | 5K 训练及四套全量验证完成 | `21.35%`；比 H9-Fixed 低 `1.80` 点，95% CI `[-3.90, +0.35]`；不支持提升 |
 | ACL-only BS64 | 检验 contribution 学习和注入在 ACL 之外的增益 | backview，layer 10，BS64，flow=1.0、ACL=0.5、contribution=0、关闭注入；训练至35K | 135724；25K验证137607/137608；30K验证135725、分析135729；35K验证135726、分析135728 | 35K训练及25K/30K/35K四套验证完成 | 25K `52.90%`；30K `54.35%`；35K `59.35%`。相对匹配SFT差值分别 `-6.10/-6.10/+2.20` 点；30K为负，35K区间跨0，未证明稳定提升 |
@@ -164,12 +165,15 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | H9 前期 ACPD-v2 BS32 5K | 5.20% | 24.20% | 15.60% | 0.40% | 11.35% |
 | SFT backview BS64 5K | 9.40% | 18.40% | 24.80% | 2.80% | 13.85% |
 | H9-Fixed backview BS64 5K | 25.40% | 32.40% | 30.00% | 4.80% | 23.15% |
+| H19-FeatureFusion backview BS64 5K | 20.00% | 33.00% | 29.20% | 2.60% | 21.20% |
 | SFT backview BS64 10K | 23.40% | 37.80% | 29.20% | 2.60% | 23.25% |
 | H9-Fixed backview BS64 10K | 41.60% | 50.60% | 47.60% | 10.00% | 37.45% |
+| H19-FeatureFusion backview BS64 10K | 42.60% | 52.80% | 42.60% | 8.20% | 36.55% |
 | SFT backview BS64 15K | 43.60% | 58.00% | 47.40% | 14.60% | 40.90% |
 | H9-Fixed backview BS64 15K | 49.40% | 64.40% | 53.60% | 19.00% | 46.60% |
 | H9-Fixed backview BS64 20K | 55.20% | 72.20% | 46.20% | 24.80% | 49.60% |
 | H9-Fixed backview BS64 25K | 63.20% | 69.40% | 62.00% | 28.40% | 55.75% |
+| H19-FeatureFusion backview BS64 25K | 65.60% | 67.00% | 63.60% | 25.20% | 55.35% |
 | H9-Fixed backview BS64 30K | 64.00% | 73.00% | 61.80% | 33.20% | 58.00% |
 | H9-Fixed backview BS64 35K | 73.20% | 73.80% | 63.60% | 33.60% | 61.05% |
 | H9-Fixed backview BS64 40K | 68.20% | 76.00% | 60.00% | 33.60% | 59.45% |
@@ -255,9 +259,9 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H18 可观测动作读出路由 | `experiments/mechanism/acpd-v2-h18-action-readout/observable-routing-protocol.md`、`observable-routing-analysis.md`；结果 `/opt/liutong/openpi-5090-research/acpd-v2-h18-action-readout/results/136935/observable_router.json` |
 | H18 动作读出固定融合 | `experiments/mechanism/acpd-v2-h18-action-readout/ensemble-protocol.md`、`ensemble-analysis.md`；结果 `/opt/liutong/openpi-5090-research/acpd-v2-h18-action-readout/results/136935/ensemble.json` |
 | H19-FeatureFusion 协议 | `experiments/student/acpd-v2-h19-feature-fusion-30k/protocol.md` |
-| H19-FeatureFusion checkpoint | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/{4999,9999}/` |
+| H19-FeatureFusion checkpoint | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/{4999,9999,14999,19999,24999,29999}/` |
 | H19-FeatureFusion 训练日志 | `/opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion/slurm-log/pi05-bv-acpdv2-feature-fusion-bs64-30k_136345.out` |
-| H19-FeatureFusion 5K/10K/25K/30K 验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/{4999,9999,24999,29999}/`；任务 `138746/138748`、`138747/138749`、`138770/138772`、`138771/138773` |
+| H19-FeatureFusion 验证 | 有效5K/10K：`/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/{4999,9999}/`，任务 `138746/138748`、`138747/138749`；25K：`/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/24999-rerun-50-per-task/`（139046/139049）；30K：`/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/29999/`（138771/138773） |
 | H15a 快速诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/fast_protocol.md` |
 | H15a 快速诊断分析 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/analysis.md` |
 | H15a 结果目录 | `/opt/liutong/openpi-5090-research/acpd-v2-gradient-conflict/` |
