@@ -59,6 +59,15 @@ experiment_names:
     summary_jobs: {5k: 138748, 10k: 138749, 25k: 139049, 30k: 139419}
     eval_status: 5k_10k_25k_complete_30k_rerun_pending
     pooled_success: {4999: 0.2120, 9999: 0.3655, 24999: 0.5535}
+  acpd_v2_multiview_35k:
+    display_name: "ACPD-v2-Fixed 多视角 Student 35K"
+    protocol: experiments/student/acpd-v2-multiview-35k/protocol.md
+    views: [leftview, rightview, topview]
+    parent: h9_fixed
+    target_steps: 35000
+    student_config: "对应视角 pi05_libero_*view_lora"
+    status: pre_registered_pending_smoke
+    checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k
   flow_time_5k_probe:
     display_name: "ACPD-v2/SFT 5K flow 时间段误差诊断"
     protocol: experiments/mechanism/acpd-v2-flow-time-5k/protocol.md
