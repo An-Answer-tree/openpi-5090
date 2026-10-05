@@ -66,7 +66,18 @@ experiment_names:
     parent: h9_fixed
     target_steps: 35000
     student_config: "对应视角 pi05_libero_*view_lora"
-    status: pre_registered_pending_smoke
+    status: submitted_pending_resources
+    train_jobs: {leftview: 139443, rightview: 139444, topview: 139445}
+    smoke_job: 139426_[0-2]
+    smoke_status: complete_all_views
+    physical_global_batch: 64
+    accumulation: 1
+    gpus: 4
+    seed: 42
+    loss_weights: {flow: 1.0, contribution: 0.2, acl: 0.5}
+    align_layer: 10
+    save_interval: 5000
+    keep_period: 1
     checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k
   flow_time_5k_probe:
     display_name: "ACPD-v2/SFT 5K flow 时间段误差诊断"
@@ -216,7 +227,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-05 19:15 CST (H19 136345 completed 30K; 25K eval 139046/139049 complete with pooled 55.35%; corrected 30K eval 139418 submitted, summary 139419 pending)"
+  checked_at: "2026-10-05 19:25 CST (multiview ACPD-v2 35K jobs 139443/139444/139445 submitted; H19 30K eval 139418 running, summary 139419 pending)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -299,6 +310,21 @@ current_execution:
       time_limit: 7-00:00:00
       target_steps: [5000, 10000, 30000]
       purpose: feature_fusion_from_pi05_base_with_acpd_v2_layer10
+    - id: 139443
+      experiment: acpd_v2_multiview_35k_leftview
+      state: pending
+      resources: 4gpu_32cpu_96g
+      target_steps: 35000
+    - id: 139444
+      experiment: acpd_v2_multiview_35k_rightview
+      state: pending
+      resources: 4gpu_32cpu_96g
+      target_steps: 35000
+    - id: 139445
+      experiment: acpd_v2_multiview_35k_topview
+      state: pending
+      resources: 4gpu_32cpu_96g
+      target_steps: 35000
     - id: 139046
       experiment: h19_feature_fusion_25k_full_eval_rerun
       state: complete_all_four_suites
