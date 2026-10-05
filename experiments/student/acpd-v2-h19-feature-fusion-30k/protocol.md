@@ -48,8 +48,8 @@ contribution 的对照，才能将收益归因于特权信息，而不是模型�
 25K 四套评测任务为 `139046`，汇总任务为 `139049`；结果目录为
 `/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/24999-rerun-50-per-task`。
 四套结果和汇总已完成，pooled success 为 `55.35%`。30K 评测任务为数组 `138771`、
-汇总任务为 `138773`；数组首个子任务因评测索引错误退出，当前没有完整 30K 结果，
-因此 30K 只记为“尚无结论”。
+汇总任务为 `138773`；该验证链未形成完整结果，现已按每个 task 50 回合重新提交为数组
+`139412`，汇总任务为 `139413`，因此 30K 仍记为“尚无结论”。
 
 旧 H19 动作读出方案在正式训练前放弃：训练任务 136147 排队中取消，
 checkpoint 轮询任务 136164 取消；无 checkpoint 和 benchmark 结果。
@@ -58,4 +58,4 @@ checkpoint 轮询任务 136164 取消；无 checkpoint 和 benchmark 结果。
 |---|---|
 | Checkpoint | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/{4999,9999,14999,19999,24999,29999}` |
 | 训练日志 | `/opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion/slurm-log` |
-| 验证结果 | `/opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion/eval` |
+| 验证结果 | `/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/{4999,9999,24999-rerun-50-per-task,29999-rerun-50-per-task}` |
