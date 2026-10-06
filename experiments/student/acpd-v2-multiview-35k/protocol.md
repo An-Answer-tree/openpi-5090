@@ -30,6 +30,23 @@ student，获得与 backview H9 可直接比较的多视角结果。
 决定。主要比较是各视角 ACPD-v2 与相同视角 BS64 SFT baseline，不能使用 backview
 baseline 替代对应视角对照。
 
+## 5K 全量验证（2026-10-06）
+
+三个视角的 `4999` checkpoint 已完整保存。本次各评测 Spatial、Object、Goal、
+LIBERO-10，每套 10 个任务、每任务 50 回合，共 2,000 回合；seed 7、replan 5、
+fixed_dataset 相机位姿与既有验证一致。推理使用对应视角的
+`pi05_libero_{view}_acpd_v2_layer10_lora`，保留两路贡献预测和注入。
+
+每个模型提交一个四子任务的单卡数组及一个 `afterok` 汇总任务，每模型最多一套
+同时运行，三个模型共用最多三张卡。单卡请求 8 CPU、24G 内存、24 小时；
+允许 `batch,debug01` 分区，排除 `gpu03`，由 Slurm
+使用未分配显卡。训练任务保持原配置继续运行，不移动或复制 checkpoint。
+
+结果、日志和视频按视角归档到
+`/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/{view}/4999/`。
+5K 结果只描述早期表现；方法收益须与相同视角、相同训练进度的 SFT 比较，
+不能用 30K SFT 对照推断早期收益。最终 30K、35K 比较保持不变。
+
 ## 通过条件
 
 训练必须完成首个检查点且无 NaN/Inf；最终结论只使用闭环成功率。若任务失败，记录

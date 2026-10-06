@@ -613,6 +613,7 @@ def _make_pi05_libero_lora_config(view_name: str) -> TrainConfig:
 def _make_pi05_libero_acpd_v2_config(
     layer: int = 9,
     *,
+    view_name: str = "backview",
     fusion_location: Literal["final", "aligned_attention"] = "final",
     injection: bool = True,
     view_mask: tuple[bool, bool] = (True, True),
@@ -620,7 +621,7 @@ def _make_pi05_libero_acpd_v2_config(
     feature_fusion_use_contribution: bool = True,
 ) -> TrainConfig:
     """Creates a deployed exact-contribution policy config."""
-    base = _make_pi05_libero_lora_config("backview")
+    base = _make_pi05_libero_lora_config(view_name)
     base_fields = {field.name: getattr(base.model, field.name) for field in dataclasses.fields(pi0_config.Pi0Config)}
     model = pi0_distill_acpd.AcpdPi0Config(
         **base_fields,
@@ -633,20 +634,21 @@ def _make_pi05_libero_acpd_v2_config(
         contribution_feature_fusion=feature_fusion,
         feature_fusion_use_contribution=feature_fusion_use_contribution,
     )
+    prefix = f"pi05_libero_{view_name}_acpd_v2"
     if feature_fusion:
         suffix = "" if feature_fusion_use_contribution else "_capacity_control"
-        name = f"pi05_libero_backview_acpd_v2_layer{layer}_feature_fusion{suffix}_lora"
+        name = f"{prefix}_layer{layer}_feature_fusion{suffix}_lora"
     elif not injection:
-        name = f"pi05_libero_backview_acpd_v2_layer{layer}_loss_only_lora"
+        name = f"{prefix}_layer{layer}_loss_only_lora"
     elif fusion_location == "aligned_attention":
-        name = f"pi05_libero_backview_acpd_v2_layer{layer}_aligned_lora"
+        name = f"{prefix}_layer{layer}_aligned_lora"
     else:
         if view_mask == (True, False):
-            name = f"pi05_libero_backview_acpd_v2_layer{layer}_agent_only_lora"
+            name = f"{prefix}_layer{layer}_agent_only_lora"
         elif view_mask == (False, True):
-            name = f"pi05_libero_backview_acpd_v2_layer{layer}_wrist_only_lora"
+            name = f"{prefix}_layer{layer}_wrist_only_lora"
         else:
-            name = "pi05_libero_backview_acpd_v2_lora" if layer == 9 else f"pi05_libero_backview_acpd_v2_layer{layer}_lora"
+            name = f"{prefix}_lora" if layer == 9 else f"{prefix}_layer{layer}_lora"
     return dataclasses.replace(
         base,
         name=name,
@@ -877,6 +879,9 @@ _CONFIGS = [
     _make_pi05_libero_lora_config("topview"),
     _make_pi05_libero_lora_config("leftview"),
     _make_pi05_libero_lora_config("rightview"),
+    _make_pi05_libero_acpd_v2_config(layer=10, view_name="leftview"),
+    _make_pi05_libero_acpd_v2_config(layer=10, view_name="rightview"),
+    _make_pi05_libero_acpd_v2_config(layer=10, view_name="topview"),
     #
     # Fine-tuning Aloha configs.
     #
