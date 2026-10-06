@@ -55,8 +55,25 @@ contribution 的对照，才能将收益归因于特权信息，而不是模型�
 旧 H19 动作读出方案在正式训练前放弃：训练任务 136147 排队中取消，
 checkpoint 轮询任务 136164 取消；无 checkpoint 和 benchmark 结果。
 
+## 35K 续训
+
+为比较 H19 在 30K 后的短期轨迹，提交一项完全接续的 35K 训练。唯一变化是
+从完整的 H19 30K `29999` checkpoint 读取模型、优化器和 dataloader 状态，
+目标步数为 35000；模型结构、数据、损失权重、学习率设置、BS64、4×5090、
+seed 42 均保持不变。输出写入独立的 `feature_fusion_35k` 根目录，并保留
+`34999` checkpoint，避免覆盖 30K 结果。该续训在 35K checkpoint 完整后再提交
+全量验证；在验证完成前不记录成功率结论。
+
+续训任务为 `139791`，当前状态为 `PENDING (Priority)`。训练脚本为
+`scripts/train_slurm/pi05_libero_backview_acpd_v2_feature_fusion_fsdp4_bs64_resume_35k.sbatch`；
+任务使用 4×5090、32 CPU、96G 内存，时限 3 天。源 checkpoint 为完整的 H19 30K
+`29999`，目标目录为
+`/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k`。
+任务开始前不复制或移动源 checkpoint；35K checkpoint 和全量验证均尚未产生。
+
 | 证据 | 路径 |
 |---|---|
 | Checkpoint | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/{4999,9999,14999,19999,24999,29999}` |
+| 35K 续训目标 | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k` |
 | 训练日志 | `/opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion/slurm-log` |
 | 验证结果 | `/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/{4999,9999,24999-rerun-50-per-task,29999-rerun-50-per-task}` |

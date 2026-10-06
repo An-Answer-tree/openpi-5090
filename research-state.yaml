@@ -51,9 +51,14 @@ experiment_names:
     comparison: [h9_fixed, backview_sft_bs64]
     contribution_feature_fusion: true
     target_steps: [5000, 10000, 30000]
-    status: complete_30k_eval
+    status: complete_30k_eval_resume_35k_pending
     train_job: 136345
     current_step_at_last_check: 30000
+    resume_job: 139791
+    resume_status: pending_priority
+    resume_source_checkpoint: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999
+    resume_target_step: 35000
+    resume_checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k
     checkpoint_status: {4999: complete, 9999: complete, 14999: complete, 19999: complete, 24999: complete, 29999: complete}
     eval_jobs: {5k: 138746, 10k: 138747, 25k: 139046, 30k: 139418}
     summary_jobs: {5k: 138748, 10k: 138749, 25k: 139049, 30k: 139419}
@@ -229,7 +234,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-06 13:20 CST (multiview ACPD-v2 35K jobs 139443/gpu02, 139444/gpu04, 139445/gpu05 are running; no success-rate result yet)"
+  checked_at: "2026-10-06 14:30 CST (H19 35K resume job 139791 is pending Priority; multiview ACPD-v2 35K jobs 139443/gpu02, 139444/gpu04, 139445/gpu05 are running; no 35K success-rate result yet)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -312,6 +317,14 @@ current_execution:
       time_limit: 7-00:00:00
       target_steps: [5000, 10000, 30000]
       purpose: feature_fusion_from_pi05_base_with_acpd_v2_layer10
+    - id: 139791
+      experiment: h19_feature_fusion_resume_35k
+      state: pending_priority
+      depends_on_checkpoint: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999
+      resources: 4gpu_32cpu_96g
+      target_steps: 35000
+      output_checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k
+      purpose: resume_h19_feature_fusion_from_30k_to_35k
     - id: 139443
       experiment: acpd_v2_multiview_35k_leftview
       state: running
