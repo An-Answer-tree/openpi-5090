@@ -51,14 +51,15 @@ experiment_names:
     comparison: [h9_fixed, backview_sft_bs64]
     contribution_feature_fusion: true
     target_steps: [5000, 10000, 30000]
-    status: training_complete_25k_eval_complete_30k_rerun_pending
+    status: complete_30k_eval
     train_job: 136345
     current_step_at_last_check: 30000
     checkpoint_status: {4999: complete, 9999: complete, 14999: complete, 19999: complete, 24999: complete, 29999: complete}
     eval_jobs: {5k: 138746, 10k: 138747, 25k: 139046, 30k: 139418}
     summary_jobs: {5k: 138748, 10k: 138749, 25k: 139049, 30k: 139419}
-    eval_status: 5k_10k_25k_complete_30k_rerun_pending
-    pooled_success: {4999: 0.2120, 9999: 0.3655, 24999: 0.5535}
+    eval_status: 5k_10k_25k_30k_complete
+    pooled_success: {4999: 0.2120, 9999: 0.3655, 24999: 0.5535, 29999: 0.6010}
+    eval_30k: {spatial: 0.6780, object: 0.7580, goal: 0.6220, libero_10: 0.3460, pooled: 0.6010}
   acpd_v2_multiview_35k:
     display_name: "ACPD-v2-Fixed 多视角 Student 35K"
     protocol: experiments/student/acpd-v2-multiview-35k/protocol.md
@@ -66,8 +67,9 @@ experiment_names:
     parent: h9_fixed
     target_steps: 35000
     student_config: "对应视角 pi05_libero_*view_lora"
-    status: submitted_pending_resources
+    status: training_running
     train_jobs: {leftview: 139443, rightview: 139444, topview: 139445}
+    nodes: {leftview: gpu02, rightview: gpu04, topview: gpu05}
     smoke_job: 139426_[0-2]
     smoke_status: complete_all_views
     physical_global_batch: 64
@@ -227,7 +229,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-05 19:25 CST (multiview ACPD-v2 35K jobs 139443/139444/139445 submitted; H19 30K eval 139418 running, summary 139419 pending)"
+  checked_at: "2026-10-06 13:20 CST (multiview ACPD-v2 35K jobs 139443/gpu02, 139444/gpu04, 139445/gpu05 are running; no success-rate result yet)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -312,18 +314,21 @@ current_execution:
       purpose: feature_fusion_from_pi05_base_with_acpd_v2_layer10
     - id: 139443
       experiment: acpd_v2_multiview_35k_leftview
-      state: pending
+      state: running
       resources: 4gpu_32cpu_96g
+      node: gpu02
       target_steps: 35000
     - id: 139444
       experiment: acpd_v2_multiview_35k_rightview
-      state: pending
+      state: running
       resources: 4gpu_32cpu_96g
+      node: gpu04
       target_steps: 35000
     - id: 139445
       experiment: acpd_v2_multiview_35k_topview
-      state: pending
+      state: running
       resources: 4gpu_32cpu_96g
+      node: gpu05
       target_steps: 35000
     - id: 139046
       experiment: h19_feature_fusion_25k_full_eval_rerun
@@ -350,7 +355,7 @@ current_execution:
       episodes_per_suite: 500
     - id: 139418
       experiment: h19_feature_fusion_30k_full_eval_rerun
-      state: pending_resources
+      state: complete_all_four_suites
       resources: 2x1gpu_array_max2_8cpu_24g
       checkpoint: 29999
       episodes_per_suite: 500
@@ -358,7 +363,7 @@ current_execution:
       eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/29999-rerun-50-per-task
     - id: 139419
       experiment: h19_feature_fusion_30k_eval_rerun_summary
-      state: pending_dependency_139418
+      state: complete_result_written
       resources: 1cpu_2g
       depends_on: 139418
       eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/29999-rerun-50-per-task
