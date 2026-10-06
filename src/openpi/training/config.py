@@ -642,13 +642,12 @@ def _make_pi05_libero_acpd_v2_config(
         name = f"{prefix}_layer{layer}_loss_only_lora"
     elif fusion_location == "aligned_attention":
         name = f"{prefix}_layer{layer}_aligned_lora"
+    elif view_mask == (True, False):
+        name = f"{prefix}_layer{layer}_agent_only_lora"
+    elif view_mask == (False, True):
+        name = f"{prefix}_layer{layer}_wrist_only_lora"
     else:
-        if view_mask == (True, False):
-            name = f"{prefix}_layer{layer}_agent_only_lora"
-        elif view_mask == (False, True):
-            name = f"{prefix}_layer{layer}_wrist_only_lora"
-        else:
-            name = f"{prefix}_lora" if layer == 9 else f"{prefix}_layer{layer}_lora"
+        name = f"{prefix}_lora" if layer == 9 else f"{prefix}_layer{layer}_lora"
     return dataclasses.replace(
         base,
         name=name,

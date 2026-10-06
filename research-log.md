@@ -131,3 +131,4 @@
 | 2026-10-05 | 预注册 | 新增 ACPD-v2 多视角 35K 协议：以 H9-Fixed 为唯一训练基准，分别训练 leftview、rightview、topview student；固定 layer 10、loss `1.0/0.2/0.5`、4×5090 physical BS64、seed 42、H9 cosine 边界。正式任务提交前先运行 debug01 单卡两步 smoke，尚无实验结果。 |
 | 2026-10-05 | 提交 | 多视角 ACPD-v2 35K 的真实数据 smoke `139426_[0-2]` 三个视角均通过；正式 4×5090、physical BS64、梯度累计1任务已提交：leftview `139443`、rightview `139444`、topview `139445`。提交时进入排队，尚无训练或成功率结论。 |
 | 2026-10-06 | 状态 | Slurm 复核显示多视角任务 `139443`（leftview，`gpu02`）、`139444`（rightview，`gpu04`）、`139445`（topview，`gpu05`）均已运行；尚未产生可用于成功率结论的 checkpoint。 |
+| 2026-10-06 | 提交 | 三个多视角`4999` checkpoint均完整。补齐对应ACPD-v2 layer10推理配置后，提交leftview `139971/139972`、rightview `139973/139974`、topview `139975/139976`验证/汇总；每模型四套各500回合，单卡数组`0-3%1`。三个Spatial子任务已使用debug01的三张空闲5090完成模型加载并进入首回合；结果归档`/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/`，尚无成功率结论。 |

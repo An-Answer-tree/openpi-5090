@@ -77,7 +77,9 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 完成 | 30K pooled `78.65%` |
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 完成 | 30K pooled `77.00%` |
 | H9-Fixed | 固定权重 ACPD-v2 对照 | layer 10，BS64，contribution=0.2，ACL=0.5 | 129728/130773 | 30K完成；恢复与续训见下表 | 5K `23.15%`；10K `37.45%`；15K `46.60%`；20K `49.60%`；25K `55.75%`；30K `58.00%`；35K `61.05%`；40K `59.45%` |
-| ACPD-v2-Fixed 多视角 35K | 检验 H9-Fixed 是否迁移到 leftview、rightview、topview student | layer 10，4×5090 FSDP LoRA，physical BS64，梯度累计1；flow/contribution/ACL=`1.0/0.2/0.5`；35K，5K间隔保存 | 139443/139444/139445 | 三个视角均已开始训练 | 尚无 checkpoint 成功率结论 |
+| ACPD-v2-Fixed leftview | 检验 H9-Fixed 在 leftview student 上的效果 | layer 10，4卡 BS64，累计1，loss=`1.0/0.2/0.5`，35K，每5K保留 | 训练139443；5K验证139971/139972 | 训练中；5K完整，单卡数组验证已运行 | 尚无结论 |
+| ACPD-v2-Fixed rightview | 检验 H9-Fixed 在 rightview student 上的效果 | 同上，仅改变 student 视角 | 训练139444；5K验证139973/139974 | 训练中；5K完整，单卡数组验证已运行 | 尚无结论 |
+| ACPD-v2-Fixed topview | 检验 H9-Fixed 在 topview student 上的效果 | 同上，仅改变 student 视角 | 训练139445；5K验证139975/139976 | 训练中；5K完整，单卡数组验证已运行 | 尚无结论 |
 | H19-FeatureFusion | 检验预测视觉贡献在动作输出前的特征融合能否提高最终成功率；观察 30K 后短期轨迹 | backview，layer 10，从 pi0.5 base 开始；4卡 FSDP LoRA，BS64，flow/contribution/ACL=1/0.2/0.5；30K后从 `29999` 完全续训至35K，每5K保留checkpoint | smoke 136339；正式136345；35K续训139791；5K验证138746/138748；10K验证138747/138749；25K验证139046/139049；30K验证139418/139419 | 30K checkpoint 与 5K/10K/25K/30K 四套验证完成；35K续训排队中（Priority） | 已有结果：5K `21.20%`，10K `36.55%`，25K `55.35%`，30K `60.10%`；35K 尚无成功率结论 |
 | H13-LossOnly | 判断 contribution 注入是否有效 | H9-Fixed 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9-Fixed 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
 | ACPD-v2-TDCA | 检验动作损失是否能改善 contribution 注入适配 | backview，layer 10，BS64，flow=1.0、contribution=0.2、ACL=0.5；仅开放 predictor 的动作梯度，训练至5K | 135943；验证136221；汇总136222 | 5K 训练及四套全量验证完成 | `21.35%`；比 H9-Fixed 低 `1.80` 点，95% CI `[-3.90, +0.35]`；不支持提升 |
@@ -267,6 +269,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | ACPD-v2 多视角 35K 协议 | `experiments/student/acpd-v2-multiview-35k/protocol.md` |
 | ACPD-v2 多视角 35K 训练脚本 | `scripts/train_slurm/pi05_libero_{leftview,rightview,topview}_acpd_v2_layer10_lora_fsdp4_bs64_35k.sbatch` |
 | ACPD-v2 多视角 35K checkpoint 根目录 | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k/{leftview,rightview,topview}/`（训练中，尚无最终 checkpoint 结论） |
+| ACPD-v2 多视角 5K 全量验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/{leftview,rightview,topview}/4999/`；四套各500回合，`summary.txt`为最终汇总，`logs/`为逐套日志，逐套`videos/`为视频；Slurm日志见同根`slurm-log/` |
 | H15a 快速诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/fast_protocol.md` |
 | H15a 快速诊断分析 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/analysis.md` |
 | H15a 结果目录 | `/opt/liutong/openpi-5090-research/acpd-v2-gradient-conflict/` |

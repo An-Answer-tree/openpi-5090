@@ -86,6 +86,29 @@ experiment_names:
     save_interval: 5000
     keep_period: 1
     checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k
+    checkpoint_5k_status: complete_all_views
+    eval_5k:
+      checkpoint_step: 4999
+      policy_config: "pi05_libero_{view}_acpd_v2_layer10_lora"
+      view_key: "{view}_image"
+      eval_jobs: {leftview: 139971, rightview: 139973, topview: 139975}
+      summary_jobs: {leftview: 139972, rightview: 139974, topview: 139976}
+      status: running_spatial_episodes
+      running_tasks: ["139971_0", "139973_0", "139975_0"]
+      node: debug01
+      partitions: [batch, debug01]
+      array: "0-3%1"
+      gpus_per_task: 1
+      max_concurrent_gpus: 3
+      cpus_per_task: 8
+      mem_per_task: 24G
+      time_limit: "1-00:00:00"
+      trials_per_task: 50
+      episodes_per_model: 2000
+      seed: 7
+      replan_steps: 5
+      result_root: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k
+      result_path: "{result_root}/{view}/4999/summary.txt"
   flow_time_5k_probe:
     display_name: "ACPD-v2/SFT 5K flow 时间段误差诊断"
     protocol: experiments/mechanism/acpd-v2-flow-time-5k/protocol.md

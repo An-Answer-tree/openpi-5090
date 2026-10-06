@@ -47,6 +47,17 @@ fixed_dataset 相机位姿与既有验证一致。推理使用对应视角的
 5K 结果只描述早期表现；方法收益须与相同视角、相同训练进度的 SFT 比较，
 不能用 30K SFT 对照推断早期收益。最终 30K、35K 比较保持不变。
 
+| Student | 验证数组 | 自动汇总 | 推理配置 |
+|---|---:|---:|---|
+| leftview | 139971 | 139972 | `pi05_libero_leftview_acpd_v2_layer10_lora` |
+| rightview | 139973 | 139974 | `pi05_libero_rightview_acpd_v2_layer10_lora` |
+| topview | 139975 | 139976 | `pi05_libero_topview_acpd_v2_layer10_lora` |
+
+复用 `run_fixed_backview_benchmark_array.sbatch`，依次传入完整 checkpoint 路径、
+对应验证目录、表中推理配置、`{view}_image`、`50`；提交时指定
+`--partition=batch,debug01 --array=0-3%1 --time=1-00:00:00`。
+汇总复用 `summarize_fixed_backview_benchmark.sbatch`，依赖对应数组全部成功。
+
 ## 通过条件
 
 训练必须完成首个检查点且无 NaN/Inf；最终结论只使用闭环成功率。若任务失败，记录
