@@ -93,9 +93,16 @@ experiment_names:
       view_key: "{view}_image"
       eval_jobs: {leftview: 139971, rightview: 139973, topview: 139975}
       summary_jobs: {leftview: 139972, rightview: 139974, topview: 139976}
-      status: running_spatial_episodes
-      running_tasks: ["139971_0", "139973_0", "139975_0"]
-      node: debug01
+      status: complete_all_suites
+      pooled_success: {leftview: 0.4295, rightview: 0.4760, topview: 0.2780}
+      suite_success:
+        leftview: {spatial: 0.2540, object: 0.6260, goal: 0.4960, libero_10: 0.3420}
+        rightview: {spatial: 0.5940, object: 0.6560, goal: 0.4160, libero_10: 0.2380}
+        topview: {spatial: 0.3400, object: 0.3060, goal: 0.3880, libero_10: 0.0780}
+      result_paths:
+        leftview: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/leftview/4999/summary.txt
+        rightview: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/rightview/4999/summary.txt
+        topview: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/4999/summary.txt
       partitions: [batch, debug01]
       array: "0-3%1"
       gpus_per_task: 1
@@ -257,7 +264,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-06 14:30 CST (H19 35K resume job 139791 is pending Priority; multiview ACPD-v2 35K jobs 139443/gpu02, 139444/gpu04, 139445/gpu05 are running; no 35K success-rate result yet)"
+  checked_at: "2026-10-07 23:24 CST (H19 35K resume job 139791 is pending Priority; multiview ACPD-v2 35K jobs 139443/gpu02, 139444/gpu04, 139445/gpu05 are running; all three 5K validations are complete)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe

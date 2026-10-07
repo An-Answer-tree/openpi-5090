@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-06（CST）
+更新时间：2026-10-07（CST）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -77,9 +77,9 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891 | 完成 | 30K pooled `78.65%` |
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892 | 完成 | 30K pooled `77.00%` |
 | H9-Fixed | 固定权重 ACPD-v2 对照 | layer 10，BS64，contribution=0.2，ACL=0.5 | 129728/130773 | 30K完成；恢复与续训见下表 | 5K `23.15%`；10K `37.45%`；15K `46.60%`；20K `49.60%`；25K `55.75%`；30K `58.00%`；35K `61.05%`；40K `59.45%` |
-| ACPD-v2-Fixed leftview | 检验 H9-Fixed 在 leftview student 上的效果 | layer 10，4卡 BS64，累计1，loss=`1.0/0.2/0.5`，35K，每5K保留 | 训练139443；5K验证139971/139972 | 训练中；5K完整，单卡数组验证已运行 | 尚无结论 |
-| ACPD-v2-Fixed rightview | 检验 H9-Fixed 在 rightview student 上的效果 | 同上，仅改变 student 视角 | 训练139444；5K验证139973/139974 | 训练中；5K完整，单卡数组验证已运行 | 尚无结论 |
-| ACPD-v2-Fixed topview | 检验 H9-Fixed 在 topview student 上的效果 | 同上，仅改变 student 视角 | 训练139445；5K验证139975/139976 | 训练中；5K完整，单卡数组验证已运行 | 尚无结论 |
+| ACPD-v2-Fixed leftview | 检验 H9-Fixed 在 leftview student 上的效果 | layer 10，4卡 BS64，累计1，loss=`1.0/0.2/0.5`，35K，每5K保留 | 训练139443；5K验证139971/139972 | 训练中；5K四套验证完成 | 5K：Spatial `25.40%`，Object `62.60%`，Goal `49.60%`，LIBERO-10 `34.20%`，Pooled `42.95%`（859/2000）；35K尚无结论 |
+| ACPD-v2-Fixed rightview | 检验 H9-Fixed 在 rightview student 上的效果 | 同上，仅改变 student 视角 | 训练139444；5K验证139973/139974 | 训练中；5K四套验证完成 | 5K：Spatial `59.40%`，Object `65.60%`，Goal `41.60%`，LIBERO-10 `23.80%`，Pooled `47.60%`（952/2000）；35K尚无结论 |
+| ACPD-v2-Fixed topview | 检验 H9-Fixed 在 topview student 上的效果 | 同上，仅改变 student 视角 | 训练139445；5K验证139975/139976 | 训练中；5K四套验证完成 | 5K：Spatial `34.00%`，Object `30.60%`，Goal `38.80%`，LIBERO-10 `7.80%`，Pooled `27.80%`（556/2000）；35K尚无结论 |
 | H19-FeatureFusion | 检验预测视觉贡献在动作输出前的特征融合能否提高最终成功率；观察 30K 后短期轨迹 | backview，layer 10，从 pi0.5 base 开始；4卡 FSDP LoRA，BS64，flow/contribution/ACL=1/0.2/0.5；30K后从 `29999` 完全续训至35K，每5K保留checkpoint | smoke 136339；正式136345；35K续训139791；5K验证138746/138748；10K验证138747/138749；25K验证139046/139049；30K验证139418/139419 | 30K checkpoint 与 5K/10K/25K/30K 四套验证完成；35K续训排队中（Priority） | 已有结果：5K `21.20%`，10K `36.55%`，25K `55.35%`，30K `60.10%`；35K 尚无成功率结论 |
 | H13-LossOnly | 判断 contribution 注入是否有效 | H9-Fixed 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9-Fixed 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
 | ACPD-v2-TDCA | 检验动作损失是否能改善 contribution 注入适配 | backview，layer 10，BS64，flow=1.0、contribution=0.2、ACL=0.5；仅开放 predictor 的动作梯度，训练至5K | 135943；验证136221；汇总136222 | 5K 训练及四套全量验证完成 | `21.35%`；比 H9-Fixed 低 `1.80` 点，95% CI `[-3.90, +0.35]`；不支持提升 |
