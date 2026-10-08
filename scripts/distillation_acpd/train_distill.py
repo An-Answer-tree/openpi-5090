@@ -1,4 +1,4 @@
-"""Trains a weak-view pi0.5 student with ACPD distillation."""
+"""Trains a weak-view pi0.5 student with ACPD or MV-SV-KD distillation."""
 
 from collections.abc import Sequence
 import dataclasses
@@ -44,7 +44,7 @@ from scripts.train import init_wandb
 
 @dataclasses.dataclass(frozen=True)
 class DistillTrainConfig:
-    """Configuration for one weak-view ACPD student."""
+    """Configuration for one weak-view distillation student."""
 
     name: str = "pi05_libero_backview_acpd_lora"
     project_name: str = "openpi"
@@ -54,6 +54,7 @@ class DistillTrainConfig:
     student_init_params: str = tyro.MISSING
     teacher_params: str = tyro.MISSING
     dataset_repo_id: str = "libero_multiview_tuned_6view_lerobot"
+    distillation_method: Literal["acpd", "mv_sv_kd"] = "acpd"
 
     student_view_key: str = "backview_image"
     teacher_view_key: str = "agentview_image"
@@ -69,6 +70,7 @@ class DistillTrainConfig:
     acpd_variance_loss_weight: float = 0.1
     action_corr_loss_weight: float = 0.5
     teacher_action_loss_weight: float = 0.0
+    feature_loss_weight: float = 0.1
     align_layers: tuple[int, ...] = (6, 12)
     acpd_memory_dim: int = 1024
     acpd_projector_hidden_dim: int = 2048
@@ -258,18 +260,20 @@ def _make_distill_model_config(
     if not isinstance(model_config, pi0_config.Pi0Config):
         raise ValueError(f"ACPD only supports Pi0Config, got {type(model_config).__name__}.")
     base_fields = {field.name: getattr(model_config, field.name) for field in dataclasses.fields(pi0_config.Pi0Config)}
+    mv_sv_kd = config.distillation_method == "mv_sv_kd"
     return pi0_distill_acpd.AcpdPi0Config(
         **base_fields,
-        align_layers=config.align_layers,
+        align_layers=(-1,) if mv_sv_kd else config.align_layers,
         acpd_memory_dim=config.acpd_memory_dim,
         acpd_projector_hidden_dim=config.acpd_projector_hidden_dim,
-        create_acpd_heads=create_acpd_heads,
-        exact_contribution_fusion=exact_contribution_fusion,
-        exact_contribution_injection=config.exact_contribution_injection,
+        create_acpd_heads=create_acpd_heads and not mv_sv_kd,
+        exact_contribution_fusion=exact_contribution_fusion and not mv_sv_kd,
+        exact_contribution_injection=config.exact_contribution_injection and not mv_sv_kd,
         exact_contribution_task_gradient=config.exact_contribution_task_gradient,
         exact_contribution_fusion_location=config.exact_contribution_fusion_location,
         exact_contribution_view_mask=config.exact_contribution_view_mask,
-        contribution_feature_fusion=(
+        contribution_feature_fusion=not mv_sv_kd
+        and (
             config.contribution_feature_fusion if contribution_feature_fusion is None else contribution_feature_fusion
         ),
         feature_fusion_use_contribution=config.feature_fusion_use_contribution,
@@ -490,6 +494,15 @@ def _teacher_action_loss(student_v_t: at.Array, teacher_v_t: at.Array, *, task_a
     return jnp.mean(jnp.square(student - teacher))
 
 
+def _feature_distillation_loss(student_hidden: at.Array, teacher_hidden: at.Array) -> tuple[at.Array, at.Array]:
+    """Returns RMS-normalized feature MSE and cosine, with a frozen target."""
+    student = _normalize_last_dim(student_hidden.astype(jnp.float32))
+    teacher = _normalize_last_dim(jax.lax.stop_gradient(teacher_hidden.astype(jnp.float32)))
+    loss = jnp.mean(jnp.sum(jnp.square(student - teacher), axis=-1))
+    cosine = jnp.mean(jnp.sum(student * teacher, axis=-1))
+    return loss, cosine
+
+
 def _per_sample_prediction_error(prediction: at.Array, target: at.Array) -> at.Array:
     """Computes mean squared prediction error for each batch item."""
     return jnp.mean(
@@ -586,7 +599,7 @@ def compute_gradients(
         student_v_t, _, student_hiddens = model.compute_train_outputs(
             preprocess_rng, student_observation, x_t, time, train=True
         )
-        if config.exact_contribution_fusion:
+        if config.exact_contribution_fusion and config.distillation_method == "acpd":
             teacher_v_t, teacher_contributions, _, _ = teacher_model.compute_attention_contributions(
                 preprocess_rng, teacher_observation, x_t, time, train=True
             )
@@ -596,11 +609,30 @@ def compute_gradients(
             )
         teacher_v_t = jax.lax.stop_gradient(teacher_v_t)
         supervised_loss = jnp.mean(jnp.square(student_v_t - target_v_t))
-        action_corr_loss = _action_corr_loss(student_v_t, teacher_v_t)
         teacher_action_loss = _teacher_action_loss(student_v_t, teacher_v_t)
         student_task_error = _per_sample_prediction_error(student_v_t[..., :7], target_v_t[..., :7])
         teacher_task_error = _per_sample_prediction_error(teacher_v_t[..., :7], target_v_t[..., :7])
 
+        if config.distillation_method == "mv_sv_kd":
+            feature_loss, feature_cosine = _feature_distillation_loss(student_hiddens[0], teacher_hiddens[0])
+            weighted_supervised_loss = config.supervised_loss_weight * supervised_loss
+            weighted_teacher_action_loss = config.teacher_action_loss_weight * teacher_action_loss
+            weighted_feature_loss = config.feature_loss_weight * feature_loss
+            total_loss = weighted_supervised_loss + weighted_teacher_action_loss + weighted_feature_loss
+            return total_loss, {
+                "loss": total_loss,
+                "supervised_loss": supervised_loss,
+                "weighted_supervised_loss": weighted_supervised_loss,
+                "teacher_action_loss": teacher_action_loss,
+                "weighted_teacher_action_loss": weighted_teacher_action_loss,
+                "feature_loss": feature_loss,
+                "weighted_feature_loss": weighted_feature_loss,
+                "feature_cosine": feature_cosine,
+                "student_task_loss": jnp.mean(student_task_error),
+                "teacher_task_loss": jnp.mean(teacher_task_error),
+            }
+
+        action_corr_loss = _action_corr_loss(student_v_t, teacher_v_t)
         per_layer = {}
         if config.exact_contribution_fusion:
             predicted_contributions = model.exact_contribution_head.predict(student_hiddens[0])
@@ -742,9 +774,10 @@ def apply_gradients(
 
 
 def main(config: DistillTrainConfig):
-    """Runs ACPD distillation."""
+    """Runs weak-view distillation."""
     init_logging()
     logging.info("Running on: %s", platform.node())
+    logging.info("Distillation config: %s", config)
     if config.gradient_accumulation_steps < 1:
         raise ValueError("--gradient-accumulation-steps must be at least 1")
     if config.acpd_loss_end_weight is not None and config.acpd_loss_decay_steps <= 0:

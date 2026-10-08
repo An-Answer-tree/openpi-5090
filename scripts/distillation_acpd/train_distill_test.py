@@ -24,6 +24,7 @@ from scripts.distillation_acpd.train_distill import _action_corr_loss
 from scripts.distillation_acpd.train_distill import _add_scaled_gradients
 from scripts.distillation_acpd.train_distill import _data_start_batch
 from scripts.distillation_acpd.train_distill import _exact_contribution_loss
+from scripts.distillation_acpd.train_distill import _feature_distillation_loss
 from scripts.distillation_acpd.train_distill import _make_student_train_config
 from scripts.distillation_acpd.train_distill import _make_teacher_train_config
 from scripts.distillation_acpd.train_distill import _micro_step_train_rng
@@ -341,6 +342,109 @@ def test_teacher_action_loss_matches_only_task_dimensions_and_detaches_teacher()
     np.testing.assert_allclose(_teacher_action_loss(student, teacher, task_action_dim=2), 9.25, atol=1e-6)
     teacher_grad = jax.grad(lambda value: _teacher_action_loss(student, value, task_action_dim=2))(teacher)
     np.testing.assert_allclose(teacher_grad, 0.0, atol=1e-6)
+
+
+def test_feature_distillation_loss_is_scale_invariant_and_detaches_teacher():
+    student = jnp.asarray([[[1.0, 0.0], [0.0, 1.0]]])
+    teacher = jnp.asarray([[[0.0, 2.0], [2.0, 0.0]]])
+
+    loss, cosine = _feature_distillation_loss(student, teacher)
+    np.testing.assert_allclose(loss, 2.0, atol=1e-6)
+    np.testing.assert_allclose(cosine, 0.0, atol=1e-6)
+    np.testing.assert_allclose(_feature_distillation_loss(student, 3.0 * student), [0.0, 1.0], atol=1e-6)
+    student_grad, teacher_grad = jax.grad(lambda s, t: _feature_distillation_loss(s, t)[0], argnums=(0, 1))(
+        student, teacher
+    )
+    assert float(jnp.linalg.norm(student_grad)) > 0.0
+    np.testing.assert_allclose(teacher_grad, 0.0, atol=1e-6)
+    assert np.isfinite(float(_feature_distillation_loss(jnp.zeros_like(student), teacher)[0]))
+
+
+def test_mv_sv_kd_has_no_acpd_heads_and_matches_plain_lora_parameter_shapes():
+    config = DistillTrainConfig(
+        distillation_method="mv_sv_kd",
+        student_init_params="base/params",
+        teacher_params="teacher/params",
+        assets_dir="assets",
+        checkpoint_base_dir="checkpoints",
+        exact_contribution_fusion=True,
+        contribution_feature_fusion=True,
+        keep_period=1,
+    )
+    student_config = _make_student_train_config(config)
+    teacher_config = _make_teacher_train_config(config, student_config)
+    for model_config in (student_config.model, teacher_config.model):
+        assert model_config.align_layers == (-1,)
+        assert not model_config.create_acpd_heads
+        assert not model_config.exact_contribution_fusion
+        assert not model_config.exact_contribution_injection
+        assert not model_config.contribution_feature_fusion
+    assert teacher_config.model.paligemma_variant == "gemma_2b"
+    assert teacher_config.model.action_expert_variant == "gemma_300m"
+    assert student_config.keep_period == 1
+    plain_config = training_config.get_config(config.student_config_name)
+    shapes = [
+        jax.eval_shape(
+            lambda rng, model_config=model_config: nnx.state(model_config.create(rng)).to_pure_dict(), jax.random.key(0)
+        )
+        for model_config in (student_config.model, plain_config.model)
+    ]
+    assert jax.tree.structure(shapes[0]) == jax.tree.structure(shapes[1])
+    for distill, plain in zip(jax.tree.leaves(shapes[0]), jax.tree.leaves(shapes[1]), strict=True):
+        assert distill.shape == plain.shape
+        assert distill.dtype == plain.dtype
+
+
+def test_mv_sv_kd_actual_gradient_path_matches_three_losses_without_auxiliary_heads():
+    class ToyModel(nnx.Module):
+        def __init__(self, seed):
+            self.features = nnx.Linear(4, 4, rngs=nnx.Rngs(seed))
+            self.output = nnx.Linear(4, 32, rngs=nnx.Rngs(seed + 1))
+
+        def compute_train_outputs(self, rng, observation, noisy_actions, time, *, train):
+            hidden = self.features(noisy_actions[..., :4]) + observation + time[:, None, None]
+            return self.output(hidden), None, (hidden,)
+
+    model_def, params = nnx.split(ToyModel(0))
+    teacher_def, teacher_params = nnx.split(ToyModel(10))
+    tx = optax.adam(1e-3)
+    state = TrainState(
+        step=jnp.asarray(0), params=params, model_def=model_def, opt_state=tx.init(params), tx=tx, ema_decay=None
+    )
+    teacher = FrozenModelState(params=teacher_params, model_def=teacher_def)
+    teacher_before = jax.tree.map(np.array, teacher.params)
+    train_config = types.SimpleNamespace(trainable_filter=nnx.Param)
+    batch = (jnp.asarray(0.7), jnp.asarray(0.2), jnp.zeros((2, 3, 32)))
+    config = DistillTrainConfig(distillation_method="mv_sv_kd", teacher_action_loss_weight=0.5)
+    for flow_weight, velocity_weight, feature_weight in (
+        (1.0, 0.5, 0.1),
+        (1.0, 0.0, 0.0),
+        (0.0, 0.5, 0.0),
+        (0.0, 0.0, 0.1),
+    ):
+        current_config = dataclasses.replace(
+            config,
+            supervised_loss_weight=flow_weight,
+            teacher_action_loss_weight=velocity_weight,
+            feature_loss_weight=feature_weight,
+        )
+        grads, info = jax.jit(
+            lambda state, current_config=current_config: compute_gradients(
+                current_config, train_config, jax.random.key(42), state, teacher, batch, jnp.asarray(0)
+            )
+        )(state)
+        expected_loss = (
+            flow_weight * info["supervised_loss"]
+            + velocity_weight * info["teacher_action_loss"]
+            + feature_weight * info["feature_loss"]
+        )
+        np.testing.assert_allclose(info["loss"], expected_loss, rtol=1e-6)
+        np.testing.assert_allclose(info["feature_loss"], 2.0 * (1.0 - info["feature_cosine"]), rtol=1e-6)
+        assert float(optax.global_norm(grads)) > 0.0
+        assert "acpd_loss" not in info
+        assert "action_corr_loss" not in info
+    for before, after in zip(jax.tree.leaves(teacher_before), jax.tree.leaves(teacher.params), strict=True):
+        np.testing.assert_array_equal(before, after)
 
 
 def test_per_sample_prediction_error_reduces_non_batch_dimensions():
