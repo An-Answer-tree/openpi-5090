@@ -74,6 +74,7 @@ H19 30K→35K续训改为2 GPU、全局micro BS32、累计2，有效BS64，单�
 | ID | 目的 | 实际配置 | Job | 状态 | 结果 |
 |---|---|---|---:|---|---|
 | Teacher | 提供 agentview+wrist 特权信息 | 全量 SFT，30K | 历史任务 | 完成 | checkpoint `29999` |
+| MV-SV-KD（pi0.5适配） | 提供多视角到单视角第三方蒸馏对照 | 提交配置：冻结既有agentview+wrist teacher，backview LoRA；4卡BS64，累计1，30K，GT/输出/最终动作特征loss=1/0.5/0.1；无ACPD/ACL/注入，每5K全部保留 | smoke 142274；正式142275 | CPU测试26项通过；smoke排队，正式等待其成功；尚未训练 | 尚无结论；离线flow与最终action hidden适配，不是原论文完整复现；[协议与执行](experiments/baseline/mv-sv-kd-backview-bs64-30k/) |
 | H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 60K | 130285/130491/130762/132791；35K验证134992/134995；后期验证134998 | 60K训练与40K/50K/60K验证完成 | 5K `13.85%`；20K `47.20%`；25K `55.80%`；30K `60.45%`；35K `57.15%`；40K `60.55%`；50K `61.30%`；60K `62.05%` |
 | H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669/130890；取消5K验证140298/140301 | 30K完成；5K验证未启动即取消，优先H19续训 | 30K pooled `71.55%`；5K尚无结论 |
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891；取消5K验证140296/140299 | 30K完成；5K验证未启动即取消，优先H19续训 | 30K pooled `78.65%`；5K尚无结论 |
@@ -222,6 +223,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | 内容 | 路径 |
 |---|---|
 | 实验目录索引 | `experiments/README.md` |
+| MV-SV-KD协议、执行与配置路径 | `experiments/baseline/mv-sv-kd-backview-bs64-30k/`；checkpoint根目录`/opt/liutong/openpi_checkpoints/fixed_dataset/baseline/mv_sv_kd/backview_bs64_30k/`；日志根目录`/opt/liutong/openpi-5090-research/mv-sv-kd-backview-bs64-30k/slurm-log/`；任务排队，尚无结果 |
 | H7/H7.1 原始指标 | `/opt/liutong/openpi-5090-research/acpd-exact-attention-probe/results/` |
 | H9 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-pbs32-5k_129710.out` |
 | H9-scale-b 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-fsdp4-bs64-30k_129728.out` |

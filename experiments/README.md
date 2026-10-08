@@ -21,6 +21,7 @@
 | `ACPD-v2-TDCA` | 任务驱动贡献适配；训练时允许动作损失更新 contribution predictor | 原 TaskAdapt 提案 |
 | `ACPD-v2-FeatureFusion` | 预测两路贡献与最终 action hidden 融合，再使用原动作输出层 | H19 |
 | `ACL-only` | 仅保留 action-level consistency loss，不学习或注入 contribution | ACL-only BS64 |
+| `MV-SV-KD (pi0.5 adaptation)` | 多视角到单视角输出/特征联合蒸馏的离线适配；非原论文完整复现 | 第三方方法对照，backview BS64 30K |
 | `Contribution-Recovery-Probe` | 测量不同 transformer 层的 teacher contribution 可恢复性 | H7/H7.1 |
 | `Gradient-Compatibility-Diagnostic` | 测量 flow、contribution、ACL 梯度的方向关系 | H15a |
 | `Component-Sweep-BS32` | 早期 flow/ACL/contribution 组件筛选 | H4/H5/H8/H9（BS32） |
@@ -34,7 +35,7 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 
 | 分类 | 内容 |
 |---|---|
-| `baseline/` | BS64 单视角 SFT 基线 |
+| `baseline/` | BS64 单视角 SFT 与第三方蒸馏方法对照 |
 | `student/` | ACPD-v2 主 student；`preliminary/` 保存早期 BS32 筛选 |
 | `ablation/` | 正式消融；`preliminary/` 保存早期 BS32/2K/5K 筛选 |
 | `mechanism/` | exact attention contribution probe 与层扫描 |
@@ -50,6 +51,7 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 | baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 10K/15K/20K/25K/30K 正式验证完成 |
 | baseline | backview BS64 30K--60K | `baseline/sft-backview-bs64-trajectory-60k/` | 续训与验证完成；30K `60.45%`，40K/50K/60K分别为`60.55/61.30/62.05%` |
 | baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 全部完成 |
+| baseline | MV-SV-KD backview BS64 30K | `baseline/mv-sv-kd-backview-bs64-30k/` | 代码与CPU检查通过；单卡smoke 142274排队，正式142275等待smoke成功；尚无结论 |
 | student | H9-Fixed 主实验（原H9-scale-b） | `student/acpd-v2-h9-batch-scaling-30k/` | 固定contribution=0.2；5K/10K/15K/20K/25K/30K/35K/40K有正式结果 |
 | student | ACPD-v2 多视角 35K | `student/acpd-v2-multiview-35k/` | smoke 已通过；leftview/rightview/topview 正式训练中（139443/139444/139445）；尚无成功率结论 |
 | student | H19-FeatureFusion BS64 30K | `student/acpd-v2-h19-feature-fusion-30k/protocol.md` | 30K checkpoint 与5K/10K/25K/30K四套验证完成；pooled `21.20%/36.55%/55.35%/60.10%` |

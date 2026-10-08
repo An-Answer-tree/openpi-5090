@@ -64,6 +64,12 @@
 
 ## 文献约束
 
+新增第三方比较方法 MV-SV-KD：将多视角到单视角的输出/特征联合蒸馏适配到
+pi0.5，使用相同既有teacher、fixed_dataset和backview学生。该适配用flow velocity
+与最终action hidden替代原论文SAC动作和视觉编码特征，不属于完整复现。
+CPU检查通过，单卡smoke与30K正式任务已提交，GPU尚未验证；尚无科研结论。
+协议和任务号：`experiments/baseline/mv-sv-kd-backview-bs64-30k/`。
+
 Lopez-Paz et al. (2015) 将 privileged information 表述为只在训练阶段可见的
 额外描述，并讨论了“先重建特权描述、再拼回 student”的直接方案可能比直接
 蒸馏 teacher 输出更困难。Xiao et al. (NeurIPS 2024) 进一步形式化了部分可观测

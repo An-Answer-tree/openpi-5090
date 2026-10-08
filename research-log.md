@@ -137,3 +137,4 @@
 | 2026-10-08 | 管理 | 用户取消topview蒸馏训练`139445`；按用户要求取消未启动的left/right/top SFT 5K验证`140296/140297/140298`及汇总`140299/140300/140301`，避免与H19争卡。H19 `141714`仍暂停等待reservation，left/right蒸馏继续运行；未删除checkpoint或已有结果。 |
 | 2026-10-08 | 提交 | 按用户要求将H19 30K→35K续训改为2 GPU、全局micro BS32、累计2、有效BS64，16CPU/48G/3天；任务`141769`指定gpu05，旧held任务`141714`取消。核对Slurm保存的脚本与每1K保留设置；16:35为排队Priority，gpu05已可调度但8卡均已分配。数据从新micro batch配置推导接续位置，不声明与原4卡逐样本一致；尚无新增成功率结论。 |
 | 2026-10-08 | 调度 | 按用户要求用`scontrol update JobId=141769 ReqNodeList=`原地解除gpu05绑定；核对`ReqNodeList=(null)`，保留原排除gpu03。无需重提任务，训练配置、任务号和提交时间保留；16:45为排队Priority，可由batch分区任意满足资源要求的节点接收。 |
+| 2026-10-08 | 预注册与提交 | MV-SV-KD pi0.5离线固定视角适配协议先commit `0d7c8f6`，实现`ff4d1e8`；26项CPU测试和静态检查通过。真实输入单卡debug smoke `142274`（BS1、2步、无checkpoint）排队，正式`142275`（4GPU/BS64/累计1/30K/8天，每5K且keep_period=1）等待smoke成功；GT/teacher输出/最终动作特征loss=1/0.5/0.1，关闭ACPD/ACL/注入。非原论文完整复现，尚无科研结果；未修改现有任务或移动、复制、删除数据和checkpoint。 |

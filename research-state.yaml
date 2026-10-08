@@ -5,6 +5,39 @@ project:
   started: "2026-09-11"
 
 experiment_names:
+  mv_sv_kd_backview_30k:
+    display_name: "MV-SV-KD (pi0.5 offline fixed-view adaptation)"
+    protocol: experiments/baseline/mv-sv-kd-backview-bs64-30k/protocol.md
+    execution: experiments/baseline/mv-sv-kd-backview-bs64-30k/execution.md
+    reference: https://arxiv.org/html/2303.07026v2
+    status: submitted_waiting_for_gpu_smoke
+    smoke_job: 142274
+    smoke_status: pending_priority
+    train_job: 142275
+    train_status: pending_dependency
+    dependency: afterok:142274
+    teacher_params: /opt/liutong/openpi_checkpoints/fixed_dataset/sft/agentview_wrist/29999/params
+    student_config: pi05_libero_backview_lora
+    distillation_method: mv_sv_kd
+    loss_weights: {gt_flow: 1.0, teacher_velocity_mse7: 0.5, rms_normalized_final_action_hidden_mse: 0.1}
+    acpd_heads: false
+    acl: false
+    contribution_injection: false
+    physical_global_batch: 64
+    gradient_accumulation_steps: 1
+    resources: 4gpu_32cpu_96g
+    time_limit: 8-00:00:00
+    seed: 42
+    num_train_steps: 30000
+    learning_rate: {warmup_steps: 1000, peak_lr: 2.5e-5, decay_steps: 30000, decay_lr: 2.5e-6}
+    save_interval: 5000
+    keep_period: 1
+    checkpoint_steps: [4999, 9999, 14999, 19999, 24999, 29999]
+    checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/baseline/mv_sv_kd/backview_bs64_30k
+    log_root: /opt/liutong/openpi-5090-research/mv-sv-kd-backview-bs64-30k/slurm-log
+    cpu_tests: 26_passed
+    gpu_smoke_verified: false
+    conclusion: 尚无结论
   h9_fixed:
     display_name: "ACPD-v2-Fixed / 固定 contribution 权重"
     legacy_id: H9-scale-b
@@ -292,9 +325,25 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-08 16:35 CST (139443/139444 running; 141769 pending Priority; 141714 cancelled before start)"
+  checked_at: "2026-10-08 23:13 CST (MV-SV-KD smoke 142274 pending Priority; train 142275 waiting afterok:142274)"
   h19_resume_checked_at: "2026-10-08 16:45 CST (141769 pending Priority; ReqNodeList cleared in place; any eligible batch node except gpu03)"
   jobs:
+    - id: 142274
+      experiment: mv_sv_kd_backview_30k_smoke
+      state: pending_priority
+      resources: 1gpu_debug01_8cpu_32g
+      time_limit: 01:00:00
+      target_steps: 2
+      save_final_checkpoint: false
+    - id: 142275
+      experiment: mv_sv_kd_backview_30k
+      state: pending_dependency
+      depends_on: 142274
+      resources: 4gpu_batch_32cpu_96g
+      time_limit: 8-00:00:00
+      target_steps: 30000
+      save_interval: 5000
+      keep_period: 1
     - id: 136879
       experiment: h9_gate_effect_probe
       state: completed_exit_0_both_tasks
