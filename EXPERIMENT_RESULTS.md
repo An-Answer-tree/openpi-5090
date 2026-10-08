@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-07（CST）
+更新时间：2026-10-08（CST）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -34,7 +34,8 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | 哪层 exact contribution 最可恢复 | layer 10；overall gap `0.3992`，比次优 layer 11 高 `0.0485`。 | H7/H7.1 |
 | Layer 10 两路视觉贡献是否同样易恢复 | agentview/wrist explained variance 为 `0.4722/0.2389`，贡献范数比为 `0.3122/0.5945`；仅描述性证据，不代表任一路的任务收益。 | H7.1 原始指标 |
 | ACPD-v2 是否优于匹配 BS64 SFT | 5K 时提升 `9.30` 点；30K 时为 `58.00%` 对 `60.45%`，差值 `-2.45` 点，95% CI `[-5.00, 0.00]`。早期优势未保持到 30K。 | H9-scale-b、H12 |
-| ACPD-v2-FeatureFusion 在 25K/30K 是否优于 H9 与 SFT | H19 为 `55.35%/60.10%`，H9-Fixed 为 `55.75%/58.00%`，SFT 为 `55.80%/60.45%`；H19 相对 H9 为 `-0.40/+2.10` 点，相对 SFT 为 `-0.45/-0.35` 点 | 25K/30K 四套各500回合完整验证；H19 30K 高于 H9，但仍未超过 SFT |
+| ACPD-v2-FeatureFusion 是否可替代 H9 | H19在5K/10K/25K比H9低`1.95/0.90/0.40`点，30K高`2.10`点；30K配对95%区间`[-0.40,+4.60]`点，相对SFT为`-0.35`点、区间`[-2.95,+2.20]`点。当前保留H9主方案，H19为候选，未证明稳定优势或提高上限。 | [H9/H19比较](experiments/student/acpd-v2-h19-feature-fusion-30k/analysis.md)；四套各500回合 |
+| H19 是否改善训练loss与贡献预测 | 与H9对齐299点，监督loss相关系数`0.999840`，各5K窗口均值差异不足`0.17%`；25–30K贡献cosine为`0.796822/0.797180`（H19/H9）。没有更快收敛或更好贡献预测的证据。 | [相同步数loss比较](experiments/student/acpd-v2-h19-feature-fusion-30k/analysis.md#训练-loss) |
 | ACPD-v2 的早期优势在 10K 是否仍存在 | 存在。H9 为 `37.45%`，SFT 为 `23.25%`；差值 `+14.20` 点，配对 95% CI `[+11.90, +16.60]`。 | 相同 2,000 episodes |
 | 10K 优势是否覆盖四个 benchmark suite | 是。Spatial/Object/Goal/LIBERO-10 分别高 `+18.2/+12.8/+18.4/+7.4` 点，四个 suite 的配对 95% CI 均严格高于 0：`[+12.6,+23.6]`、`[+7.2,+18.2]`、`[+13.8,+22.8]`、`[+4.6,+10.2]`。 | H9/SFT 10K 全量验证 |
 | 15K 优势是否仍覆盖四个 benchmark suite | 四套点估计均为正：`+5.8/+6.4/+6.2/+4.4` 点；Object 和 Goal 的区间严格高于 0，Spatial 与 LIBERO-10 下界为 0。 | H9/SFT 15K 全量验证 |

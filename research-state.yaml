@@ -65,6 +65,13 @@ experiment_names:
     eval_status: 5k_10k_25k_30k_complete
     pooled_success: {4999: 0.2120, 9999: 0.3655, 24999: 0.5535, 29999: 0.6010}
     eval_30k: {spatial: 0.6780, object: 0.7580, goal: 0.6220, libero_10: 0.3460, pooled: 0.6010}
+    analysis: experiments/student/acpd-v2-h19-feature-fusion-30k/analysis.md
+    h19_minus_h9_30k: 0.0210
+    h19_minus_h9_30k_paired_ci95: [-0.0040, 0.0460]
+    supervised_loss_correlation_with_h9: 0.99984036
+    max_5k_window_flow_mean_relative_difference: 0.0016185
+    analysis_conclusion: no_detected_faster_flow_convergence_or_stable_eval_advantage
+    method_recommendation: h9_main_h19_candidate_pending_35k_and_capacity_control
   acpd_v2_multiview_35k:
     display_name: "ACPD-v2-Fixed 多视角 Student 35K"
     protocol: experiments/student/acpd-v2-multiview-35k/protocol.md
