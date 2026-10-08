@@ -81,7 +81,7 @@ python -m scripts.distillation_acpd.train_distill \
   --decay-steps=30000 \
   --decay-lr=2.5e-6 \
   --log-interval=100 \
-  --save-interval=5000 \
+  --save-interval=1000 \
   --keep-period=1 \
   --resume-from=/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999 \
   --resume-data-loader \

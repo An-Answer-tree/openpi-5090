@@ -51,13 +51,18 @@ experiment_names:
     comparison: [h9_fixed, backview_sft_bs64]
     contribution_feature_fusion: true
     target_steps: [5000, 10000, 30000]
-    status: complete_30k_eval_resume_35k_pending
+    status: complete_30k_eval_resume_35k_held
     train_job: 136345
     current_step_at_last_check: 30000
-    resume_job: 139791
-    resume_status: pending_priority
+    resume_job: 141714
+    resume_status: pending_job_held_user_for_reservation
+    replaced_resume_job: 139791
+    replaced_resume_job_status: cancelled_before_start
     resume_source_checkpoint: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999
     resume_target_step: 35000
+    resume_save_interval: 1000
+    resume_keep_period: 1
+    resume_planned_checkpoint_steps: [30999, 31999, 32999, 33999, 34999]
     resume_checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k
     checkpoint_status: {4999: complete, 9999: complete, 14999: complete, 19999: complete, 24999: complete, 29999: complete}
     eval_jobs: {5k: 138746, 10k: 138747, 25k: 139046, 30k: 139418}
@@ -271,7 +276,8 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-07 23:24 CST (H19 35K resume job 139791 is pending Priority; multiview ACPD-v2 35K jobs 139443/gpu02, 139444/gpu04, 139445/gpu05 are running; all three 5K validations are complete)"
+  checked_at: "2026-10-07 23:24 CST (multiview ACPD-v2 35K jobs 139443/gpu02, 139444/gpu04, 139445/gpu05 are running; all three 5K validations are complete)"
+  h19_resume_checked_at: "2026-10-08 15:55 CST (replacement 141714 held for user reservation; old pending job 139791 cancelled; save every 1K and retain all five checkpoints)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -356,10 +362,17 @@ current_execution:
       purpose: feature_fusion_from_pi05_base_with_acpd_v2_layer10
     - id: 139791
       experiment: h19_feature_fusion_resume_35k
-      state: pending_priority
+      state: cancelled_before_start
+      replaced_by: 141714
+    - id: 141714
+      experiment: h19_feature_fusion_resume_35k
+      state: pending_job_held_user_for_reservation
       depends_on_checkpoint: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999
       resources: 4gpu_32cpu_96g
       target_steps: 35000
+      save_interval: 1000
+      keep_period: 1
+      planned_checkpoint_steps: [30999, 31999, 32999, 33999, 34999]
       output_checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k
       purpose: resume_h19_feature_fusion_from_30k_to_35k
     - id: 139443
