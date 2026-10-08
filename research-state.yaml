@@ -51,15 +51,23 @@ experiment_names:
     comparison: [h9_fixed, backview_sft_bs64]
     contribution_feature_fusion: true
     target_steps: [5000, 10000, 30000]
-    status: complete_30k_eval_resume_35k_held
+    status: complete_30k_eval_resume_35k_pending
     train_job: 136345
     current_step_at_last_check: 30000
-    resume_job: 141714
-    resume_status: pending_job_held_user_for_reservation
-    replaced_resume_job: 139791
+    resume_job: 141769
+    resume_status: pending_priority
+    replaced_resume_job: 141714
     replaced_resume_job_status: cancelled_before_start
     resume_source_checkpoint: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999
     resume_target_step: 35000
+    resume_resources: 2gpu_16cpu_48g
+    resume_requested_node: gpu05
+    resume_time_limit: 3-00:00:00
+    resume_global_micro_batch: 32
+    resume_gradient_accumulation: 2
+    resume_effective_batch: 64
+    resume_data_start_batch: 60000
+    resume_data_note: derived_with_new_micro_batch_size_not_identical_to_original_64_sample_batches
     resume_save_interval: 1000
     resume_keep_period: 1
     resume_planned_checkpoint_steps: [30999, 31999, 32999, 33999, 34999]
@@ -283,8 +291,8 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-08 16:14 CST (139443/139444 running; user cancelled topview 139445; SFT 5K eval arrays 140296/140297/140298 and summaries 140299/140300/140301 cancelled before start)"
-  h19_resume_checked_at: "2026-10-08 16:14 CST (141714 held for reservation; no reservations exist; gpu05 drained with 5 of 8 GPUs allocated to other users)"
+  checked_at: "2026-10-08 16:35 CST (139443/139444 running; 141769 pending Priority on gpu05; 141714 cancelled before start)"
+  h19_resume_checked_at: "2026-10-08 16:35 CST (141769 submitted with 2 GPUs, micro BS32 and accumulation 2; gpu05 schedulable with 8 of 8 GPUs allocated)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -373,9 +381,19 @@ current_execution:
       replaced_by: 141714
     - id: 141714
       experiment: h19_feature_fusion_resume_35k
-      state: pending_job_held_user_for_reservation
+      state: cancelled_before_start
+      replaced_by: 141769
+    - id: 141769
+      experiment: h19_feature_fusion_resume_35k
+      state: pending_priority
       depends_on_checkpoint: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999
-      resources: 4gpu_32cpu_96g
+      resources: 2gpu_16cpu_48g
+      requested_node: gpu05
+      time_limit: 3-00:00:00
+      global_micro_batch: 32
+      gradient_accumulation: 2
+      effective_batch: 64
+      script: scripts/train_slurm/pi05_libero_backview_acpd_v2_feature_fusion_fsdp2_bs64_resume_35k.sbatch
       target_steps: 35000
       save_interval: 1000
       keep_period: 1

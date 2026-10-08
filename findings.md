@@ -128,7 +128,7 @@ H17-Decay只改变该权重；它不能同时证明不可恢复信息、LoRA容�
 
 ## 工程约束
 
-- 最终论文对照除 teacher 外统一使用 4 GPU、physical global BS64。
+- 原始正式对照除 teacher 外使用4 GPU、physical global BS64；H19 30K→35K续训使用2 GPU、全局micro BS32、累计2、有效BS64，需单独标注，不能称为逐样本完全一致的4卡接续。
 - 蒸馏 checkpoint 使用零起始目录编号；需要保留每 5K 时设置 `keep_period=1`。
 - 精选 checkpoint 只在完整写入后建立硬链接，不移动或删除原 checkpoint。
 - 活动任务的 checkpoint、数据集、脚本和输出路径不得修改。

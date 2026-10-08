@@ -57,20 +57,22 @@ checkpoint 轮询任务 136164 取消；无 checkpoint 和 benchmark 结果。
 
 ## 35K 续训
 
-为比较 H19 在 30K 后的短期轨迹，提交一项完全接续的 35K 训练。
-从完整的 H19 30K `29999` checkpoint 读取模型、优化器和 dataloader 状态，
-目标步数为 35000；模型结构、数据、损失权重、学习率设置、BS64、4×5090、
-seed 42 均保持不变。输出写入独立的 `feature_fusion_35k` 根目录，避免覆盖
+为比较 H19 在 30K 后的短期轨迹，从完整的 H19 30K `29999` checkpoint
+恢复模型与优化器，目标步数为 35000。使用2×5090、全局 micro BS32、
+梯度累计2，有效BS64；模型结构、数据、损失权重、学习率设置与seed 42沿用原训练。
+数据加载器按新micro batch配置从`30000×2=60000`处推导接续位置；
+micro batch及每轮丢弃的尾部样本变化，不能声称与原4卡训练逐样本完全一致。
+输出写入独立的 `feature_fusion_35k` 根目录，避免覆盖
 30K 结果。续训使用 `save_interval=1000`、`keep_period=1`，保存并保留
 `30999/31999/32999/33999/34999`，对应 31K–35K；原 0–30K 训练仍是每5K保存。
 全量验证另行提交，在验证完成前不记录成功率结论。
 
-2026-10-08 已取消尚未启动的旧任务 `139791`，替换任务为 `141714`，使用
-`sbatch --hold` 提交，当前为 `PENDING (JobHeldUser)`，不占GPU。
-用户创建 reservation 后，将新任务绑定到该 reservation，再释放暂停。
-本次不创建 reservation，不停止其他训练。训练脚本为
-`scripts/train_slurm/pi05_libero_backview_acpd_v2_feature_fusion_fsdp4_bs64_resume_35k.sbatch`；
-任务使用 4×5090、32 CPU、96G 内存，时限 3 天。源 checkpoint 为完整的 H19 30K
+2026-10-08取消尚未启动的4卡任务`141714`（此前替换`139791`），
+提交2卡任务`141769`，通过`sbatch --nodelist=gpu05`指定节点，无reservation。
+16:35查询为`PENDING (Priority)`；gpu05已可调度，8/8 GPU已分配。
+训练脚本为
+`scripts/train_slurm/pi05_libero_backview_acpd_v2_feature_fusion_fsdp2_bs64_resume_35k.sbatch`；
+任务使用 2×5090、16 CPU、48G 内存，时限 3 天。源 checkpoint 为完整的 H19 30K
 `29999`，目标目录为
 `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k`。
 任务开始前不复制或移动源 checkpoint；35K checkpoint 和全量验证均尚未产生。
