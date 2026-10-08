@@ -84,8 +84,9 @@ experiment_names:
     parent: h9_fixed
     target_steps: 35000
     student_config: "对应视角 pi05_libero_*view_lora"
-    status: training_running
+    status: leftview_rightview_running_topview_cancelled_by_user
     train_jobs: {leftview: 139443, rightview: 139444, topview: 139445}
+    train_status: {leftview: running, rightview: running, topview: cancelled_by_user_for_h19_resources}
     nodes: {leftview: gpu02, rightview: gpu04, topview: gpu05}
     smoke_job: 139426_[0-2]
     smoke_status: complete_all_views
@@ -128,6 +129,12 @@ experiment_names:
       replan_steps: 5
       result_root: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k
       result_path: "{result_root}/{view}/4999/summary.txt"
+    sft_eval_5k:
+      eval_jobs: {leftview: 140296, rightview: 140297, topview: 140298}
+      summary_jobs: {leftview: 140299, rightview: 140300, topview: 140301}
+      status: cancelled_before_start_to_prioritize_h19_resume
+      cancelled_at: "2026-10-08 16:13 CST"
+      conclusion: no_results
   flow_time_5k_probe:
     display_name: "ACPD-v2/SFT 5K flow 时间段误差诊断"
     protocol: experiments/mechanism/acpd-v2-flow-time-5k/protocol.md
@@ -276,8 +283,8 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-07 23:24 CST (multiview ACPD-v2 35K jobs 139443/gpu02, 139444/gpu04, 139445/gpu05 are running; all three 5K validations are complete)"
-  h19_resume_checked_at: "2026-10-08 15:55 CST (replacement 141714 held for user reservation; old pending job 139791 cancelled; save every 1K and retain all five checkpoints)"
+  checked_at: "2026-10-08 16:14 CST (139443/139444 running; user cancelled topview 139445; SFT 5K eval arrays 140296/140297/140298 and summaries 140299/140300/140301 cancelled before start)"
+  h19_resume_checked_at: "2026-10-08 16:14 CST (141714 held for reservation; no reservations exist; gpu05 drained with 5 of 8 GPUs allocated to other users)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -389,7 +396,7 @@ current_execution:
       target_steps: 35000
     - id: 139445
       experiment: acpd_v2_multiview_35k_topview
-      state: running
+      state: cancelled_by_user_for_h19_resources
       resources: 4gpu_32cpu_96g
       node: gpu05
       target_steps: 35000
