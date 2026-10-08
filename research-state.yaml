@@ -61,7 +61,8 @@ experiment_names:
     resume_source_checkpoint: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999
     resume_target_step: 35000
     resume_resources: 2gpu_16cpu_48g
-    resume_requested_node: gpu05
+    resume_requested_node: null
+    resume_excluded_nodes: [gpu03]
     resume_time_limit: 3-00:00:00
     resume_global_micro_batch: 32
     resume_gradient_accumulation: 2
@@ -291,8 +292,8 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-08 16:35 CST (139443/139444 running; 141769 pending Priority on gpu05; 141714 cancelled before start)"
-  h19_resume_checked_at: "2026-10-08 16:35 CST (141769 submitted with 2 GPUs, micro BS32 and accumulation 2; gpu05 schedulable with 8 of 8 GPUs allocated)"
+  checked_at: "2026-10-08 16:35 CST (139443/139444 running; 141769 pending Priority; 141714 cancelled before start)"
+  h19_resume_checked_at: "2026-10-08 16:45 CST (141769 pending Priority; ReqNodeList cleared in place; any eligible batch node except gpu03)"
   jobs:
     - id: 136879
       experiment: h9_gate_effect_probe
@@ -388,7 +389,8 @@ current_execution:
       state: pending_priority
       depends_on_checkpoint: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999
       resources: 2gpu_16cpu_48g
-      requested_node: gpu05
+      requested_node: null
+      excluded_nodes: [gpu03]
       time_limit: 3-00:00:00
       global_micro_batch: 32
       gradient_accumulation: 2
