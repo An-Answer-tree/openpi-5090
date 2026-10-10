@@ -67,6 +67,7 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 | ablation | ACL-only BS64 35K | `ablation/acpd-v2-acl-only-bs64-35k/protocol.md` | 训练及25K/30K/35K全量验证完成；pooled分别为`52.90%/54.35%/59.35%` |
 | mechanism | 5K flow 时间段误差 | `mechanism/acpd-v2-flow-time-5k/` | 两次单卡只读诊断完成；首次低时间段信号未复现 |
 | mechanism | H9 10K 推理期注入消融 | `mechanism/acpd-v2-h9-inference-injection-10k/analysis.md` | 完成；完整注入高1.40点，配对95%区间跨0，未检测到总体依赖 |
+| mechanism | H9 35K 推理期注入消融 | `mechanism/acpd-v2-h9-inference-injection-35k/` | 同一checkpoint关闭预测注入；四套全量验证145280_[0-3]排队，汇总与配对分析145282等待；尚无结论 |
 | mechanism | ACPD-v2中期逐任务差异 | `mechanism/acpd-v2-task-heterogeneity/` | 完成探索性日志分析；Object早期广泛受益，但任务方向随step改变 |
 | mechanism | ACPD-v2早期逐任务收益覆盖 | `mechanism/acpd-v2-early-task-coverage/` | 完成探索性日志分析；10K有32/40任务正差，回合重采样区间[27,34]；15K仅20个保持 |
 | mechanism | ACPD-v2早期步数效率 | `mechanism/acpd-v2-step-efficiency/` | 完成三组跨step配对分析；5K H9与10K SFT pooled接近，另两组不满足±3点范围 |

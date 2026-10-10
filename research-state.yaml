@@ -195,6 +195,42 @@ experiment_names:
     injection_off_success: 0.3605
     paired_difference: 0.014
     paired_ci95: [-0.0095, 0.037]
+  h9_inference_injection_35k:
+    display_name: "H9 35K 推理期 contribution 注入消融"
+    protocol: experiments/mechanism/acpd-v2-h9-inference-injection-35k/protocol.md
+    execution: experiments/mechanism/acpd-v2-h9-inference-injection-35k/execution.md
+    status: submitted_pending_priority
+    checked_at: "2026-10-10 15:26 CST"
+    eval_job_id: 145280
+    summary_analysis_job_id: 145282
+    dependency: afterok:145280
+    checkpoint: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/34999
+    policy_config: pi05_libero_backview_acpd_v2_layer10_loss_only_lora
+    control_config: pi05_libero_backview_acpd_v2_layer10_lora
+    intervention: inference_only_exact_contribution_injection_false
+    control_dir: /opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999
+    eval_dir: /opt/liutong/openpi-5090-evals/acpd-v2-h9-inference-ablation/34999
+    result: experiments/mechanism/acpd-v2-h9-inference-injection-35k/results/paired_analysis.json
+    full_success: 0.6105
+    injection_off_success: null
+    paired_difference: null
+    paired_ci95: null
+    difference_direction: full_minus_injection_off
+    array: "0-3"
+    array_concurrency_limit: null
+    gpu_resources_per_task: 1gpu_8cpu_24g
+    eval_time_limit: "1-00:00:00"
+    analysis_resources: 1cpu_2g_20min
+    partition: batch
+    excluded_nodes: [gpu03]
+    trials_per_task: 50
+    episodes: 2000
+    seed: 7
+    replan_steps: 5
+    bootstrap_samples: 10000
+    bootstrap_seed: 42
+    conclusion: 尚无结论
+    scope: inference_dependency_not_training_injection_causal_ablation
   h9_agent_only_injection_10k:
     display_name: "ACPD-v2 Agentview-only 推理注入 10K"
     protocol: experiments/ablation/acpd-v2-agent-only-injection-10k/protocol.md
@@ -325,9 +361,23 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-08 23:13 CST (MV-SV-KD smoke 142274 pending Priority; train 142275 waiting afterok:142274)"
+  checked_at: "2026-10-10 15:26 CST (H9 injection-off 35K array 145280 pending Priority; summary/analysis 145282 waiting afterok:145280; other entries retain their last checked state)"
   h19_resume_checked_at: "2026-10-08 16:45 CST (141769 pending Priority; ReqNodeList cleared in place; any eligible batch node except gpu03)"
   jobs:
+    - id: 145280
+      experiment: h9_inference_injection_35k
+      state: pending_priority
+      array: "0-3"
+      resources_per_task: 1gpu_batch_8cpu_24g
+      time_limit: "1-00:00:00"
+      episodes: 2000
+      purpose: same_h9_35k_checkpoint_inference_injection_off
+    - id: 145282
+      experiment: h9_inference_injection_35k_summary_paired_analysis
+      state: pending_dependency
+      depends_on: 145280
+      resources: 1cpu_2g
+      time_limit: "00:20:00"
     - id: 142274
       experiment: mv_sv_kd_backview_30k_smoke
       state: pending_priority
