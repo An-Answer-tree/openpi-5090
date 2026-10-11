@@ -70,3 +70,22 @@ leftview/rightview 训练 `139443/139444` 继续运行，已有结果与 checkpo
 
 训练必须完成首个检查点且无 NaN/Inf；最终结论只使用闭环成功率。若任务失败，记录
 工程状态，不把训练 loss 当作方法结论。
+
+## 30K 全量验证（2026-10-12）
+
+leftview/rightview 的30K与35K checkpoint已完整保存，训练日志确认35K最终
+写入完成。本次只提交两视角的30K（目录`29999`）验证，保持原预注册比较。
+
+| 项目 | 设置 |
+|---|---|
+| 模型 | ACPD-v2-Fixed，layer 10，保留两路贡献预测与注入 |
+| Checkpoint | 原训练目录`multiview_35k/{view}/pi05_libero_{view}_acpd_v2_layer10/pi05_libero_{view}_acpd_v2_layer10_lora_fsdp4_bs64_35k/29999` |
+| 推理配置与视角 | `pi05_libero_{view}_acpd_v2_layer10_lora`、`{view}_image` |
+| 验证协议 | fixed_dataset相机位姿；四套各500回合，共2000回合；seed 7，replan 5，图像224，等待10步；与相同视角30K SFT一致 |
+| GPU任务 | 每模型单卡数组`0-3`，不限制并发；每项8 CPU、24G、24小时，batch分区、排除gpu03 |
+| 汇总 | 每模型一个1 CPU、2G、15分钟任务，依赖四个子任务全部成功 |
+| 环境 | `openpi`策略服务、`openpi-libero`仿真；`CONDA_ENVS_PATH=/home/liutong/miniconda3/envs`；联网关闭、代理清除 |
+| 输出 | `/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/{view}/29999/`；套件日志在`logs/`，视频在各套`videos/`，调度日志在`slurm-log/`，最终汇总为`summary.txt` |
+
+复用已有验证数组和汇总脚本，不复制或移动checkpoint。任务号提交后记录于
+`research-state.yaml`与结果台账；验证完成前，两视角30K均为“尚无结论”。
