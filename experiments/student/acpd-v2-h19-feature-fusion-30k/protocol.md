@@ -70,7 +70,11 @@ micro batch及每轮丢弃的尾部样本变化，不能声称与原4卡训练�
 2026-10-08取消尚未启动的4卡任务`141714`（此前替换`139791`），
 提交2卡任务`141769`，无reservation。16:45按用户要求原地清除gpu05绑定，
 已核对`ReqNodeList=(null)`；可在batch分区任意满足资源要求的节点运行，
-保留原`gpu03`排除设置。任务仍为`PENDING (Priority)`，任务号与排队时间保留。
+保留原`gpu03`排除设置。2026-10-11重新提交为`147003`；
+23:09为`PENDING (Priority)`，实际GPU训练尚未核对。
+恢复代码已显式使用当前2卡分片布局，CPU检查覆盖4→2设备的参数、
+优化器状态和步数恢复，以及源文件只读。原任务执行状态与故障证据
+仅记于`research-state.yaml`，不作为实验结果。
 训练脚本为
 `scripts/train_slurm/pi05_libero_backview_acpd_v2_feature_fusion_fsdp2_bs64_resume_35k.sbatch`；
 任务使用 2×5090、16 CPU、48G 内存，时限 3 天。源 checkpoint 为完整的 H19 30K

@@ -87,10 +87,14 @@ experiment_names:
     status: complete_30k_eval_resume_35k_pending
     train_job: 136345
     current_step_at_last_check: 30000
-    resume_job: 141769
+    resume_job: 147003
     resume_status: pending_priority
-    replaced_resume_job: 141714
-    replaced_resume_job_status: cancelled_before_start
+    replaced_resume_job: 141769
+    replaced_resume_job_status: failed_before_training_cross_device_restore
+    resume_fix_commit: 6898a7b
+    resume_fix: explicit_current_mesh_sharding_for_parameters_and_optimizer_state
+    resume_verification: 29_distillation_cpu_tests_passed_including_4_to_2_device_restore_with_and_without_ema
+    resume_gpu_training_verified: false
     resume_source_checkpoint: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999
     resume_target_step: 35000
     resume_resources: 2gpu_16cpu_48g
@@ -362,7 +366,7 @@ experiment_names:
 
 current_execution:
   checked_at: "2026-10-10 15:26 CST (H9 injection-off 35K array 145280 pending Priority; summary/analysis 145282 waiting afterok:145280; other entries retain their last checked state)"
-  h19_resume_checked_at: "2026-10-08 16:45 CST (141769 pending Priority; ReqNodeList cleared in place; any eligible batch node except gpu03)"
+  h19_resume_checked_at: "2026-10-11 23:09 CST (147003 pending Priority; 141769 failed before training; cross-device restore fixed and CPU-tested; GPU training not yet verified)"
   jobs:
     - id: 145280
       experiment: h9_inference_injection_35k
@@ -485,7 +489,18 @@ current_execution:
       replaced_by: 141769
     - id: 141769
       experiment: h19_feature_fusion_resume_35k
+      state: failed_before_training
+      failure_time: "2026-10-11 21:32 CST"
+      failure_reason: orbax_used_saved_4_device_sharding_on_2_gpus_without_explicit_target_sharding
+      failure_log: /opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion-35k/slurm-log/pi05-bv-h19-feature-fusion-r35k-2g_141769.out
+      replaced_by: 147003
+      fix_commit: 6898a7b
+    - id: 147003
+      experiment: h19_feature_fusion_resume_35k
       state: pending_priority
+      submitted_at: "2026-10-11 23:04 CST"
+      replaces: 141769
+      training_verified: false
       depends_on_checkpoint: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999
       resources: 2gpu_16cpu_48g
       requested_node: null
@@ -500,6 +515,7 @@ current_execution:
       keep_period: 1
       planned_checkpoint_steps: [30999, 31999, 32999, 33999, 34999]
       output_checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k
+      stdout: /opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion-35k/slurm-log/pi05-bv-h19-feature-fusion-r35k-2g_147003.out
       purpose: resume_h19_feature_fusion_from_30k_to_35k
     - id: 139443
       experiment: acpd_v2_multiview_35k_leftview
