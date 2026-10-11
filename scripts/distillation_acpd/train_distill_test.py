@@ -6,6 +6,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import optax
+import pytest
 
 from openpi.models.pi0_distill_acpd import AcpdHead
 from openpi.models.pi0_distill_acpd import AcpdPi0
@@ -548,8 +549,14 @@ def test_scheduled_weight_scales_actual_training_gradients():
     np.testing.assert_allclose(final_info["acpd_loss_weight"], 0.05)
 
 
-def test_external_resume_restores_exact_step_and_adam_without_source_writes(tmp_path):
-    model = nnx.Linear(2, 2, rngs=nnx.Rngs(0))
+@pytest.mark.parametrize(("source_devices", "target_devices"), [(1, 1), (4, 2)])
+@pytest.mark.parametrize("ema_decay", [None, 0.9])
+def test_external_resume_restores_exact_step_and_adam_without_source_writes(
+    tmp_path, source_devices, target_devices, ema_decay
+):
+    if jax.device_count() < source_devices:
+        pytest.skip("Run with XLA_FLAGS=--xla_force_host_platform_device_count=4 for cross-device restore.")
+    model = nnx.Linear(4, 4, rngs=nnx.Rngs(0))
     model_def, params = nnx.split(model)
     tx = optax.adam(1e-3)
     grads = jax.tree.map(jnp.ones_like, params)
@@ -560,8 +567,18 @@ def test_external_resume_restores_exact_step_and_adam_without_source_writes(tmp_
         model_def=model_def,
         opt_state=opt_state,
         tx=tx,
-        ema_decay=None,
+        ema_decay=ema_decay,
+        ema_params=None if ema_decay is None else params,
     )
+    source_mesh = jax.sharding.Mesh(np.asarray(jax.devices()[:source_devices]), ("fsdp",))
+    target_mesh = jax.sharding.Mesh(np.asarray(jax.devices()[:target_devices]), ("fsdp",))
+
+    def make_sharding(value, mesh):
+        spec = jax.sharding.PartitionSpec("fsdp") if value.ndim == 2 else jax.sharding.PartitionSpec()
+        return jax.sharding.NamedSharding(mesh, spec)
+
+    state = jax.tree.map(lambda value: jax.device_put(value, make_sharding(value, source_mesh)), state)
+    target_sharding = jax.tree.map(lambda value: make_sharding(value, target_mesh), state)
     loader = types.SimpleNamespace(data_config=lambda: types.SimpleNamespace(norm_stats=None, asset_id=None))
     manager, _ = checkpoints.initialize_checkpoint_dir(
         tmp_path / "source", keep_period=1, overwrite=False, resume=False
@@ -573,10 +590,12 @@ def test_external_resume_restores_exact_step_and_adam_without_source_writes(tmp_
     # This traversal is limited to the tiny temporary test checkpoint.
     source_files = {path: (path.stat().st_size, path.stat().st_mtime_ns) for path in (tmp_path / "source").rglob("*")}
     template = jax.tree.map(lambda x: jax.ShapeDtypeStruct(x.shape, x.dtype), state)
-    restored = _restore_from_checkpoint(str(tmp_path / "source" / "9999"), template)
+    restored = _restore_from_checkpoint(str(tmp_path / "source" / "9999"), template, target_sharding)
     assert int(restored.step) == 10_000
     for actual, expected in zip(jax.tree.leaves(restored), jax.tree.leaves(state), strict=True):
         np.testing.assert_array_equal(actual, expected)
+    for actual, expected in zip(jax.tree.leaves(restored), jax.tree.leaves(target_sharding), strict=True):
+        assert actual.sharding.is_equivalent_to(expected, actual.ndim)
     actual_updates, _ = restored.tx.update(grads, restored.opt_state, restored.params)
     expected_updates, _ = state.tx.update(grads, state.opt_state, state.params)
     for actual, expected in zip(jax.tree.leaves(actual_updates), jax.tree.leaves(expected_updates), strict=True):

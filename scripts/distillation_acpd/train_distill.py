@@ -412,7 +412,11 @@ def _data_start_batch(config: DistillTrainConfig, start_step: int, *, resuming: 
     return start_step * config.gradient_accumulation_steps
 
 
-def _restore_from_checkpoint(path: str, state: training_utils.TrainState) -> training_utils.TrainState:
+def _restore_from_checkpoint(
+    path: str,
+    state: training_utils.TrainState,
+    state_sharding: training_utils.TrainState | None = None,
+) -> training_utils.TrainState:
     """Restores an exact checkpoint read-only, without copying its files."""
     checkpoint = pathlib.Path(path).resolve()
     with ocp.CheckpointManager(
@@ -423,7 +427,7 @@ def _restore_from_checkpoint(path: str, state: training_utils.TrainState) -> tra
         },
         options=ocp.CheckpointManagerOptions(read_only=True, create=False, enable_async_checkpointing=False),
     ) as manager:
-        return _checkpoints.restore_state(manager, state, step=int(checkpoint.name))
+        return _checkpoints.restore_state(manager, state, step=int(checkpoint.name), state_sharding=state_sharding)
 
 
 def _acpd_loss_weight(config: DistillTrainConfig, step: at.Array) -> at.Array | float:
@@ -826,10 +830,12 @@ def main(config: DistillTrainConfig):
     )
     jax.block_until_ready(student_state)
     if resuming:
-        student_state = _checkpoints.restore_state(checkpoint_manager, student_state)
+        student_state = _checkpoints.restore_state(
+            checkpoint_manager, student_state, state_sharding=student_state_sharding
+        )
     elif config.resume_from is not None:
         logging.info("Restoring full training state read-only from %s", config.resume_from)
-        student_state = _restore_from_checkpoint(config.resume_from, student_state)
+        student_state = _restore_from_checkpoint(config.resume_from, student_state, student_state_sharding)
 
     start_step = int(student_state.step)
     logging.info("Starting at optimizer step %d; target step %d", start_step, config.num_train_steps)

@@ -90,16 +90,28 @@ def restore_state(
     checkpoint_manager: ocp.CheckpointManager,
     state: training_utils.TrainState,
     step: int | None = None,
+    *,
+    state_sharding: training_utils.TrainState | None = None,
 ) -> training_utils.TrainState:
+    """Restores parameters and optimizer state onto the requested devices."""
     with at.disable_typechecking():
         # Split params that can be used for inference into a separate item.
         train_state, params = _split_params(state)
+        train_sharding, params_sharding = (None, None) if state_sharding is None else _split_params(state_sharding)
         restored = checkpoint_manager.restore(
             step,
-            items={
-                "train_state": train_state,
-                "params": {"params": params},
-            },
+            args=ocp.args.Composite(
+                train_state=ocp.args.PyTreeRestore(
+                    train_state,
+                    restore_args=ocp.checkpoint_utils.construct_restore_args(train_state, train_sharding),
+                ),
+                params=ocp.args.PyTreeRestore(
+                    {"params": params},
+                    restore_args=ocp.checkpoint_utils.construct_restore_args(
+                        {"params": params}, None if params_sharding is None else {"params": params_sharding}
+                    ),
+                ),
+            ),
         )
     return _merge_params(restored["train_state"], restored["params"])
 
