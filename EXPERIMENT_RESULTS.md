@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-11（CST；本次更新 H19 35K 续训状态）
+更新时间：2026-10-12（CST；本次更新 leftview/rightview 35K 训练完成及验证提交状态）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -80,8 +80,8 @@ H19 30K→35K续训改为2 GPU、全局micro BS32、累计2，有效BS64，单�
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891；取消5K验证140296/140299 | 30K完成；5K验证未启动即取消，优先H19续训 | 30K pooled `78.65%`；5K尚无结论 |
 | H14-right | rightview baseline | LoRA，BS64，30K，每 5K 保存 | 130671/130892；取消5K验证140297/140300 | 30K完成；5K验证未启动即取消，优先H19续训 | 30K pooled `77.00%`；5K尚无结论 |
 | H9-Fixed | 固定权重 ACPD-v2 对照 | layer 10，BS64，contribution=0.2，ACL=0.5 | 129728/130773 | 30K完成；恢复与续训见下表 | 5K `23.15%`；10K `37.45%`；15K `46.60%`；20K `49.60%`；25K `55.75%`；30K `58.00%`；35K `61.05%`；40K `59.45%` |
-| ACPD-v2-Fixed leftview | 检验 H9-Fixed 在 leftview student 上的效果 | layer 10，4卡 BS64，累计1，loss=`1.0/0.2/0.5`，35K，每5K保留 | 训练139443；5K验证139971/139972 | 训练中；5K四套验证完成 | 5K：Spatial `25.40%`，Object `62.60%`，Goal `49.60%`，LIBERO-10 `34.20%`，Pooled `42.95%`（859/2000）；35K尚无结论 |
-| ACPD-v2-Fixed rightview | 检验 H9-Fixed 在 rightview student 上的效果 | 同上，仅改变 student 视角 | 训练139444；5K验证139973/139974 | 训练中；5K四套验证完成 | 5K：Spatial `59.40%`，Object `65.60%`，Goal `41.60%`，LIBERO-10 `23.80%`，Pooled `47.60%`（952/2000）；35K尚无结论 |
+| ACPD-v2-Fixed leftview | 检验 H9-Fixed 在 leftview student 上的效果 | layer 10，4卡 BS64，累计1，loss=`1.0/0.2/0.5`，35K，每5K保留 | 训练139443；5K验证139971/139972；35K验证147057/147058 | 35K训练完成；5K四套验证完成；35K四套全量验证排队 | 5K：Spatial `25.40%`，Object `62.60%`，Goal `49.60%`，LIBERO-10 `34.20%`，Pooled `42.95%`（859/2000）；35K尚无结论 |
+| ACPD-v2-Fixed rightview | 检验 H9-Fixed 在 rightview student 上的效果 | 同上，仅改变 student 视角 | 训练139444；5K验证139973/139974；35K验证147059/147060 | 35K训练完成；5K四套验证完成；35K四套全量验证排队 | 5K：Spatial `59.40%`，Object `65.60%`，Goal `41.60%`，LIBERO-10 `23.80%`，Pooled `47.60%`（952/2000）；35K尚无结论 |
 | ACPD-v2-Fixed topview | 检验 H9-Fixed 在 topview student 上的效果 | 同上，仅改变 student 视角 | 训练139445；5K验证139975/139976 | 用户为优先H19续训取消训练；5K四套验证完成 | 5K：Spatial `34.00%`，Object `30.60%`，Goal `38.80%`，LIBERO-10 `7.80%`，Pooled `27.80%`（556/2000）；35K尚无结论 |
 | H19-FeatureFusion | 检验预测视觉贡献在动作输出前的特征融合能否提高最终成功率；观察 30K 后短期轨迹 | backview，layer 10，从 pi0.5 base 开始；0–30K为4卡 FSDP LoRA，BS64，flow/contribution/ACL=1/0.2/0.5，每5K保存；从 `29999` 恢复模型与优化器，2卡全局micro BS32、累计2、有效BS64续训至35K，每1K保存且全部保留 | smoke 136339；正式136345；35K续训147003；5K验证138746/138748；10K验证138747/138749；25K验证139046/139049；30K验证139418/139419 | 30K checkpoint 与 5K/10K/25K/30K 四套验证完成；10月11日23:09核对，35K续训147003在batch排队（Priority），尚未推进训练；不绑定节点，排除gpu03 | 已有结果：5K `21.20%`，10K `36.55%`，25K `55.35%`，30K `60.10%`；35K 尚无成功率结论 |
 | H13-LossOnly | 判断 contribution 注入是否有效 | H9-Fixed 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9-Fixed 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
@@ -273,8 +273,9 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H19-FeatureFusion 35K续训 | 从完整 H19 30K `29999` 恢复模型与优化器，按新micro batch配置推导数据位置；每1K保存，`keep_period=1`保留`30999/31999/32999/33999/34999` | 147003，2×5090，全局micro BS32，累计2，有效BS64，16CPU/48G/3天；不绑定节点，排除gpu03；10月11日23:09为`PENDING (Priority)` | 源 checkpoint：`/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999`；独立目标目录：`/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp2_bs64_35k`；日志：`/opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion-35k/slurm-log/pi05-bv-h19-feature-fusion-r35k-2g_147003.out`；尚无35K验证结果 |
 | ACPD-v2 多视角 35K 协议 | `experiments/student/acpd-v2-multiview-35k/protocol.md` |
 | ACPD-v2 多视角 35K 训练脚本 | `scripts/train_slurm/pi05_libero_{leftview,rightview,topview}_acpd_v2_layer10_lora_fsdp4_bs64_35k.sbatch` |
-| ACPD-v2 多视角 35K checkpoint 根目录 | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k/{leftview,rightview,topview}/`（训练中，尚无最终 checkpoint 结论） |
+| ACPD-v2 多视角 35K checkpoint 根目录 | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k/{leftview,rightview,topview}/`；leftview/rightview的`34999`完整保存，topview训练已取消 |
 | ACPD-v2 多视角 5K 全量验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/{leftview,rightview,topview}/4999/`；四套各500回合，`summary.txt`为最终汇总，`logs/`为逐套日志，逐套`videos/`为视频；Slurm日志见同根`slurm-log/` |
+| ACPD-v2 leftview/rightview 35K 全量验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/{leftview,rightview}/34999/`；各2000回合，数组`147057/147059`，汇总`147058/147060`；日志`logs/`、视频各套`videos/`、调度日志`slurm-log/`；最终结果为`summary.txt`，当前排队 |
 | H15a 快速诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/fast_protocol.md` |
 | H15a 快速诊断分析 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/analysis.md` |
 | H15a 结果目录 | `/opt/liutong/openpi-5090-research/acpd-v2-gradient-conflict/` |

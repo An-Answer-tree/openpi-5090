@@ -130,9 +130,10 @@ experiment_names:
     parent: h9_fixed
     target_steps: 35000
     student_config: "对应视角 pi05_libero_*view_lora"
-    status: leftview_rightview_running_topview_cancelled_by_user
+    status: leftview_rightview_training_complete_35k_eval_pending_topview_cancelled
     train_jobs: {leftview: 139443, rightview: 139444, topview: 139445}
-    train_status: {leftview: running, rightview: running, topview: cancelled_by_user_for_h19_resources}
+    train_status: {leftview: complete_35k, rightview: complete_35k, topview: cancelled_by_user_for_h19_resources}
+    training_completion_evidence: final_34999_metadata_and_successful_save_finalize_log
     nodes: {leftview: gpu02, rightview: gpu04, topview: gpu05}
     smoke_job: 139426_[0-2]
     smoke_status: complete_all_views
@@ -146,6 +147,42 @@ experiment_names:
     keep_period: 1
     checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k
     checkpoint_5k_status: complete_all_views
+    checkpoint_35k_status: {leftview: complete, rightview: complete, topview: not_completed}
+    eval_35k:
+      checked_at: "2026-10-12 00:22 CST"
+      checkpoint_step: 34999
+      policy_config: "pi05_libero_{view}_acpd_v2_layer10_lora"
+      view_key: "{view}_image"
+      eval_jobs: {leftview: 147057, rightview: 147059}
+      summary_jobs: {leftview: 147058, rightview: 147060}
+      status: pending_priority
+      summary_status: pending_afterok_array_dependency
+      replaced_30k_array: 147056
+      replaced_30k_status: cancelled_before_start_by_user_checkpoint_correction
+      partition: batch
+      excluded_nodes: [gpu03]
+      array: "0-3"
+      concurrency_limit: null
+      gpus_per_task: 1
+      cpus_per_task: 8
+      mem_per_task: 24G
+      time_limit: "1-00:00:00"
+      summary_resources: 1cpu_2g_15min
+      trials_per_task: 50
+      episodes_per_suite: 500
+      episodes_per_model: 2000
+      seed: 7
+      replan_steps: 5
+      image_size: 224
+      num_steps_wait: 10
+      conda_envs_path: /home/liutong/miniconda3/envs
+      offline: true
+      proxies: disabled
+      result_paths:
+        leftview: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/leftview/34999/summary.txt
+        rightview: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/rightview/34999/summary.txt
+      baseline_note: corresponding_view_sft_results_are_30k_not_matched_35k
+      conclusion: 尚无结论
     eval_5k:
       checkpoint_step: 4999
       policy_config: "pi05_libero_{view}_acpd_v2_layer10_lora"
@@ -367,6 +404,7 @@ experiment_names:
 current_execution:
   checked_at: "2026-10-10 15:26 CST (H9 injection-off 35K array 145280 pending Priority; summary/analysis 145282 waiting afterok:145280; other entries retain their last checked state)"
   h19_resume_checked_at: "2026-10-11 23:09 CST (147003 pending Priority; 141769 failed before training; cross-device restore fixed and CPU-tested; GPU training not yet verified)"
+  multiview_35k_checked_at: "2026-10-12 00:22 CST (leftview/rightview 35K training complete; eval arrays 147057/147059 pending Priority; summaries 147058/147060 waiting dependencies; 30K array 147056 cancelled before start)"
   jobs:
     - id: 145280
       experiment: h9_inference_injection_35k
@@ -519,16 +557,46 @@ current_execution:
       purpose: resume_h19_feature_fusion_from_30k_to_35k
     - id: 139443
       experiment: acpd_v2_multiview_35k_leftview
-      state: running
+      state: complete_35k_final_checkpoint_saved
       resources: 4gpu_32cpu_96g
       node: gpu02
       target_steps: 35000
     - id: 139444
       experiment: acpd_v2_multiview_35k_rightview
-      state: running
+      state: complete_35k_final_checkpoint_saved
       resources: 4gpu_32cpu_96g
       node: gpu04
       target_steps: 35000
+    - id: 147057
+      experiment: acpd_v2_multiview_leftview_35k_eval
+      state: pending_priority
+      array: "0-3"
+      resources_per_task: 1gpu_8cpu_24g
+      time_limit: "1-00:00:00"
+      checkpoint_step: 34999
+      episodes: 2000
+      eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/leftview/34999
+    - id: 147058
+      experiment: acpd_v2_multiview_leftview_35k_summary
+      state: pending_dependency
+      depends_on: 147057
+      resources: 1cpu_2g
+      time_limit: "00:15:00"
+    - id: 147059
+      experiment: acpd_v2_multiview_rightview_35k_eval
+      state: pending_priority
+      array: "0-3"
+      resources_per_task: 1gpu_8cpu_24g
+      time_limit: "1-00:00:00"
+      checkpoint_step: 34999
+      episodes: 2000
+      eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/rightview/34999
+    - id: 147060
+      experiment: acpd_v2_multiview_rightview_35k_summary
+      state: pending_dependency
+      depends_on: 147059
+      resources: 1cpu_2g
+      time_limit: "00:15:00"
     - id: 139445
       experiment: acpd_v2_multiview_35k_topview
       state: cancelled_by_user_for_h19_resources
