@@ -136,7 +136,7 @@ experiment_names:
     parent: h9_fixed
     target_steps: 35000
     student_config: "对应视角 pi05_libero_*view_lora"
-    status: leftview_rightview_training_complete_35k_eval_pending_topview_cancelled
+    status: leftview_35k_eval_complete_rightview_eval_running_topview_cancelled
     train_jobs: {leftview: 139443, rightview: 139444, topview: 139445}
     train_status: {leftview: complete_35k, rightview: complete_35k, topview: cancelled_by_user_for_h19_resources}
     training_completion_evidence: final_34999_metadata_and_successful_save_finalize_log
@@ -155,14 +155,25 @@ experiment_names:
     checkpoint_5k_status: complete_all_views
     checkpoint_35k_status: {leftview: complete, rightview: complete, topview: not_completed}
     eval_35k:
-      checked_at: "2026-10-12 12:59 CST"
+      checked_at: "2026-10-12 16:43 CST"
       checkpoint_step: 34999
       policy_config: "pi05_libero_{view}_acpd_v2_layer10_lora"
       view_key: "{view}_image"
       eval_jobs: {leftview: 147057, rightview: 147059}
       summary_jobs: {leftview: 147058, rightview: 147060}
-      status: pending_priority
-      summary_status: pending_afterok_array_dependency
+      status: leftview_complete_rightview_libero10_running
+      summary_status: {leftview: complete, rightview: pending_afterok_array_dependency}
+      view_status: {leftview: complete_all_suites, rightview: three_suites_complete_libero10_running}
+      pooled_success: {leftview: 0.7965}
+      success_counts: {leftview: {successes: 1593, episodes: 2000}}
+      suite_success:
+        leftview: {spatial: 0.8160, object: 0.8160, goal: 0.8240, libero_10: 0.7300}
+        rightview: {spatial: 0.8360, object: 0.9000, goal: 0.8320}
+      leftview_vs_sft_30k:
+        baseline_success: 0.7865
+        difference: 0.0100
+        paired_ci95: [-0.0135, 0.0335]
+        analysis: experiments/student/acpd-v2-multiview-35k/results/leftview_35k_vs_sft_30k_paired_analysis.json
       replaced_30k_array: 147056
       replaced_30k_status: cancelled_before_start_by_user_checkpoint_correction
       partition: batch
@@ -191,7 +202,7 @@ experiment_names:
         leftview: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/leftview/34999/summary.txt
         rightview: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/rightview/34999/summary.txt
       baseline_note: corresponding_view_sft_results_are_30k_not_matched_35k
-      conclusion: 尚无结论
+      conclusion: leftview高于30K_SFT的点估计但区间跨0且训练步数不同_rightview全量尚无结论
     eval_5k:
       checkpoint_step: 4999
       policy_config: "pi05_libero_{view}_acpd_v2_layer10_lora"
@@ -418,7 +429,7 @@ current_execution:
   checked_at: "2026-10-10 15:26 CST (H9 injection-off 35K array 145280 pending Priority; summary/analysis 145282 waiting afterok:145280; other entries retain their last checked state)"
   h19_resume_checked_at: "2026-10-12 15:28 CST (147300 running on gpu04 since 15:16:41; 4 GPUs, BS64, accumulation 1; optimizer step 30000 and data batch 30000 restored; finite loss and continuing training verified)"
   evaluation_priority_checked_at: "2026-10-12 11:58 CST (147057/147059/145280 retained and pending Priority; summaries 147058/147060/145282 retained and waiting dependencies; MV-SV-KD 142275 still running)"
-  multiview_35k_checked_at: "2026-10-12 12:59 CST (147057/147059 and summaries bound to res_gpu04 in place; evaluations pending; no results yet)"
+  multiview_35k_checked_at: "2026-10-12 16:43 CST (leftview final 1593/2000; rightview Spatial/Object/Goal complete, 147059_3 LIBERO-10 running and 147060 waiting dependency)"
   reservation_checked_at: "2026-10-12 12:59 CST"
   evaluation_reservation:
     name: res_gpu04
@@ -632,7 +643,7 @@ current_execution:
       target_steps: 35000
     - id: 147057
       experiment: acpd_v2_multiview_leftview_35k_eval
-      state: pending_priority
+      state: complete_all_four_suites
       reservation: res_gpu04
       array: "0-3"
       resources_per_task: 1gpu_8cpu_24g
@@ -642,14 +653,16 @@ current_execution:
       eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/leftview/34999
     - id: 147058
       experiment: acpd_v2_multiview_leftview_35k_summary
-      state: pending_dependency
+      state: complete_summary_available
       reservation: res_gpu04
       depends_on: 147057
       resources: 1cpu_2g
       time_limit: "00:15:00"
     - id: 147059
       experiment: acpd_v2_multiview_rightview_35k_eval
-      state: pending_priority
+      state: three_suites_complete_libero10_running
+      running_tasks: [3]
+      completed_tasks: [0, 1, 2]
       reservation: res_gpu04
       array: "0-3"
       resources_per_task: 1gpu_8cpu_24g
