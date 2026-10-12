@@ -117,3 +117,8 @@ leftview/rightview 的30K与35K checkpoint已完整保存，训练日志确认35
 | 脚本 | `scripts/train_slurm/pi05_libero_topview_acpd_v2_layer10_lora_fsdp4_bs64_35k.sbatch` |
 
 续训协议先提交到git，再提交Slurm任务。沿用原checkpoint目录，不复制或移动模型。
+
+2026-10-12 17:27:38 CST提交任务`147339`，协议commit `fa4f232`先于提交。
+保存边界、恢复状态与数据接续8项测试通过；实际sbatch命令CLI解析、bash语法、
+Slurm test-only和已提交脚本核对通过。17:28任务为Priority排队，未分配GPU；
+实际恢复step15000和batch15000须待启动日志确认。

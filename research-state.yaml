@@ -139,11 +139,12 @@ experiment_names:
     parent: h9_fixed
     target_steps: 35000
     student_config: "对应视角 pi05_libero_*view_lora"
-    status: leftview_rightview_35k_eval_complete_topview_cancelled
-    train_jobs: {leftview: 139443, rightview: 139444, topview: 139445}
-    train_status: {leftview: complete_35k, rightview: complete_35k, topview: cancelled_by_user_for_h19_resources}
+    status: leftview_rightview_35k_eval_complete_topview_resume_pending
+    train_jobs: {leftview: 139443, rightview: 139444, topview: 147339}
+    previous_topview_train_job: 139445
+    train_status: {leftview: complete_35k, rightview: complete_35k, topview: resume_pending_priority}
     training_completion_evidence: final_34999_metadata_and_successful_save_finalize_log
-    nodes: {leftview: gpu02, rightview: gpu04, topview: gpu05}
+    nodes: {leftview: gpu02, rightview: gpu04, topview: null}
     smoke_job: 139426_[0-2]
     smoke_status: complete_all_views
     physical_global_batch: 64
@@ -157,6 +158,33 @@ experiment_names:
     checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k
     checkpoint_5k_status: complete_all_views
     checkpoint_35k_status: {leftview: complete, rightview: complete, topview: not_completed}
+    topview_resume:
+      job: 147339
+      submitted_at: "2026-10-12 17:27:38 CST"
+      status: pending_priority
+      protocol_commit: fa4f232
+      source_checkpoint_step: 14999
+      source_optimizer_step: 15000
+      existing_checkpoint_steps: [4999, 9999, 14999]
+      resume_data_loader: true
+      expected_data_start_batch: 15000
+      physical_global_batch: 64
+      gradient_accumulation_steps: 1
+      fsdp_devices: 4
+      resources: 4gpu_32cpu_96g
+      time_limit: "8-00:00:00"
+      partition: batch
+      excluded_nodes: [gpu03]
+      required_node: null
+      save_interval: 5000
+      save_interval_after: [30000, 1000]
+      keep_period: 1
+      planned_new_checkpoint_steps: [19999, 24999, 29999, 30999, 31999, 32999, 33999, 34999]
+      script: scripts/train_slurm/pi05_libero_topview_acpd_v2_layer10_lora_fsdp4_bs64_35k.sbatch
+      checkpoint_dir: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k/topview/pi05_libero_topview_acpd_v2_layer10/pi05_libero_topview_acpd_v2_layer10_lora_fsdp4_bs64_35k
+      stdout: /opt/liutong/openpi-5090-research/acpd-v2-multiview-35k/slurm-log/pi05-tv-acpdv2-l10-fsdp4-bs64-35k_147339.out
+      verification: 8_targeted_tests_and_cli_parsing_and_slurm_saved_script_passed
+      conclusion: 尚无35K结论_GPU续训待资源分配后验证
     eval_35k:
       checked_at: "2026-10-12 17:00 CST"
       checkpoint_step: 34999
@@ -436,7 +464,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-12 17:02 CST (squeue: only training 142275 on gpu02 and 147300 on gpu04 running; no pending jobs; left/right 25K evals were not submitted, request withdrawn and no dedicated code generated)"
+  checked_at: "2026-10-12 17:28 CST (142275 on gpu02 and 147300 on gpu04 running; topview resume 147339 pending Priority; left/right 25K evals not submitted)"
   h19_resume_checked_at: "2026-10-12 15:28 CST (147300 running on gpu04 since 15:16:41; 4 GPUs, BS64, accumulation 1; optimizer step 30000 and data batch 30000 restored; finite loss and continuing training verified)"
   evaluation_priority_checked_at: "2026-10-12 11:58 CST (147057/147059/145280 retained and pending Priority; summaries 147058/147060/145282 retained and waiting dependencies; MV-SV-KD 142275 still running)"
   multiview_35k_checked_at: "2026-10-12 17:00 CST (leftview final 1593/2000 and rightview final 1586/2000; both summaries available; no evaluation jobs remaining in squeue)"
@@ -694,6 +722,20 @@ current_execution:
       resources: 4gpu_32cpu_96g
       node: gpu05
       target_steps: 35000
+    - id: 147339
+      experiment: acpd_v2_multiview_topview_resume_35k
+      state: pending_priority
+      resources: 4gpu_32cpu_96g
+      partition: batch
+      time_limit: "8-00:00:00"
+      resume_optimizer_step: 15000
+      resume_data_loader: true
+      target_steps: 35000
+      physical_global_batch: 64
+      gradient_accumulation_steps: 1
+      save_interval: 5000
+      save_interval_after: [30000, 1000]
+      keep_period: 1
     - id: 139046
       experiment: h19_feature_fusion_25k_full_eval_rerun
       state: complete_all_four_suites

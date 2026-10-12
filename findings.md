@@ -94,6 +94,8 @@ step30000、数据接续batch30000且实际训练正常。leftview/rightview 35K
 完成，分别为79.65%/79.30%；当前对应SFT为30K，比较时须明确训练步数差异。
 H9 35K关闭注入验证已完成，pooled未检测到开启与关闭的差异。
 H19 35K仍无结果，两者均未证明提高SFT最终上限。
+Topview从已保存15K接续到35K，任务147339排队；30K后每1K保存且全部保留，
+完整恢复训练状态并接续数据顺序。35K尚无结论，GPU恢复待启动后确认。
 详细loss、配对区间及证据：
 `experiments/student/acpd-v2-h19-feature-fusion-30k/analysis.md`。
 
