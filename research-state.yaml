@@ -249,8 +249,8 @@ experiment_names:
     display_name: "H9 35K 推理期 contribution 注入消融"
     protocol: experiments/mechanism/acpd-v2-h9-inference-injection-35k/protocol.md
     execution: experiments/mechanism/acpd-v2-h9-inference-injection-35k/execution.md
-    status: spatial_object_goal_running_libero10_pending_resources
-    checked_at: "2026-10-12 12:59 CST"
+    status: complete_no_detected_pooled_dependency
+    checked_at: "2026-10-12 15:43 CST"
     eval_job_id: 145280
     summary_analysis_job_id: 145282
     dependency: afterok:145280
@@ -262,9 +262,9 @@ experiment_names:
     eval_dir: /opt/liutong/openpi-5090-evals/acpd-v2-h9-inference-ablation/34999
     result: experiments/mechanism/acpd-v2-h9-inference-injection-35k/results/paired_analysis.json
     full_success: 0.6105
-    injection_off_success: null
-    paired_difference: null
-    paired_ci95: null
+    injection_off_success: 0.6130
+    paired_difference: -0.0025
+    paired_ci95: [-0.0265, 0.0215]
     difference_direction: full_minus_injection_off
     array: "0-3"
     array_concurrency_limit: null
@@ -273,8 +273,8 @@ experiment_names:
     analysis_resources: 1cpu_2g_20min
     partition: batch
     reservation: res_gpu04
-    running_tasks: [0, 1, 2]
-    pending_tasks: [3]
+    running_tasks: []
+    pending_tasks: []
     reservation_node: gpu04
     excluded_nodes: [gpu03]
     trials_per_task: 50
@@ -283,7 +283,7 @@ experiment_names:
     replan_steps: 5
     bootstrap_samples: 10000
     bootstrap_seed: 42
-    conclusion: 尚无结论
+    conclusion: 未检测到35K总体推理注入依赖，不替代训练期注入消融
     scope: inference_dependency_not_training_injection_causal_ablation
   h9_agent_only_injection_10k:
     display_name: "ACPD-v2 Agentview-only 推理注入 10K"
@@ -440,9 +440,9 @@ current_execution:
   jobs:
     - id: 145280
       experiment: h9_inference_injection_35k
-      state: spatial_object_goal_running_libero10_pending_resources
-      running_tasks: [0, 1, 2]
-      pending_tasks: [3]
+      state: complete_all_four_suites
+      running_tasks: []
+      pending_tasks: []
       reservation: res_gpu04
       array: "0-3"
       resources_per_task: 1gpu_batch_8cpu_24g
@@ -451,7 +451,7 @@ current_execution:
       purpose: same_h9_35k_checkpoint_inference_injection_off
     - id: 145282
       experiment: h9_inference_injection_35k_summary_paired_analysis
-      state: pending_dependency
+      state: complete_summary_and_paired_analysis
       reservation: res_gpu04
       depends_on: 145280
       resources: 1cpu_2g
