@@ -58,10 +58,10 @@ checkpoint 轮询任务 136164 取消；无 checkpoint 和 benchmark 结果。
 ## 35K 续训
 
 为比较 H19 在 30K 后的短期轨迹，从完整的 H19 30K `29999` checkpoint
-恢复模型与优化器，目标步数为 35000。使用2×5090、全局 micro BS32、
-梯度累计2，有效BS64；模型结构、数据、损失权重、学习率设置与seed 42沿用原训练。
-数据加载器按新micro batch配置从`30000×2=60000`处推导接续位置；
-micro batch及每轮丢弃的尾部样本变化，不能声称与原4卡训练逐样本完全一致。
+恢复模型与优化器，目标步数为 35000。2026-10-12按用户要求改回4×5090、
+physical global BS64、梯度累计1；模型结构、数据、损失权重、学习率设置与
+seed 42沿用原训练。数据加载器保持原batch配置，从batch 30000接续。
+原30K cosine结束后学习率保持`2.5e-6`，不重新warmup。
 输出写入独立的 `feature_fusion_35k` 根目录，避免覆盖
 30K 结果。续训使用 `save_interval=1000`、`keep_period=1`，保存并保留
 `30999/31999/32999/33999/34999`，对应 31K–35K；原 0–30K 训练仍是每5K保存。
@@ -75,9 +75,10 @@ micro batch及每轮丢弃的尾部样本变化，不能声称与原4卡训练�
 恢复代码已显式使用当前2卡分片布局，CPU检查覆盖4→2设备的参数、
 优化器状态和步数恢复，以及源文件只读。原任务执行状态与故障证据
 仅记于`research-state.yaml`，不作为实验结果。
-训练脚本为
-`scripts/train_slurm/pi05_libero_backview_acpd_v2_feature_fusion_fsdp2_bs64_resume_35k.sbatch`；
-任务使用 2×5090、16 CPU、48G 内存，时限 3 天。源 checkpoint 为完整的 H19 30K
+当前训练脚本为
+`scripts/train_slurm/pi05_libero_backview_acpd_v2_feature_fusion_fsdp4_bs64_resume_35k.sbatch`；
+任务使用 4×5090、32 CPU、96G 内存，时限 3 天，提交时使用`res_gpu04`预约。
+源 checkpoint 为完整的 H19 30K
 `29999`，目标目录为
 `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k`。
 任务开始前不复制或移动源 checkpoint；35K checkpoint 和全量验证均尚未产生。
@@ -86,6 +87,10 @@ micro batch及每轮丢弃的尾部样本变化，不能声称与原4卡训练�
 验证`147057`、rightview 35K验证`147059`和H9 35K关闭注入验证`145280`。
 三项验证及自动汇总均保留；H19源checkpoint、续训脚本和既有结果不变。
 本次取消不产生实验结论，H19 35K尚无结果。
+
+2026-10-12恢复上述4卡续训安排。原三项35K验证继续运行，不取消或重启。
+`--resume`允许空目标目录从源checkpoint初始化，后续重提时优先恢复目标目录中
+已有的完整训练状态；不覆盖已有checkpoint。
 
 | 证据 | 路径 |
 |---|---|
