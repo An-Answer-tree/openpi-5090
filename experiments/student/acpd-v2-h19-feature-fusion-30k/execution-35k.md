@@ -4,14 +4,14 @@
 
 | 项目 | 设置 |
 |---|---|
-| 状态 | 14:55排队Resources；实际GPU续训尚未验证 |
+| 状态 | 15:16:41在gpu04开始；15:28确认实际更新参数且训练持续推进 |
 | 资源 | batch，4×5090，32 CPU，96G，3天，预约`res_gpu04` |
 | 训练 | FSDP4 LoRA，physical global BS64，累计1，30K→35K |
 | 恢复 | 源checkpoint只读，恢复模型、优化器与步数；seed42、BS64，从batch30000接续 |
 | 模型与loss | H19 FeatureFusion、layer10；flow/contribution/ACL=1/0.2/0.5 |
 | 学习率 | 沿用30K cosine；30K以后保持2.5e-6，不重启warmup |
 | 保存 | 每1K保存，keep_period=1；保留30999/31999/32999/33999/34999 |
-| 检查 | 5项恢复测试通过；bash语法、Slurm test-only及实际保存脚本核对通过 |
+| 检查 | 5项恢复测试通过；bash语法、Slurm test-only及保存脚本通过；实际恢复step30000、batch30000，首个训练loss有限 |
 | 验证 | 本次只提交训练；尚无35K模型和成功率结果 |
 
 - 脚本：`scripts/train_slurm/pi05_libero_backview_acpd_v2_feature_fusion_fsdp4_bs64_resume_35k.sbatch`

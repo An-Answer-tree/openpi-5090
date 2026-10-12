@@ -84,12 +84,13 @@ experiment_names:
     comparison: [h9_fixed, backview_sft_bs64]
     contribution_feature_fusion: true
     target_steps: [5000, 10000, 30000]
-    status: complete_30k_eval_resume_35k_submitted_4gpu
+    status: complete_30k_eval_resume_35k_running_4gpu
     train_job: 136345
     current_step_at_last_check: 30000
     resume_job: 147300
-    resume_status: pending_resources
-    resume_checked_at: "2026-10-12 14:55 CST"
+    resume_status: running_training_verified
+    resume_checked_at: "2026-10-12 15:28 CST"
+    resume_started_at: "2026-10-12 15:16:41 CST"
     resume_execution: experiments/student/acpd-v2-h19-feature-fusion-30k/execution-35k.md
     replaced_resume_job: 147003
     replaced_resume_job_status: cancelled_before_start_by_user
@@ -97,7 +98,8 @@ experiment_names:
     resume_fix: explicit_current_mesh_sharding_for_parameters_and_optimizer_state
     resume_verification: 29_distillation_cpu_tests_passed_including_4_to_2_device_restore_with_and_without_ema
     resume_submission_checks: 5_resume_tests_passed_bash_syntax_slurm_test_only_and_saved_script_verified
-    resume_gpu_training_verified: false
+    resume_gpu_training_verified: true
+    resume_training_evidence: restored_optimizer_step_30000_data_batch_30000_finite_losses_and_continuing_progress
     resume_source_checkpoint: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999
     resume_target_step: 35000
     resume_resources: 4gpu_32cpu_96g
@@ -414,7 +416,7 @@ experiment_names:
 
 current_execution:
   checked_at: "2026-10-10 15:26 CST (H9 injection-off 35K array 145280 pending Priority; summary/analysis 145282 waiting afterok:145280; other entries retain their last checked state)"
-  h19_resume_checked_at: "2026-10-12 14:55 CST (147300 submitted with res_gpu04; 4 GPUs, BS64, accumulation 1, 32 CPUs, 96G, 3 days; pending Resources; source checkpoint read-only; GPU resume not yet verified)"
+  h19_resume_checked_at: "2026-10-12 15:28 CST (147300 running on gpu04 since 15:16:41; 4 GPUs, BS64, accumulation 1; optimizer step 30000 and data batch 30000 restored; finite loss and continuing training verified)"
   evaluation_priority_checked_at: "2026-10-12 11:58 CST (147057/147059/145280 retained and pending Priority; summaries 147058/147060/145282 retained and waiting dependencies; MV-SV-KD 142275 still running)"
   multiview_35k_checked_at: "2026-10-12 12:59 CST (147057/147059 and summaries bound to res_gpu04 in place; evaluations pending; no results yet)"
   reservation_checked_at: "2026-10-12 12:59 CST"
@@ -593,10 +595,13 @@ current_execution:
       purpose: resume_h19_feature_fusion_from_30k_to_35k
     - id: 147300
       experiment: h19_feature_fusion_resume_35k
-      state: pending_resources
+      state: running_training_verified
       submitted_at: "2026-10-12 14:54 CST"
+      started_at: "2026-10-12 15:16:41 CST"
+      checked_at: "2026-10-12 15:28 CST"
       replaces: 147003
-      training_verified: false
+      training_verified: true
+      node: gpu04
       resources: 4gpu_32cpu_96g
       requested_node: null
       reservation: res_gpu04

@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-12（CST；H19 30K→35K续训已重新提交为4卡任务）
+更新时间：2026-10-12（CST；H19 4卡30K→35K续训已正常开始）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -69,7 +69,7 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 ## 正式 BS64 实验
 
 除 teacher 外，原始正式训练使用 4 GPU、physical global BS64、无梯度累积。
-H19 30K→35K续训提交配置为4 GPU、physical global BS64、累计1；尚未启动。
+H19 30K→35K续训已在gpu04运行，4 GPU、physical global BS64、累计1。
 
 | ID | 目的 | 实际配置 | Job | 状态 | 结果 |
 |---|---|---|---:|---|---|
@@ -83,7 +83,7 @@ H19 30K→35K续训提交配置为4 GPU、physical global BS64、累计1；尚�
 | ACPD-v2-Fixed leftview | 检验 H9-Fixed 在 leftview student 上的效果 | layer 10，4卡 BS64，累计1，loss=`1.0/0.2/0.5`，35K，每5K保留 | 训练139443；5K验证139971/139972；35K验证147057/147058 | 35K训练完成；5K四套验证完成；35K四套全量验证排队 | 5K：Spatial `25.40%`，Object `62.60%`，Goal `49.60%`，LIBERO-10 `34.20%`，Pooled `42.95%`（859/2000）；35K尚无结论 |
 | ACPD-v2-Fixed rightview | 检验 H9-Fixed 在 rightview student 上的效果 | 同上，仅改变 student 视角 | 训练139444；5K验证139973/139974；35K验证147059/147060 | 35K训练完成；5K四套验证完成；35K四套全量验证排队 | 5K：Spatial `59.40%`，Object `65.60%`，Goal `41.60%`，LIBERO-10 `23.80%`，Pooled `47.60%`（952/2000）；35K尚无结论 |
 | ACPD-v2-Fixed topview | 检验 H9-Fixed 在 topview student 上的效果 | 同上，仅改变 student 视角 | 训练139445；5K验证139975/139976 | 用户为优先H19续训取消训练；5K四套验证完成 | 5K：Spatial `34.00%`，Object `30.60%`，Goal `38.80%`，LIBERO-10 `7.80%`，Pooled `27.80%`（556/2000）；35K尚无结论 |
-| H19-FeatureFusion | 检验预测视觉贡献在动作输出前的特征融合能否提高最终成功率 | backview，layer 10；0–30K为4卡FSDP LoRA，BS64，flow/contribution/ACL=1/0.2/0.5，每5K保留；30K→35K续训同卡数、BS64、累计1，每1K全部保留，LR保持2.5e-6 | 正式136345；续训147300；5K验证138746/138748；10K验证138747/138749；25K验证139046/139049；30K验证139418/139419 | 30K训练及既有验证完成；4卡35K续训排队，使用res_gpu04 | 已有结果：5K `21.20%`，10K `36.55%`，25K `55.35%`，30K `60.10%`；35K尚无结论 |
+| H19-FeatureFusion | 检验预测视觉贡献在动作输出前的特征融合能否提高最终成功率 | backview，layer 10；0–30K为4卡FSDP LoRA，BS64，flow/contribution/ACL=1/0.2/0.5，每5K保留；30K→35K续训同卡数、BS64、累计1，每1K全部保留，LR保持2.5e-6 | 正式136345；续训147300；5K验证138746/138748；10K验证138747/138749；25K验证139046/139049；30K验证139418/139419 | 30K训练及既有验证完成；4卡35K续训15:16在gpu04开始，完整状态与数据接续已验证 | 已有结果：5K `21.20%`，10K `36.55%`，25K `55.35%`，30K `60.10%`；35K尚无结论 |
 | H13-LossOnly | 判断 contribution 注入是否有效 | H9-Fixed 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9-Fixed 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
 | ACPD-v2-TDCA | 检验动作损失是否能改善 contribution 注入适配 | backview，layer 10，BS64，flow=1.0、contribution=0.2、ACL=0.5；仅开放 predictor 的动作梯度，训练至5K | 135943；验证136221；汇总136222 | 5K 训练及四套全量验证完成 | `21.35%`；比 H9-Fixed 低 `1.80` 点，95% CI `[-3.90, +0.35]`；不支持提升 |
 | ACL-only BS64 | 检验 contribution 学习和注入在 ACL 之外的增益 | backview，layer 10，BS64，flow=1.0、ACL=0.5、contribution=0、关闭注入；训练至35K | 135724；25K验证137607/137608；30K验证135725、分析135729；35K验证135726、分析135728 | 35K训练及25K/30K/35K四套验证完成 | 25K `52.90%`；30K `54.35%`；35K `59.35%`。相对匹配SFT差值分别 `-6.10/-6.10/+2.20` 点；30K为负，35K区间跨0，未证明稳定提升 |
@@ -270,7 +270,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H19-FeatureFusion checkpoint | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/{4999,9999,14999,19999,24999,29999}/` |
 | H19-FeatureFusion 训练日志 | `/opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion/slurm-log/pi05-bv-acpdv2-feature-fusion-bs64-30k_136345.out` |
 | H19-FeatureFusion 验证 | 有效5K/10K：`/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/{4999,9999}/`，任务 `138746/138748`、`138747/138749`；25K：`/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/24999-rerun-50-per-task/`（139046/139049）；30K：`/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/29999-rerun-50-per-task/`（139418/139419），pooled `60.10%` |
-| H19-FeatureFusion 35K续训 | 任务`147300`，4卡BS64、累计1；每1K保留31K–35K。源checkpoint：`/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999`；目标根目录：`/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k`；[执行记录](experiments/student/acpd-v2-h19-feature-fusion-30k/execution-35k.md)；排队，尚无35K结果 |
+| H19-FeatureFusion 35K续训 | 任务`147300`，4卡BS64、累计1；每1K保留31K–35K。源checkpoint：`/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999`；目标根目录：`/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k`；[执行记录](experiments/student/acpd-v2-h19-feature-fusion-30k/execution-35k.md)；训练中，尚无35K结果 |
 | ACPD-v2 多视角 35K 协议 | `experiments/student/acpd-v2-multiview-35k/protocol.md` |
 | ACPD-v2 多视角 35K 训练脚本 | `scripts/train_slurm/pi05_libero_{leftview,rightview,topview}_acpd_v2_layer10_lora_fsdp4_bs64_35k.sbatch` |
 | ACPD-v2 多视角 35K checkpoint 根目录 | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k/{leftview,rightview,topview}/`；leftview/rightview的`34999`完整保存，topview训练已取消 |
