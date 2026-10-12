@@ -7,6 +7,12 @@
 
 ## 当前结论
 
+## 新提交实验
+
+| 实验 | 目的 | 配置 | 状态 | 结论 |
+|---|---|---|---|---|
+| Original ACPD backview BS32 5K→30K | 在论文原版动作条件 privileged cue 方法下观察长训练效果 | 5K完整checkpoint接续；layers 6+12；4×5090 FSDP；global BS32；累计1；loss `1.0/0.2/0.5`；25K后每1K保存 | 协议与脚本已通过静态及续训规则测试，尚未提交 | 尚无结论 |
+
 本文正式 BS64 结果中的 H9 统一称为 **ACPD-v2-Fixed（Attention Contribution
 Privileged Distillation，固定权重）**。新实验称为 **ACPD-v2-Decay**；两者关系如下。
 

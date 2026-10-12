@@ -52,6 +52,7 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 | 类别 | 实验 | 协议/分析 | 状态 |
 |---|---|---|---|
 | baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 10K/15K/20K/25K/30K 正式验证完成 |
+| student | 原论文 ACPD backview BS32 5K→30K | `student/acpd-original-backview-bs32-30k/` | 已锁定协议与脚本；等待提交，尚无30K结果 |
 | baseline | backview BS64 30K--60K | `baseline/sft-backview-bs64-trajectory-60k/` | 续训与验证完成；30K `60.45%`，40K/50K/60K分别为`60.55/61.30/62.05%` |
 | baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 全部完成 |
 | baseline | MV-SV-KD backview BS64 30K | `baseline/mv-sv-kd-backview-bs64-30k/` | CPU检查及单卡2步smoke通过；正式142275在gpu02训练；尚无结论 |
