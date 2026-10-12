@@ -84,30 +84,32 @@ experiment_names:
     comparison: [h9_fixed, backview_sft_bs64]
     contribution_feature_fusion: true
     target_steps: [5000, 10000, 30000]
-    status: complete_30k_eval_resume_35k_cancelled_to_prioritize_evaluations
+    status: complete_30k_eval_resume_35k_submitted_4gpu
     train_job: 136345
     current_step_at_last_check: 30000
-    resume_job: 147003
-    resume_status: cancelled_before_start_by_user
-    resume_cancelled_at: "2026-10-12 11:58 CST"
-    resume_cancel_reason: prioritize_leftview_rightview_35k_and_h9_injection_off_35k_evaluations
-    replaced_resume_job: 141769
-    replaced_resume_job_status: failed_before_training_cross_device_restore
+    resume_job: 147300
+    resume_status: pending_resources
+    resume_checked_at: "2026-10-12 14:55 CST"
+    resume_execution: experiments/student/acpd-v2-h19-feature-fusion-30k/execution-35k.md
+    replaced_resume_job: 147003
+    replaced_resume_job_status: cancelled_before_start_by_user
     resume_fix_commit: 6898a7b
     resume_fix: explicit_current_mesh_sharding_for_parameters_and_optimizer_state
     resume_verification: 29_distillation_cpu_tests_passed_including_4_to_2_device_restore_with_and_without_ema
+    resume_submission_checks: 5_resume_tests_passed_bash_syntax_slurm_test_only_and_saved_script_verified
     resume_gpu_training_verified: false
     resume_source_checkpoint: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999
     resume_target_step: 35000
-    resume_resources: 2gpu_16cpu_48g
+    resume_resources: 4gpu_32cpu_96g
+    resume_reservation: res_gpu04
     resume_requested_node: null
     resume_excluded_nodes: [gpu03]
     resume_time_limit: 3-00:00:00
-    resume_global_micro_batch: 32
-    resume_gradient_accumulation: 2
+    resume_global_micro_batch: 64
+    resume_gradient_accumulation: 1
     resume_effective_batch: 64
-    resume_data_start_batch: 60000
-    resume_data_note: derived_with_new_micro_batch_size_not_identical_to_original_64_sample_batches
+    resume_data_start_batch: 30000
+    resume_data_note: same_seed_batch64_and_accumulation1_resume_at_original_next_batch
     resume_save_interval: 1000
     resume_keep_period: 1
     resume_planned_checkpoint_steps: [30999, 31999, 32999, 33999, 34999]
@@ -412,7 +414,7 @@ experiment_names:
 
 current_execution:
   checked_at: "2026-10-10 15:26 CST (H9 injection-off 35K array 145280 pending Priority; summary/analysis 145282 waiting afterok:145280; other entries retain their last checked state)"
-  h19_resume_checked_at: "2026-10-12 11:58 CST (147003 cancelled by user before training to prioritize three evaluations; source checkpoints and resume script preserved; GPU resume not verified)"
+  h19_resume_checked_at: "2026-10-12 14:55 CST (147300 submitted with res_gpu04; 4 GPUs, BS64, accumulation 1, 32 CPUs, 96G, 3 days; pending Resources; source checkpoint read-only; GPU resume not yet verified)"
   evaluation_priority_checked_at: "2026-10-12 11:58 CST (147057/147059/145280 retained and pending Priority; summaries 147058/147060/145282 retained and waiting dependencies; MV-SV-KD 142275 still running)"
   multiview_35k_checked_at: "2026-10-12 12:59 CST (147057/147059 and summaries bound to res_gpu04 in place; evaluations pending; no results yet)"
   reservation_checked_at: "2026-10-12 12:59 CST"
@@ -588,6 +590,28 @@ current_execution:
       planned_checkpoint_steps: [30999, 31999, 32999, 33999, 34999]
       output_checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k
       stdout: /opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion-35k/slurm-log/pi05-bv-h19-feature-fusion-r35k-2g_147003.out
+      purpose: resume_h19_feature_fusion_from_30k_to_35k
+    - id: 147300
+      experiment: h19_feature_fusion_resume_35k
+      state: pending_resources
+      submitted_at: "2026-10-12 14:54 CST"
+      replaces: 147003
+      training_verified: false
+      resources: 4gpu_32cpu_96g
+      requested_node: null
+      reservation: res_gpu04
+      excluded_nodes: [gpu03]
+      time_limit: 3-00:00:00
+      physical_global_batch: 64
+      gradient_accumulation: 1
+      data_start_batch: 30000
+      script: scripts/train_slurm/pi05_libero_backview_acpd_v2_feature_fusion_fsdp4_bs64_resume_35k.sbatch
+      target_steps: 35000
+      save_interval: 1000
+      keep_period: 1
+      planned_checkpoint_steps: [30999, 31999, 32999, 33999, 34999]
+      output_checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k
+      stdout: /opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion-35k/slurm-log/pi05-bv-h19-feature-fusion-r35k_147300.out
       purpose: resume_h19_feature_fusion_from_30k_to_35k
     - id: 139443
       experiment: acpd_v2_multiview_35k_leftview

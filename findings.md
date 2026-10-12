@@ -85,8 +85,9 @@ contribution 可以被预测，不代表预测 contribution 在动作接口中�
 2026-10-08比较H9与当前H19-FeatureFusion：30K观测值H19更高，但配对区间
 跨0，早期和25K也未检测到稳定优势。当前以结构较简单、已有注入消融及较完整
 轨迹的H9为主方案；这不是H9性能已被证明更高。H19保留为候选；2026-10-12
-按用户决定取消未启动的35K续训，先等待leftview/rightview 35K及H9 35K关闭
-注入验证。H19 35K仍无结果，两者均未证明提高SFT最终上限。
+11:58按用户决定取消未启动的2卡35K续训；14:54重新提交4卡续训`147300`，
+BS64、累计1、每1K保留。leftview/rightview 35K及H9 35K关闭注入验证继续运行。
+H19 35K仍无结果，两者均未证明提高SFT最终上限。
 详细loss、配对区间及证据：
 `experiments/student/acpd-v2-h19-feature-fusion-30k/analysis.md`。
 
@@ -135,7 +136,7 @@ H17-Decay只改变该权重；它不能同时证明不可恢复信息、LoRA容�
 
 ## 工程约束
 
-- 原始正式对照除 teacher 外使用4 GPU、physical global BS64；H19 30K→35K续训提交配置为2 GPU、全局micro BS32、累计2、有效BS64，未实际训练，不能称为逐样本完全一致的4卡接续。
+- 原始正式对照除 teacher 外使用4 GPU、physical global BS64。H19当前30K→35K续训保持4 GPU、BS64、累计1，数据从原配置batch 30000接续；GPU续训尚待验证。此前2卡micro BS32、累计2方案未实际训练。
 - 改变GPU数量恢复训练时，参数和优化器状态都必须显式指定当前设备的分片布局，不能沿用checkpoint内保存的布局。4→2设备的数值、优化器、步数和源文件只读检查已通过；147003已在启动前取消，实际GPU续训尚未验证。
 - 蒸馏 checkpoint 使用零起始目录编号；需要保留每 5K 时设置 `keep_period=1`。
 - 精选 checkpoint 只在完整写入后建立硬链接，不移动或删除原 checkpoint。
