@@ -31,6 +31,9 @@
 Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch size、
 训练步数或验证规模的实验不能仅因名称相近而合并。
 
+“推理期注入消融”复用已训练H9权重，只关闭推理注入；H13-LossOnly从头训练，
+训练与推理均关闭注入。两者检验的问题不同，不合并为同一消融。
+
 ## 目录
 
 | 分类 | 内容 |
@@ -53,7 +56,7 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 | baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 全部完成 |
 | baseline | MV-SV-KD backview BS64 30K | `baseline/mv-sv-kd-backview-bs64-30k/` | CPU检查及单卡2步smoke通过；正式142275在gpu02训练；尚无结论 |
 | student | H9-Fixed 主实验（原H9-scale-b） | `student/acpd-v2-h9-batch-scaling-30k/` | 固定contribution=0.2；5K/10K/15K/20K/25K/30K/35K/40K有正式结果 |
-| student | ACPD-v2 多视角 35K | `student/acpd-v2-multiview-35k/` | left/right训练及35K验证完成，分别79.65%/79.30%；top 15K→35K续训147339排队，30K后每1K全部保留；与对应30K SFT训练步数不同 |
+| student | ACPD-v2 多视角 35K | `student/acpd-v2-multiview-35k/` | left/right训练及35K验证完成，分别79.65%/79.30%；top 15K→35K续训147339在gpu04运行，30K后每1K全部保留；与对应30K SFT训练步数不同 |
 | student | H19-FeatureFusion BS64 30K→35K | `student/acpd-v2-h19-feature-fusion-30k/protocol.md` | 5K/10K/25K/30K四套验证完成；pooled `21.20%/36.55%/55.35%/60.10%`；35K续训147300运行，自动全量验证147342、汇总147343等待依赖 |
 | mechanism | H15a ACPD-v2 梯度冲突诊断 | `mechanism/acpd-v2-h15a-gradient-conflict/` | 完成；不支持后期梯度冲突假设 |
 | mechanism | H18-ActionReadout 冻结贡献动作读出诊断 | `mechanism/acpd-v2-h18-action-readout/` | 完成；离线MSE未检测到contribution独立收益，无仿真 |
@@ -67,7 +70,7 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 | ablation | ACL-only BS64 35K | `ablation/acpd-v2-acl-only-bs64-35k/protocol.md` | 训练及25K/30K/35K全量验证完成；pooled分别为`52.90%/54.35%/59.35%` |
 | mechanism | 5K flow 时间段误差 | `mechanism/acpd-v2-flow-time-5k/` | 两次单卡只读诊断完成；首次低时间段信号未复现 |
 | mechanism | H9 10K 推理期注入消融 | `mechanism/acpd-v2-h9-inference-injection-10k/analysis.md` | 完成；完整注入高1.40点，配对95%区间跨0，未检测到总体依赖 |
-| mechanism | H9 30K 推理期注入消融 | `mechanism/acpd-v2-h9-inference-injection-30k/` | 同一29999权重关闭预测注入；四套全量验证147346、汇总分析147347已提交；尚无结论 |
+| mechanism | H9 30K 推理期注入消融 | `mechanism/acpd-v2-h9-inference-injection-30k/analysis.md` | 147346/147347完成；开启58.00%、关闭58.90%，开启−关闭-0.90点、配对95%区间[-3.40,+1.60]点；未检测到总体推理依赖 |
 | mechanism | H9 35K 推理期注入消融 | `mechanism/acpd-v2-h9-inference-injection-35k/` | 145280/145282完成；开启61.05%、关闭61.30%，配对差值-0.25点、区间跨0；未检测到总体依赖 |
 | mechanism | ACPD-v2中期逐任务差异 | `mechanism/acpd-v2-task-heterogeneity/` | 完成探索性日志分析；Object早期广泛受益，但任务方向随step改变 |
 | mechanism | ACPD-v2早期逐任务收益覆盖 | `mechanism/acpd-v2-early-task-coverage/` | 完成探索性日志分析；10K有32/40任务正差，回合重采样区间[27,34]；15K仅20个保持 |

@@ -35,8 +35,15 @@ sbatch --parsable --reservation=res_gpu04 --dependency=afterok:147346 \
 日志、视频、summary.txt在
 `/opt/liutong/openpi-5090-evals/acpd-v2-h9-inference-ablation/29999/`；配对结果在
 `experiments/mechanism/acpd-v2-h9-inference-injection-30k/results/paired_analysis.json`。
-尚无30K关闭注入成功率结论。
+18:39确认Spatial/Object/Goal在gpu04正常仿真；LIBERO-10随后开始运行。
+21:42自动汇总与配对结果写出，21:55核对40任务×50回合完整，所有回合键与
+原30K完整注入对照一致，JSON与原始日志计数一致。
 
-18:39确认Spatial/Object/Goal三个子任务在gpu04运行，日志已有连续仿真
-回合及Success记录；模型加载和环境启动正常。LIBERO-10等待Priority，
-汇总等待四套全部成功。尚无完整成功率结果。
+| 项目 | 最终状态 |
+|---|---|
+| 验证147346_[0-3] | 四套各500回合完成，共1178/2000成功，58.90% |
+| 汇总与分析147347 | summary.txt与paired_analysis.json已生成 |
+| 同checkpoint开启−关闭 | -0.90点，配对95%区间[-3.40,+1.60]点 |
+| 结论 | 未检测到总体推理注入依赖；不替代训练期无注入消融 |
+
+最终结果与比较见[analysis.md](analysis.md)。

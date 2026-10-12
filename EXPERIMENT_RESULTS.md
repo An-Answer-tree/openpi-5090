@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-12（CST；leftview/rightview 35K全量验证完成；H19续训正常）
+更新时间：2026-10-12 21:56 CST（H9 30K关闭注入全量验证完成；H19与topview续训运行）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -53,7 +53,9 @@ H9-recovery、mid-trajectory、trajectory 分别是 H9-Fixed 的轨迹恢复、�
 | H9 与同进度 SFT 在 35K 的比较 | H9 `61.05%`，SFT `57.15%`；探索性配对差值 `+3.90` 点，95% CI `[+1.45, +6.35]`。SFT 35K 比自身 30K 低 `3.30` 点，不能据此断言 H9 提高了最终上限。 | 相同 2,000 episodes |
 | H9 的最佳观测点是否超过 SFT 的最佳观测点 | H9 35K `61.05%` 对 SFT 60K `62.05%`；探索性配对差值 `-1.00` 点，95% CI `[-3.45, +1.45]`。未证明 ACPD-v2 提高最终上限。 | 相同 2,000 episodes；不同训练进度 |
 | H9 40K 是否继续高于 35K | 40K `59.45%`，35K `61.05%`；探索性配对差值 `-1.60` 点，95% CI `[-4.05, +0.80]`，未检测到确定的下降。 | 相同 2,000 episodes |
-| 显式 contribution 注入是否有效 | 有正向证据。H9 为 `23.15%`，H13 loss-only 为 `20.60%`；差值 `+2.55` 点，配对 95% CI `[+0.40, +4.70]`。 | H13 |
+| 从头训练的注入方案是否提高5K成功率 | 有正向证据。H9 为 `23.15%`，训练与推理均无注入的H13 loss-only 为 `20.60%`；差值 `+2.55` 点，配对 95% CI `[+0.40, +4.70]`。不等同于已有模型的推理注入依赖。 | H13 |
+| H9 30K推理是否依赖注入 | 同一权重开启`58.00%`、关闭`58.90%`；开启−关闭`-0.90`点，配对95%区间`[-3.40,+1.60]`点，未检测到总体依赖；不能据此判断训练期注入无效。 | [30K推理消融](experiments/mechanism/acpd-v2-h9-inference-injection-30k/analysis.md)；2,000回合 |
+| H9 35K推理是否依赖注入 | 同一权重开启`61.05%`、关闭`61.30%`；开启−关闭`-0.25`点，配对95%区间`[-2.65,+2.15]`点，未检测到总体依赖。 | [35K推理消融](experiments/mechanism/acpd-v2-h9-inference-injection-35k/analysis.md)；2,000回合 |
 | 放开 contribution predictor 的动作梯度能否提高 5K 成功率 | TDCA 为 `21.35%`，H9-Fixed 为 `23.15%`；差值 `-1.80` 点，配对 95% CI `[-3.90, +0.35]`。未检测到提高。 | TDCA 5K，2,000 episodes |
 | ACPD-v2 是否通过降低训练 MSE 获益 | 没有该证据。与 SFT 对齐的 299 个监督 loss 点相关系数为 `0.9985`，全程均值几乎相同；5K 成功率增益不能由更低训练 MSE 解释。 | H9/H12 loss 对齐 |
 | 辅助目标在 30K 前是否自然消失 | 没有。加权 contribution/ACL 从首个到末个窗口下降 `53.42/53.04%`，但在总目标中的窗口占比保持约 `59--61%/16--17%`。 | H9 0--30K loss |
@@ -74,7 +76,7 @@ H19 30K→35K续训已在gpu04运行，4 GPU、physical global BS64、累计1。
 | ID | 目的 | 实际配置 | Job | 状态 | 结果 |
 |---|---|---|---:|---|---|
 | Teacher | 提供 agentview+wrist 特权信息 | 全量 SFT，30K | 历史任务 | 完成 | checkpoint `29999` |
-| MV-SV-KD（pi0.5适配） | 提供多视角到单视角第三方蒸馏对照 | 冻结既有agentview+wrist teacher，backview LoRA；4卡BS64，累计1，30K，GT/输出/最终动作特征loss=1/0.5/0.1；无ACPD/ACL/注入，每5K全部保留 | smoke 142274；正式142275 | CPU测试26项及单卡2步smoke通过；正式训练在gpu02运行，约5.69K/30K（10月12日17:00） | 尚无结论；离线flow与最终action hidden适配，不是原论文完整复现；[协议与执行](experiments/baseline/mv-sv-kd-backview-bs64-30k/) |
+| MV-SV-KD（pi0.5适配） | 提供多视角到单视角第三方蒸馏对照 | 冻结既有agentview+wrist teacher，backview LoRA；4卡BS64，累计1，30K，GT/输出/最终动作特征loss=1/0.5/0.1；无ACPD/ACL/注入，每5K全部保留 | smoke 142274；正式142275 | CPU测试26项及单卡2步smoke通过；正式训练在gpu02运行 | 尚无结论；离线flow与最终action hidden适配，不是原论文完整复现；[协议与执行](experiments/baseline/mv-sv-kd-backview-bs64-30k/) |
 | H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 60K | 130285/130491/130762/132791；35K验证134992/134995；后期验证134998 | 60K训练与40K/50K/60K验证完成 | 5K `13.85%`；20K `47.20%`；25K `55.80%`；30K `60.45%`；35K `57.15%`；40K `60.55%`；50K `61.30%`；60K `62.05%` |
 | H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669/130890；取消5K验证140298/140301 | 30K完成；5K验证未启动即取消，优先H19续训 | 30K pooled `71.55%`；5K尚无结论 |
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891；取消5K验证140296/140299 | 30K完成；5K验证未启动即取消，优先H19续训 | 30K pooled `78.65%`；5K尚无结论 |
@@ -82,7 +84,7 @@ H19 30K→35K续训已在gpu04运行，4 GPU、physical global BS64、累计1。
 | H9-Fixed | 固定权重 ACPD-v2 对照 | layer 10，BS64，contribution=0.2，ACL=0.5 | 129728/130773 | 30K完成；恢复与续训见下表 | 5K `23.15%`；10K `37.45%`；15K `46.60%`；20K `49.60%`；25K `55.75%`；30K `58.00%`；35K `61.05%`；40K `59.45%` |
 | ACPD-v2-Fixed leftview | 检验 H9-Fixed 在 leftview student 上的效果 | layer 10，4卡 BS64，累计1，loss=`1.0/0.2/0.5`，35K，每5K保留 | 训练139443；5K验证139971/139972；35K验证147057/147058 | 35K训练及5K/35K四套全量验证完成 | 5K pooled `42.95%`（859/2000）；35K pooled `79.65%`（1593/2000），比对应30K SFT高`1.00`点，配对95% CI `[-1.35,+3.35]`点；训练步数不同，未检测到确定优势；[分析](experiments/student/acpd-v2-multiview-35k/analysis.md) |
 | ACPD-v2-Fixed rightview | 检验 H9-Fixed 在 rightview student 上的效果 | 同上，仅改变 student 视角 | 训练139444；5K验证139973/139974；35K验证147059/147060 | 35K训练及5K/35K四套全量验证完成 | 5K pooled `47.60%`（952/2000）；35K pooled `79.30%`（1586/2000），比对应30K SFT高`2.30`点，配对95% CI `[+0.20,+4.40]`点；训练步数不同，不能归因为同进度方法收益；[分析](experiments/student/acpd-v2-multiview-35k/analysis.md) |
-| ACPD-v2-Fixed topview | 检验 H9-Fixed 在 topview student 上的效果 | 同上，仅改变student视角；15K→35K恢复完整状态与数据顺序，30K及之前每5K保存，之后每1K，全部保留 | 原训练139445；续训147339；5K验证139975/139976 | 15K完整保存；续训Priority排队；5K四套验证完成 | 5K pooled `27.80%`（556/2000）；35K尚无结论；[续训协议](experiments/student/acpd-v2-multiview-35k/protocol.md#topview-15k35k续训2026-10-12) |
+| ACPD-v2-Fixed topview | 检验 H9-Fixed 在 topview student 上的效果 | 同上，仅改变student视角；15K→35K恢复完整状态与数据顺序，30K及之前每5K保存，之后每1K，全部保留 | 原训练139445；续训147339；5K验证139975/139976 | 15K完整保存；续训在gpu04运行；5K四套验证完成 | 5K pooled `27.80%`（556/2000）；35K尚无结论；[续训协议](experiments/student/acpd-v2-multiview-35k/protocol.md#topview-15k35k续训2026-10-12) |
 | H19-FeatureFusion | 检验预测视觉贡献在动作输出前的特征融合能否提高最终成功率 | backview，layer 10；0–30K为4卡FSDP LoRA，BS64，flow/contribution/ACL=1/0.2/0.5，每5K保留；30K→35K续训同卡数、BS64、累计1，每1K全部保留，LR保持2.5e-6；35K四套各500回合自动验证 | 正式136345；续训147300；5K验证138746/138748；10K验证138747/138749；25K验证139046/139049；30K验证139418/139419；35K验证147342/147343 | 30K训练及既有验证完成；4卡35K续训在gpu04运行；35K验证等待续训成功结束，汇总等待四套成功 | 已有结果：5K `21.20%`，10K `36.55%`，25K `55.35%`，30K `60.10%`；35K尚无结论 |
 | H13-LossOnly | 判断 contribution 注入是否有效 | H9-Fixed 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9-Fixed 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
 | ACPD-v2-TDCA | 检验动作损失是否能改善 contribution 注入适配 | backview，layer 10，BS64，flow=1.0、contribution=0.2、ACL=0.5；仅开放 predictor 的动作梯度，训练至5K | 135943；验证136221；汇总136222 | 5K 训练及四套全量验证完成 | `21.35%`；比 H9-Fixed 低 `1.80` 点，95% CI `[-3.90, +0.35]`；不支持提升 |
@@ -114,11 +116,11 @@ H17 15K只有Spatial/Object部分结果，无四套pooled；详见
 | H18-ActionReadout-Ensemble | 检查读出头误差互补是否可由固定平均利用 | 复用 136935 特征；50% hidden-only + 50% hidden-contribution；另做两折 alpha 网格探索 | 无新 Slurm 任务 | 完成；未通过 | 固定平均相对 layer10 变差 `0.036%`，MSE差值95% CI `[-0.00029722,+0.00036291]`；不提交正式融合验证 |
 | Flow-time 5K | 检查早期优势是否对应特定时间段的 flow 误差 | 冻结 SFT/H9 5K；首轮512样本，复核128样本且每样本5个 t；单卡只读 | 136591、136595 | 完成；无仿真 | 首轮整体无差异；首轮 t=0.1 信号在同样本复核中未复现（差值 `+0.00283`，95% CI 跨0）；不支持启动时间重采样训练 |
 | H9 10K 推理期注入消融 | 同一个 H9 checkpoint 仅在推理时关闭 contribution 注入，判断部署时是否依赖该分支 | 四套各500回合；与原H9结果配对 | 136866、136867 | 完成 | 完整注入`37.45%`，关闭注入`36.05%`；差值`+1.40`点，配对95% CI `[-0.95,+3.70]`点；未检测到总体依赖 |
-| H9 30K 推理期注入消融 | 判断同一已训练模型是否依赖推理期预测注入 | 同一`29999`权重仅关闭注入；四套各500回合，seed7；复用完整注入58.00%作配对对照 | 验证147346_[0-3]；汇总与分析147347 | Spatial/Object/Goal在gpu04正常仿真，LIBERO-10排队；汇总等待四套成功 | 尚无结论；[协议与执行](experiments/mechanism/acpd-v2-h9-inference-injection-30k/) |
+| H9 30K 推理期注入消融 | 判断同一已训练模型是否依赖推理期预测注入 | 同一`29999`权重仅关闭注入；四套各500回合，seed7；复用完整注入58.00%作配对对照 | 验证147346_[0-3]；汇总与分析147347 | 四套全量验证与配对分析完成 | 开启`58.00%`，关闭`58.90%`；开启−关闭`-0.90`点，配对95%区间`[-3.40,+1.60]`点。未检测到总体依赖；不替代训练期无注入消融；[分析](experiments/mechanism/acpd-v2-h9-inference-injection-30k/analysis.md) |
 | H9 35K 推理期注入消融 | 判断同一已训练模型是否依赖推理期预测注入 | 同一`34999`权重仅关闭注入；四套各500回合；复用完整注入作配对对照 | 验证145280_[0-3]；汇总145282 | 四套全量验证与配对分析完成 | 开启`61.05%`，关闭`61.30%`；开启−关闭`-0.25`点，配对95%区间`[-2.65,+2.15]`点。未检测到总体依赖；不替代训练期无注入消融；[分析](experiments/mechanism/acpd-v2-h9-inference-injection-35k/analysis.md) |
 | H9 可观测 gate 可靠性 | 检验 student-only 视角一致性特征能否预测 episode 是否应注入 | H9 10K/30K，各128个 BS8 batch、194个 episode，两折 episode-held-out AUROC | 136904_0/1；136974/136904 | 完成；探索性 | 10K两折 AUROC：cosine `0.5600/0.4906`、分歧度 `0.5795/0.4962`、不平衡度 `0.5769/0.5098`；30K：`0.5268/0.5387`、`0.5128/0.5241`、`0.5357/0.5041`，均未达到预注册`0.60`，不支持当前动态 gate |
 | H9 Agentview-only 注入 10K | 检验离线 probe 中 agentview-only 优于 wrist-only 的方向能否复现到闭环 | H9 10K `9999`；推理时保留 agentview、屏蔽 wrist；四套各500回合 | 136992；汇总136993 | 停止；无结论 | 训练使用双分支、推理屏蔽一支，存在分布不一致；不作为独立 contribution 因果证据 |
-| ACPD-v2 注入离线动作影响 | 固定 H9 10K/30K，比较完整/关闭/分路注入的7维 flow MSE 与速度改变量 | 各128个BS8 batch；单卡冻结前向；按episode重采样 | smoke 136878；正式136879_[0-1%1] | 两点完成 | 完整注入−关闭MSE为`+0.00000834/+0.00000261`，两点区间均跨0；无离线改善证据，待闭环验证 |
+| ACPD-v2 注入离线动作影响 | 固定 H9 10K/30K，比较完整/关闭/分路注入的7维 flow MSE 与速度改变量 | 各128个BS8 batch；单卡冻结前向；按episode重采样 | smoke 136878；正式136879_[0-1%1] | 两点完成 | 完整注入−关闭MSE为`+0.00000834/+0.00000261`，两点区间均跨0；无离线改善证据，10K/30K闭环检验也未检测到总体推理依赖 |
 | 注入分路差异 | 复用 H9 10K/30K 四分支逐样本误差，比较 agentview、wrist 与两路交互 | 各1,024样本、194 episode；CPU配对重采样，无新仿真 | 无新Slurm任务 | 完成；探索性 | 10K wrist−agent MSE `+0.00002726`，30K区间跨0；未检测到稳定分路差异或交互，不能证明闭环收益 |
 | H9 teacher action signal 训练诊断 | 检查 teacher 动作目标是否持续优于 student 当前动作 | 复用 H9 训练日志的 0/5K/10K/15K/20K/25K/29.9K 记录，比较同一 batch 的 task loss | 无新Slurm任务 | 完成；训练诊断 | `teacher_better_ratio` 为 `0.9958--1.0000`，teacher task loss 始终低于 student；支持动作级 teacher 信号有效，但不是 benchmark 或因果结论 |
 | Teacher-Action-MSE 5K（取消） | 直接拟合 teacher 动作的候选消融 | 4×5090、BS64、teacher-action MSE 权重0.1；smoke 136967 完成，正式训练及验证链已取消 | 136914、136916_[0-3]、136917、136918 | 取消；无科研结果 | GT flow/action 已是直接监督目标，未继续增加有误差的 teacher 动作 MSE；不能据此给出正负实验结论 |
@@ -183,7 +185,9 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | H9-Fixed backview BS64 25K | 63.20% | 69.40% | 62.00% | 28.40% | 55.75% |
 | H19-FeatureFusion backview BS64 25K | 65.60% | 67.00% | 63.60% | 25.20% | 55.35% |
 | H9-Fixed backview BS64 30K | 64.00% | 73.00% | 61.80% | 33.20% | 58.00% |
+| H9-Fixed backview BS64 30K（仅推理关闭注入） | 65.00% | 73.00% | 64.40% | 33.20% | 58.90% |
 | H9-Fixed backview BS64 35K | 73.20% | 73.80% | 63.60% | 33.60% | 61.05% |
+| H9-Fixed backview BS64 35K（仅推理关闭注入） | 68.20% | 74.60% | 68.40% | 34.00% | 61.30% |
 | H9-Fixed backview BS64 40K | 68.20% | 76.00% | 60.00% | 33.60% | 59.45% |
 | ACL-only backview BS64 25K | 63.40% | 62.40% | 61.80% | 24.00% | 52.90% |
 | ACL-only backview BS64 30K | 61.20% | 71.00% | 60.00% | 25.20% | 54.35% |
@@ -227,7 +231,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | 内容 | 路径 |
 |---|---|
 | 实验目录索引 | `experiments/README.md` |
-| MV-SV-KD协议、执行与配置路径 | `experiments/baseline/mv-sv-kd-backview-bs64-30k/`；checkpoint根目录`/opt/liutong/openpi_checkpoints/fixed_dataset/baseline/mv_sv_kd/backview_bs64_30k/`；日志根目录`/opt/liutong/openpi-5090-research/mv-sv-kd-backview-bs64-30k/slurm-log/`；任务排队，尚无结果 |
+| MV-SV-KD协议、执行与配置路径 | `experiments/baseline/mv-sv-kd-backview-bs64-30k/`；checkpoint根目录`/opt/liutong/openpi_checkpoints/fixed_dataset/baseline/mv_sv_kd/backview_bs64_30k/`；日志根目录`/opt/liutong/openpi-5090-research/mv-sv-kd-backview-bs64-30k/slurm-log/`；训练运行，尚无验证结果 |
 | H7/H7.1 原始指标 | `/opt/liutong/openpi-5090-research/acpd-exact-attention-probe/results/` |
 | H9 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-pbs32-5k_129710.out` |
 | H9-scale-b 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-fsdp4-bs64-30k_129728.out` |
@@ -277,7 +281,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H19-FeatureFusion 35K自动验证 | 数组`147342_[0-3]`等待`afterok:147300`；汇总`147343`等待四套成功；四套各500回合，结果`/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/34999/summary.txt`，日志和视频在同目录归档；尚无结论 |
 | ACPD-v2 多视角 35K 协议 | `experiments/student/acpd-v2-multiview-35k/protocol.md` |
 | ACPD-v2 多视角 35K 训练脚本 | `scripts/train_slurm/pi05_libero_{leftview,rightview,topview}_acpd_v2_layer10_lora_fsdp4_bs64_35k.sbatch` |
-| ACPD-v2 多视角 35K checkpoint 根目录 | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k/{leftview,rightview,topview}/`；leftview/rightview的`34999`完整保存；topview保留4999/9999/14999，15K→35K续训147339排队，30K后每1K保存 |
+| ACPD-v2 多视角 35K checkpoint 根目录 | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k/{leftview,rightview,topview}/`；leftview/rightview的`34999`完整保存；topview保留4999/9999/14999，15K→35K续训147339运行，30K后每1K保存 |
 | ACPD-v2 多视角 5K 全量验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/{leftview,rightview,topview}/4999/`；四套各500回合，`summary.txt`为最终汇总，`logs/`为逐套日志，逐套`videos/`为视频；Slurm日志见同根`slurm-log/` |
 | ACPD-v2 leftview/rightview 35K 全量验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/{leftview,rightview}/34999/`；各2000回合，数组`147057/147059`，汇总`147058/147060`；日志`logs/`、视频各套`videos/`、调度日志`slurm-log/`；两视角的`summary.txt`均已完成；[结果与配对分析](experiments/student/acpd-v2-multiview-35k/analysis.md) |
 | H15a 快速诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/fast_protocol.md` |
@@ -298,7 +302,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | ACPD-v2-TDCA 与 H9 5K 配对分析 | `experiments/ablation/acpd-v2-tdca-5k/results/tdca_vs_h9_5k_paired_analysis.json` |
 | Flow-time 5K 诊断协议、结果与日志 | `experiments/mechanism/acpd-v2-flow-time-5k/`；结果 `results/136591/summary.json`、`results/136595/summary.json` |
 | H9 10K 推理期注入消融 | `experiments/mechanism/acpd-v2-h9-inference-injection-10k/analysis.md`；配对结果 `results/paired_analysis.json`；验证 `/opt/liutong/openpi-5090-evals/acpd-v2-h9-inference-ablation/9999/` |
-| H9 30K 推理期注入消融 | 协议与执行：`experiments/mechanism/acpd-v2-h9-inference-injection-30k/`；验证`/opt/liutong/openpi-5090-evals/acpd-v2-h9-inference-ablation/29999/`；任务147346/147347；尚无结果 |
+| H9 30K 推理期注入消融 | [分析](experiments/mechanism/acpd-v2-h9-inference-injection-30k/analysis.md)与配对结果`results/paired_analysis.json`；汇总`/opt/liutong/openpi-5090-evals/acpd-v2-h9-inference-ablation/29999/summary.txt`；同目录`logs/`为逐回合证据，视频在各suite目录；任务147346/147347完成 |
 | H9 35K 推理期注入消融 | 协议、分析与配对结果：`experiments/mechanism/acpd-v2-h9-inference-injection-35k/`；验证：`/opt/liutong/openpi-5090-evals/acpd-v2-h9-inference-ablation/34999/summary.txt`；原始逐回合结果在`logs/`，配对结果在同实验目录`results/paired_analysis.json`；复用原H9 35K checkpoint，不复制 |
 | ACPD-v2 注入离线动作影响 | `experiments/mechanism/acpd-v2-gate-effect/analysis.md`；原始结果 `/opt/liutong/openpi-5090-research/acpd-v2-gate-effect/results/{136880,136879}/` |
 | ACPD-v2逐任务差异 | `experiments/mechanism/acpd-v2-task-heterogeneity/analysis.md`；原始三组日志路径见该文 |

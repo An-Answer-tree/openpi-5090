@@ -185,7 +185,10 @@ experiment_names:
     topview_resume:
       job: 147339
       submitted_at: "2026-10-12 17:27:38 CST"
-      status: pending_priority
+      status: running_continuing_progress
+      checked_at: "2026-10-12 21:56 CST"
+      node: gpu04
+      observed_step_approx: 15100
       protocol_commit: fa4f232
       source_checkpoint_step: 14999
       source_optimizer_step: 15000
@@ -208,7 +211,7 @@ experiment_names:
       checkpoint_dir: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k/topview/pi05_libero_topview_acpd_v2_layer10/pi05_libero_topview_acpd_v2_layer10_lora_fsdp4_bs64_35k
       stdout: /opt/liutong/openpi-5090-research/acpd-v2-multiview-35k/slurm-log/pi05-tv-acpdv2-l10-fsdp4-bs64-35k_147339.out
       verification: 8_targeted_tests_and_cli_parsing_and_slurm_saved_script_passed
-      conclusion: 尚无35K结论_GPU续训待资源分配后验证
+      conclusion: GPU续训持续推进_尚无35K验证结论
     eval_35k:
       checked_at: "2026-10-12 17:00 CST"
       checkpoint_step: 34999
@@ -323,10 +326,10 @@ experiment_names:
     protocol: experiments/mechanism/acpd-v2-h9-inference-injection-30k/protocol.md
     protocol_commit: 1d956a0
     execution: experiments/mechanism/acpd-v2-h9-inference-injection-30k/execution.md
-    status: running_three_suites_fourth_pending
-    checked_at: "2026-10-12 18:39 CST"
-    running_tasks: [0, 1, 2]
-    pending_tasks: [3]
+    status: complete_no_detected_pooled_dependency
+    checked_at: "2026-10-12 21:56 CST"
+    running_tasks: []
+    pending_tasks: []
     startup_verified: loaded_checkpoint_and_simulation_episodes_progressing_in_three_suites
     eval_job_id: 147346
     summary_analysis_job_id: 147347
@@ -339,6 +342,14 @@ experiment_names:
     eval_dir: /opt/liutong/openpi-5090-evals/acpd-v2-h9-inference-ablation/29999
     result: experiments/mechanism/acpd-v2-h9-inference-injection-30k/results/paired_analysis.json
     full_success: 0.5800
+    injection_off_success: 0.5890
+    full_success_count: 1160
+    injection_off_success_count: 1178
+    suite_injection_off_success: {spatial: 0.6500, object: 0.7300, goal: 0.6440, libero_10: 0.3320}
+    paired_difference: -0.0090
+    paired_ci95: [-0.0340, 0.0160]
+    analysis: experiments/mechanism/acpd-v2-h9-inference-injection-30k/analysis.md
+    completeness_verified: 40_tasks_50_initial_states_each_episode_keys_match_json_matches_logs
     difference_direction: full_minus_injection_off
     array: "0-3"
     array_concurrency_limit: null
@@ -354,7 +365,7 @@ experiment_names:
     replan_steps: 5
     bootstrap_samples: 10000
     bootstrap_seed: 42
-    conclusion: 尚无结论
+    conclusion: 未检测到30K总体推理注入依赖_不证明等效_不替代训练期注入消融
     scope: inference_dependency_not_training_injection_causal_ablation
   h9_inference_injection_35k:
     display_name: "H9 35K 推理期 contribution 注入消融"
@@ -526,7 +537,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-12 17:28 CST (142275 on gpu02 and 147300 on gpu04 running; topview resume 147339 pending Priority; left/right 25K evals not submitted)"
+  checked_at: "2026-10-12 21:56 CST (142275 on gpu02 and 147300/147339 on gpu04 running; H9 30K injection-off evaluation and analysis complete; H19 35K evaluation waiting dependency)"
   h19_resume_checked_at: "2026-10-12 15:28 CST (147300 running on gpu04 since 15:16:41; 4 GPUs, BS64, accumulation 1; optimizer step 30000 and data batch 30000 restored; finite loss and continuing training verified)"
   evaluation_priority_checked_at: "2026-10-12 11:58 CST (147057/147059/145280 retained and pending Priority; summaries 147058/147060/145282 retained and waiting dependencies; MV-SV-KD 142275 still running)"
   multiview_35k_checked_at: "2026-10-12 17:00 CST (leftview final 1593/2000 and rightview final 1586/2000; both summaries available; no evaluation jobs remaining in squeue)"
@@ -551,10 +562,10 @@ current_execution:
   jobs:
     - id: 147346
       experiment: h9_inference_injection_30k
-      state: running_three_suites_fourth_pending
-      running_tasks: [0, 1, 2]
-      pending_tasks: [3]
-      checked_at: "2026-10-12 18:39 CST"
+      state: complete_all_four_suites
+      running_tasks: []
+      pending_tasks: []
+      checked_at: "2026-10-12 21:56 CST"
       node: gpu04
       reservation: res_gpu04
       array: "0-3"
@@ -565,7 +576,9 @@ current_execution:
       eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-h9-inference-ablation/29999
     - id: 147347
       experiment: h9_inference_injection_30k_summary_paired_analysis
-      state: pending_dependency
+      state: complete_result_written
+      checked_at: "2026-10-12 21:56 CST"
+      result: experiments/mechanism/acpd-v2-h9-inference-injection-30k/results/paired_analysis.json
       reservation: res_gpu04
       depends_on: 147346
       resources: 1cpu_2g
@@ -825,7 +838,10 @@ current_execution:
       target_steps: 35000
     - id: 147339
       experiment: acpd_v2_multiview_topview_resume_35k
-      state: pending_priority
+      state: running_continuing_progress
+      checked_at: "2026-10-12 21:56 CST"
+      node: gpu04
+      observed_step_approx: 15100
       resources: 4gpu_32cpu_96g
       partition: batch
       time_limit: "8-00:00:00"
