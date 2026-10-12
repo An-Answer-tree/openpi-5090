@@ -1,17 +1,17 @@
 # 实验结果台账
 
-更新时间：2026-10-12 21:56 CST（H9 30K关闭注入全量验证完成；H19与topview续训运行）
+更新时间：2026-10-13 00:24 CST（原论文ACPD续训147454等待gpu04预约资源；H19与topview续训运行）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
-
-## 当前结论
 
 ## 新提交实验
 
 | 实验 | 目的 | 配置 | 状态 | 结论 |
 |---|---|---|---|---|
-| Original ACPD backview BS32 5K→30K | 在论文原版动作条件 privileged cue 方法下观察长训练效果 | 5K完整checkpoint接续；layers 6+12；4×5090 FSDP；global BS32；累计1；loss `1.0/0.2/0.5`；25K后每1K保存 | 协议与脚本已通过静态及续训规则测试，尚未提交 | 尚无结论 |
+| Original ACPD backview BS32 5K→30K | 在论文原版动作条件 privileged cue 方法下观察长训练效果 | 5K完整checkpoint接续；layers 6+12；4×5090 FSDP；global BS32；累计1；loss `1.0/0.2/0.5`；每5K保存，25K后每1K全部保留 | 147454已提交；仅gpu04、res_gpu04预约；等待资源 | 尚无结论；[协议与执行](experiments/student/acpd-original-backview-bs32-30k/) |
+
+## 当前结论
 
 本文正式 BS64 结果中的 H9 统一称为 **ACPD-v2-Fixed（Attention Contribution
 Privileged Distillation，固定权重）**。新实验称为 **ACPD-v2-Decay**；两者关系如下。

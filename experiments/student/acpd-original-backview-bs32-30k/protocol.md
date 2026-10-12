@@ -32,6 +32,7 @@ contribution预测或H19特征融合。长训练尚无结论；5K历史结果为
 | 损失 | flow + 0.2 × (cue cosine + 0.1 × variance) + 0.5 × ACL |
 | Cue网络 | layers6+12；memory1024；projector hidden2048；query stop-gradient |
 | 资源 | 4×5090 FSDP；global BS32、累计1；32CPU、96G，时限8天 |
+| 调度 | 任务147454；仅gpu04，绑定用户预约res_gpu04；等待资源，不修改已有任务 |
 | 优化 | seed42；原AdamW/clip1.0；warmup1000、peak2.5e-5、30K cosine、末期2.5e-6 |
 | 接续 | 只读恢复参数、辅助网络、Adam及step；从第5000批重建采样顺序；保持8workers及persistent-worker语义 |
 | 保存 | 10K/15K/20K/25K及26K/27K/28K/29K/30K；`keep_period=1`全部保留；来源5K留在原处 |

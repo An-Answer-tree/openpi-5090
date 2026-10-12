@@ -3,7 +3,8 @@
 # Save every 5K through 25K, then every 1K; preserve all checkpoints.
 #SBATCH --job-name=pi05-bv-acpd-original-r30k
 #SBATCH --partition=batch
-#SBATCH --exclude=gpu03
+#SBATCH --nodelist=gpu04
+#SBATCH --reservation=res_gpu04
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32

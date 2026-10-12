@@ -5,6 +5,26 @@ project:
   started: "2026-09-11"
 
 experiment_names:
+  acpd_original_backview_bs32_30k:
+    display_name: "Original ACPD backview BS32 5K→30K"
+    protocol: experiments/student/acpd-original-backview-bs32-30k/protocol.md
+    execution: experiments/student/acpd-original-backview-bs32-30k/execution.md
+    status: pending_resources
+    train_job: 147454
+    requested_node: gpu04
+    reservation: res_gpu04
+    align_layers: [6, 12]
+    physical_global_batch: 32
+    gradient_accumulation_steps: 1
+    loss_weights: {flow: 1.0, cue: 0.2, variance_within_cue: 0.1, acl: 0.5}
+    contribution_injection: false
+    resume_optimizer_step: 5000
+    resume_data_loader: true
+    num_train_steps: 30000
+    save_interval: 5000
+    save_interval_after: [25000, 1000]
+    keep_period: 1
+    conclusion: 尚无结论
   mv_sv_kd_backview_30k:
     display_name: "MV-SV-KD (pi0.5 offline fixed-view adaptation)"
     protocol: experiments/baseline/mv-sv-kd-backview-bs64-30k/protocol.md
@@ -537,11 +557,11 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-12 21:56 CST (142275 on gpu02 and 147300/147339 on gpu04 running; H9 30K injection-off evaluation and analysis complete; H19 35K evaluation waiting dependency)"
+  checked_at: "2026-10-13 00:24 CST (147454 pending Resources on gpu04/res_gpu04; 142275 on gpu02 and 147300/147339 on gpu04 running; existing jobs and dependencies unchanged)"
   h19_resume_checked_at: "2026-10-12 15:28 CST (147300 running on gpu04 since 15:16:41; 4 GPUs, BS64, accumulation 1; optimizer step 30000 and data batch 30000 restored; finite loss and continuing training verified)"
   evaluation_priority_checked_at: "2026-10-12 11:58 CST (147057/147059/145280 retained and pending Priority; summaries 147058/147060/145282 retained and waiting dependencies; MV-SV-KD 142275 still running)"
   multiview_35k_checked_at: "2026-10-12 17:00 CST (leftview final 1593/2000 and rightview final 1586/2000; both summaries available; no evaluation jobs remaining in squeue)"
-  reservation_checked_at: "2026-10-12 12:59 CST"
+  reservation_checked_at: "2026-10-13 00:24 CST"
   evaluation_reservation:
     name: res_gpu04
     node: gpu04
@@ -550,16 +570,38 @@ current_execution:
     end: "2026-10-16 12:48 CST"
     flags: [IGNORE_JOBS, SPEC_NODES, MAGNETIC]
     gpus_total: 8
-    gpus_allocated_to_user: 3
-    gpus_allocated_to_existing_other_jobs: 5
+    gpus_allocated_to_user: 8
+    gpus_allocated_to_existing_other_jobs: 0
     gpus_unallocated: 0
     logical_cpus_total: 224
-    logical_cpus_allocated: 70
+    logical_cpus_allocated: 64
     memory_gib_total: 360
-    memory_gib_allocated: 328
+    memory_gib_allocated: 192
     pending_jobs_bound_in_place: [145280_2, 145280_3, 147057, 147059, 145282, 147058, 147060]
     note: reservation_does_not_preempt_existing_jobs_resource_counts_are_a_snapshot
   jobs:
+    - id: 147454
+      experiment: acpd_original_backview_bs32_resume_30k
+      state: pending_resources
+      checked_at: "2026-10-13 00:24 CST"
+      requested_node: gpu04
+      reservation: res_gpu04
+      resources: 4gpu_32cpu_96g
+      partition: batch
+      time_limit: "8-00:00:00"
+      physical_global_batch: 32
+      gradient_accumulation_steps: 1
+      resume_optimizer_step: 5000
+      resume_data_loader: true
+      target_steps: 30000
+      save_interval: 5000
+      save_interval_after: [25000, 1000]
+      keep_period: 1
+      training_verified: false
+      source_checkpoint: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/layers_5k/pi05_libero_backview_acpd_lora_layers6_12/pi05_libero_backview_acpd_lora_fsdp2_layers6_12_bs32_5k/4999
+      output_checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_original/backview_bs32_30k
+      script: scripts/train_slurm/pi05_libero_backview_acpd_original_fsdp4_bs32_resume_30k.sbatch
+      stdout: /opt/liutong/openpi-5090-research/acpd-original-backview-bs32-30k/slurm-log/pi05-bv-acpd-original-r30k_147454.out
     - id: 147346
       experiment: h9_inference_injection_30k
       state: complete_all_four_suites

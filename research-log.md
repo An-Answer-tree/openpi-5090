@@ -149,3 +149,4 @@
 | 2026-10-12 | 结果 | 21:56核对H9 30K推理注入消融147346/147347完成：关闭1178/2000（58.90%），开启1160/2000（58.00%）；开启−关闭-0.90点，配对95%区间[-3.40,+1.60]点。原始40任务×50回合完整、键一致且JSON计数匹配；未检测到总体推理依赖，不替代训练期消融。35K开启61.05%，比30K关闭高2.15点，跨step不归因于注入；详见`experiments/mechanism/acpd-v2-h9-inference-injection-30k/analysis.md`。 |
 | 2026-10-12 | 状态 | 21:56 topview续训147339已在gpu04运行并推进至约15.1K；H19续训147300和第三方baseline142275继续运行。更新当前状态，未修改任务或checkpoint；三者尚无新增最终验证结论。 |
 | 2026-10-13 | 预注册 | 新增 Original ACPD backview BS32 5K→30K：复用已有完整5K layers 6+12 checkpoint，保持论文原版 selector、cue prediction、variance regularization 与 ACL；4×5090 FSDP、global BS32、累计1，25K后每1K保存。先提交协议和脚本，尚无训练或成功率结论。 |
+| 2026-10-13 | 提交与调度 | 原论文ACPD续训147454已提交；按用户要求原地绑定gpu04与res_gpu04，00:24等待Resources，4GPU/32CPU/96G/8天，BS32、累计1。H19 147300、topview 147339、第三方baseline 142275及验证依赖均未修改；没有移动、复制或删除checkpoint与数据。保存与续训规则6项测试通过、2项因单设备跳过；实际GPU恢复尚待启动验证。 |
