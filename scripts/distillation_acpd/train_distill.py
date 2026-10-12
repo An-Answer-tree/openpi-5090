@@ -98,6 +98,8 @@ class DistillTrainConfig:
     decay_lr: float = 2.5e-6
     log_interval: int = 100
     save_interval: int = 5_000
+    # Completed-step threshold and save interval to use afterward.
+    save_interval_after: tuple[int, int] | None = None
     keep_period: int | None = 5_000
     save_final_checkpoint: bool = True
     overwrite: bool = False
@@ -410,6 +412,19 @@ def _data_start_batch(config: DistillTrainConfig, start_step: int, *, resuming: 
     if not config.resume_data_loader:
         return 0
     return start_step * config.gradient_accumulation_steps
+
+
+def _should_save_checkpoint(config: DistillTrainConfig, step: int) -> bool:
+    """Returns whether to save after completing this zero-based training step."""
+    completed_steps = step + 1
+    save_interval = config.save_interval
+    if config.save_interval_after is not None:
+        after_step, after_interval = config.save_interval_after
+        if completed_steps > after_step:
+            save_interval = after_interval
+    return completed_steps % save_interval == 0 or (
+        config.save_final_checkpoint and completed_steps == config.num_train_steps
+    )
 
 
 def _restore_from_checkpoint(
@@ -925,9 +940,7 @@ def main(config: DistillTrainConfig):
             infos = []
         batch = next(data_iter)
 
-        periodic_save = (step + 1) % config.save_interval == 0
-        final_save = config.save_final_checkpoint and step == config.num_train_steps - 1
-        if periodic_save or final_save:
+        if _should_save_checkpoint(config, step):
             _checkpoints.save_state(checkpoint_manager, student_state, data_loader, step)
 
     logging.info("Waiting for checkpoint manager to finish")

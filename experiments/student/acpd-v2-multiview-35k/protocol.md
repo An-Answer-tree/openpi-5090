@@ -99,3 +99,21 @@ leftview/rightview 的30K与35K checkpoint已完整保存，训练日志确认35
 2026-10-12 12:59 CST原地将两个待运行数组及汇总任务绑定到`res_gpu04`
 （gpu04，有效期10月12日12:48至10月16日12:48）。未重提任务，任务号、
 评测配置、并发设置、输出路径和依赖关系不变；等待预约节点的已有任务释放资源。
+
+## Topview 15K→35K续训（2026-10-12）
+
+按用户要求接续已取消的topview训练。原目录已保留完整的4999/9999/14999；
+本次恢复最新14999的模型、优化器与全局步数，使用同seed、BS64、累计1，
+从batch15000接续数据顺序。训练目标仍为35K，teacher、loss和学习率沿用原配置。
+30K以后LR保持2.5e-6，不重启warmup。本次仅改变保存频率，尚无35K任务结论。
+
+| 项目 | 设置 |
+|---|---|
+| 资源 | batch，4×5090 FSDP，32 CPU、96G、8天；排除gpu03，正常排队，不限定节点 |
+| 保存 | 30K及之前每5K；30K之后每1K；keep_period=1全部保留 |
+| 预期新增目录 | 19999/24999/29999/30999/31999/32999/33999/34999 |
+| 数据接续 | --resume-data-loader；恢复step15000，累计1，对应batch15000 |
+| Checkpoint目录 | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k/topview/pi05_libero_topview_acpd_v2_layer10/pi05_libero_topview_acpd_v2_layer10_lora_fsdp4_bs64_35k` |
+| 脚本 | `scripts/train_slurm/pi05_libero_topview_acpd_v2_layer10_lora_fsdp4_bs64_35k.sbatch` |
+
+续训协议先提交到git，再提交Slurm任务。沿用原checkpoint目录，不复制或移动模型。

@@ -32,6 +32,7 @@ from scripts.distillation_acpd.train_distill import _micro_step_train_rng
 from scripts.distillation_acpd.train_distill import _per_sample_prediction_error
 from scripts.distillation_acpd.train_distill import _restore_from_checkpoint
 from scripts.distillation_acpd.train_distill import _scale_gradients
+from scripts.distillation_acpd.train_distill import _should_save_checkpoint
 from scripts.distillation_acpd.train_distill import _teacher_action_loss
 from scripts.distillation_acpd.train_distill import compute_gradients
 
@@ -465,6 +466,26 @@ def test_gradient_accumulation_averages_independent_microbatches():
     first_rng = _micro_step_train_rng(jax.random.key(0), 3, 0, gradient_accumulation_steps=4)
     second_rng = _micro_step_train_rng(jax.random.key(0), 3, 1, gradient_accumulation_steps=4)
     assert not np.array_equal(first_rng, second_rng)
+
+
+@pytest.mark.parametrize(
+    ("save_interval_after", "expected_steps"),
+    [
+        (None, [4_999, 9_999, 14_999, 19_999, 24_999, 29_999, 34_999]),
+        ((30_000, 1_000), [4_999, 9_999, 14_999, 19_999, 24_999, 29_999, 30_999, 31_999, 32_999, 33_999, 34_999]),
+    ],
+)
+def test_checkpoint_schedule_keeps_requested_steps(save_interval_after, expected_steps):
+    config = DistillTrainConfig(num_train_steps=35_000, save_interval_after=save_interval_after)
+
+    assert [step for step in range(config.num_train_steps) if _should_save_checkpoint(config, step)] == expected_steps
+
+
+def test_checkpoint_schedule_preserves_optional_final_save():
+    config = DistillTrainConfig(num_train_steps=34_567, save_interval_after=(30_000, 1_000))
+
+    assert _should_save_checkpoint(config, 34_566)
+    assert not _should_save_checkpoint(dataclasses.replace(config, save_final_checkpoint=False), 34_566)
 
 
 def test_resume_data_loader_accounts_for_gradient_accumulation():

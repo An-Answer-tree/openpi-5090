@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# ACPD-v2-Fixed, topview student, H9-matched 35K trajectory.
+# ACPD-v2-Fixed, topview student; resume the latest complete checkpoint.
+# Save every 5K through 30K, then every 1K through 35K; keep all checkpoints.
 #SBATCH --job-name=pi05-tv-acpdv2-l10-fsdp4-bs64-35k
 #SBATCH --partition=batch
 #SBATCH --exclude=gpu03
@@ -77,7 +78,9 @@ python -m scripts.distillation_acpd.train_distill \
   --decay-lr=2.5e-6 \
   --log-interval=100 \
   --save-interval=5000 \
+  --save-interval-after 30000 1000 \
   --keep-period=1 \
   --resume \
+  --resume-data-loader \
   --fsdp-devices=4 \
   --no-wandb-enabled
