@@ -63,13 +63,14 @@
 | 读出头固定融合是否利用互补性 | 50% hidden-only与50% hidden-contribution的MSE相对固定layer10变化`+0.036%`，区间`[-0.00029722,+0.00036291]`跨0；两折alpha探索变化`+0.125%` | 简单平均不能利用oracle互补性；不继续增加H18小型读出组合，优先端到端训练接口。 |
 | 单视角 baseline 是否受视角影响 | left/right/top/backview 30K pooled 分别为 `78.65/77.00/71.55/60.45%` | 视角差异大；ACPD 必须使用相同 student 视角的 SFT 对照。 |
 | ACPD-v2 在 leftview 的终点表现 | 35K `79.65%`（1593/2000），对应30K SFT `78.65%`；配对差值`+1.00`点，95% CI `[-1.35,+3.35]`点 | 点估计较高，未检测到确定优势；两者训练步数不同，不能视为同进度对照。 |
+| ACPD-v2 在 rightview 的终点表现 | 35K `79.30%`（1586/2000），对应30K SFT `77.00%`；配对差值`+2.30`点，95% CI `[+0.20,+4.40]`点 | 本次评测区间高于0；训练步数不同，不能归因为同进度方法收益，也不覆盖训练seed变化。 |
 
 ## 文献约束
 
 新增第三方比较方法 MV-SV-KD：将多视角到单视角的输出/特征联合蒸馏适配到
 pi0.5，使用相同既有teacher、fixed_dataset和backview学生。该适配用flow velocity
 与最终action hidden替代原论文SAC动作和视觉编码特征，不属于完整复现。
-CPU检查通过，单卡smoke与30K正式任务已提交，GPU尚未验证；尚无科研结论。
+CPU检查及单卡2步smoke通过，30K正式任务142275在gpu02训练；尚无科研结论。
 协议和任务号：`experiments/baseline/mv-sv-kd-backview-bs64-30k/`。
 
 Lopez-Paz et al. (2015) 将 privileged information 表述为只在训练阶段可见的
@@ -89,8 +90,8 @@ contribution 可以被预测，不代表预测 contribution 在动作接口中�
 轨迹的H9为主方案；这不是H9性能已被证明更高。H19保留为候选；2026-10-12
 11:58按用户决定取消未启动的2卡35K续训；14:54重新提交4卡续训`147300`，
 BS64、累计1、每1K保留。15:16在gpu04开始；15:28确认模型与优化器恢复至
-step30000、数据接续batch30000且实际训练正常。leftview 35K全量验证完成，
-rightview已完成Spatial/Object/Goal，LIBERO-10仍运行，全量尚无结论。
+step30000、数据接续batch30000且实际训练正常。leftview/rightview 35K全量验证
+完成，分别为79.65%/79.30%；当前对应SFT为30K，比较时须明确训练步数差异。
 H9 35K关闭注入验证已完成，pooled未检测到开启与关闭的差异。
 H19 35K仍无结果，两者均未证明提高SFT最终上限。
 详细loss、配对区间及证据：

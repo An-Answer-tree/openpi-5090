@@ -51,9 +51,9 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 | baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 10K/15K/20K/25K/30K 正式验证完成 |
 | baseline | backview BS64 30K--60K | `baseline/sft-backview-bs64-trajectory-60k/` | 续训与验证完成；30K `60.45%`，40K/50K/60K分别为`60.55/61.30/62.05%` |
 | baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 全部完成 |
-| baseline | MV-SV-KD backview BS64 30K | `baseline/mv-sv-kd-backview-bs64-30k/` | 代码与CPU检查通过；单卡smoke 142274排队，正式142275等待smoke成功；尚无结论 |
+| baseline | MV-SV-KD backview BS64 30K | `baseline/mv-sv-kd-backview-bs64-30k/` | CPU检查及单卡2步smoke通过；正式142275在gpu02训练；尚无结论 |
 | student | H9-Fixed 主实验（原H9-scale-b） | `student/acpd-v2-h9-batch-scaling-30k/` | 固定contribution=0.2；5K/10K/15K/20K/25K/30K/35K/40K有正式结果 |
-| student | ACPD-v2 多视角 35K | `student/acpd-v2-multiview-35k/` | left/right训练完成，top训练取消；left 35K验证79.65%，right 35K验证运行中；与对应30K SFT训练步数不同 |
+| student | ACPD-v2 多视角 35K | `student/acpd-v2-multiview-35k/` | left/right训练及35K验证完成，分别79.65%/79.30%；top训练取消；与对应30K SFT训练步数不同 |
 | student | H19-FeatureFusion BS64 30K | `student/acpd-v2-h19-feature-fusion-30k/protocol.md` | 30K checkpoint 与5K/10K/25K/30K四套验证完成；pooled `21.20%/36.55%/55.35%/60.10%` |
 | mechanism | H15a ACPD-v2 梯度冲突诊断 | `mechanism/acpd-v2-h15a-gradient-conflict/` | 完成；不支持后期梯度冲突假设 |
 | mechanism | H18-ActionReadout 冻结贡献动作读出诊断 | `mechanism/acpd-v2-h18-action-readout/` | 完成；离线MSE未检测到contribution独立收益，无仿真 |
