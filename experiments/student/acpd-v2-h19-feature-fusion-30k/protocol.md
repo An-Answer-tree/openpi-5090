@@ -82,6 +82,11 @@ micro batch及每轮丢弃的尾部样本变化，不能声称与原4卡训练�
 `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k`。
 任务开始前不复制或移动源 checkpoint；35K checkpoint 和全量验证均尚未产生。
 
+2026-10-12 11:58 CST按用户要求取消未启动的`147003`，先安排leftview 35K
+验证`147057`、rightview 35K验证`147059`和H9 35K关闭注入验证`145280`。
+三项验证及自动汇总均保留；H19源checkpoint、续训脚本和既有结果不变。
+本次取消不产生实验结论，H19 35K尚无结果。
+
 | 证据 | 路径 |
 |---|---|
 | Checkpoint | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/{4999,9999,14999,19999,24999,29999}` |

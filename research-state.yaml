@@ -84,11 +84,13 @@ experiment_names:
     comparison: [h9_fixed, backview_sft_bs64]
     contribution_feature_fusion: true
     target_steps: [5000, 10000, 30000]
-    status: complete_30k_eval_resume_35k_pending
+    status: complete_30k_eval_resume_35k_cancelled_to_prioritize_evaluations
     train_job: 136345
     current_step_at_last_check: 30000
     resume_job: 147003
-    resume_status: pending_priority
+    resume_status: cancelled_before_start_by_user
+    resume_cancelled_at: "2026-10-12 11:58 CST"
+    resume_cancel_reason: prioritize_leftview_rightview_35k_and_h9_injection_off_35k_evaluations
     replaced_resume_job: 141769
     replaced_resume_job_status: failed_before_training_cross_device_restore
     resume_fix_commit: 6898a7b
@@ -403,7 +405,8 @@ experiment_names:
 
 current_execution:
   checked_at: "2026-10-10 15:26 CST (H9 injection-off 35K array 145280 pending Priority; summary/analysis 145282 waiting afterok:145280; other entries retain their last checked state)"
-  h19_resume_checked_at: "2026-10-11 23:09 CST (147003 pending Priority; 141769 failed before training; cross-device restore fixed and CPU-tested; GPU training not yet verified)"
+  h19_resume_checked_at: "2026-10-12 11:58 CST (147003 cancelled by user before training to prioritize three evaluations; source checkpoints and resume script preserved; GPU resume not verified)"
+  evaluation_priority_checked_at: "2026-10-12 11:58 CST (147057/147059/145280 retained and pending Priority; summaries 147058/147060/145282 retained and waiting dependencies; MV-SV-KD 142275 still running)"
   multiview_35k_checked_at: "2026-10-12 00:22 CST (leftview/rightview 35K training complete; eval arrays 147057/147059 pending Priority; summaries 147058/147060 waiting dependencies; 30K array 147056 cancelled before start)"
   jobs:
     - id: 145280
@@ -535,7 +538,9 @@ current_execution:
       fix_commit: 6898a7b
     - id: 147003
       experiment: h19_feature_fusion_resume_35k
-      state: pending_priority
+      state: cancelled_before_start_by_user
+      cancelled_at: "2026-10-12 11:58 CST"
+      cancel_reason: prioritize_three_35k_evaluation_arrays
       submitted_at: "2026-10-11 23:04 CST"
       replaces: 141769
       training_verified: false
