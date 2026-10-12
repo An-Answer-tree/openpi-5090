@@ -120,9 +120,33 @@ experiment_names:
     resume_planned_checkpoint_steps: [30999, 31999, 32999, 33999, 34999]
     resume_checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k
     checkpoint_status: {4999: complete, 9999: complete, 14999: complete, 19999: complete, 24999: complete, 29999: complete}
-    eval_jobs: {5k: 138746, 10k: 138747, 25k: 139046, 30k: 139418}
-    summary_jobs: {5k: 138748, 10k: 138749, 25k: 139049, 30k: 139419}
-    eval_status: 5k_10k_25k_30k_complete
+    eval_jobs: {5k: 138746, 10k: 138747, 25k: 139046, 30k: 139418, 35k: 147342}
+    summary_jobs: {5k: 138748, 10k: 138749, 25k: 139049, 30k: 139419, 35k: 147343}
+    eval_status: 5k_10k_25k_30k_complete_35k_waiting_for_training
+    eval_35k:
+      submitted_at: "2026-10-12 18:11 CST"
+      protocol_commit: bf943ff
+      status: pending_dependency
+      eval_job: 147342
+      dependency: afterok:147300
+      array: "0-3"
+      resources_per_task: 1gpu_8cpu_24g
+      time_limit: "1-00:00:00"
+      reservation: res_gpu04
+      policy_config: pi05_libero_backview_acpd_v2_layer10_feature_fusion_lora
+      base_image_key: backview_image
+      checkpoint: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_35k/34999
+      episodes_per_task: 50
+      episodes_per_suite: 500
+      episodes_total: 2000
+      seed: 7
+      eval_dir: /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/34999
+      summary_job: 147343
+      summary_dependency: afterok:147342
+      summary_resources: 1cpu_2g
+      summary_path: /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/34999/summary.txt
+      verification: bash_syntax_slurm_test_only_policy_config_and_live_dependencies_passed
+      conclusion: 尚无结论
     pooled_success: {4999: 0.2120, 9999: 0.3655, 24999: 0.5535, 29999: 0.6010}
     eval_30k: {spatial: 0.6780, object: 0.7580, goal: 0.6220, libero_10: 0.3460, pooled: 0.6010}
     analysis: experiments/student/acpd-v2-h19-feature-fusion-30k/analysis.md
@@ -668,6 +692,24 @@ current_execution:
       output_checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k
       stdout: /opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion-35k/slurm-log/pi05-bv-h19-feature-fusion-r35k_147300.out
       purpose: resume_h19_feature_fusion_from_30k_to_35k
+    - id: 147342
+      experiment: h19_feature_fusion_35k_full_eval
+      state: pending_dependency
+      depends_on: 147300
+      reservation: res_gpu04
+      array: "0-3"
+      resources_per_task: 1gpu_8cpu_24g
+      time_limit: "1-00:00:00"
+      checkpoint_step: 34999
+      episodes: 2000
+      eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/34999
+    - id: 147343
+      experiment: h19_feature_fusion_35k_summary
+      state: pending_dependency
+      depends_on: 147342
+      reservation: res_gpu04
+      resources: 1cpu_2g
+      time_limit: "00:15:00"
     - id: 139443
       experiment: acpd_v2_multiview_35k_leftview
       state: complete_35k_final_checkpoint_saved

@@ -12,7 +12,7 @@
 | 学习率 | 沿用30K cosine；30K以后保持2.5e-6，不重启warmup |
 | 保存 | 每1K保存，keep_period=1；保留30999/31999/32999/33999/34999 |
 | 检查 | 5项恢复测试通过；bash语法、Slurm test-only及保存脚本通过；实际恢复step30000、batch30000，首个训练loss有限 |
-| 验证 | 本次只提交训练；尚无35K模型和成功率结果 |
+| 验证 | 18:11提交147342_[0-3]，afterok:147300；汇总147343，afterok:147342；尚无35K结果 |
 
 - 脚本：`scripts/train_slurm/pi05_libero_backview_acpd_v2_feature_fusion_fsdp4_bs64_resume_35k.sbatch`
 - 源checkpoint：`/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999`
@@ -20,3 +20,36 @@
 - 日志：`/opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion-35k/slurm-log/pi05-bv-h19-feature-fusion-r35k_147300.out`
 
 原三项35K验证及其汇总继续执行，本次未修改其他任务，也未移动或复制checkpoint。
+
+## 35K自动全量验证
+
+协议提交：`bf943ff`。复用已有数组和汇总脚本，没有修改训练或评测代码。
+四个子任务各1 GPU、8 CPU、24G、24小时，无并行数量限制；使用`res_gpu04`。
+每套500回合，共2000回合，seed 7；policy为
+`pi05_libero_backview_acpd_v2_layer10_feature_fusion_lora`。
+
+| 项目 | 路径或检查结果 |
+|---|---|
+| Checkpoint | 本次4卡续训目标目录的`34999`；任务开始时检查`_CHECKPOINT_METADATA` |
+| 评测结果 | `/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/34999/` |
+| 日志与视频 | 同目录`slurm-log/`、`logs/`、各suite的`videos/` |
+| 汇总 | 同目录`summary.txt`；四套全部成功后运行 |
+| 已完成检查 | bash语法、Slurm test-only、CPU读取policy配置通过；实际依赖和资源已核对 |
+
+提交命令：
+
+```bash
+sbatch --job-name=eval-bv-h19-35k --reservation=res_gpu04 \
+  --dependency=afterok:147300 --time=1-00:00:00 \
+  --output=/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/34999/slurm-log/%x_%A_%a.out \
+  examples/libero/eval_slurm/run_fixed_backview_benchmark_array.sbatch \
+  /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_35k/34999 \
+  /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/34999 \
+  pi05_libero_backview_acpd_v2_layer10_feature_fusion_lora backview_image 50
+
+sbatch --job-name=summary-bv-h19-35k --reservation=res_gpu04 \
+  --dependency=afterok:147342 \
+  --output=/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/34999/slurm-log/%x_%j.out \
+  examples/libero/eval_slurm/summarize_fixed_backview_benchmark.sbatch \
+  /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/34999
+```
