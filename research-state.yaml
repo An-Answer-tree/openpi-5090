@@ -151,7 +151,7 @@ experiment_names:
     checkpoint_5k_status: complete_all_views
     checkpoint_35k_status: {leftview: complete, rightview: complete, topview: not_completed}
     eval_35k:
-      checked_at: "2026-10-12 00:22 CST"
+      checked_at: "2026-10-12 12:59 CST"
       checkpoint_step: 34999
       policy_config: "pi05_libero_{view}_acpd_v2_layer10_lora"
       view_key: "{view}_image"
@@ -162,6 +162,9 @@ experiment_names:
       replaced_30k_array: 147056
       replaced_30k_status: cancelled_before_start_by_user_checkpoint_correction
       partition: batch
+      reservation: res_gpu04
+      reservation_node: gpu04
+      reservation_binding: updated_pending_arrays_in_place_preserving_ids_and_dependencies
       excluded_nodes: [gpu03]
       array: "0-3"
       concurrency_limit: null
@@ -242,8 +245,8 @@ experiment_names:
     display_name: "H9 35K 推理期 contribution 注入消融"
     protocol: experiments/mechanism/acpd-v2-h9-inference-injection-35k/protocol.md
     execution: experiments/mechanism/acpd-v2-h9-inference-injection-35k/execution.md
-    status: submitted_pending_priority
-    checked_at: "2026-10-10 15:26 CST"
+    status: spatial_object_goal_running_libero10_pending_resources
+    checked_at: "2026-10-12 12:59 CST"
     eval_job_id: 145280
     summary_analysis_job_id: 145282
     dependency: afterok:145280
@@ -265,6 +268,10 @@ experiment_names:
     eval_time_limit: "1-00:00:00"
     analysis_resources: 1cpu_2g_20min
     partition: batch
+    reservation: res_gpu04
+    running_tasks: [0, 1, 2]
+    pending_tasks: [3]
+    reservation_node: gpu04
     excluded_nodes: [gpu03]
     trials_per_task: 50
     episodes: 2000
@@ -407,11 +414,32 @@ current_execution:
   checked_at: "2026-10-10 15:26 CST (H9 injection-off 35K array 145280 pending Priority; summary/analysis 145282 waiting afterok:145280; other entries retain their last checked state)"
   h19_resume_checked_at: "2026-10-12 11:58 CST (147003 cancelled by user before training to prioritize three evaluations; source checkpoints and resume script preserved; GPU resume not verified)"
   evaluation_priority_checked_at: "2026-10-12 11:58 CST (147057/147059/145280 retained and pending Priority; summaries 147058/147060/145282 retained and waiting dependencies; MV-SV-KD 142275 still running)"
-  multiview_35k_checked_at: "2026-10-12 00:22 CST (leftview/rightview 35K training complete; eval arrays 147057/147059 pending Priority; summaries 147058/147060 waiting dependencies; 30K array 147056 cancelled before start)"
+  multiview_35k_checked_at: "2026-10-12 12:59 CST (147057/147059 and summaries bound to res_gpu04 in place; evaluations pending; no results yet)"
+  reservation_checked_at: "2026-10-12 12:59 CST"
+  evaluation_reservation:
+    name: res_gpu04
+    node: gpu04
+    users: [liutong]
+    start: "2026-10-12 12:48 CST"
+    end: "2026-10-16 12:48 CST"
+    flags: [IGNORE_JOBS, SPEC_NODES, MAGNETIC]
+    gpus_total: 8
+    gpus_allocated_to_user: 3
+    gpus_allocated_to_existing_other_jobs: 5
+    gpus_unallocated: 0
+    logical_cpus_total: 224
+    logical_cpus_allocated: 70
+    memory_gib_total: 360
+    memory_gib_allocated: 328
+    pending_jobs_bound_in_place: [145280_2, 145280_3, 147057, 147059, 145282, 147058, 147060]
+    note: reservation_does_not_preempt_existing_jobs_resource_counts_are_a_snapshot
   jobs:
     - id: 145280
       experiment: h9_inference_injection_35k
-      state: pending_priority
+      state: spatial_object_goal_running_libero10_pending_resources
+      running_tasks: [0, 1, 2]
+      pending_tasks: [3]
+      reservation: res_gpu04
       array: "0-3"
       resources_per_task: 1gpu_batch_8cpu_24g
       time_limit: "1-00:00:00"
@@ -420,6 +448,7 @@ current_execution:
     - id: 145282
       experiment: h9_inference_injection_35k_summary_paired_analysis
       state: pending_dependency
+      reservation: res_gpu04
       depends_on: 145280
       resources: 1cpu_2g
       time_limit: "00:20:00"
@@ -575,6 +604,7 @@ current_execution:
     - id: 147057
       experiment: acpd_v2_multiview_leftview_35k_eval
       state: pending_priority
+      reservation: res_gpu04
       array: "0-3"
       resources_per_task: 1gpu_8cpu_24g
       time_limit: "1-00:00:00"
@@ -584,12 +614,14 @@ current_execution:
     - id: 147058
       experiment: acpd_v2_multiview_leftview_35k_summary
       state: pending_dependency
+      reservation: res_gpu04
       depends_on: 147057
       resources: 1cpu_2g
       time_limit: "00:15:00"
     - id: 147059
       experiment: acpd_v2_multiview_rightview_35k_eval
       state: pending_priority
+      reservation: res_gpu04
       array: "0-3"
       resources_per_task: 1gpu_8cpu_24g
       time_limit: "1-00:00:00"
@@ -599,6 +631,7 @@ current_execution:
     - id: 147060
       experiment: acpd_v2_multiview_rightview_35k_summary
       state: pending_dependency
+      reservation: res_gpu04
       depends_on: 147059
       resources: 1cpu_2g
       time_limit: "00:15:00"
