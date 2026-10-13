@@ -157,7 +157,7 @@ H17-Decay只改变该权重；它不能同时证明不可恢复信息、LoRA容�
 
 ## 工程约束
 
-- 原论文ACPD backview的5K完整checkpoint仍存在；2026-10-13提交续训147454至30K，4卡BS32、累计1，只使用gpu04的res_gpu04预约，当前等待资源。此方法为layers6+12的cue选择与预测，无ACPD-v2注入；尚无长训练结论，协议与执行见`experiments/student/acpd-original-backview-bs32-30k/`。
+- 原论文ACPD backview续训147454已于2026-10-13训练至30K，21:25最终29999保存完成；4卡BS32、累计1，使用gpu04的res_gpu04预约。此方法为layers6+12的cue选择与预测，无ACPD-v2注入；尚未进行30K仿真验证，无成功率结论，证据见`experiments/student/acpd-original-backview-bs32-30k/execution.md`。21:41 gpu04仅topview147628占4卡，另4卡空闲。
 - 原始正式对照除 teacher 外使用4 GPU、physical global BS64。H19 30K→35K续训已完成，保持4 GPU、BS64、累计1，数据从原配置batch 30000接续；实际GPU恢复与训练已验证。此前2卡micro BS32、累计2方案未实际训练。
 - 改变GPU数量恢复训练时，参数和优化器状态都必须显式指定当前设备的分片布局，不能沿用checkpoint内保存的布局。4→2设备的数值、优化器、步数和源文件只读检查已通过；147003已在启动前取消，实际GPU续训尚未验证。
 - 蒸馏 checkpoint 使用零起始目录编号；需要保留每 5K 时设置 `keep_period=1`。

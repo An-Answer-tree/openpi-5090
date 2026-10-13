@@ -9,11 +9,14 @@ experiment_names:
     display_name: "Original ACPD backview BS32 5K→30K"
     protocol: experiments/student/acpd-original-backview-bs32-30k/protocol.md
     execution: experiments/student/acpd-original-backview-bs32-30k/execution.md
-    status: training_running
+    status: training_complete_30k_pending_evaluation
     train_job: 147454
-    train_checked_at: "2026-10-13 10:45 CST"
+    train_checked_at: "2026-10-13 21:41 CST"
     train_node: gpu04
-    observed_step_approx: 13000
+    observed_step_approx: 30000
+    final_checkpoint_step: 29999
+    final_checkpoint_saved_at: "2026-10-13 21:25:52 CST"
+    training_completion_evidence: final_29999_metadata_and_successful_save_finalize_log
     requested_node: gpu04
     reservation: res_gpu04
     align_layers: [6, 12]
@@ -585,7 +588,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-13 11:42 CST (H19 147342 four tasks and summary 147343 cancelled by user; topview 147628 running on gpu04 with no dependency, optimizer step and data batch 20000 restored, finite first loss and continuing progress; 147454 and 142275 unchanged)"
+  checked_at: "2026-10-13 21:41 CST (Original ACPD 147454 reached 30K and finalized checkpoint 29999 at 21:25; gpu04 has 4 GPUs allocated to topview 147628 and 4 unallocated; topview approximately 26K/35K; MV-SV-KD 142275 running on gpu02; no pending or evaluation jobs)"
   h19_resume_checked_at: "2026-10-13 09:44 CST (35K training complete at 05:45; all five checkpoints 31K--35K finalized; 147342 training dependency satisfied and pending Resources; 147343 pending evaluation dependency)"
   evaluation_priority_checked_at: "2026-10-12 11:58 CST (147057/147059/145280 retained and pending Priority; summaries 147058/147060/145282 retained and waiting dependencies; MV-SV-KD 142275 still running)"
   multiview_35k_checked_at: "2026-10-12 17:00 CST (leftview final 1593/2000 and rightview final 1586/2000; both summaries available; no evaluation jobs remaining in squeue)"
@@ -598,22 +601,26 @@ current_execution:
     end: "2026-10-16 12:48 CST"
     flags: [IGNORE_JOBS, SPEC_NODES, MAGNETIC]
     gpus_total: 8
-    gpus_allocated_to_user: 8
+    gpus_allocated_to_user: 4
     gpus_allocated_to_existing_other_jobs: 0
-    gpus_unallocated: 0
+    gpus_unallocated: 4
     logical_cpus_total: 224
-    logical_cpus_allocated: 64
+    logical_cpus_allocated: 32
     memory_gib_total: 360
-    memory_gib_allocated: 192
+    memory_gib_allocated: 96
+    resource_counts_checked_at: "2026-10-13 21:41 CST"
     pending_jobs_bound_in_place: [145280_2, 145280_3, 147057, 147059, 145282, 147058, 147060]
     note: reservation_does_not_preempt_existing_jobs_resource_counts_are_a_snapshot
   jobs:
     - id: 147454
       experiment: acpd_original_backview_bs32_resume_30k
-      state: running_continuing_progress
-      checked_at: "2026-10-13 10:45 CST"
+      state: training_complete_30k_final_checkpoint_saved
+      checked_at: "2026-10-13 21:41 CST"
       node: gpu04
-      observed_step_approx: 13000
+      observed_step_approx: 30000
+      final_checkpoint_step: 29999
+      final_checkpoint_saved_at: "2026-10-13 21:25:52 CST"
+      training_completion_evidence: final_29999_metadata_and_successful_save_finalize_log
       requested_node: gpu04
       reservation: res_gpu04
       resources: 4gpu_32cpu_96g
