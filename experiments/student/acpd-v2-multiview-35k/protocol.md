@@ -122,3 +122,16 @@ leftview/rightview 的30K与35K checkpoint已完整保存，训练日志确认35
 保存边界、恢复状态与数据接续8项测试通过；实际sbatch命令CLI解析、bash语法、
 Slurm test-only和已提交脚本核对通过。17:28任务为Priority排队，未分配GPU；
 实际恢复step15000和batch15000须待启动日志确认。
+
+## Topview 暂停以优先验证 H19（2026-10-13）
+
+按用户要求，暂停topview以释放gpu04上的4卡，优先完成H19 35K全量验证。
+停止前核对topview 20K目录`19999`的完成标记、params和train_state元数据。
+当前约21K，没有即时保存功能，停止后约1K未保存进度需从20K重算。
+
+复用已有H19数组`147342_[0-3]`和汇总`147343`，不重复提交验证。
+topview使用原脚本重新提交，依赖`afterok:147343`，仅使用gpu04、预约
+`res_gpu04`。验证或汇总失败时不自动启动训练，避免提前占用验证资源。
+恢复模型、Adam状态和全局步数，`--resume-data-loader`从batch20000接续；
+seed42、BS64、累计1、loss权重、cosine LR、35K目标和保存规则全部保持不变。
+不复制、移动或删除checkpoint，不影响原版ACPD或MV-SV-KD训练。
