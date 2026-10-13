@@ -110,7 +110,7 @@ experiment_names:
     comparison: [h9_fixed, backview_sft_bs64]
     contribution_feature_fusion: true
     target_steps: [5000, 10000, 30000]
-    status: complete_35k_training_eval_running
+    status: complete_35k_training_eval_cancelled_by_user_partial_only
     train_job: 136345
     current_step_at_last_check: 35000
     resume_job: 147300
@@ -148,12 +148,13 @@ experiment_names:
     checkpoint_status: {4999: complete, 9999: complete, 14999: complete, 19999: complete, 24999: complete, 29999: complete}
     eval_jobs: {5k: 138746, 10k: 138747, 25k: 139046, 30k: 139418, 35k: 147342}
     summary_jobs: {5k: 138748, 10k: 138749, 25k: 139049, 30k: 139419, 35k: 147343}
-    eval_status: 5k_10k_25k_30k_complete_35k_running
+    eval_status: 5k_10k_25k_30k_complete_35k_cancelled_partial_only
     eval_35k:
       submitted_at: "2026-10-12 18:11 CST"
       protocol_commit: bf943ff
-      status: running_all_four_suites_episodes_confirmed
-      checked_at: "2026-10-13 10:48 CST"
+      status: cancelled_by_user_partial_only
+      checked_at: "2026-10-13 11:40 CST"
+      cancelled_at: "2026-10-13 11:38:22 CST"
       started_at: "2026-10-13 10:44:47 CST"
       node: gpu04
       eval_job: 147342
@@ -171,10 +172,15 @@ experiment_names:
       seed: 7
       eval_dir: /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/34999
       summary_job: 147343
+      summary_status: cancelled_by_user_no_full_summary
       summary_dependency: afterok:147342
       summary_resources: 1cpu_2g
       summary_path: /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/34999/summary.txt
       verification: bash_syntax_slurm_test_only_policy_config_and_live_dependencies_passed
+      partial_result: experiments/student/acpd-v2-h19-feature-fusion-30k/evaluation-35k-partial.md
+      completed_episodes: 1232
+      partial_successes: 748
+      h9_matched_successes: 790
       conclusion: 尚无结论
     pooled_success: {4999: 0.2120, 9999: 0.3655, 24999: 0.5535, 29999: 0.6010}
     eval_30k: {spatial: 0.6780, object: 0.7580, goal: 0.6220, libero_10: 0.3460, pooled: 0.6010}
@@ -184,7 +190,7 @@ experiment_names:
     supervised_loss_correlation_with_h9: 0.99984036
     max_5k_window_flow_mean_relative_difference: 0.0016185
     analysis_conclusion: no_detected_faster_flow_convergence_or_stable_eval_advantage
-    method_recommendation: h9_main_h19_candidate_pending_35k_and_capacity_control
+    method_recommendation: h9_main_h19_35k_partial_only_no_full_ranking
   acpd_v2_multiview_35k:
     display_name: "ACPD-v2-Fixed 多视角 Student 35K"
     protocol: experiments/student/acpd-v2-multiview-35k/protocol.md
@@ -192,10 +198,10 @@ experiment_names:
     parent: h9_fixed
     target_steps: 35000
     student_config: "对应视角 pi05_libero_*view_lora"
-    status: leftview_rightview_35k_eval_complete_topview_paused_for_h19_eval
+    status: leftview_rightview_35k_eval_complete_topview_training_running
     train_jobs: {leftview: 139443, rightview: 139444, topview: 147628}
     previous_topview_train_job: 139445
-    train_status: {leftview: complete_35k, rightview: complete_35k, topview: pending_h19_eval_summary}
+    train_status: {leftview: complete_35k, rightview: complete_35k, topview: running_training_verified}
     training_completion_evidence: final_34999_metadata_and_successful_save_finalize_log
     nodes: {leftview: gpu02, rightview: gpu04, topview: gpu04}
     smoke_job: 139426_[0-2]
@@ -214,11 +220,15 @@ experiment_names:
     topview_resume:
       job: 147628
       submitted_at: "2026-10-13 10:44:34 CST"
-      status: pending_h19_eval_summary
-      checked_at: "2026-10-13 10:45 CST"
+      status: running_training_verified
+      checked_at: "2026-10-13 11:42 CST"
+      started_at: "2026-10-13 11:38:26 CST"
       node: gpu04
       reservation: res_gpu04
-      dependency: afterok:147343
+      dependency: null
+      previous_dependency: afterok:147343
+      dependency_removed_at: "2026-10-13 11:38:22 CST"
+      reason: user_stopped_h19_eval_and_prioritized_topview_training
       paused_job: 147339
       paused_at: "2026-10-13 10:44:45 CST"
       observed_step_before_pause_approx: 21000
@@ -245,8 +255,11 @@ experiment_names:
       script: scripts/train_slurm/pi05_libero_topview_acpd_v2_layer10_lora_fsdp4_bs64_35k.sbatch
       checkpoint_dir: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k/topview/pi05_libero_topview_acpd_v2_layer10/pi05_libero_topview_acpd_v2_layer10_lora_fsdp4_bs64_35k
       stdout: /opt/liutong/openpi-5090-research/acpd-v2-multiview-35k/slurm-log/pi05-tv-acpdv2-l10-fsdp4-bs64-35k_147628.out
-      verification: complete_20k_metadata_bash_syntax_slurm_test_only_and_live_dependency_passed
-      conclusion: 暂停等待H19验证汇总成功后恢复_尚无35K验证结论
+      verification: restored_optimizer_step_20000_data_batch_20000_finite_first_loss_and_continuing_progress
+      first_logged_step: 20000
+      first_logged_loss: 0.0689
+      first_logged_supervised_loss: 0.0131
+      conclusion: 从20K恢复训练状态_尚无35K验证结论
     eval_35k:
       checked_at: "2026-10-12 17:00 CST"
       checkpoint_step: 34999
@@ -572,7 +585,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-13 10:45 CST (147339 stopped at approximately 21K; H19 147342 four tasks running on gpu04; topview 147628 waits for summary 147343; 147454 and 142275 remain running)"
+  checked_at: "2026-10-13 11:42 CST (H19 147342 four tasks and summary 147343 cancelled by user; topview 147628 running on gpu04 with no dependency, optimizer step and data batch 20000 restored, finite first loss and continuing progress; 147454 and 142275 unchanged)"
   h19_resume_checked_at: "2026-10-13 09:44 CST (35K training complete at 05:45; all five checkpoints 31K--35K finalized; 147342 training dependency satisfied and pending Resources; 147343 pending evaluation dependency)"
   evaluation_priority_checked_at: "2026-10-12 11:58 CST (147057/147059/145280 retained and pending Priority; summaries 147058/147060/145282 retained and waiting dependencies; MV-SV-KD 142275 still running)"
   multiview_35k_checked_at: "2026-10-12 17:00 CST (leftview final 1593/2000 and rightview final 1586/2000; both summaries available; no evaluation jobs remaining in squeue)"
@@ -828,8 +841,9 @@ current_execution:
       purpose: resume_h19_feature_fusion_from_30k_to_35k
     - id: 147342
       experiment: h19_feature_fusion_35k_full_eval
-      state: running_all_four_suites_episodes_confirmed
-      checked_at: "2026-10-13 10:48 CST"
+      state: cancelled_by_user_partial_only
+      checked_at: "2026-10-13 11:40 CST"
+      completed_episodes: 1232
       started_at: "2026-10-13 10:44:47 CST"
       node: gpu04
       training_dependency_satisfied: true
@@ -843,7 +857,7 @@ current_execution:
       eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/34999
     - id: 147343
       experiment: h19_feature_fusion_35k_summary
-      state: pending_dependency
+      state: cancelled_by_user_incomplete_evaluation
       depends_on: 147342
       reservation: res_gpu04
       resources: 1cpu_2g
@@ -923,9 +937,13 @@ current_execution:
       keep_period: 1
     - id: 147628
       experiment: acpd_v2_multiview_topview_resume_after_h19_eval
-      state: pending_dependency
-      depends_on: 147343
-      dependency: afterok:147343
+      state: running_training_verified
+      checked_at: "2026-10-13 11:42 CST"
+      started_at: "2026-10-13 11:38:26 CST"
+      node: gpu04
+      depends_on: null
+      dependency: null
+      previous_dependency: afterok:147343
       requested_node: gpu04
       reservation: res_gpu04
       resources: 4gpu_32cpu_96g
