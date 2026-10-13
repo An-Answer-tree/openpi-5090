@@ -151,3 +151,4 @@
 | 2026-10-13 | 预注册 | 新增 Original ACPD backview BS32 5K→30K：复用已有完整5K layers 6+12 checkpoint，保持论文原版 selector、cue prediction、variance regularization 与 ACL；4×5090 FSDP、global BS32、累计1，25K后每1K保存。先提交协议和脚本，尚无训练或成功率结论。 |
 | 2026-10-13 | 提交与调度 | 原论文ACPD续训147454已提交；按用户要求原地绑定gpu04与res_gpu04，00:24等待Resources，4GPU/32CPU/96G/8天，BS32、累计1。H19 147300、topview 147339、第三方baseline 142275及验证依赖均未修改；没有移动、复制或删除checkpoint与数据。保存与续训规则6项测试通过、2项因单设备跳过；实际GPU恢复尚待启动验证。 |
 | 2026-10-13 | 训练完成 | H19 30K→35K续训147300于05:45完成，约14小时29分；09:44逐一核对30999/31999/32999/33999/34999完成标记及params/train_state元数据，五个checkpoint全部保留。验证147342_[0-3]的afterok依赖已满足，等待Resources；汇总147343等待验证，尚无35K成功率。未修改任务或checkpoint。 |
+| 2026-10-13 | 调度 | 按用户要求10:44暂停topview147339（约21K，完整保存至20K），释放4卡后H19 35K验证147342_[0-3]于10:44:47在gpu04全部启动。后继topview147628已提交并解除hold，依赖汇总147343成功，恢复20K完整状态与batch20000，保持4卡BS64、累计1和35K目标；约1K未保存进度需重算。协议commit987f571先于提交；未改变其他训练，未移动或复制checkpoint。 |
