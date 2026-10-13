@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-13 21:41 CST（旧版ACPD 30K训练完成；gpu04空闲4卡，topview继续训练）
+更新时间：2026-10-13 22:26 CST（旧版ACPD 30K四套模型加载成功并进入首回合；topview训练不变）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -9,7 +9,7 @@
 
 | 实验 | 目的 | 配置 | 状态 | 结论 |
 |---|---|---|---|---|
-| Original ACPD backview BS32 5K→30K | 在论文原版动作条件 privileged cue 方法下观察长训练效果 | 5K完整checkpoint接续；layers 6+12；4×5090 FSDP；global BS32；累计1；loss `1.0/0.2/0.5`；每5K保存，25K后每1K全部保留 | 147454已训练至30K，21:25最终29999保存完成；释放4卡，尚未验证 | 尚无成功率结论；[协议与执行](experiments/student/acpd-original-backview-bs32-30k/) |
+| Original ACPD backview BS32 5K→30K | 在论文原版动作条件 privileged cue 方法下观察长训练效果 | 5K完整checkpoint接续；layers 6+12；4×5090 FSDP；global BS32；累计1；loss `1.0/0.2/0.5`；每5K保存，25K后每1K全部保留 | 30K训练完成；全量验证147939_[0-3]在gpu04同时运行，四套各500回合，模型加载成功并进入首回合；汇总147944等待依赖 | 尚无成功率结论；[验证协议](experiments/student/acpd-original-backview-bs32-30k/evaluation-30k.md) |
 
 ## 当前结论
 
