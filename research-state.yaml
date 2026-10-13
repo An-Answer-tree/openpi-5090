@@ -107,12 +107,14 @@ experiment_names:
     comparison: [h9_fixed, backview_sft_bs64]
     contribution_feature_fusion: true
     target_steps: [5000, 10000, 30000]
-    status: complete_30k_eval_resume_35k_running_4gpu
+    status: complete_35k_training_eval_pending_resources
     train_job: 136345
-    current_step_at_last_check: 30000
+    current_step_at_last_check: 35000
     resume_job: 147300
-    resume_status: running_training_verified
-    resume_checked_at: "2026-10-12 15:28 CST"
+    resume_status: complete_35k_all_five_checkpoints_saved
+    resume_checked_at: "2026-10-13 09:44 CST"
+    resume_final_save_at: "2026-10-13 05:45:08 CST"
+    resume_elapsed_approx: "14:29:00"
     resume_started_at: "2026-10-12 15:16:41 CST"
     resume_execution: experiments/student/acpd-v2-h19-feature-fusion-30k/execution-35k.md
     replaced_resume_job: 147003
@@ -138,15 +140,16 @@ experiment_names:
     resume_save_interval: 1000
     resume_keep_period: 1
     resume_planned_checkpoint_steps: [30999, 31999, 32999, 33999, 34999]
+    resume_saved_checkpoint_steps: [30999, 31999, 32999, 33999, 34999]
     resume_checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k
     checkpoint_status: {4999: complete, 9999: complete, 14999: complete, 19999: complete, 24999: complete, 29999: complete}
     eval_jobs: {5k: 138746, 10k: 138747, 25k: 139046, 30k: 139418, 35k: 147342}
     summary_jobs: {5k: 138748, 10k: 138749, 25k: 139049, 30k: 139419, 35k: 147343}
-    eval_status: 5k_10k_25k_30k_complete_35k_waiting_for_training
+    eval_status: 5k_10k_25k_30k_complete_35k_pending_resources
     eval_35k:
       submitted_at: "2026-10-12 18:11 CST"
       protocol_commit: bf943ff
-      status: pending_dependency
+      status: pending_resources_training_dependency_satisfied
       eval_job: 147342
       dependency: afterok:147300
       array: "0-3"
@@ -558,7 +561,7 @@ experiment_names:
 
 current_execution:
   checked_at: "2026-10-13 00:24 CST (147454 pending Resources on gpu04/res_gpu04; 142275 on gpu02 and 147300/147339 on gpu04 running; existing jobs and dependencies unchanged)"
-  h19_resume_checked_at: "2026-10-12 15:28 CST (147300 running on gpu04 since 15:16:41; 4 GPUs, BS64, accumulation 1; optimizer step 30000 and data batch 30000 restored; finite loss and continuing training verified)"
+  h19_resume_checked_at: "2026-10-13 09:44 CST (35K training complete at 05:45; all five checkpoints 31K--35K finalized; 147342 training dependency satisfied and pending Resources; 147343 pending evaluation dependency)"
   evaluation_priority_checked_at: "2026-10-12 11:58 CST (147057/147059/145280 retained and pending Priority; summaries 147058/147060/145282 retained and waiting dependencies; MV-SV-KD 142275 still running)"
   multiview_35k_checked_at: "2026-10-12 17:00 CST (leftview final 1593/2000 and rightview final 1586/2000; both summaries available; no evaluation jobs remaining in squeue)"
   reservation_checked_at: "2026-10-13 00:24 CST"
@@ -783,10 +786,12 @@ current_execution:
       purpose: resume_h19_feature_fusion_from_30k_to_35k
     - id: 147300
       experiment: h19_feature_fusion_resume_35k
-      state: running_training_verified
+      state: complete_35k_all_five_checkpoints_saved
       submitted_at: "2026-10-12 14:54 CST"
       started_at: "2026-10-12 15:16:41 CST"
-      checked_at: "2026-10-12 15:28 CST"
+      checked_at: "2026-10-13 09:44 CST"
+      final_save_at: "2026-10-13 05:45:08 CST"
+      validation_dependency_satisfied_at: "2026-10-13 05:45:16 CST"
       replaces: 147003
       training_verified: true
       node: gpu04
@@ -803,12 +808,15 @@ current_execution:
       save_interval: 1000
       keep_period: 1
       planned_checkpoint_steps: [30999, 31999, 32999, 33999, 34999]
+      saved_checkpoint_steps: [30999, 31999, 32999, 33999, 34999]
       output_checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k
       stdout: /opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion-35k/slurm-log/pi05-bv-h19-feature-fusion-r35k_147300.out
       purpose: resume_h19_feature_fusion_from_30k_to_35k
     - id: 147342
       experiment: h19_feature_fusion_35k_full_eval
-      state: pending_dependency
+      state: pending_resources
+      checked_at: "2026-10-13 09:44 CST"
+      training_dependency_satisfied: true
       depends_on: 147300
       reservation: res_gpu04
       array: "0-3"
