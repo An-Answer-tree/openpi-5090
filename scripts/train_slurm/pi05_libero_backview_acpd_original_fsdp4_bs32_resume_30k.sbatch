@@ -83,4 +83,5 @@ python -m scripts.distillation_acpd.train_distill \
   --resume-from=/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_lora/ablations/layers_5k/pi05_libero_backview_acpd_lora_layers6_12/pi05_libero_backview_acpd_lora_fsdp2_layers6_12_bs32_5k/4999 \
   --resume-data-loader \
   --fsdp-devices=4 \
-  --no-wandb-enabled
+  --no-wandb-enabled \
+  "$@"
