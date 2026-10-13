@@ -6,10 +6,10 @@ project:
 
 experiment_names:
   acpd_original_backview_bs32_30k:
-    display_name: "Original ACPD backview BS32 5K→30K"
+    display_name: "Original ACPD backview BS32 5K→50K"
     protocol: experiments/student/acpd-original-backview-bs32-30k/protocol.md
     execution: experiments/student/acpd-original-backview-bs32-30k/execution.md
-    status: training_complete_30k_evaluation_running
+    status: training_complete_30k_evaluation_cancelled_resume50k_restored_waiting_data
     train_job: 147454
     train_checked_at: "2026-10-13 21:41 CST"
     train_node: gpu04
@@ -36,8 +36,12 @@ experiment_names:
       eval_job: 147939
       summary_job: 147944
       submitted_at: "2026-10-13 22:24:13 CST"
-      checked_at: "2026-10-13 22:26 CST"
-      status: all_four_models_loaded_first_episode_started
+      checked_at: "2026-10-13 23:37 CST"
+      status: cancelled_by_user_incomplete_logs_preserved
+      completed_episodes: 1431
+      partial_successes: 673
+      partial_rate_percent: 47.030049
+      partial_result_limitation: stopped_after_observing_results_not_full_evaluation
       node: gpu04
       reservation: res_gpu04
       array: "0-3"
@@ -55,6 +59,36 @@ experiment_names:
       episodes_total: 2000
       output_dir: /opt/liutong/openpi-5090-evals/acpd-original-backview-bs32-30k/29999
       comparison_limitation: original_bs32_vs_formal_h9_h19_sft_bs64_not_batch_matched
+    resume_50k:
+      protocol: experiments/student/acpd-original-backview-bs32-30k/resume-50k.md
+      protocol_commit: c56ec50
+      train_job: 147971
+      status: running_checkpoint_restored_waiting_data_initialization
+      submitted_at: "2026-10-13 23:37:17 CST"
+      started_at: "2026-10-13 23:37:17 CST"
+      checked_at: "2026-10-13 23:51 CST"
+      node: gpu04
+      reservation: res_gpu04
+      resources: 4gpu_32cpu_96g
+      physical_global_batch: 32
+      gradient_accumulation_steps: 1
+      time_limit: "2-00:00:00"
+      resume_optimizer_step: 30000
+      observed_optimizer_step: 30000
+      checkpoint_restored_at: "2026-10-13 23:38:44 CST"
+      checkpoint_restore_verified: true
+      data_loader_initialized: false
+      training_advance_verified: false
+      resume_data_loader: true
+      target_steps: 50000
+      lr_after_30k: 2.5e-6
+      reset_lr_schedule: false
+      save_interval_after: [25000, 1000]
+      keep_period: 1
+      source_checkpoint: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_original/backview_bs32_30k/pi05_libero_backview_acpd_original_layers6_12/pi05_libero_backview_acpd_original_lora_fsdp4_bs32_30k/29999
+      checkpoint_root_unchanged: true
+      script: scripts/train_slurm/pi05_libero_backview_acpd_original_fsdp4_bs32_resume_50k.sbatch
+      stdout: /opt/liutong/openpi-5090-research/acpd-original-backview-bs32-50k/slurm-log/pi05-bv-acpd-original-r50k_147971.out
     conclusion: 尚无结论
   mv_sv_kd_backview_30k:
     display_name: "MV-SV-KD (pi0.5 offline fixed-view adaptation)"
@@ -613,7 +647,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-13 22:26 CST (Original ACPD 30K evaluation 147939_[0-3] all models loaded and first episode started on gpu04; summary 147944 waiting afterok; topview 147628 and MV-SV-KD 142275 unchanged)"
+  checked_at: "2026-10-13 23:51 CST (Original ACPD evaluation 147939 and summary 147944 cancelled by user; resume50k 147971 running on gpu04, model and optimizer restored to step30000, waiting data initialization; first update not yet verified; topview 147628 and MV-SV-KD 142275 unchanged)"
   h19_resume_checked_at: "2026-10-13 09:44 CST (35K training complete at 05:45; all five checkpoints 31K--35K finalized; 147342 training dependency satisfied and pending Resources; 147343 pending evaluation dependency)"
   evaluation_priority_checked_at: "2026-10-12 11:58 CST (147057/147059/145280 retained and pending Priority; summaries 147058/147060/145282 retained and waiting dependencies; MV-SV-KD 142275 still running)"
   multiview_35k_checked_at: "2026-10-12 17:00 CST (leftview final 1593/2000 and rightview final 1586/2000; both summaries available; no evaluation jobs remaining in squeue)"
@@ -633,14 +667,35 @@ current_execution:
     logical_cpus_allocated: 64
     memory_gib_total: 360
     memory_gib_allocated: 192
-    resource_counts_checked_at: "2026-10-13 22:25 CST"
+    resource_counts_checked_at: "2026-10-13 23:37 CST"
     pending_jobs_bound_in_place: [145280_2, 145280_3, 147057, 147059, 145282, 147058, 147060]
     note: reservation_does_not_preempt_existing_jobs_resource_counts_are_a_snapshot
   jobs:
+    - id: 147971
+      experiment: acpd_original_backview_bs32_resume_50k
+      state: running_checkpoint_restored_waiting_data_initialization
+      started_at: "2026-10-13 23:37:17 CST"
+      checked_at: "2026-10-13 23:51 CST"
+      node: gpu04
+      reservation: res_gpu04
+      resources: 4gpu_32cpu_96g
+      time_limit: "2-00:00:00"
+      physical_global_batch: 32
+      gradient_accumulation_steps: 1
+      resume_optimizer_step: 30000
+      observed_optimizer_step: 30000
+      checkpoint_restore_verified: true
+      training_advance_verified: false
+      resume_data_loader: true
+      target_steps: 50000
+      save_interval_after: [25000, 1000]
+      keep_period: 1
+      script: scripts/train_slurm/pi05_libero_backview_acpd_original_fsdp4_bs32_resume_50k.sbatch
+      stdout: /opt/liutong/openpi-5090-research/acpd-original-backview-bs32-50k/slurm-log/pi05-bv-acpd-original-r50k_147971.out
     - id: 147939
       experiment: acpd_original_backview_bs32_30k_evaluation
-      state: all_four_models_loaded_first_episode_started
-      checked_at: "2026-10-13 22:26 CST"
+      state: cancelled_by_user_partial_logs_preserved
+      checked_at: "2026-10-13 23:37 CST"
       node: gpu04
       reservation: res_gpu04
       array: "0-3"
@@ -651,7 +706,7 @@ current_execution:
       eval_path: /opt/liutong/openpi-5090-evals/acpd-original-backview-bs32-30k/29999
     - id: 147944
       experiment: acpd_original_backview_bs32_30k_summary
-      state: pending_dependency
+      state: cancelled_by_user
       depends_on: 147939
       reservation: res_gpu04
       node: gpu04
