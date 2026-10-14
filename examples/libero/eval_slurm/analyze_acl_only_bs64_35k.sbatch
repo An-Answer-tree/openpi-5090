@@ -20,6 +20,8 @@ export CONDA_ENVS_PATH=/home/liutong/miniconda3/envs
 source /home/liutong/miniconda3/etc/profile.d/conda.sh
 conda activate openpi
 export HF_HUB_OFFLINE=1
+export HF_HOME=/opt/liutong/huggingface
+export HF_DATASETS_CACHE=/opt/liutong/huggingface/datasets
 export HF_DATASETS_OFFLINE=1
 export TRANSFORMERS_OFFLINE=1
 export OPENBLAS_NUM_THREADS=1

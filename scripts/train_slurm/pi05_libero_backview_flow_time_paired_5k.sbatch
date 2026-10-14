@@ -15,6 +15,8 @@ set -euo pipefail
 source /home/liutong/miniconda3/etc/profile.d/conda.sh
 conda activate openpi
 
+export HF_HOME=/opt/liutong/huggingface
+export HF_DATASETS_CACHE=/opt/liutong/huggingface/datasets
 export HF_LEROBOT_HOME=/opt/liutong
 export HF_DATASETS_OFFLINE=1
 export HF_HUB_OFFLINE=1

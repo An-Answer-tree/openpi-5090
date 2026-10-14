@@ -24,6 +24,8 @@ mkdir -p "${TMPDIR}"
 
 source /home/liutong/miniconda3/etc/profile.d/conda.sh
 
+export HF_HOME=/opt/liutong/huggingface
+export HF_DATASETS_CACHE=/opt/liutong/huggingface/datasets
 export HF_DATASETS_OFFLINE=1
 export HF_HUB_DISABLE_TELEMETRY=1
 export HF_HUB_OFFLINE=1

@@ -15,3 +15,13 @@ Slurm 已提交任务的状态以 `squeue` 为准，脚本留在顶层不代表�
 `archive/legacy_bs32/` 保存旧 BS16/BS32 launcher；`archive/diagnostics/` 保存已完成的
 probe launcher；`archive/completed/` 保存一次性25K恢复脚本；`archive/abandoned/`
 保存不再继续的 H11 launcher。归档脚本不用于新的正式提交。
+
+## 数据缓存
+
+现用训练和 LIBERO 验证入口明确设置 `HF_HOME=/opt/liutong/huggingface`、
+`HF_DATASETS_CACHE=/opt/liutong/huggingface/datasets`，复用已有缓存，不依赖
+交互式 `.bashrc` 或提交时继承的环境。离线设置只关闭联网，不关闭本地缓存。
+
+修改仅对后续启动生效；不重启或修改正在训练的进程。2026-10-14确认任务147971
+仍映射 `/home/liutong/.cache/huggingface/datasets/` 的重复Arrow缓存，训练结束且
+确认无进程使用前不得清理；不要移动原数据或checkpoint。
