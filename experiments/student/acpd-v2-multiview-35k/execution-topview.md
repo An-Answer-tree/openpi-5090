@@ -38,3 +38,9 @@ scontrol release 147628
 ```
 
 H19部分结果见[`evaluation-35k-partial.md`](../acpd-v2-h19-feature-fusion-30k/evaluation-35k-partial.md)。
+
+## 35K完成
+
+2026-10-14 17:19:00最终`34999`保存及Save Finalize完成；已核对
+`34999/_CHECKPOINT_METADATA`。任务147628已退出Slurm活动队列，未修改任何任务。
+从20K接续的本次执行约29小时41分；35K尚无验证结论。

@@ -21,7 +21,7 @@ checkpoint：
 `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_original/backview_bs32_30k/pi05_libero_backview_acpd_original_layers6_12/pi05_libero_backview_acpd_original_lora_fsdp4_bs32_30k/49999`。
 
 完成标记和`assets/libero_multiview/norm_stats.json`已核对。不移动、复制或删除模型；
-不修改topview147628或MV-SV-KD142275。50K尚无验证结论。
+不修改topview147628或MV-SV-KD142275。
 
 ## 实际提交
 
@@ -31,4 +31,26 @@ checkpoint：
 | 验证 | `148343_[0-3]`；2026-10-14 14:52:32四项同时在gpu04启动 |
 | 汇总 | `148347`，依赖`afterok:148343`；结果`49999/summary.txt` |
 | 检查 | 复用脚本bash语法、checkpoint完成标记及norm stats、Slurm测试提交通过；实际资源、预约与输出路径已核对 |
-| 状态 | 四项运行，汇总等待依赖；尚无成功率结论 |
+| 状态 | 四项全量完成，汇总148347已生成；2026-10-14 17:30:49汇总文件写入 |
+
+## 最终结果
+
+2026-10-14 17:48核对：每套10任务、每任务50个唯一回合，四套共2000回合；
+逐回合解析与`49999/summary.txt`一致。H9比较为探索性，不是BS与步数匹配对照。
+
+| 套件 | 旧版50K成功/回合 | 旧版50K | H9 BS64 35K | 旧版−H9（百分点） | 配对95%区间（百分点） |
+|---|---:|---:|---:|---:|---|
+| Spatial | 301/500 | 60.20% | 73.20% | -13.00 | [-18.60,-7.60] |
+| Object | 314/500 | 62.80% | 73.80% | -11.00 | [-15.80,-6.20] |
+| Goal | 323/500 | 64.60% | 63.60% | +1.00 | [-3.80,+5.80] |
+| LIBERO-10 | 124/500 | 24.80% | 33.60% | -8.80 | [-13.60,-3.80] |
+| 合计 | 1062/2000 | 53.10% | 61.05% | -7.95 | [-10.50,-5.40] |
+
+本次旧版50K整体低于H9 35K；Goal未检测到确定差异。不同BS、训练步数与训练
+轨迹共同变化，不能单独证明方法差异，也不能用提前停止的30K部分结果证明50K增益。
+区间仅对固定任务的评测回合分层配对重采样，不覆盖训练seed变化。
+
+证据：原验证目录`logs/`及`summary.txt`；H9为
+`/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/`。
+配对原始指标：[results/paired-h9-35k.json](results/paired-h9-35k.json)，
+复用`analyze_paired_eval.py`，bootstrap=10000、seed42。

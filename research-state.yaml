@@ -9,7 +9,7 @@ experiment_names:
     display_name: "Original ACPD backview BS32 5K→50K"
     protocol: experiments/student/acpd-original-backview-bs32-30k/protocol.md
     execution: experiments/student/acpd-original-backview-bs32-30k/execution.md
-    status: training_complete_50k_evaluation_running
+    status: training_complete_50k_evaluation_complete
     train_job: 147454
     train_checked_at: "2026-10-13 21:41 CST"
     train_node: gpu04
@@ -97,10 +97,24 @@ experiment_names:
       protocol_commit: 4a2a1d8
       eval_job: 148343
       summary_job: 148347
-      status: running_all_four_suites
+      status: complete_all_four_suites_and_summary
       submitted_at: "2026-10-14 14:52:32 CST"
       started_at: "2026-10-14 14:52:32 CST"
-      checked_at: "2026-10-14 14:53 CST"
+      checked_at: "2026-10-14 17:50 CST"
+      summary_written_at: "2026-10-14 17:30:49 CST"
+      completed_episodes: 2000
+      successes: 1062
+      pooled_rate_percent: 53.10
+      suites:
+        spatial: {successes: 301, episodes: 500, rate_percent: 60.20}
+        object: {successes: 314, episodes: 500, rate_percent: 62.80}
+        goal: {successes: 323, episodes: 500, rate_percent: 64.60}
+        libero_10: {successes: 124, episodes: 500, rate_percent: 24.80}
+      paired_h9_35k:
+        classification: exploratory_bs_and_step_not_matched
+        difference_pp: -7.95
+        ci95_pp: [-10.50, -5.40]
+        metrics: experiments/student/acpd-original-backview-bs32-30k/results/paired-h9-35k.json
       node: gpu04
       reservation: res_gpu04
       array: "0-3"
@@ -118,8 +132,8 @@ experiment_names:
       episodes_total: 2000
       output_dir: /opt/liutong/openpi-5090-evals/acpd-original-backview-bs32-50k/49999
       comparison_limitation: original_bs32_vs_formal_h9_h19_sft_bs64_not_batch_matched
-      conclusion: 尚无结论
-    conclusion: 尚无结论
+      conclusion: 旧版50K为53.10%，低于H9 BS64 35K的61.05%；BS和步数不同，不能单独归因为方法。
+    conclusion: 50K全量验证完成，53.10%；30K评测提前停止，不以其部分结果判断50K增益。
   mv_sv_kd_backview_30k:
     display_name: "MV-SV-KD (pi0.5 offline fixed-view adaptation)"
     protocol: experiments/baseline/mv-sv-kd-backview-bs64-30k/protocol.md
@@ -130,9 +144,9 @@ experiment_names:
     smoke_status: complete_two_steps_finite_loss
     train_job: 142275
     train_status: running
-    train_checked_at: "2026-10-12 17:00 CST"
+    train_checked_at: "2026-10-14 17:50 CST"
     train_node: gpu02
-    observed_steps_approx: 5690
+    observed_steps_approx: 16900
     dependency: afterok:142274
     teacher_params: /opt/liutong/openpi_checkpoints/fixed_dataset/sft/agentview_wrist/29999/params
     student_config: pi05_libero_backview_lora
@@ -290,10 +304,10 @@ experiment_names:
     parent: h9_fixed
     target_steps: 35000
     student_config: "对应视角 pi05_libero_*view_lora"
-    status: leftview_rightview_35k_eval_complete_topview_training_running
+    status: all_views_training_complete_leftview_rightview_35k_eval_complete
     train_jobs: {leftview: 139443, rightview: 139444, topview: 147628}
     previous_topview_train_job: 139445
-    train_status: {leftview: complete_35k, rightview: complete_35k, topview: running_training_verified}
+    train_status: {leftview: complete_35k, rightview: complete_35k, topview: complete_35k}
     training_completion_evidence: final_34999_metadata_and_successful_save_finalize_log
     nodes: {leftview: gpu02, rightview: gpu04, topview: gpu04}
     smoke_job: 139426_[0-2]
@@ -308,12 +322,14 @@ experiment_names:
     keep_period: 1
     checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k
     checkpoint_5k_status: complete_all_views
-    checkpoint_35k_status: {leftview: complete, rightview: complete, topview: not_completed}
+    checkpoint_35k_status: {leftview: complete, rightview: complete, topview: complete}
     topview_resume:
       job: 147628
       submitted_at: "2026-10-13 10:44:34 CST"
-      status: running_training_verified
-      checked_at: "2026-10-13 11:42 CST"
+      status: complete_35k_final_checkpoint_saved
+      checked_at: "2026-10-14 17:50 CST"
+      final_checkpoint_step: 34999
+      final_checkpoint_saved_at: "2026-10-14 17:19:00 CST"
       started_at: "2026-10-13 11:38:26 CST"
       node: gpu04
       reservation: res_gpu04
@@ -677,7 +693,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-14 14:53 CST (Original ACPD final 50K checkpoint saved at 14:28:38; evaluation148343 all four tasks running on gpu04; summary148347 waiting dependency; topview147628 and MV-SV-KD142275 still running unchanged)"
+  checked_at: "2026-10-14 17:50 CST (Original ACPD 50K full evaluation and summary complete: 1062/2000=53.10%; topview147628 final35K saved at17:19; only MV-SV-KD142275 remains running, approximately16.9K/30K; no jobs modified)"
   h19_resume_checked_at: "2026-10-13 09:44 CST (35K training complete at 05:45; all five checkpoints 31K--35K finalized; 147342 training dependency satisfied and pending Resources; 147343 pending evaluation dependency)"
   evaluation_priority_checked_at: "2026-10-12 11:58 CST (147057/147059/145280 retained and pending Priority; summaries 147058/147060/145282 retained and waiting dependencies; MV-SV-KD 142275 still running)"
   multiview_35k_checked_at: "2026-10-12 17:00 CST (leftview final 1593/2000 and rightview final 1586/2000; both summaries available; no evaluation jobs remaining in squeue)"
@@ -703,7 +719,7 @@ current_execution:
   jobs:
     - id: 148343
       experiment: acpd_original_backview_bs32_50k_evaluation
-      state: running_all_four_suites
+      state: complete_all_four_suites
       started_at: "2026-10-14 14:52:32 CST"
       node: gpu04
       reservation: res_gpu04
@@ -715,7 +731,7 @@ current_execution:
       eval_path: /opt/liutong/openpi-5090-evals/acpd-original-backview-bs32-50k/49999
     - id: 148347
       experiment: acpd_original_backview_bs32_50k_summary
-      state: pending_dependency
+      state: complete_summary_generated
       depends_on: 148343
       reservation: res_gpu04
       node: gpu04
@@ -1096,8 +1112,10 @@ current_execution:
       keep_period: 1
     - id: 147628
       experiment: acpd_v2_multiview_topview_resume_after_h19_eval
-      state: running_training_verified
-      checked_at: "2026-10-13 11:42 CST"
+      state: complete_35k_final_checkpoint_saved
+      checked_at: "2026-10-14 17:50 CST"
+      final_checkpoint_step: 34999
+      final_checkpoint_saved_at: "2026-10-14 17:19:00 CST"
       started_at: "2026-10-13 11:38:26 CST"
       node: gpu04
       depends_on: null
