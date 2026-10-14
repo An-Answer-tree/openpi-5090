@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-14 23:11 CST（topview 31K/32K全量结果为73.50%/75.50%，33K/34K验证继续；三视角31K–34K补训已提交，backview首步通过，left/right排队）
+更新时间：2026-10-15 00:03 CST（topview 31K–34K全量验证完成，分别73.50%/75.50%/75.00%/75.15%；其他任务沿用10月14日23:11快照，本次未复查）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -93,7 +93,7 @@ H19 30K→35K续训已在gpu04完成，4 GPU、physical global BS64、累计1。
 | H9-Fixed | 固定权重 ACPD-v2 对照 | layer 10，BS64，contribution=0.2，ACL=0.5 | 129728/130773 | 30K完成；恢复与续训见下表 | 5K `23.15%`；10K `37.45%`；15K `46.60%`；20K `49.60%`；25K `55.75%`；30K `58.00%`；35K `61.05%`；40K `59.45%` |
 | ACPD-v2-Fixed leftview | 检验 H9-Fixed 在 leftview student 上的效果 | layer 10，4卡 BS64，累计1，loss=`1.0/0.2/0.5`，35K，每5K保留 | 训练139443；5K验证139971/139972；35K验证147057/147058 | 35K训练及5K/35K四套全量验证完成 | 5K pooled `42.95%`（859/2000）；35K pooled `79.65%`（1593/2000），比对应30K SFT高`1.00`点，配对95% CI `[-1.35,+3.35]`点；训练步数不同，未检测到确定优势；[分析](experiments/student/acpd-v2-multiview-35k/analysis.md) |
 | ACPD-v2-Fixed rightview | 检验 H9-Fixed 在 rightview student 上的效果 | 同上，仅改变 student 视角 | 训练139444；5K验证139973/139974；35K验证147059/147060 | 35K训练及5K/35K四套全量验证完成 | 5K pooled `47.60%`（952/2000）；35K pooled `79.30%`（1586/2000），比对应30K SFT高`2.30`点，配对95% CI `[+0.20,+4.40]`点；训练步数不同，不能归因为同进度方法收益；[分析](experiments/student/acpd-v2-multiview-35k/analysis.md) |
-| ACPD-v2-Fixed topview | 检验 H9-Fixed 在 topview student 上的效果及30K–35K轨迹 | 同上，仅改变student视角；完整状态与数据顺序恢复，30K及之前每5K保存，之后每1K，全部保留 | 训练147628；30K验证148506/148511；31K–34K数组148526/148528/148530/148532及指定suite补跑；35K验证148502/148510 | 5K/30K/31K/32K/35K全量验证完成；33K/34K继续运行，每模型2000回合 | 5K `27.80%`；30K `73.20%`，比同进度SFT高`1.65`点；31K/32K/35K为`73.50%/75.50%/73.50%`。32K目前最高观测，比SFT30K高`3.95`点，但不同进度、探索性checkpoint选择；未计算配对区间。[分析与证据](experiments/student/acpd-v2-multiview-35k/analysis.md#topview-30k35k) |
+| ACPD-v2-Fixed topview | 检验 H9-Fixed 在 topview student 上的效果及30K–35K轨迹 | 同上，仅改变student视角；完整状态与数据顺序恢复，30K及之前每5K保存，之后每1K，全部保留 | 训练147628；30K验证148506/148511；31K–34K数组148526/148528/148530/148532及指定suite补跑；35K验证148502/148510 | 5K及30K–35K各点全量验证完成，每模型2000回合 | 5K `27.80%`；30K–35K依次`73.20/73.50/75.50/75.00/75.15/73.50%`。同进度30K比SFT高`1.65`点；32K最高观测，比SFT30K高`3.95`点，但不同进度、探索性checkpoint选择；未计算配对区间。[分析与证据](experiments/student/acpd-v2-multiview-35k/analysis.md#topview-31k34k) |
 | H19-FeatureFusion | 检验预测视觉贡献在动作输出前的特征融合能否提高最终成功率 | backview，layer 10；0–30K为4卡FSDP LoRA，BS64，flow/contribution/ACL=1/0.2/0.5，每5K保留；30K→35K续训同卡数、BS64、累计1，每1K全部保留，LR保持2.5e-6；35K原定四套各500回合 | 正式136345；续训147300；5K验证138746/138748；10K验证138747/138749；25K验证139046/139049；30K验证139418/139419；取消35K验证147342/147343 | 35K训练完成，31K–35K全部完整保存；35K验证按用户要求11:38取消，完成1232/2000回合，日志保留，不生成全量汇总 | 已有全量结果：5K `21.20%`，10K `36.55%`，25K `55.35%`，30K `60.10%`；35K未完成，尚无全量结论；[部分结果](experiments/student/acpd-v2-h19-feature-fusion-30k/evaluation-35k-partial.md) |
 | H13-LossOnly | 判断 contribution 注入是否有效 | H9-Fixed 去除 residual 注入，BS64，5K | 130599/130774 | 完成 | pooled `20.60%`；H9-Fixed 高 `2.55` 点，配对 95% CI `[+0.40, +4.70]` |
 | ACPD-v2-TDCA | 检验动作损失是否能改善 contribution 注入适配 | backview，layer 10，BS64，flow=1.0、contribution=0.2、ACL=0.5；仅开放 predictor 的动作梯度，训练至5K | 135943；验证136221；汇总136222 | 5K 训练及四套全量验证完成 | `21.35%`；比 H9-Fixed 低 `1.80` 点，95% CI `[-3.90, +0.35]`；不支持提升 |
@@ -215,6 +215,8 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | ACPD-v2-Fixed topview BS64 30K | 82.40% | 78.00% | 80.00% | 52.40% | 73.20% |
 | ACPD-v2-Fixed topview BS64 31K | 82.40% | 76.40% | 80.20% | 55.00% | 73.50% |
 | ACPD-v2-Fixed topview BS64 32K | 85.00% | 81.60% | 80.60% | 54.80% | 75.50% |
+| ACPD-v2-Fixed topview BS64 33K | 85.60% | 81.80% | 81.60% | 51.00% | 75.00% |
+| ACPD-v2-Fixed topview BS64 34K | 85.40% | 80.80% | 79.80% | 54.60% | 75.15% |
 | ACPD-v2-Fixed topview BS64 35K | 82.40% | 80.60% | 79.20% | 51.80% | 73.50% |
 | SFT leftview BS64 30K | 84.00% | 79.60% | 79.40% | 71.60% | 78.65% |
 | ACPD-v2-Fixed leftview BS64 35K | 81.60% | 81.60% | 82.40% | 73.00% | 79.65% |
@@ -301,7 +303,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | ACPD-v2 多视角 5K 全量验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/{leftview,rightview,topview}/4999/`；四套各500回合，`summary.txt`为最终汇总，`logs/`为逐套日志，逐套`videos/`为视频；Slurm日志见同根`slurm-log/` |
 | ACPD-v2 leftview/rightview 35K 全量验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/{leftview,rightview}/34999/`；各2000回合，数组`147057/147059`，汇总`147058/147060`；日志`logs/`、视频各套`videos/`、调度日志`slurm-log/`；两视角的`summary.txt`均已完成；[结果与配对分析](experiments/student/acpd-v2-multiview-35k/analysis.md) |
 | ACPD-v2 topview 30K/35K 全量验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/{29999,34999}/summary.txt`；各2000回合，最终73.20%/73.50%；30K数组148506/汇总148511，35K数组148502/汇总148510；logs为逐套日志、各套videos为视频、slurm-log为调度日志；[协议与完成记录](experiments/student/acpd-v2-multiview-35k/evaluation-topview-30k-35k.md)、[分析](experiments/student/acpd-v2-multiview-35k/analysis.md#topview-30k35k) |
-| ACPD-v2 topview 31K–34K 全量验证 | 同一验证根目录下的`{30999,31999,32999,33999}/`；各2000回合，数组148526/148528/148530/148532及指定suite补跑；汇总148527/148529/148531/148533。31K/32K的`summary.txt`已生成，分别73.50%/75.50%；33K/34K继续。归档结构与30K/35K相同；[协议](experiments/student/acpd-v2-multiview-35k/evaluation-topview-31k-34k.md)、[结果](experiments/student/acpd-v2-multiview-35k/analysis.md#topview-31k32k) |
+| ACPD-v2 topview 31K–34K 全量验证 | 同一验证根目录下的`{30999,31999,32999,33999}/`；各2000回合均完成，依次73.50%/75.50%/75.00%/75.15%；原始证据为各目录`logs/{spatial,object,goal,libero_10}.log`，均有完整500回合与最终标记。31K–33K的`summary.txt`已生成，34K按四套最终日志计算。数组148526/148528/148530/148532及指定suite补跑；[协议](experiments/student/acpd-v2-multiview-35k/evaluation-topview-31k-34k.md)、[结果](experiments/student/acpd-v2-multiview-35k/analysis.md#topview-31k34k) |
 | H15a 快速诊断协议 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/fast_protocol.md` |
 | H15a 快速诊断分析 | `experiments/mechanism/acpd-v2-h15a-gradient-conflict/analysis.md` |
 | H15a 结果目录 | `/opt/liutong/openpi-5090-research/acpd-v2-gradient-conflict/` |

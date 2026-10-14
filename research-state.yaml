@@ -354,7 +354,7 @@ experiment_names:
     parent: h9_fixed
     target_steps: 35000
     student_config: "对应视角 pi05_libero_*view_lora"
-    status: all_views_training_and_35k_eval_complete_topview_31k_34k_running
+    status: all_views_training_and_35k_eval_complete_topview_31k_34k_all_results_complete
     train_jobs: {leftview: 139443, rightview: 139444, topview: 147628}
     previous_topview_train_job: 139445
     train_status: {leftview: complete_35k, rightview: complete_35k, topview: complete_35k}
@@ -483,9 +483,12 @@ experiment_names:
       protocol: experiments/student/acpd-v2-multiview-35k/evaluation-topview-31k-34k.md
       protocol_commit: 07d84f3
       submitted_at: "2026-10-14 18:42 CST"
-      checked_at: "2026-10-14 23:11 CST"
-      status: 31k_32k_all_suites_and_summaries_complete_33k_spatial_and_34k_libero10_running
-      completed_checkpoint_steps: [30999, 31999]
+      checked_at: "2026-10-15 00:03 CST"
+      status: all_four_models_2000_episodes_complete_34k_summary_dependency_blocked
+      completed_checkpoint_steps: [30999, 31999, 32999, 33999]
+      completed_summary_checkpoint_steps: [30999, 31999, 32999]
+      summary_status_34k: pending_DependencyNeverSatisfied_afterok_148532_failed
+      results_source: complete_per_suite_episode_logs_and_final_success_markers
       results:
         30999:
           successes: 1470
@@ -505,6 +508,24 @@ experiment_names:
             object: {successes: 408, episodes: 500, rate_percent: 81.60}
             goal: {successes: 403, episodes: 500, rate_percent: 80.60}
             libero_10: {successes: 274, episodes: 500, rate_percent: 54.80}
+        32999:
+          successes: 1500
+          episodes: 2000
+          pooled_rate_percent: 75.00
+          suites:
+            spatial: {successes: 428, episodes: 500, rate_percent: 85.60}
+            object: {successes: 409, episodes: 500, rate_percent: 81.80}
+            goal: {successes: 408, episodes: 500, rate_percent: 81.60}
+            libero_10: {successes: 255, episodes: 500, rate_percent: 51.00}
+        33999:
+          successes: 1503
+          episodes: 2000
+          pooled_rate_percent: 75.15
+          suites:
+            spatial: {successes: 427, episodes: 500, rate_percent: 85.40}
+            object: {successes: 404, episodes: 500, rate_percent: 80.80}
+            goal: {successes: 399, episodes: 500, rate_percent: 79.80}
+            libero_10: {successes: 273, episodes: 500, rate_percent: 54.60}
       failed_suites: {30999: [object], 31999: [object], 32999: [spatial]}
       failure_evidence: policy_server_exited_during_startup_with_tempfile_FileNotFoundError_under_dev_shm
       failure_logs:
@@ -512,7 +533,7 @@ experiment_names:
         - /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/logs/object.startup-failed-148528_1.log
         - /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/32999/logs/spatial.startup-failed-148530_0.log
       pending_suite: {}
-      running_suites: {32999: [spatial], 33999: [libero_10]}
+      running_suites: {}
       retry_submitted: true
       retry_jobs: {30999: 148674, 31999: 148675, 32999: 148676}
       retry_array_tasks: {30999: 1, 31999: 1, 32999: 0}
@@ -543,7 +564,7 @@ experiment_names:
       total_episodes: 8000
       result_root: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview
       validation: bash_syntax_checkpoint_completion_params_metadata_norm_stats_slurm_test_only_and_submitted_job_resources_passed
-      conclusion: 31K和32K全量结果为73.50%和75.50%；33K和34K未完成，无完整轨迹结论；未计算配对区间。
+      conclusion: 31K–34K全量结果为73.50%/75.50%/75.00%/75.15%；32K为30K–35K最高观测点，属于探索性checkpoint选择；未计算配对区间。
     eval_35k:
       checked_at: "2026-10-12 17:00 CST"
       checkpoint_step: 34999
@@ -869,7 +890,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-14 23:11 CST (backview148740 training near30.1K, left/right148741/148742 pending; topview31K/32K completed all2000 episodes and summaries at73.50%/75.50%; 33K Spatial148676 and34K LIBERO10_148532_3 still running; summary148531 waits only148676; MV-SV-KD142275 unchanged)"
+  checked_at: "2026-10-15 00:03 CST (topview31K–34K all2000 episodes complete at73.50%/75.50%/75.00%/75.15%; summaries31K–33K complete,34K148533 pending DependencyNeverSatisfied; other jobs retain2026-10-14 23:11 snapshot and were not rechecked)"
   cache_maintenance:
     checked_at: "2026-10-14 21:46 CST"
     freed_gib_approx: 122
@@ -957,7 +978,7 @@ current_execution:
       depends_on: 148675
     - id: 148530
       experiment: acpd_v2_topview_33k_full_evaluation
-      state: object_goal_libero10_results_complete_spatial_retry_148676_running
+      state: all_four_suite_results_complete_with_retry_148676
       checkpoint_step: 32999
       array: "0-3"
       resources_per_task: 1gpu_8cpu_24g
@@ -965,11 +986,11 @@ current_execution:
       reservation: res_gpu04
     - id: 148531
       experiment: acpd_v2_topview_33k_summary
-      state: pending_dependency
+      state: complete_summary_written
       depends_on: 148676
     - id: 148532
       experiment: acpd_v2_topview_34k_full_evaluation
-      state: spatial_object_goal_complete_libero10_running
+      state: all_four_suite_results_complete
       checkpoint_step: 33999
       array: "0-3"
       resources_per_task: 1gpu_8cpu_24g
@@ -977,7 +998,7 @@ current_execution:
       reservation: res_gpu04
     - id: 148533
       experiment: acpd_v2_topview_34k_summary
-      state: pending_dependency
+      state: pending_DependencyNeverSatisfied
       depends_on: 148532
     - id: 148674
       experiment: acpd_v2_topview_31k_object_retry
@@ -997,7 +1018,7 @@ current_execution:
       reservation: res_gpu04
     - id: 148676
       experiment: acpd_v2_topview_33k_spatial_retry
-      state: running_policy_loaded_simulation_started
+      state: complete_428_of_500
       array: "0"
       checkpoint_step: 32999
       resources: 1gpu_8cpu_24g
