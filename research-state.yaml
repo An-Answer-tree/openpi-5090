@@ -433,8 +433,17 @@ experiment_names:
       protocol: experiments/student/acpd-v2-multiview-35k/evaluation-topview-31k-34k.md
       protocol_commit: 07d84f3
       submitted_at: "2026-10-14 18:42 CST"
-      checked_at: "2026-10-14 20:27 CST"
-      status: running_remaining_suites_34k_libero10_pending_resources
+      checked_at: "2026-10-14 21:16 CST"
+      status: partially_running_three_suite_startup_failures_no_full_results
+      failed_suites: {30999: [object], 31999: [object], 32999: [spatial]}
+      failure_evidence: policy_server_exited_during_startup_with_tempfile_FileNotFoundError_under_dev_shm
+      failure_logs:
+        - /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/30999/logs/object.log
+        - /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/logs/object.log
+        - /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/32999/logs/spatial.log
+      pending_suite: {33999: [libero_10]}
+      pending_reason: Priority
+      retry_submitted: false
       study_type: exploratory_checkpoint_trajectory
       inherited_evaluation: eval_topview_30k_35k
       checkpoint_steps: [30999, 31999, 32999, 33999]
@@ -781,7 +790,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-14 20:27 CST (topview30K/35K evaluations and summaries complete at 73.20%/73.50%; 31K--34K eight remaining suite tasks running on gpu04, 148532_3 pending Resources and summaries waiting afterok; existing tasks unchanged)"
+  checked_at: "2026-10-14 21:16 CST (topview30K/35K final results unchanged; 31K/32K Object and 33K Spatial startup failures confirmed from logs; eight other suite tasks running on gpu04, 148532_3 pending Priority; no retries or changes to jobs)"
   h19_resume_checked_at: "2026-10-13 09:44 CST (35K training complete at 05:45; all five checkpoints 31K--35K finalized; 147342 training dependency satisfied and pending Resources; 147343 pending evaluation dependency)"
   evaluation_priority_checked_at: "2026-10-12 11:58 CST (147057/147059/145280 retained and pending Priority; summaries 147058/147060/145282 retained and waiting dependencies; MV-SV-KD 142275 still running)"
   multiview_35k_checked_at: "2026-10-12 17:00 CST (leftview final 1593/2000 and rightview final 1586/2000; both summaries available; no evaluation jobs remaining in squeue)"
@@ -807,7 +816,7 @@ current_execution:
   jobs:
     - id: 148526
       experiment: acpd_v2_topview_31k_full_evaluation
-      state: running_remaining_suite
+      state: running_libero10_object_startup_failed
       checkpoint_step: 30999
       array: "0-3"
       resources_per_task: 1gpu_8cpu_24g
@@ -819,7 +828,7 @@ current_execution:
       depends_on: 148526
     - id: 148528
       experiment: acpd_v2_topview_32k_full_evaluation
-      state: running_remaining_suite
+      state: running_libero10_object_startup_failed
       checkpoint_step: 31999
       array: "0-3"
       resources_per_task: 1gpu_8cpu_24g
@@ -831,7 +840,7 @@ current_execution:
       depends_on: 148528
     - id: 148530
       experiment: acpd_v2_topview_33k_full_evaluation
-      state: running_remaining_suites
+      state: running_three_suites_spatial_startup_failed
       checkpoint_step: 32999
       array: "0-3"
       resources_per_task: 1gpu_8cpu_24g
@@ -843,7 +852,7 @@ current_execution:
       depends_on: 148530
     - id: 148532
       experiment: acpd_v2_topview_34k_full_evaluation
-      state: running_three_suites_one_pending_resources
+      state: running_three_suites_libero10_pending_priority
       checkpoint_step: 33999
       array: "0-3"
       resources_per_task: 1gpu_8cpu_24g
