@@ -304,7 +304,7 @@ experiment_names:
     parent: h9_fixed
     target_steps: 35000
     student_config: "对应视角 pi05_libero_*view_lora"
-    status: all_views_training_complete_leftview_rightview_35k_eval_complete
+    status: all_views_training_complete_leftview_rightview_eval_complete_topview_30k_35k_eval_running
     train_jobs: {leftview: 139443, rightview: 139444, topview: 147628}
     previous_topview_train_job: 139445
     train_status: {leftview: complete_35k, rightview: complete_35k, topview: complete_35k}
@@ -368,6 +368,52 @@ experiment_names:
       first_logged_loss: 0.0689
       first_logged_supervised_loss: 0.0131
       conclusion: 从20K恢复训练状态_尚无35K验证结论
+    eval_topview_30k_35k:
+      protocol: experiments/student/acpd-v2-multiview-35k/evaluation-topview-30k-35k.md
+      protocol_commit: ed71885
+      checked_at: "2026-10-14 17:57 CST"
+      status: running_both_four_suite_arrays
+      models:
+        checkpoint_34999:
+          eval_job: 148502
+          summary_job: 148510
+          started_at: "2026-10-14 17:56:27 CST"
+          dependency: afterok:148502
+          status: running_all_four_suites
+          output_dir: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/34999
+        checkpoint_29999:
+          eval_job: 148506
+          summary_job: 148511
+          started_at: "2026-10-14 17:56:29 CST"
+          dependency: afterok:148506
+          status: running_all_four_suites
+          output_dir: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/29999
+      policy_config: pi05_libero_topview_acpd_v2_layer10_lora
+      base_image_key: topview_image
+      exact_contribution_injection: true
+      exact_contribution_view_mask: [true, true]
+      partition: batch
+      node: gpu04
+      reservation: res_gpu04
+      array: "0-3"
+      concurrency_limit: null
+      resources_per_task: 1gpu_8cpu_24g
+      total_evaluation_gpus: 8
+      time_limit: "1-00:00:00"
+      summary_resources: 1cpu_2g_15min
+      episodes_per_suite: 500
+      episodes_per_model: 2000
+      total_episodes: 4000
+      seed: 7
+      replan_steps: 5
+      image_size: 224
+      num_steps_wait: 10
+      conda_envs_path: /home/liutong/miniconda3/envs
+      offline: true
+      proxies: disabled
+      validation: bash_syntax_cpu_policy_config_checkpoint_markers_params_metadata_norm_stats_slurm_test_only_and_live_resource_checks_passed
+      comparison: matched_topview_sft_bs64_30k_primary_35k_vs_sft30k_not_step_matched
+      conclusion: 尚无结论
     eval_35k:
       checked_at: "2026-10-12 17:00 CST"
       checkpoint_step: 34999
@@ -693,7 +739,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-14 17:50 CST (Original ACPD 50K full evaluation and summary complete: 1062/2000=53.10%; topview147628 final35K saved at17:19; only MV-SV-KD142275 remains running, approximately16.9K/30K; no jobs modified)"
+  checked_at: "2026-10-14 17:57 CST (topview35K evaluation148502 and30K evaluation148506 all eight tasks running on gpu04 reservation; summaries148510/148511 waiting dependencies; MV-SV-KD142275 unchanged on gpu02)"
   h19_resume_checked_at: "2026-10-13 09:44 CST (35K training complete at 05:45; all five checkpoints 31K--35K finalized; 147342 training dependency satisfied and pending Resources; 147343 pending evaluation dependency)"
   evaluation_priority_checked_at: "2026-10-12 11:58 CST (147057/147059/145280 retained and pending Priority; summaries 147058/147060/145282 retained and waiting dependencies; MV-SV-KD 142275 still running)"
   multiview_35k_checked_at: "2026-10-12 17:00 CST (leftview final 1593/2000 and rightview final 1586/2000; both summaries available; no evaluation jobs remaining in squeue)"
@@ -717,6 +763,48 @@ current_execution:
     pending_jobs_bound_in_place: [145280_2, 145280_3, 147057, 147059, 145282, 147058, 147060]
     note: reservation_does_not_preempt_existing_jobs_resource_counts_are_a_snapshot
   jobs:
+    - id: 148502
+      experiment: acpd_v2_topview_35k_full_evaluation
+      state: running_all_four_suites
+      started_at: "2026-10-14 17:56:27 CST"
+      node: gpu04
+      reservation: res_gpu04
+      array: "0-3"
+      concurrency_limit: null
+      resources_per_task: 1gpu_8cpu_24g
+      time_limit: "1-00:00:00"
+      checkpoint_step: 34999
+      episodes: 2000
+      eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/34999
+    - id: 148510
+      experiment: acpd_v2_topview_35k_summary
+      state: pending_dependency
+      depends_on: 148502
+      node: gpu04
+      reservation: res_gpu04
+      resources: 1cpu_2g
+      time_limit: "00:15:00"
+    - id: 148506
+      experiment: acpd_v2_topview_30k_full_evaluation
+      state: running_all_four_suites
+      started_at: "2026-10-14 17:56:29 CST"
+      node: gpu04
+      reservation: res_gpu04
+      array: "0-3"
+      concurrency_limit: null
+      resources_per_task: 1gpu_8cpu_24g
+      time_limit: "1-00:00:00"
+      checkpoint_step: 29999
+      episodes: 2000
+      eval_path: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/29999
+    - id: 148511
+      experiment: acpd_v2_topview_30k_summary
+      state: pending_dependency
+      depends_on: 148506
+      node: gpu04
+      reservation: res_gpu04
+      resources: 1cpu_2g
+      time_limit: "00:15:00"
     - id: 148343
       experiment: acpd_original_backview_bs32_50k_evaluation
       state: complete_all_four_suites
