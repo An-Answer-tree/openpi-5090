@@ -433,23 +433,32 @@ experiment_names:
       protocol: experiments/student/acpd-v2-multiview-35k/evaluation-topview-31k-34k.md
       protocol_commit: 07d84f3
       submitted_at: "2026-10-14 18:42 CST"
-      checked_at: "2026-10-14 21:16 CST"
-      status: partially_running_three_suite_startup_failures_no_full_results
+      checked_at: "2026-10-14 21:46 CST"
+      status: retry_31k_32k_evaluating_33k_retry_pending_resources_remaining_libero10_running
       failed_suites: {30999: [object], 31999: [object], 32999: [spatial]}
       failure_evidence: policy_server_exited_during_startup_with_tempfile_FileNotFoundError_under_dev_shm
       failure_logs:
-        - /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/30999/logs/object.log
-        - /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/logs/object.log
-        - /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/32999/logs/spatial.log
-      pending_suite: {33999: [libero_10]}
-      pending_reason: Priority
-      retry_submitted: false
+        - /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/30999/logs/object.startup-failed-148526_1.log
+        - /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/logs/object.startup-failed-148528_1.log
+        - /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/32999/logs/spatial.startup-failed-148530_0.log
+      pending_suite: {32999: [spatial]}
+      pending_reason: Resources
+      retry_submitted: true
+      retry_jobs: {30999: 148674, 31999: 148675, 32999: 148676}
+      retry_array_tasks: {30999: 1, 31999: 1, 32999: 0}
+      retry_fix_commit: 5b8c96d
+      retry_protocol: identical_500_episode_suites_no_model_or_inference_changes
+      execution_record: experiments/student/acpd-v2-multiview-35k/execution-maintenance-2026-10-14.md
       study_type: exploratory_checkpoint_trajectory
       inherited_evaluation: eval_topview_30k_35k
       checkpoint_steps: [30999, 31999, 32999, 33999]
       eval_jobs: {30999: 148526, 31999: 148528, 32999: 148530, 33999: 148532}
       summary_jobs: {30999: 148527, 31999: 148529, 32999: 148531, 33999: 148533}
-      summary_dependency: afterok_corresponding_full_array
+      summary_dependency:
+        30999: "afterok:148674"
+        31999: "afterok:148675"
+        32999: "afterok:148530_3:148676"
+        33999: "afterok:148532"
       policy_config: pi05_libero_topview_acpd_v2_layer10_lora
       base_image_key: topview_image
       node: gpu04
@@ -790,7 +799,15 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-14 21:16 CST (topview30K/35K final results unchanged; 31K/32K Object and 33K Spatial startup failures confirmed from logs; eight other suite tasks running on gpu04, 148532_3 pending Priority; no retries or changes to jobs)"
+  checked_at: "2026-10-14 21:46 CST (122GiB inactive home Arrow cache removed; eval TMPDIR isolated under opt; 31K/32K Object retries148674/148675 have loaded policies and entered simulation; 33K Spatial retry148676 pending Resources; remaining LIBERO-10 suites148530_3/148532_3 running; summary dependencies repaired; MV-SV-KD142275 unchanged)"
+  cache_maintenance:
+    checked_at: "2026-10-14 21:46 CST"
+    freed_gib_approx: 122
+    deleted_path: /home/liutong/.cache/huggingface/datasets/parquet/default-b858ebb0a6d98a77/0.0.0/9c460aabd2aa27d1496e5e38d2060760561f0ac2cd6a110134eefa5b3f153b8d
+    preserved_active_cache: /opt/liutong/huggingface/datasets
+    future_conda_defaults: {openpi: opt_huggingface_cache, openpi-libero: opt_huggingface_cache}
+    data_and_checkpoints_untouched: true
+    record: experiments/student/acpd-v2-multiview-35k/execution-maintenance-2026-10-14.md
   h19_resume_checked_at: "2026-10-13 09:44 CST (35K training complete at 05:45; all five checkpoints 31K--35K finalized; 147342 training dependency satisfied and pending Resources; 147343 pending evaluation dependency)"
   evaluation_priority_checked_at: "2026-10-12 11:58 CST (147057/147059/145280 retained and pending Priority; summaries 147058/147060/145282 retained and waiting dependencies; MV-SV-KD 142275 still running)"
   multiview_35k_checked_at: "2026-10-12 17:00 CST (leftview final 1593/2000 and rightview final 1586/2000; both summaries available; no evaluation jobs remaining in squeue)"
@@ -816,7 +833,7 @@ current_execution:
   jobs:
     - id: 148526
       experiment: acpd_v2_topview_31k_full_evaluation
-      state: running_libero10_object_startup_failed
+      state: three_suites_complete_object_failed_retry_148674
       checkpoint_step: 30999
       array: "0-3"
       resources_per_task: 1gpu_8cpu_24g
@@ -825,10 +842,10 @@ current_execution:
     - id: 148527
       experiment: acpd_v2_topview_31k_summary
       state: pending_dependency
-      depends_on: 148526
+      depends_on: 148674
     - id: 148528
       experiment: acpd_v2_topview_32k_full_evaluation
-      state: running_libero10_object_startup_failed
+      state: three_suites_complete_object_failed_retry_148675
       checkpoint_step: 31999
       array: "0-3"
       resources_per_task: 1gpu_8cpu_24g
@@ -837,10 +854,10 @@ current_execution:
     - id: 148529
       experiment: acpd_v2_topview_32k_summary
       state: pending_dependency
-      depends_on: 148528
+      depends_on: 148675
     - id: 148530
       experiment: acpd_v2_topview_33k_full_evaluation
-      state: running_three_suites_spatial_startup_failed
+      state: object_goal_complete_libero10_running_spatial_retry_148676_pending
       checkpoint_step: 32999
       array: "0-3"
       resources_per_task: 1gpu_8cpu_24g
@@ -849,10 +866,10 @@ current_execution:
     - id: 148531
       experiment: acpd_v2_topview_33k_summary
       state: pending_dependency
-      depends_on: 148530
+      depends_on: ["148530_3", 148676]
     - id: 148532
       experiment: acpd_v2_topview_34k_full_evaluation
-      state: running_three_suites_libero10_pending_priority
+      state: spatial_object_goal_complete_libero10_running
       checkpoint_step: 33999
       array: "0-3"
       resources_per_task: 1gpu_8cpu_24g
@@ -862,6 +879,30 @@ current_execution:
       experiment: acpd_v2_topview_34k_summary
       state: pending_dependency
       depends_on: 148532
+    - id: 148674
+      experiment: acpd_v2_topview_31k_object_retry
+      state: running_policy_loaded_simulation_started
+      array: "1"
+      checkpoint_step: 30999
+      resources: 1gpu_8cpu_24g
+      node: gpu04
+      reservation: res_gpu04
+    - id: 148675
+      experiment: acpd_v2_topview_32k_object_retry
+      state: running_policy_loaded_simulation_started
+      array: "1"
+      checkpoint_step: 31999
+      resources: 1gpu_8cpu_24g
+      node: gpu04
+      reservation: res_gpu04
+    - id: 148676
+      experiment: acpd_v2_topview_33k_spatial_retry
+      state: pending_resources
+      array: "0"
+      checkpoint_step: 32999
+      resources: 1gpu_8cpu_24g
+      node: gpu04
+      reservation: res_gpu04
     - id: 148502
       experiment: acpd_v2_topview_35k_full_evaluation
       state: complete_all_four_suites

@@ -159,6 +159,12 @@ H17-Decay只改变该权重；它不能同时证明不可恢复信息、LoRA容�
 
 ## 工程约束
 
+- 2026-10-14删除未被活动任务映射的`/home` Hugging Face Arrow缓存约122 GiB；
+  conda openpi/openpi-libero之后激活默认使用`/opt/liutong/huggingface/datasets`。
+  三项topview验证因`/dev/shm`临时父目录消失而启动失败，未见OOM证据；
+  临时目录改为suite评测目录内独立mktemp，退出只清理自身目录；补跑仅覆盖失败suite。
+  记录：`experiments/student/acpd-v2-multiview-35k/execution-maintenance-2026-10-14.md`。
+
 2026-10-14 14:28:38原论文ACPD任务147971完成50K最终checkpoint保存；
 14:52:32提交的全量验证148343_[0-3]在gpu04运行；17:30:49汇总148347已生成。
 评测为backview单视角、seed7、四套各500回合，复用原30K协议，不加载辅助cue网络。

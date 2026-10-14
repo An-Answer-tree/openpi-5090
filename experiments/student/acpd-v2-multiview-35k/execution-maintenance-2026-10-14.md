@@ -34,8 +34,21 @@
 
 失败证据位于评测根目录
 `/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/`：
-`30999/logs/object.log`、`31999/logs/object.log`、`32999/logs/spatial.log`。
+`30999/logs/object.startup-failed-148526_1.log`、
+`31999/logs/object.startup-failed-148528_1.log`、
+`32999/logs/spatial.startup-failed-148530_0.log`。
 
 ## 重跑任务
 
-补跑任务号及实际启动检查将在提交后补充。已有完整suite日志不重跑。
+修复commit `5b8c96d`先提交并推送，之后提交补跑。
+
+| Checkpoint | 补跑suite | 新任务 | 原汇总及修改后的依赖 | 21:46检查 |
+|---|---|---|---|---|
+| 31K / 30999 | Object | 148674_1 | 148527：afterok:148674 | gpu04运行；policy已加载，仿真进入episode0 |
+| 32K / 31999 | Object | 148675_1 | 148529：afterok:148675 | gpu04运行；policy已加载，仿真进入episode0 |
+| 33K / 32999 | Spatial | 148676_0 | 148531：afterok:148530_3:148676 | 等待gpu04资源 |
+
+三项均1GPU/8CPU/24G/24小时，使用`res_gpu04`、原checkpoint、相同50回合/任务。
+31K/32K其他三套、33K Object/Goal、34K Spatial/Object/Goal的最终日志均已核对。
+33K/34K LIBERO-10仍运行；34K汇总148533保持原完整数组依赖。
+汇总脚本要求四套共2000回合；不会把部分结果当作最终成功率。
