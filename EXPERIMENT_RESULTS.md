@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-13 23:51 CST（旧版ACPD 30K验证已取消；50K续训147971已恢复step30000，等待数据初始化）
+更新时间：2026-10-14 14:53 CST（旧版ACPD 50K完整保存；全量验证148343四项已在gpu04启动，汇总148347等待依赖）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -9,7 +9,7 @@
 
 | 实验 | 目的 | 配置 | 状态 | 结论 |
 |---|---|---|---|---|
-| Original ACPD backview BS32 5K→50K | 在论文原版动作条件 privileged cue 方法下观察长训练效果 | layers 6+12；4×5090 FSDP；global BS32；累计1；loss `1.0/0.2/0.5`；25K后每1K全部保留；30K后LR保持`2.5e-6` | 30K训练完成；验证147939_[0-3]及汇总147944按用户要求取消，部分日志保留；续训147971在gpu04运行，模型与优化器恢复至step30000，等待数据初始化，尚未确认首步更新；目标50K | 30K验证未完成，尚无全量成功率结论；[部分评测记录](experiments/student/acpd-original-backview-bs32-30k/evaluation-30k.md)、[续训协议](experiments/student/acpd-original-backview-bs32-30k/resume-50k.md) |
+| Original ACPD backview BS32 5K→50K | 在论文原版动作条件 privileged cue 方法下观察长训练效果 | layers 6+12；4×5090 FSDP；global BS32；累计1；loss `1.0/0.2/0.5`；25K后每1K全部保留；30K后LR保持`2.5e-6` | 50K训练及49999保存完成（14:28:38）；全量验证148343_[0-3]在gpu04同时运行，汇总148347等待依赖；30K验证提前停止，部分日志保留 | 50K尚无验证结论；[50K验证](experiments/student/acpd-original-backview-bs32-30k/evaluation-50k.md)、[30K部分评测](experiments/student/acpd-original-backview-bs32-30k/evaluation-30k.md)、[续训协议](experiments/student/acpd-original-backview-bs32-30k/resume-50k.md) |
 
 ## 当前结论
 
@@ -237,6 +237,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | 内容 | 路径 |
 |---|---|
 | 实验目录索引 | `experiments/README.md` |
+| 原论文ACPD backview 50K验证 | `experiments/student/acpd-original-backview-bs32-30k/evaluation-50k.md`；checkpoint为原`acpd_original/backview_bs32_30k`实验目录中的`49999`；验证根目录`/opt/liutong/openpi-5090-evals/acpd-original-backview-bs32-50k/49999/`，四套日志`logs/`、视频各suite的`videos/`、Slurm日志`slurm-log/`；验证148343，汇总148347；尚无成功率结论 |
 | MV-SV-KD协议、执行与配置路径 | `experiments/baseline/mv-sv-kd-backview-bs64-30k/`；checkpoint根目录`/opt/liutong/openpi_checkpoints/fixed_dataset/baseline/mv_sv_kd/backview_bs64_30k/`；日志根目录`/opt/liutong/openpi-5090-research/mv-sv-kd-backview-bs64-30k/slurm-log/`；训练运行，尚无验证结果 |
 | H7/H7.1 原始指标 | `/opt/liutong/openpi-5090-research/acpd-exact-attention-probe/results/` |
 | H9 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-pbs32-5k_129710.out` |
