@@ -167,6 +167,11 @@ topview续训147628也已完成35K，2026-10-14 17:19:00最终34999保存成功�
 各四套、每套500回合；自动汇总148510/148511等待对应数组成功。保留H9的两路
 贡献预测与注入，30K与同视角SFT30K为主要比较；尚无30K/35K验证结论。
 协议：`experiments/student/acpd-v2-multiview-35k/evaluation-topview-30k-35k.md`。
+18:42按用户要求补充topview 31K–34K全量验证：数组148526/148528/148530/148532，
+对应汇总148527/148529/148531/148533，均绑定gpu04的res_gpu04预约；每模型四套
+共2000回合，无并发上限。18:43等待节点资源，30K/35K验证保持运行。
+这是查看临时结果后增加的探索性checkpoint轨迹测量；尚无新增验证结论。
+协议：`experiments/student/acpd-v2-multiview-35k/evaluation-topview-31k-34k.md`。
 MV-SV-KD142275仍在训练，未修改任务。
 协议和证据：`experiments/student/acpd-original-backview-bs32-30k/evaluation-50k.md`。
 下方23:51记录为历史快照，不代表当前训练仍在初始化。

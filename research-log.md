@@ -4,6 +4,7 @@
 
 | 日期 | 类型 | 记录 |
 |---|---|---|
+| 2026-10-14 | 探索性轨迹评测 | 按用户要求补充topview ACPD-v2 31K–34K全量验证，每模型四套各500回合，沿用H9注入与seed7协议。协议先commit07d84f3；18:42提交数组148526/148528/148530/148532与afterok汇总148527/148529/148531/148533，18:43在gpu04的res_gpu04预约内等待资源。不影响30K/35K验证及MV-SV-KD，不移动checkpoint；最高观测点属于探索性选择，尚无结论。 |
 | 2026-09-11 | 方法 | 对照论文与历史实现后，采用联合训练 selector/predictor、cue variance 和 ACL 的 ACPD 目标。 |
 | 2026-09-11 | 结果 | H1/H2 均通过：FSDP4 effective BS32 可运行；physical BS32、accumulation 1 的单卡峰值为 17,337 MiB，后续原始 ACPD 使用该配置。 |
 | 2026-09-12 | 审计 | 论文旧表格混用了 `historical_sg`、gated 和 ungated 配置，不能作为受控组件消融证据；后续结果以当前复现实验为准。 |
