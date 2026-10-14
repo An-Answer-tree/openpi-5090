@@ -19,8 +19,17 @@ base_image_key=${8:-backview_image}
 
 test -f "${checkpoint_dir}/_CHECKPOINT_METADATA"
 mkdir -p "${eval_dir}"
-export TMPDIR="/dev/shm/openpi-slurm-tmp/${SLURM_JOB_ID}/${suite_name}"
-mkdir -p "${TMPDIR}"
+tmp_dir=$(mktemp -d "${eval_dir}/tmp.XXXXXX")
+export TMPDIR="${tmp_dir}"
+
+cleanup() {
+  if [[ -n "${server_pid:-}" ]]; then
+    kill "${server_pid}" 2>/dev/null || true
+    wait "${server_pid}" 2>/dev/null || true
+  fi
+  rm -rf -- "${tmp_dir}"
+}
+trap cleanup EXIT
 
 source /home/liutong/miniconda3/etc/profile.d/conda.sh
 
@@ -53,7 +62,6 @@ CUDA_VISIBLE_DEVICES="${gpu_id}" python scripts/serve_policy.py \
   --policy.config "${policy_config}" \
   --policy.dir "${checkpoint_dir}" &
 server_pid=$!
-trap 'kill "${server_pid}" 2>/dev/null || true; wait "${server_pid}" 2>/dev/null || true' EXIT
 
 for ((elapsed = 0; elapsed < 5400; elapsed += 5)); do
   if curl --silent --fail --noproxy '*' "http://127.0.0.1:${port}/healthz" >/dev/null; then
