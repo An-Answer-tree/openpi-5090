@@ -5,6 +5,56 @@ project:
   started: "2026-09-11"
 
 experiment_names:
+  acpd_v2_checkpoint_trajectory_31k_34k:
+    display_name: "ACPD-v2-Fixed back/left/right 31K–34K checkpoint补训"
+    parent: h9_fixed
+    protocol: experiments/student/acpd-v2-trajectory-31k-34k/protocol.md
+    execution: experiments/student/acpd-v2-trajectory-31k-34k/execution.md
+    protocol_commit: 9f3c9cc
+    submitted_at: "2026-10-14 22:52:53 CST"
+    checked_at: "2026-10-14 23:01 CST"
+    status: backview_running_first_step_verified_left_right_pending
+    study_type: checkpoint_trajectory_reconstruction_not_new_method
+    views: [backview, leftview, rightview]
+    train_jobs: {backview: 148740, leftview: 148741, rightview: 148742}
+    train_status: {backview: running_first_step_verified, leftview: pending_resources, rightview: pending_node_reservation_availability}
+    node: gpu04
+    reservation: res_gpu04
+    reservation_end: "2026-10-16 12:48 CST"
+    resources_per_job: 4gpu_32cpu_96g
+    time_limit: "1-00:00:00"
+    physical_global_batch: 64
+    gradient_accumulation_steps: 1
+    fsdp_devices: 4
+    align_layers: [10]
+    exact_contribution_fusion: true
+    loss_weights: {flow: 1.0, contribution: 0.2, acl: 0.5}
+    seed: 42
+    resume_optimizer_step: 30000
+    resume_data_loader: true
+    data_start_batch: 30000
+    num_train_steps: 34000
+    learning_rate: {warmup_steps: 1000, peak_lr: 2.5e-5, decay_steps: 30000, decay_lr: 2.5e-6}
+    lr_after_30k: 2.5e-6
+    reset_lr_schedule: false
+    save_interval: 1000
+    keep_period: 1
+    checkpoint_steps: [30999, 31999, 32999, 33999]
+    source_checkpoints:
+      backview: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/29999
+      leftview: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k/leftview/pi05_libero_leftview_acpd_v2_layer10/pi05_libero_leftview_acpd_v2_layer10_lora_fsdp4_bs64_35k/29999
+      rightview: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k/rightview/pi05_libero_rightview_acpd_v2_layer10/pi05_libero_rightview_acpd_v2_layer10_lora_fsdp4_bs64_35k/29999
+    source_checkpoints_read_only: true
+    preserve_existing_35k: true
+    checkpoint_root: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/trajectory_31k_34k
+    log_root: /opt/liutong/openpi-5090-research/acpd-v2-trajectory-31k-34k/slurm-log
+    source_data_and_checkpoints_moved_copied_deleted: false
+    cpu_tests: 8_passed_24_deselected
+    backview_restore_verified: true
+    backview_first_step_verified: true
+    backview_first_step_loss: 0.0791
+    evaluation_submitted: false
+    conclusion: 尚无结论
   acpd_original_backview_bs32_30k:
     display_name: "Original ACPD backview BS32 5K→50K"
     protocol: experiments/student/acpd-original-backview-bs32-30k/protocol.md
@@ -433,16 +483,36 @@ experiment_names:
       protocol: experiments/student/acpd-v2-multiview-35k/evaluation-topview-31k-34k.md
       protocol_commit: 07d84f3
       submitted_at: "2026-10-14 18:42 CST"
-      checked_at: "2026-10-14 21:46 CST"
-      status: retry_31k_32k_evaluating_33k_retry_pending_resources_remaining_libero10_running
+      checked_at: "2026-10-14 23:11 CST"
+      status: 31k_32k_all_suites_and_summaries_complete_33k_spatial_and_34k_libero10_running
+      completed_checkpoint_steps: [30999, 31999]
+      results:
+        30999:
+          successes: 1470
+          episodes: 2000
+          pooled_rate_percent: 73.50
+          suites:
+            spatial: {successes: 412, episodes: 500, rate_percent: 82.40}
+            object: {successes: 382, episodes: 500, rate_percent: 76.40}
+            goal: {successes: 401, episodes: 500, rate_percent: 80.20}
+            libero_10: {successes: 275, episodes: 500, rate_percent: 55.00}
+        31999:
+          successes: 1510
+          episodes: 2000
+          pooled_rate_percent: 75.50
+          suites:
+            spatial: {successes: 425, episodes: 500, rate_percent: 85.00}
+            object: {successes: 408, episodes: 500, rate_percent: 81.60}
+            goal: {successes: 403, episodes: 500, rate_percent: 80.60}
+            libero_10: {successes: 274, episodes: 500, rate_percent: 54.80}
       failed_suites: {30999: [object], 31999: [object], 32999: [spatial]}
       failure_evidence: policy_server_exited_during_startup_with_tempfile_FileNotFoundError_under_dev_shm
       failure_logs:
         - /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/30999/logs/object.startup-failed-148526_1.log
         - /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/logs/object.startup-failed-148528_1.log
         - /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/32999/logs/spatial.startup-failed-148530_0.log
-      pending_suite: {32999: [spatial]}
-      pending_reason: Resources
+      pending_suite: {}
+      running_suites: {32999: [spatial], 33999: [libero_10]}
       retry_submitted: true
       retry_jobs: {30999: 148674, 31999: 148675, 32999: 148676}
       retry_array_tasks: {30999: 1, 31999: 1, 32999: 0}
@@ -457,7 +527,7 @@ experiment_names:
       summary_dependency:
         30999: "afterok:148674"
         31999: "afterok:148675"
-        32999: "afterok:148530_3:148676"
+        32999: "afterok:148676"
         33999: "afterok:148532"
       policy_config: pi05_libero_topview_acpd_v2_layer10_lora
       base_image_key: topview_image
@@ -473,7 +543,7 @@ experiment_names:
       total_episodes: 8000
       result_root: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview
       validation: bash_syntax_checkpoint_completion_params_metadata_norm_stats_slurm_test_only_and_submitted_job_resources_passed
-      conclusion: 尚无结论
+      conclusion: 31K和32K全量结果为73.50%和75.50%；33K和34K未完成，无完整轨迹结论；未计算配对区间。
     eval_35k:
       checked_at: "2026-10-12 17:00 CST"
       checkpoint_step: 34999
@@ -799,7 +869,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-14 21:46 CST (122GiB inactive home Arrow cache removed; eval TMPDIR isolated under opt; 31K/32K Object retries148674/148675 have loaded policies and entered simulation; 33K Spatial retry148676 pending Resources; remaining LIBERO-10 suites148530_3/148532_3 running; summary dependencies repaired; MV-SV-KD142275 unchanged)"
+  checked_at: "2026-10-14 23:11 CST (backview148740 training near30.1K, left/right148741/148742 pending; topview31K/32K completed all2000 episodes and summaries at73.50%/75.50%; 33K Spatial148676 and34K LIBERO10_148532_3 still running; summary148531 waits only148676; MV-SV-KD142275 unchanged)"
   cache_maintenance:
     checked_at: "2026-10-14 21:46 CST"
     freed_gib_approx: 122
@@ -831,9 +901,39 @@ current_execution:
     pending_jobs_bound_in_place: [145280_2, 145280_3, 147057, 147059, 145282, 147058, 147060]
     note: reservation_does_not_preempt_existing_jobs_resource_counts_are_a_snapshot
   jobs:
+    - id: 148740
+      experiment: acpd_v2_checkpoint_trajectory_backview_31k_34k
+      state: running_first_step_verified
+      started_at: "2026-10-14 22:52:54 CST"
+      resume_step: 30000
+      target_step: 34000
+      data_start_batch: 30000
+      first_step_loss: 0.0791
+      resources: 4gpu_32cpu_96g
+      time_limit: "1-00:00:00"
+      node: gpu04
+      reservation: res_gpu04
+    - id: 148741
+      experiment: acpd_v2_checkpoint_trajectory_leftview_31k_34k
+      state: pending_priority
+      resume_step: 30000
+      target_step: 34000
+      resources: 4gpu_32cpu_96g
+      time_limit: "1-00:00:00"
+      requested_node: gpu04
+      reservation: res_gpu04
+    - id: 148742
+      experiment: acpd_v2_checkpoint_trajectory_rightview_31k_34k
+      state: pending_priority
+      resume_step: 30000
+      target_step: 34000
+      resources: 4gpu_32cpu_96g
+      time_limit: "1-00:00:00"
+      requested_node: gpu04
+      reservation: res_gpu04
     - id: 148526
       experiment: acpd_v2_topview_31k_full_evaluation
-      state: three_suites_complete_object_failed_retry_148674
+      state: all_four_suite_results_complete_with_retry_148674
       checkpoint_step: 30999
       array: "0-3"
       resources_per_task: 1gpu_8cpu_24g
@@ -841,11 +941,11 @@ current_execution:
       reservation: res_gpu04
     - id: 148527
       experiment: acpd_v2_topview_31k_summary
-      state: pending_dependency
+      state: complete_1470_of_2000
       depends_on: 148674
     - id: 148528
       experiment: acpd_v2_topview_32k_full_evaluation
-      state: three_suites_complete_object_failed_retry_148675
+      state: all_four_suite_results_complete_with_retry_148675
       checkpoint_step: 31999
       array: "0-3"
       resources_per_task: 1gpu_8cpu_24g
@@ -853,11 +953,11 @@ current_execution:
       reservation: res_gpu04
     - id: 148529
       experiment: acpd_v2_topview_32k_summary
-      state: pending_dependency
+      state: complete_1510_of_2000
       depends_on: 148675
     - id: 148530
       experiment: acpd_v2_topview_33k_full_evaluation
-      state: object_goal_complete_libero10_running_spatial_retry_148676_pending
+      state: object_goal_libero10_results_complete_spatial_retry_148676_running
       checkpoint_step: 32999
       array: "0-3"
       resources_per_task: 1gpu_8cpu_24g
@@ -866,7 +966,7 @@ current_execution:
     - id: 148531
       experiment: acpd_v2_topview_33k_summary
       state: pending_dependency
-      depends_on: ["148530_3", 148676]
+      depends_on: 148676
     - id: 148532
       experiment: acpd_v2_topview_34k_full_evaluation
       state: spatial_object_goal_complete_libero10_running
@@ -881,7 +981,7 @@ current_execution:
       depends_on: 148532
     - id: 148674
       experiment: acpd_v2_topview_31k_object_retry
-      state: running_policy_loaded_simulation_started
+      state: complete_382_of_500
       array: "1"
       checkpoint_step: 30999
       resources: 1gpu_8cpu_24g
@@ -889,7 +989,7 @@ current_execution:
       reservation: res_gpu04
     - id: 148675
       experiment: acpd_v2_topview_32k_object_retry
-      state: running_policy_loaded_simulation_started
+      state: complete_408_of_500
       array: "1"
       checkpoint_step: 31999
       resources: 1gpu_8cpu_24g
@@ -897,7 +997,7 @@ current_execution:
       reservation: res_gpu04
     - id: 148676
       experiment: acpd_v2_topview_33k_spatial_retry
-      state: pending_resources
+      state: running_policy_loaded_simulation_started
       array: "0"
       checkpoint_step: 32999
       resources: 1gpu_8cpu_24g

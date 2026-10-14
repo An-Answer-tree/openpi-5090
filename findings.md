@@ -9,13 +9,19 @@
 **ACPD-v2-NoInjection**，历史简称 H13-LossOnly。
 下文历史 H9 BS32 单独注明。恢复与延长训练属于 H9-Fixed，不是新方法。
 
+2026-10-14补齐backview/leftview/rightview的31K–34K：从各自30K完整状态分支，
+保持4卡BS64、累计1、原loss与30K后LR，每1K全部保留，已有35K不变。
+148740已恢复step30000和data batch30000，首步loss有限；148741/148742排队。
+尚无新增成功率结论，不宣称逐位复现历史35K。
+证据：`experiments/student/acpd-v2-trajectory-31k-34k/execution.md`。
+
 ## 当前认识
 
 | 问题 | 证据 | 结论 |
 |---|---|---|
 | 原始 Cue 是否有效 | Full ACPD 仅比 ACL-only 高 `0.15` 点，95% CI `[-1.15, 1.40]` | 没有检测到 Cue 的额外收益。 |
 | 旧版ACPD长训练是否超过H9 | 旧版BS32 50K为53.10%，H9 BS64 35K为61.05%；配对差值-7.95点，95%区间[-10.50,-5.40]点 | 本次旧版50K较低；BS、步数与轨迹不同，不能单独归因为方法。 |
-| Topview ACPD-v2 30K/35K是否优于SFT30K | 各2000回合；ACPD30K/35K为73.20%/73.50%，SFT30K为71.55% | 同进度30K点估计高1.65点；35K高1.95点但不同进度。35K比ACPD30K高0.30点；本次未计算配对区间，31K–34K尚无全量结论。 |
+| Topview ACPD-v2 30K–35K是否优于SFT30K | 各2000回合；ACPD30K/31K/32K/35K为73.20%/73.50%/75.50%/73.50%，SFT30K为71.55% | 同进度30K点估计高1.65点；32K目前最高观测，比SFT30K高3.95点，但不同进度、探索性checkpoint选择。未计算配对区间，33K/34K尚无全量结论。 |
 | 特权视觉贡献能否恢复 | layer 10 overall gap `0.3992`，比次优层高 `0.0485` | backview 表征可以预测 teacher 的真实 attention contribution。 |
 | 两路贡献的恢复质量是否一致 | layer 10 agentview/wrist explained variance 为 `0.4722/0.2389`，贡献/总attention范数比为 `0.3122/0.5945` | wrist 目标更大但较难恢复；这是分路融合的设计动机，不是任务收益或显著层间差异的证明。 |
 | layer 10 是否已被显著证明优于 layer 11 | H7.1 点估计差值 `0.0485`，但没有保存逐样本层间差值；分别的 bootstrap 区间不能替代配对检验 | layer 10 是预注册规则下的工程选择，层间显著性仍未验证；复核约需 6 小时、2 GPU，当前不优先。 |

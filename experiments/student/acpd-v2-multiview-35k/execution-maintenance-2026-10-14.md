@@ -52,3 +52,17 @@
 31K/32K其他三套、33K Object/Goal、34K Spatial/Object/Goal的最终日志均已核对。
 33K/34K LIBERO-10仍运行；34K汇总148533保持原完整数组依赖。
 汇总脚本要求四套共2000回合；不会把部分结果当作最终成功率。
+
+## 33K汇总依赖调整
+
+23:01核对33K的LIBERO-10日志已完整写出`255/500`及最终成功率`0.5100`。
+148530_3在最终结果之后因shell退出阶段`unexpected EOF while looking for matching
+\"`报错，旧汇总依赖因此无法满足；不是仿真中断或新增科研负结果。
+该现象与旧运行shell读取已修改脚本相符；当前脚本`bash -n`通过。
+Object、Goal、LIBERO-10三套各500回合及最终标记均已核对，不重复GPU评测。
+
+已将148531原地改为`afterok:148676`，只等待33K Spatial补跑；
+23:01确认148676_0已在gpu04运行，汇总等待正常依赖，不再永久等待失败job。
+源日志：`/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/32999/logs/libero_10.log`；
+退出错误见同模型`slurm-log/`下148530_3的输出。
+其他活动suite、checkpoint和协议不变。
