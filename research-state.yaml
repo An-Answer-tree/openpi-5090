@@ -12,7 +12,7 @@ experiment_names:
     execution: experiments/student/acpd-v2-trajectory-31k-34k/execution.md
     protocol_commit: 9f3c9cc
     submitted_at: "2026-10-14 22:52:53 CST"
-    checked_at: "2026-10-15 20:53 CST"
+    checked_at: "2026-10-15 23:43 CST"
     status: all_views_training_complete_backview_leftview_31k_to_34k_evaluated_rightview_evaluation_in_progress
     study_type: checkpoint_trajectory_reconstruction_not_new_method
     views: [backview, leftview, rightview]
@@ -161,8 +161,8 @@ experiment_names:
       protocol: experiments/student/acpd-v2-trajectory-31k-34k/evaluation-rightview.md
       protocol_commit: 69d82bd
       submitted_at: "2026-10-15 20:19 CST"
-      checked_at: "2026-10-15 20:53 CST"
-      status: 31k_32k_all_eight_suites_running_33k_34k_pending_priority
+      checked_at: "2026-10-15 23:43 CST"
+      status: 31k_32k_33k_complete_34k_libero10_running
       node: gpu04
       reservation: res_gpu04
       checkpoint_steps: [30999, 31999, 32999, 33999]
@@ -186,14 +186,48 @@ experiment_names:
       huggingface_offline: true
       output_root: /opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview
       jobs:
-        31k: {array_job: 149171, summary_job: 149172, status: all_four_suites_running, completed_episodes_snapshot: 753}
-        32k: {array_job: 149173, summary_job: 149174, status: all_four_suites_running, completed_episodes_snapshot: 720}
-        33k: {array_job: 149175, summary_job: 149176, status: pending_priority}
-        34k: {array_job: 149177, summary_job: 149178, status: pending_priority}
+        31k:
+          array_job: 149171
+          summary_job: 149172
+          status: complete
+          successes: 1563
+          episodes: 2000
+          pooled_success_rate: 0.7815
+          suite_successes: {spatial: 426, object: 445, goal: 407, libero_10: 285}
+          evidence: /opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview/30999/summary.txt
+        32k:
+          array_job: 149173
+          summary_job: 149174
+          status: complete
+          successes: 1620
+          episodes: 2000
+          pooled_success_rate: 0.8100
+          suite_successes: {spatial: 451, object: 443, goal: 429, libero_10: 297}
+          evidence: /opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview/31999/summary.txt
+        33k:
+          array_job: 149175
+          summary_job: 149176
+          status: complete
+          successes: 1552
+          episodes: 2000
+          pooled_success_rate: 0.7760
+          suite_successes: {spatial: 415, object: 434, goal: 421, libero_10: 282}
+          evidence: /opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview/32999/summary.txt
+        34k:
+          array_job: 149177
+          summary_job: 149178
+          status: spatial_object_goal_complete_libero10_running
+          completed_episodes_snapshot: 1745
+          completed_suite_successes: {spatial: 410, object: 452, goal: 408}
+          libero_10_partial_snapshot: {successes: 142, episodes: 245}
+      best_completed_checkpoint: 31999
+      best_completed_pooled_success_rate: 0.8100
+      difference_vs_existing_35k_percentage_points: 1.70
+      paired_interval_computed: false
       other_jobs_modified: false
       data_and_checkpoints_moved_copied_deleted: false
-      conclusion: 尚无结论
-    conclusion: backview31K至34K为59.10%/58.65%/60.45%/60.70%，均未超过历史35K的61.05%；leftview依次为81.00%/81.55%/80.00%/79.10%，32K为最高观测点，比已有35K高1.90点；未计算配对区间，不作显著性判断；rightview新增验证尚无完整结论
+      conclusion: 31K/32K/33K分别78.15%/81.00%/77.60%，各2000回合；32K最高观测，比已有35K高1.70点；34K尚无完整结论；未计算配对区间，不作显著性判断
+    conclusion: backview31K至34K为59.10%/58.65%/60.45%/60.70%，均未超过历史35K的61.05%；leftview依次为81.00%/81.55%/80.00%/79.10%，32K最高观测，比已有35K高1.90点；rightview31K至33K为78.15%/81.00%/77.60%，32K最高观测，比已有35K高1.70点，34K尚无完整结论；未计算配对区间，不作显著性判断
   acpd_original_backview_bs32_30k:
     display_name: "Original ACPD backview BS32 5K→50K"
     protocol: experiments/student/acpd-original-backview-bs32-30k/protocol.md
