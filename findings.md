@@ -14,9 +14,18 @@
 从各自原29999恢复完整模型、优化器及数据batch30000，LR保持2.5e-6；
 save_interval=1000、keep_period=1，保留已有checkpoint和新增31000/31999。
 沿用SFT保存规则，31000含31001个优化步，最终31999含32000个优化步。
-三项数据顺序恢复CPU测试通过；当前均Priority排队，实际GPU恢复与新结果尚未确认。
+三项数据顺序恢复CPU测试通过。00:56按用户要求取消三个续训任务，优先ACL-only：
+leftview已恢复且记录step30000的有限loss，right/top尚未启动；无新增验证结论。
 这是补齐相同步数SFT基线，不是新方法；此前按ACPD轨迹选择32K的探索性性质不变。
 记录：`experiments/baseline/sft-multiview-bs64-resume-32k/execution.md`。
+
+2026-10-16 00:58提交ACL-only BS64 30K→34K轨迹补训149325，已在gpu04获得4卡。
+保持原flow/ACL=1/0.5、contribution=0和关闭注入，从29999恢复模型/Adam和数据batch30000，
+LR保持2.5e-6；独立输出，每1K保存并全部保留30999/31999/32999/33999。
+8项CPU恢复/保存/数据接续测试、CLI与Slurm试提交通过；00:59已确认GPU恢复step30000
+和data batch30000，首步训练尚待确认；
+本次未提交验证，尚无新增成功率结论。原35K及其他已有checkpoint不变。
+证据：`experiments/ablation/acpd-v2-acl-only-bs64-35k/trajectory-31k-34k-execution.md`。
 
 2026-10-14补齐backview/leftview/rightview的31K–34K：从各自30K完整状态分支，
 保持4卡BS64、累计1、原loss与30K后LR，每1K全部保留，已有35K不变。

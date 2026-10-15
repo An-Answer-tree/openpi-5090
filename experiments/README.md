@@ -51,7 +51,8 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 
 | 类别 | 实验 | 协议/分析 | 状态 |
 |---|---|---|---|
-| baseline | left/right/topview BS64 30K→32K | `baseline/sft-multiview-bs64-resume-32k/` | 149303/149304/149305已提交，Priority排队；4卡BS64、累计1，自动选节点；每1K全部保留，新增31000/31999；尚无新增验证结论 |
+| ablation | ACL-only backview BS64 30K→34K | `ablation/acpd-v2-acl-only-bs64-35k/trajectory-31k-34k-protocol.md` | 149325在gpu04启动，4卡BS64、累计1；独立输出31K–34K、每1K全部保留，原35K不变；尚无新增验证结论 |
+| baseline | left/right/topview BS64 30K→32K | `baseline/sft-multiview-bs64-resume-32k/` | 149303/149304/149305已按用户要求取消，优先ACL-only；已有checkpoint保留，无新增验证结论 |
 | student | H9-Fixed back/left/right 31K–34K轨迹补训 | `student/acpd-v2-trajectory-31k-34k/` | 三视角31K–34K训练完成且全部保留；back/left验证完成，right31K–33K完成、34K尚无完整结论；已有35K不变 |
 | baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 10K/15K/20K/25K/30K 正式验证完成 |
 | student | 原论文 ACPD backview BS32 5K→50K | `student/acpd-original-backview-bs32-30k/` | 50K训练及全量验证完成，pooled53.10%；30K部分验证已取消；BS32不同于正式BS64对照 |
