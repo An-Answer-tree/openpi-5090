@@ -12,8 +12,8 @@ experiment_names:
     execution: experiments/student/acpd-v2-trajectory-31k-34k/execution.md
     protocol_commit: 9f3c9cc
     submitted_at: "2026-10-14 22:52:53 CST"
-    checked_at: "2026-10-15 19:05 CST"
-    status: all_views_training_complete_backview_leftview_31k_32k_33k_evaluated
+    checked_at: "2026-10-15 20:20 CST"
+    status: all_views_training_complete_backview_leftview_31k_32k_33k_evaluated_rightview_evaluation_submitted
     study_type: checkpoint_trajectory_reconstruction_not_new_method
     views: [backview, leftview, rightview]
     train_jobs: {backview: 148740, leftview: 148741, rightview: 148742}
@@ -136,6 +136,42 @@ experiment_names:
           episodes_per_suite: 500
           evidence: /opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/leftview/32999/summary.txt
         34k: {array_job: 148928, summary_job: 148929, afterok_training: 148741, status: running}
+    evaluation_rightview:
+      protocol: experiments/student/acpd-v2-trajectory-31k-34k/evaluation-rightview.md
+      protocol_commit: 69d82bd
+      submitted_at: "2026-10-15 20:19 CST"
+      checked_at: "2026-10-15 20:20 CST"
+      status: 31k_all_suites_running_32k_two_suites_running_33k_34k_pending
+      node: gpu04
+      reservation: res_gpu04
+      checkpoint_steps: [30999, 31999, 32999, 33999]
+      checkpoint_completion_params_norm_stats_verified: true
+      array: "0-3"
+      array_concurrency_limit: null
+      resources_per_task: 1gpu_8cpu_24g
+      time_limit: "08:00:00"
+      summary_resources: 1cpu_2g_15min
+      summary_dependency: afterok_entire_corresponding_array
+      episodes_per_suite: 500
+      episodes_per_checkpoint: 2000
+      seed: 7
+      policy_config: pi05_libero_rightview_acpd_v2_layer10_lora
+      base_image_key: rightview_image
+      startup_verified_at: "2026-10-15 20:21 CST"
+      startup_verified_tasks: ["149171_0", "149171_1", "149171_2", "149171_3", "149173_0", "149173_1"]
+      startup_verification: model_loaded_policy_connected_first_simulation_episode_entered
+      contribution_injection: true
+      proxy_enabled: false
+      huggingface_offline: true
+      output_root: /opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview
+      jobs:
+        31k: {array_job: 149171, summary_job: 149172, status: all_four_suites_running}
+        32k: {array_job: 149173, summary_job: 149174, status: spatial_object_running_goal_libero10_pending}
+        33k: {array_job: 149175, summary_job: 149176, status: pending_gpu04_resources_or_reservation_window}
+        34k: {array_job: 149177, summary_job: 149178, status: pending_gpu04_resources_or_reservation_window}
+      other_jobs_modified: false
+      data_and_checkpoints_moved_copied_deleted: false
+      conclusion: 尚无结论
     conclusion: backview31K/32K/33K为59.10%/58.65%/60.45%，均未超过历史35K的61.05%；leftview31K/32K/33K为81.00%/81.55%/80.00%，比已有35K的79.65%高1.35/1.90/0.35点，32K为目前leftview最高观测点；未计算配对区间，不作显著性判断；34K尚无完整结论
   acpd_original_backview_bs32_30k:
     display_name: "Original ACPD backview BS32 5K→50K"
@@ -972,7 +1008,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-15 09:07 CST (31K–34K backview/leftview training about33.7K, rightview pending; eight evaluation arrays and eight summaries submitted; MV-SV-KD running; topview34K148533 still pending DependencyNeverSatisfied; other historical entries retain their own snapshots)"
+  checked_at: "2026-10-15 20:20 CST (rightview31K–34K full evaluations149171–149178 submitted; 31K four suites and32K two suites running on gpu04, remaining suites pending; backview/leftview34K LIBERO-10 still running; MV-SV-KD142275 running on gpu02; topview34K148533 pending DependencyNeverSatisfied; other historical entries retain their own snapshots)"
   cache_maintenance:
     checked_at: "2026-10-14 21:46 CST"
     freed_gib_approx: 122
@@ -984,11 +1020,11 @@ current_execution:
   h19_resume_checked_at: "2026-10-13 09:44 CST (35K training complete at 05:45; all five checkpoints 31K--35K finalized; 147342 training dependency satisfied and pending Resources; 147343 pending evaluation dependency)"
   evaluation_priority_checked_at: "2026-10-12 11:58 CST (147057/147059/145280 retained and pending Priority; summaries 147058/147060/145282 retained and waiting dependencies; MV-SV-KD 142275 still running)"
   multiview_35k_checked_at: "2026-10-12 17:00 CST (leftview final 1593/2000 and rightview final 1586/2000; both summaries available; no evaluation jobs remaining in squeue)"
-  reservation_checked_at: "2026-10-13 00:24 CST"
+  reservation_checked_at: "2026-10-15 20:20 CST"
   evaluation_reservation:
     name: res_gpu04
     node: gpu04
-    users: [liutong]
+    users: [liutong, yangxiaoshu, wangzihan]
     start: "2026-10-12 12:48 CST"
     end: "2026-10-16 12:48 CST"
     flags: [IGNORE_JOBS, SPEC_NODES, MAGNETIC]
@@ -1000,10 +1036,18 @@ current_execution:
     logical_cpus_allocated: 64
     memory_gib_total: 360
     memory_gib_allocated: 192
-    resource_counts_checked_at: "2026-10-13 23:37 CST"
+    resource_counts_checked_at: "2026-10-15 20:20 CST"
     pending_jobs_bound_in_place: [145280_2, 145280_3, 147057, 147059, 145282, 147058, 147060]
     note: reservation_does_not_preempt_existing_jobs_resource_counts_are_a_snapshot
   jobs:
+    - {id: 149171, experiment: acpd_v2_rightview_31k_full_evaluation, state: running_all_four_suites, array: "0-3", resources_per_task: 1gpu_8cpu_24g, time_limit: "08:00:00", requested_node: gpu04, reservation: res_gpu04, summary_job: 149172}
+    - {id: 149173, experiment: acpd_v2_rightview_32k_full_evaluation, state: running_0_1_pending_2_3, array: "0-3", resources_per_task: 1gpu_8cpu_24g, time_limit: "08:00:00", requested_node: gpu04, reservation: res_gpu04, summary_job: 149174}
+    - {id: 149175, experiment: acpd_v2_rightview_33k_full_evaluation, state: pending_gpu04_resources_or_reservation_window, array: "0-3", resources_per_task: 1gpu_8cpu_24g, time_limit: "08:00:00", requested_node: gpu04, reservation: res_gpu04, summary_job: 149176}
+    - {id: 149177, experiment: acpd_v2_rightview_34k_full_evaluation, state: pending_gpu04_resources_or_reservation_window, array: "0-3", resources_per_task: 1gpu_8cpu_24g, time_limit: "08:00:00", requested_node: gpu04, reservation: res_gpu04, summary_job: 149178}
+    - {id: 149172, experiment: acpd_v2_rightview_31k_summary, state: pending_dependency, depends_on: 149171, resources: 1cpu_2g}
+    - {id: 149174, experiment: acpd_v2_rightview_32k_summary, state: pending_dependency, depends_on: 149173, resources: 1cpu_2g}
+    - {id: 149176, experiment: acpd_v2_rightview_33k_summary, state: pending_dependency, depends_on: 149175, resources: 1cpu_2g}
+    - {id: 149178, experiment: acpd_v2_rightview_34k_summary, state: pending_dependency, depends_on: 149177, resources: 1cpu_2g}
     - id: 148740
       experiment: acpd_v2_checkpoint_trajectory_backview_31k_34k
       state: running_approx_33700

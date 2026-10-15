@@ -28,6 +28,11 @@ backview新增31K–33K结果均未超过历史35K的61.05%；33K低0.60点。
 证据：`experiments/student/acpd-v2-trajectory-31k-34k/execution.md`。
 验证协议与任务：`experiments/student/acpd-v2-trajectory-31k-34k/evaluation-backview-leftview.md`。
 
+2026-10-15 20:20补交rightview31K–34K全量验证：数组149171/149173/149175/149177，
+汇总分别149172/149174/149176/149178。每模型四套各500回合，gpu04预约，无数组并发上限；
+31K四套和32K两套已启动，其余等待资源，尚无新增结果。不修改原H9完整注入配置和其他任务。
+协议、checkpoint和结果路径：`experiments/student/acpd-v2-trajectory-31k-34k/evaluation-rightview.md`。
+
 ## 当前认识
 
 | 问题 | 证据 | 结论 |
