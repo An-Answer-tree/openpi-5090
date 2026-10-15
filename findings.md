@@ -11,9 +11,14 @@
 
 2026-10-14补齐backview/leftview/rightview的31K–34K：从各自30K完整状态分支，
 保持4卡BS64、累计1、原loss与30K后LR，每1K全部保留，已有35K不变。
-148740已恢复step30000和data batch30000，首步loss有限；148741/148742排队。
-尚无新增成功率结论，不宣称逐位复现历史35K。
+148740已恢复step30000和data batch30000，首步loss有限。
+2026-10-15 09:07核对：148740/148741约33.7K运行，148742等资源；
+backview/leftview的31K–33K完整，34K尚未保存。两个视角31K–34K共8组全量验证
+148914–148929已提交（偶数为数组、后继奇数为汇总），34K分别等待148740/148741成功。
+每模型四套各500回合，gpu04预约，无数组并发上限；尚无新增成功率结论，
+不宣称逐位复现历史35K。
 证据：`experiments/student/acpd-v2-trajectory-31k-34k/execution.md`。
+验证协议与任务：`experiments/student/acpd-v2-trajectory-31k-34k/evaluation-backview-leftview.md`。
 
 ## 当前认识
 

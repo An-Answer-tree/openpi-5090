@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-15 00:03 CST（topview 31K–34K全量验证完成，分别73.50%/75.50%/75.00%/75.15%；其他任务沿用10月14日23:11快照，本次未复查）
+更新时间：2026-10-15 09:07 CST（backview/leftview 31K–34K全量验证已提交，尚无结果；两视角训练约33.7K；topview已完成结果不变，其他历史实验保留原快照）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -9,9 +9,10 @@
 
 | 实验 | 目的 | 配置 | 状态 | 结论 |
 |---|---|---|---|---|
-| ACPD-v2-Fixed backview 30K→34K | 补齐31K–34K checkpoint轨迹 | 原H9；4×5090 FSDP、BS64、累计1；完整状态与数据接续；每1K全部保留；LR保持2.5e-6 | 148740在gpu04运行；step30000、batch30000及有限首步loss已确认 | 尚无结论；[协议与执行](experiments/student/acpd-v2-trajectory-31k-34k/execution.md)；已有35K不变 |
-| ACPD-v2-Fixed leftview 30K→34K | 补齐31K–34K checkpoint轨迹 | 同上，仅改变student视角及其30K源checkpoint | 148741等待Resources | 尚无结论；[协议与执行](experiments/student/acpd-v2-trajectory-31k-34k/execution.md) |
+| ACPD-v2-Fixed backview 30K→34K | 补齐31K–34K checkpoint轨迹 | 原H9；4×5090 FSDP、BS64、累计1；完整状态与数据接续；每1K全部保留；LR保持2.5e-6 | 148740在gpu04约33.7K；31K–33K完整，34K未保存 | 尚无结论；[协议与执行](experiments/student/acpd-v2-trajectory-31k-34k/execution.md)；已有35K不变 |
+| ACPD-v2-Fixed leftview 30K→34K | 补齐31K–34K checkpoint轨迹 | 同上，仅改变student视角及其30K源checkpoint | 148741在gpu04约33.7K；31K–33K完整，34K未保存 | 尚无结论；[协议与执行](experiments/student/acpd-v2-trajectory-31k-34k/execution.md) |
 | ACPD-v2-Fixed rightview 30K→34K | 补齐31K–34K checkpoint轨迹 | 同上，仅改变student视角及其30K源checkpoint | 148742等待gpu04资源/预约窗口 | 尚无结论；[协议与执行](experiments/student/acpd-v2-trajectory-31k-34k/execution.md) |
+| ACPD-v2-Fixed backview/leftview 31K–34K验证 | 测量两个视角的后期成功率轨迹 | 原H9完整注入；每模型四套各500回合；4个单卡子任务及1个汇总 | 8组验证148914/148916/148918/148920/148922/148924/148926/148928已提交；31K–33K等资源，34K等对应训练成功 | 尚无结论；[验证任务与路径](experiments/student/acpd-v2-trajectory-31k-34k/evaluation-backview-leftview.md) |
 | Original ACPD backview BS32 5K→50K | 在论文原版动作条件 privileged cue 方法下观察长训练效果 | layers 6+12；4×5090 FSDP；global BS32；累计1；loss `1.0/0.2/0.5`；25K后每1K全部保留；30K后LR保持`2.5e-6` | 50K训练、四套全量验证148343及汇总148347完成；30K验证提前停止，部分日志保留 | 50K为1062/2000=`53.10%`；比H9 BS64 35K低`7.95`点，探索性配对95%区间`[-10.50,-5.40]`点；BS和训练步数不同，不能完全归因于方法；[50K验证](experiments/student/acpd-original-backview-bs32-30k/evaluation-50k.md) |
 
 ## 当前结论
@@ -247,7 +248,7 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | 内容 | 路径 |
 |---|---|
 | 实验目录索引 | `experiments/README.md` |
-| ACPD-v2 back/left/right 31K–34K补训 | [协议](experiments/student/acpd-v2-trajectory-31k-34k/protocol.md)、[执行](experiments/student/acpd-v2-trajectory-31k-34k/execution.md)；checkpoint：`/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/trajectory_31k_34k/{view}/pi05_libero_{view}_acpd_v2_layer10/pi05_libero_{view}_acpd_v2_layer10_lora_fsdp4_bs64_resume_34k/{30999,31999,32999,33999}`；日志：`/opt/liutong/openpi-5090-research/acpd-v2-trajectory-31k-34k/slurm-log/`；148740/148741/148742；尚无新增验证结果 |
+| ACPD-v2 back/left/right 31K–34K补训 | [协议](experiments/student/acpd-v2-trajectory-31k-34k/protocol.md)、[执行](experiments/student/acpd-v2-trajectory-31k-34k/execution.md)；checkpoint：`/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/trajectory_31k_34k/{view}/pi05_libero_{view}_acpd_v2_layer10/pi05_libero_{view}_acpd_v2_layer10_lora_fsdp4_bs64_resume_34k/{30999,31999,32999,33999}`；日志：`/opt/liutong/openpi-5090-research/acpd-v2-trajectory-31k-34k/slurm-log/`；148740/148741/148742；back/left新增验证[任务索引](experiments/student/acpd-v2-trajectory-31k-34k/evaluation-backview-leftview.md)，输出`/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/{view}/{step}/`；尚无新增验证结果 |
 | 原论文ACPD backview 50K验证 | `experiments/student/acpd-original-backview-bs32-30k/evaluation-50k.md`；checkpoint为原`acpd_original/backview_bs32_30k`实验目录中的`49999`；验证根目录`/opt/liutong/openpi-5090-evals/acpd-original-backview-bs32-50k/49999/`，`summary.txt`为最终53.10%；四套日志`logs/`、视频各suite的`videos/`、Slurm日志`slurm-log/`；验证148343，汇总148347；配对分析`experiments/student/acpd-original-backview-bs32-30k/results/paired-h9-35k.json` |
 | MV-SV-KD协议、执行与配置路径 | `experiments/baseline/mv-sv-kd-backview-bs64-30k/`；checkpoint根目录`/opt/liutong/openpi_checkpoints/fixed_dataset/baseline/mv_sv_kd/backview_bs64_30k/`；日志根目录`/opt/liutong/openpi-5090-research/mv-sv-kd-backview-bs64-30k/slurm-log/`；训练运行，尚无验证结果 |
 | H7/H7.1 原始指标 | `/opt/liutong/openpi-5090-research/acpd-exact-attention-probe/results/` |
