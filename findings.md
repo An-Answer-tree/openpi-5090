@@ -9,6 +9,15 @@
 **ACPD-v2-NoInjection**，历史简称 H13-LossOnly。
 下文历史 H9 BS32 单独注明。恢复与延长训练属于 H9-Fixed，不是新方法。
 
+2026-10-16 00:14提交left/right/topview SFT BS64的30K→32K续训，任务
+149303/149304/149305，均为4卡FSDP、累计1、32CPU/96G/24小时，batch自动选节点。
+从各自原29999恢复完整模型、优化器及数据batch30000，LR保持2.5e-6；
+save_interval=1000、keep_period=1，保留已有checkpoint和新增31000/31999。
+沿用SFT保存规则，31000含31001个优化步，最终31999含32000个优化步。
+三项数据顺序恢复CPU测试通过；当前均Priority排队，实际GPU恢复与新结果尚未确认。
+这是补齐相同步数SFT基线，不是新方法；此前按ACPD轨迹选择32K的探索性性质不变。
+记录：`experiments/baseline/sft-multiview-bs64-resume-32k/execution.md`。
+
 2026-10-14补齐backview/leftview/rightview的31K–34K：从各自30K完整状态分支，
 保持4卡BS64、累计1、原loss与30K后LR，每1K全部保留，已有35K不变。
 148740已恢复step30000和data batch30000，首步loss有限。

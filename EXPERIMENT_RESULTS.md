@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-15 23:43 CST（rightview31K–33K全量验证完成，分别78.15%/81.00%/77.60%；34K仅LIBERO-10仍在验证）
+更新时间：2026-10-16 00:14 CST（三视角SFT BS64 30K→32K续训已提交，保留31K附近和32K）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -9,6 +9,9 @@
 
 | 实验 | 目的 | 配置 | 状态 | 结论 |
 |---|---|---|---|---|
+| SFT-View leftview 30K→32K | 补齐同视角32K基线 | 4×5090 FSDP、BS64、累计1；恢复模型/优化器及数据batch30000；LR保持2.5e-6；每1K全部保留，batch自动选节点 | 149303已提交，Priority排队 | 尚无结论；保留31K附近的31000与最终31999，精确步数见[协议与执行](experiments/baseline/sft-multiview-bs64-resume-32k/execution.md) |
+| SFT-View rightview 30K→32K | 补齐同视角32K基线 | 同上，仅改变视角与原30K checkpoint | 149304已提交，Priority排队 | 尚无结论；[协议与执行](experiments/baseline/sft-multiview-bs64-resume-32k/execution.md) |
+| SFT-View topview 30K→32K | 补齐同视角32K基线 | 同上，仅改变视角与原30K checkpoint | 149305已提交，Priority排队 | 尚无结论；[协议与执行](experiments/baseline/sft-multiview-bs64-resume-32k/execution.md) |
 | ACPD-v2-Fixed backview 30K→34K | 补齐31K–34K checkpoint轨迹 | 原H9；4×5090 FSDP、BS64、累计1；完整状态与数据接续；每1K全部保留；LR保持2.5e-6 | 148740完成；31K–34K完整保存 | 训练完成；成功率见下行；[协议与执行](experiments/student/acpd-v2-trajectory-31k-34k/execution.md)；已有35K不变 |
 | ACPD-v2-Fixed leftview 30K→34K | 补齐31K–34K checkpoint轨迹 | 同上，仅改变student视角及其30K源checkpoint | 148741完成；31K–34K完整保存 | 训练完成；31K–34K成功率见下行；[协议与执行](experiments/student/acpd-v2-trajectory-31k-34k/execution.md) |
 | ACPD-v2-Fixed rightview 30K→34K | 补齐31K–34K checkpoint轨迹 | 同上，仅改变student视角及其30K源checkpoint | 148742完成；31K–34K完整保存 | 训练完成；31K–33K成功率见下行，34K尚无完整结论；[协议与执行](experiments/student/acpd-v2-trajectory-31k-34k/execution.md) |

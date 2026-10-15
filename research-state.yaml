@@ -5,6 +5,54 @@ project:
   started: "2026-09-11"
 
 experiment_names:
+  sft_multiview_bs64_resume_32k:
+    display_name: "SFT-View left/right/topview BS64 30K→32K"
+    parent: sft_multiview_bs64_30k
+    protocol: experiments/baseline/sft-multiview-bs64-resume-32k/protocol.md
+    execution: experiments/baseline/sft-multiview-bs64-resume-32k/execution.md
+    protocol_commit: f775536
+    submitted_at: "2026-10-16 00:14:09 CST"
+    checked_at: "2026-10-16 00:14 CST"
+    status: submitted_pending_priority
+    study_type: matched_step_baseline_extension_after_exploratory_checkpoint_selection
+    views: [leftview, rightview, topview]
+    train_jobs: {leftview: 149303, rightview: 149304, topview: 149305}
+    train_status: {leftview: pending_priority, rightview: pending_priority, topview: pending_priority}
+    partition: batch
+    requested_node: null
+    excluded_nodes: []
+    reservation: null
+    resources_per_job: 4gpu_32cpu_96g
+    time_limit: "1-00:00:00"
+    physical_global_batch: 64
+    gradient_accumulation_steps: 1
+    fsdp_devices: 4
+    seed: 42
+    resume_optimizer_step: 30000
+    resume_data_loader: true
+    data_start_batch: 30000
+    num_train_steps: 32000
+    learning_rate: {warmup_steps: 1000, peak_lr: 2.5e-5, decay_steps: 30000, decay_lr: 2.5e-6}
+    lr_after_30k: 2.5e-6
+    reset_lr_schedule: false
+    save_interval: 1000
+    keep_period: 1
+    checkpoint_steps: [31000, 31999]
+    checkpoint_optimizer_steps: [31001, 32000]
+    checkpoint_numbering: original_sft_periodic_save_uses_zero_based_loop_step
+    checkpoint_run_dirs:
+      leftview: /opt/liutong/openpi_checkpoints/fixed_dataset/sft/leftview_bs64_30k/pi05_libero_leftview_lora/pi05_libero_leftview_lora_fsdp4_bs64_30k
+      rightview: /opt/liutong/openpi_checkpoints/fixed_dataset/sft/rightview_bs64_30k/pi05_libero_rightview_lora/pi05_libero_rightview_lora_fsdp4_bs64_30k
+      topview: /opt/liutong/openpi_checkpoints/fixed_dataset/sft/topview_bs64_30k/pi05_libero_topview_lora/pi05_libero_topview_lora_fsdp4_bs64_30k
+    source_checkpoint: 29999
+    preserve_existing_checkpoints: true
+    log_root: /opt/liutong/openpi-5090-research/sft-multiview-bs64-resume-32k/slurm-log
+    source_data_and_checkpoints_moved_copied_deleted: false
+    cpu_tests: 3_passed_6_deselected
+    cli_checks: 3_passed
+    slurm_test_only: 3_passed
+    gpu_restore_verified: false
+    evaluation_submitted: false
   acpd_v2_checkpoint_trajectory_31k_34k:
     display_name: "ACPD-v2-Fixed back/left/right 31K–34K checkpoint补训"
     parent: h9_fixed
@@ -1063,7 +1111,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-15 20:53 CST (backview/leftview31K–34K all evaluations complete; rightview31K/32K eight suites running on gpu04,33K/34K pending Priority; MV-SV-KD142275 about20.6K/30K on gpu02; topview34K148533 pending DependencyNeverSatisfied; other historical entries retain their own snapshots)"
+  checked_at: "2026-10-16 00:14 CST (SFT left/right/top resume32K jobs149303/149304/149305 pending Priority, batch automatic allocation; rightview34K149177_3 and MV-SV-KD142275 running; other historical entries retain their own snapshots)"
   cache_maintenance:
     checked_at: "2026-10-14 21:46 CST"
     freed_gib_approx: 122
@@ -1095,6 +1143,9 @@ current_execution:
     pending_jobs_bound_in_place: [145280_2, 145280_3, 147057, 147059, 145282, 147058, 147060]
     note: reservation_does_not_preempt_existing_jobs_resource_counts_are_a_snapshot
   jobs:
+    - {id: 149303, experiment: sft_leftview_bs64_resume_32k, state: pending_priority, resources: 4gpu_32cpu_96g, time_limit: "1-00:00:00", requested_node: null, reservation: null}
+    - {id: 149304, experiment: sft_rightview_bs64_resume_32k, state: pending_priority, resources: 4gpu_32cpu_96g, time_limit: "1-00:00:00", requested_node: null, reservation: null}
+    - {id: 149305, experiment: sft_topview_bs64_resume_32k, state: pending_priority, resources: 4gpu_32cpu_96g, time_limit: "1-00:00:00", requested_node: null, reservation: null}
     - {id: 149171, experiment: acpd_v2_rightview_31k_full_evaluation, state: running_all_four_suites, array: "0-3", resources_per_task: 1gpu_8cpu_24g, time_limit: "08:00:00", requested_node: gpu04, reservation: res_gpu04, summary_job: 149172}
     - {id: 149173, experiment: acpd_v2_rightview_32k_full_evaluation, state: running_all_four_suites, array: "0-3", resources_per_task: 1gpu_8cpu_24g, time_limit: "08:00:00", requested_node: gpu04, reservation: res_gpu04, summary_job: 149174}
     - {id: 149175, experiment: acpd_v2_rightview_33k_full_evaluation, state: pending_priority, array: "0-3", resources_per_task: 1gpu_8cpu_24g, time_limit: "08:00:00", requested_node: gpu04, reservation: res_gpu04, summary_job: 149176}
