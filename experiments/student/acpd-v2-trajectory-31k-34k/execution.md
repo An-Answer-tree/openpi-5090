@@ -49,3 +49,14 @@ checkpoint源元数据按明确路径核对；没有递归扫盘。
 | backview | `pi05-bv-acpdv2-bs64-r34k_148740.out` |
 | leftview | `pi05-lv-acpdv2-bs64-r34k_148741.out` |
 | rightview | `pi05-rv-acpdv2-bs64-r34k_148742.out` |
+
+## 2026-10-15 14:00核对
+
+| Student | 任务 | 实际状态 | 保存证据 |
+|---|---|---|---|
+| backview | 148740 | 完成34K | 日志09:57:29完成33999保存，无后台保存错误；最终checkpoint、params元数据及norm_stats已核对 |
+| leftview | 148741 | 完成34K | 日志09:57:28完成33999保存，无后台保存错误；最终checkpoint、params元数据及norm_stats已核对 |
+| rightview | 148742 | gpu04运行，约32.2K/34K | 13:59日志持续推进，约5.6–5.8秒/步；预计剩余约3小时，不是保证完成时间 |
+
+backview/leftview31K–34K全量验证另见[验证记录](evaluation-backview-leftview.md)，
+已完成backview31K，其余运行或排队；未调整任何现有任务。

@@ -3,7 +3,7 @@
 ## 目的与固定协议
 
 补齐两个视角在30K–35K之间的成功率轨迹。沿用原H9推理配置，不修改模型，
-不关闭任何contribution分支或gate注入。这是探索性checkpoint比较，尚无结果。
+不关闭任何contribution分支或gate注入。这是探索性checkpoint比较，已完成结果见文末。
 训练来源见[补训协议](protocol.md)；不宣称逐位复现历史35K轨迹。
 
 | 项目 | 设置 |
@@ -44,7 +44,7 @@ evaluation:
 
 分别与同视角已有30K/35K结果比较；各模型保留原始成功/总数，不合并不同checkpoint的回合。
 选择31K–35K中的最高观测点属于探索性选择，不等同于独立测试的最优模型。
-尚无新增成功率结论。
+完整结果见文末；未完成模型不作成功率结论。
 
 ## 实际提交
 
@@ -67,3 +67,18 @@ evaluation:
 提交后核对gpu04预约、每项1GPU/8CPU/24G/12小时、数组0-3及34K训练依赖。
 09:07时148740/148741均在约33.7K继续训练，148742仍等待资源，MV-SV-KD142275继续运行；
 未修改上述任务，也未新增checkpoint复制或后台轮询任务。
+
+## 已完成结果
+
+2026-10-15 14:00 CST核对，原始日志与自动汇总一致。每套500回合。
+
+| Student / step | Spatial | Object | Goal | LIBERO-10 | Pooled |
+|---|---:|---:|---:|---:|---:|
+| backview 31K / 30999 | 342/500（68.40%） | 373/500（74.60%） | 285/500（57.00%） | 182/500（36.40%） | 1182/2000（59.10%） |
+
+证据：`/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/backview/30999/summary.txt`，
+以及同目录`logs/{spatial,object,goal,libero_10}.log`的`Final success rate`。
+31K未超过历史35K的61.05%；未计算配对区间，不作显著性判断。
+
+backview32K/33K验证中，backview34K及leftview31K–34K排队，尚无完整结果。
+backview/leftview34K checkpoint均已完整保存，原训练依赖已满足。
