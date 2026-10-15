@@ -13,7 +13,7 @@
 | 相机 | fixed_dataset tuned相机，与原训练和已有验证一致 |
 | 回合 | Spatial/Object/Goal/LIBERO-10各500回合；每任务50回合，共2000回合/模型 |
 | 推理 | seed7，224×224，replan5，等待10步；保留视频 |
-| 资源 | batch、gpu04、res_gpu04；每模型数组0-3，无数组并发上限；每项1GPU/8CPU/24G/24小时 |
+| 资源 | batch、gpu04、res_gpu04；每模型数组0-3，无数组并发上限；每项1GPU/8CPU/24G/12小时 |
 | 汇总 | 每模型1CPU/2G/15分钟；afterok等待该模型四个子任务全部成功 |
 | 34K等待 | backview依赖训练148740成功，leftview依赖148741成功；依赖满足前不占GPU |
 | 环境 | conda openpi推理、openpi-libero仿真；HF离线、清除代理；命名环境位于`/home/liutong/miniconda3/envs` |
@@ -21,7 +21,8 @@
 复用`examples/libero/eval_slurm/run_fixed_backview_benchmark_array.sbatch`和
 `summarize_fixed_backview_benchmark.sbatch`，显式传入视角配置和相机键，不修改共享脚本。
 31K–33K的完成标记、params元数据及`assets/libero_multiview/norm_stats.json`已核对；
-34K尚未保存，提交训练成功依赖。预约当前截至2026-10-16 12:48 CST，
+34K尚未保存，提交训练成功依赖。验证脚本默认8小时，本次设12小时留余量，
+同时避免24小时请求过早超出预约剩余窗口。预约当前截至2026-10-16 12:48 CST，
 Slurm按资源与预约剩余窗口排队，不保证八个模型均能在窗口内启动。
 不停止、修改或提前占用现有训练；不复制、移动、覆盖或删除数据与checkpoint。
 
