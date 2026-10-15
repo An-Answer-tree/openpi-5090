@@ -4,6 +4,7 @@
 
 | 日期 | 类型 | 记录 |
 |---|---|---|
+| 2026-10-15 | 结果 | Leftview ACPD-v2-Fixed补训32K/33K完成全量验证：1631/2000=81.55%、1600/2000=80.00%，分别比已有35K高1.90/0.35点；32K为目前leftview最高观测点，四套85.20/79.40/84.80/76.80%。未计算配对区间，不作显著性判断；两个视角34K尚无完整结果。证据：`experiments/student/acpd-v2-trajectory-31k-34k/evaluation-backview-leftview.md`。 |
 | 2026-10-15 | 结果 | Leftview ACPD-v2-Fixed补训31K完成全量验证：1620/2000=81.00%，四套83.00/83.40/83.40/74.20%；比已有35K的79.65%高1.35点，四套点估计均较高。未计算配对区间，不作显著性判断；checkpoint选择为探索性。证据：`experiments/student/acpd-v2-trajectory-31k-34k/evaluation-backview-leftview.md`。 |
 | 2026-10-15 | 结果 | Backview ACPD-v2-Fixed补训33K完成全量验证：1209/2000=60.45%，四套68.20/74.80/67.80/31.00%；比历史35K低0.60点，未计算配对区间。新增31K–33K均未超过35K，34K尚待验证。三视角补训均完成34K，每1K checkpoint完整保留。证据：`experiments/student/acpd-v2-trajectory-31k-34k/`。 |
 | 2026-10-15 | 结果 | Backview ACPD-v2-Fixed补训32K完成全量验证：1173/2000=58.65%，四套67.60/79.80/57.20/30.00%；比历史35K的61.05%低2.40点。31K为59.10%；33K/34K尚无完整结果，未计算配对区间，不作显著性判断。证据：`experiments/student/acpd-v2-trajectory-31k-34k/evaluation-backview-leftview.md`。 |

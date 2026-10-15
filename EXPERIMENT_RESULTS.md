@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-15 17:33 CST（leftview 31K全量验证81.00%，比已有35K高1.35点；backview 31K–33K均未超过35K；其余验证继续；其他历史实验保留原快照）
+更新时间：2026-10-15 19:05 CST（leftview 31K/32K/33K全量验证81.00%/81.55%/80.00%，均高于已有35K的79.65%；backview 31K–33K均未超过35K；两个视角34K验证中；其他历史实验保留原快照）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -10,9 +10,9 @@
 | 实验 | 目的 | 配置 | 状态 | 结论 |
 |---|---|---|---|---|
 | ACPD-v2-Fixed backview 30K→34K | 补齐31K–34K checkpoint轨迹 | 原H9；4×5090 FSDP、BS64、累计1；完整状态与数据接续；每1K全部保留；LR保持2.5e-6 | 148740完成；31K–34K完整保存 | 训练完成；成功率见下行；[协议与执行](experiments/student/acpd-v2-trajectory-31k-34k/execution.md)；已有35K不变 |
-| ACPD-v2-Fixed leftview 30K→34K | 补齐31K–34K checkpoint轨迹 | 同上，仅改变student视角及其30K源checkpoint | 148741完成；31K–34K完整保存 | 训练完成；31K成功率见下行；[协议与执行](experiments/student/acpd-v2-trajectory-31k-34k/execution.md) |
+| ACPD-v2-Fixed leftview 30K→34K | 补齐31K–34K checkpoint轨迹 | 同上，仅改变student视角及其30K源checkpoint | 148741完成；31K–34K完整保存 | 训练完成；31K–33K成功率见下行；[协议与执行](experiments/student/acpd-v2-trajectory-31k-34k/execution.md) |
 | ACPD-v2-Fixed rightview 30K→34K | 补齐31K–34K checkpoint轨迹 | 同上，仅改变student视角及其30K源checkpoint | 148742完成；31K–34K完整保存 | 训练完成；尚无新增成功率结论；[协议与执行](experiments/student/acpd-v2-trajectory-31k-34k/execution.md) |
-| ACPD-v2-Fixed backview/leftview 31K–34K验证 | 测量两个视角的后期成功率轨迹 | 原H9完整注入；每模型四套各500回合；4个单卡子任务及1个汇总 | backview31K/32K/33K及leftview31K完成；backview34K、leftview32K/33K验证中；leftview34K排队 | backview31K/32K/33K为`59.10%/58.65%/60.45%`，均未超过历史35K的`61.05%`；leftview31K为1620/2000=`81.00%`，比已有35K的`79.65%`高`1.35`点，四套点估计均较高；未计算配对区间，不作显著性判断；其余尚无完整结论；[四套指标与证据](experiments/student/acpd-v2-trajectory-31k-34k/evaluation-backview-leftview.md#已完成结果) |
+| ACPD-v2-Fixed backview/leftview 31K–34K验证 | 测量两个视角的后期成功率轨迹 | 原H9完整注入；每模型四套各500回合；4个单卡子任务及1个汇总 | 两个视角31K–33K均完成，34K验证中 | backview31K/32K/33K为`59.10%/58.65%/60.45%`，均未超过历史35K的`61.05%`；leftview31K/32K/33K为1620/1631/1600成功、各2000回合，即`81.00%/81.55%/80.00%`，分别比已有35K的`79.65%`高`1.35/1.90/0.35`点；32K为目前leftview最高观测点。未计算配对区间，不作显著性判断；34K尚无完整结论；[四套指标与证据](experiments/student/acpd-v2-trajectory-31k-34k/evaluation-backview-leftview.md#已完成结果) |
 | Original ACPD backview BS32 5K→50K | 在论文原版动作条件 privileged cue 方法下观察长训练效果 | layers 6+12；4×5090 FSDP；global BS32；累计1；loss `1.0/0.2/0.5`；25K后每1K全部保留；30K后LR保持`2.5e-6` | 50K训练、四套全量验证148343及汇总148347完成；30K验证提前停止，部分日志保留 | 50K为1062/2000=`53.10%`；比H9 BS64 35K低`7.95`点，探索性配对95%区间`[-10.50,-5.40]`点；BS和训练步数不同，不能完全归因于方法；[50K验证](experiments/student/acpd-original-backview-bs32-30k/evaluation-50k.md) |
 
 ## 当前结论
