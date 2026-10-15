@@ -60,3 +60,11 @@ checkpoint源元数据按明确路径核对；没有递归扫盘。
 
 backview/leftview31K–34K全量验证另见[验证记录](evaluation-backview-leftview.md)，
 已完成backview31K，其余运行或排队；未调整任何现有任务。
+
+## 2026-10-15 16:55核对
+
+rightview任务148742完成34K，最终33999于16:52:22保存并完成Save Finalize，
+日志无后台保存错误；31K–34K四个checkpoint的完成标记、params元数据与norm_stats均已核对。
+三个视角补训均完成；源checkpoint与已有35K未改变。
+backview31K/32K/33K全量成功率为59.10%/58.65%/60.45%，均未超过历史35K的61.05%；
+leftview31K/32K/33K验证中，两个视角34K等待资源。未调整任务，未移动或复制checkpoint。
