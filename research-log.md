@@ -4,6 +4,7 @@
 
 | 日期 | 类型 | 记录 |
 |---|---|---|
+| 2026-10-15 | 结果 | Leftview ACPD-v2-Fixed补训31K完成全量验证：1620/2000=81.00%，四套83.00/83.40/83.40/74.20%；比已有35K的79.65%高1.35点，四套点估计均较高。未计算配对区间，不作显著性判断；checkpoint选择为探索性。证据：`experiments/student/acpd-v2-trajectory-31k-34k/evaluation-backview-leftview.md`。 |
 | 2026-10-15 | 结果 | Backview ACPD-v2-Fixed补训33K完成全量验证：1209/2000=60.45%，四套68.20/74.80/67.80/31.00%；比历史35K低0.60点，未计算配对区间。新增31K–33K均未超过35K，34K尚待验证。三视角补训均完成34K，每1K checkpoint完整保留。证据：`experiments/student/acpd-v2-trajectory-31k-34k/`。 |
 | 2026-10-15 | 结果 | Backview ACPD-v2-Fixed补训32K完成全量验证：1173/2000=58.65%，四套67.60/79.80/57.20/30.00%；比历史35K的61.05%低2.40点。31K为59.10%；33K/34K尚无完整结果，未计算配对区间，不作显著性判断。证据：`experiments/student/acpd-v2-trajectory-31k-34k/evaluation-backview-leftview.md`。 |
 | 2026-10-14 | 结果 | Topview ACPD-v2 BS64 30K/35K均完成2000回合全量验证，最终1464/2000=73.20%、1470/2000=73.50%；SFT30K为71.55%，分别高1.65/1.95点。30K为同进度比较，35K不是；本次未计算配对区间，31K–34K尚无全量结论。证据：`experiments/student/acpd-v2-multiview-35k/analysis.md`。 |

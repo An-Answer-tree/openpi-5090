@@ -70,17 +70,25 @@ evaluation:
 
 ## 已完成结果
 
-2026-10-15 16:55 CST核对，原始日志与自动汇总一致。每套500回合。
+2026-10-15 17:33 CST核对，原始日志与自动汇总一致。每套500回合。
 
 | Student / step | Spatial | Object | Goal | LIBERO-10 | Pooled |
 |---|---:|---:|---:|---:|---:|
 | backview 31K / 30999 | 342/500（68.40%） | 373/500（74.60%） | 285/500（57.00%） | 182/500（36.40%） | 1182/2000（59.10%） |
 | backview 32K / 31999 | 338/500（67.60%） | 399/500（79.80%） | 286/500（57.20%） | 150/500（30.00%） | 1173/2000（58.65%） |
 | backview 33K / 32999 | 341/500（68.20%） | 374/500（74.80%） | 339/500（67.80%） | 155/500（31.00%） | 1209/2000（60.45%） |
+| leftview 31K / 30999 | 415/500（83.00%） | 417/500（83.40%） | 417/500（83.40%） | 371/500（74.20%） | 1620/2000（81.00%） |
 
 证据：`/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/backview/{30999,31999,32999}/summary.txt`，
 以及同目录`logs/{spatial,object,goal,libero_10}.log`的`Final success rate`。
-31K/32K/33K分别比历史35K的61.05%低1.95/2.40/0.60点；未计算配对区间，不作显著性判断。
+leftview31K证据：`/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/leftview/30999/summary.txt`，
+以及同目录四套日志。
+backview31K/32K/33K分别比历史35K的61.05%低1.95/2.40/0.60点；未计算配对区间，不作显著性判断。
 
-leftview31K/32K/33K验证中，backview34K及leftview34K排队，尚无完整结果。
+leftview31K比已有35K的1593/2000=79.65%高1.35点（多27次成功）；
+Spatial/Object/Goal/LIBERO-10分别高1.40/1.80/1.00/1.20点。
+35K参考：`/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/leftview/34999/summary.txt`。
+这是相同评测协议下的观测差值，尚未计算配对区间；探索性checkpoint选择不等于独立测试的最优模型。
+
+leftview32K/33K及backview34K验证中，leftview34K排队，尚无完整结果。
 backview/leftview34K checkpoint均已完整保存，原训练依赖已满足。
