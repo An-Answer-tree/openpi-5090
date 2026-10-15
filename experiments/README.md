@@ -85,12 +85,15 @@ H9-Fixed 的恢复、早中期验证及延长训练是同一方法的不同执�
 ## 精选 Checkpoint
 
 根目录：`/opt/liutong/openpi_checkpoints/fixed_dataset/curated`。
-2026-10-16核对仅有teacher30K、backview SFT5K、backview ACPD-v2 25K三个归档；
-另外五个模型目录为空。teacher只有推理权重，没有优化器状态。
+2026-10-16按用户指定归档：四视角SFT30K、backview student35K、left/right/topview
+student32K；teacher30K保持不变。消融分为MV-SV-KD、ACL-only、原版cross-attention
+蒸馏、H9推理关闭注入、完整H9五类，按真实验证结果选择checkpoint。
+13个选择入口已归档，MV-SV-KD目标30K尚未产出；旧SFT5K/H9 25K入口保留。
 
-实际归档内容、来源以及当前四视角student、SFT和ACL-only的原路径统一维护于
-[Checkpoint检索表](checkpoint-index.md)。空归档目录不表示原checkpoint不存在，
-已训练完成也不表示已归档。旧BS16/BS32 checkpoint仍保留原路径。
+实际归档与注意事项统一见[Checkpoint检索表](checkpoint-index.md)，
+来源、归档、推理配置和四套计数见[清单](curated-checkpoints.yaml)。
+58.90%为H9 30K推理关闭注入；图中ACL-only数值已按原始记录纠正。
+teacher只有推理权重，无优化器状态。
 
 ## 归档规则
 

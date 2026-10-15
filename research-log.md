@@ -4,6 +4,7 @@
 
 | 日期 | 类型 | 记录 |
 |---|---|---|
+| 2026-10-16 | 管理 | 按用户图表与原始验证值更新精选集合：四视角SFT30K、backview student35K、其余student32K；消融分五类。新增12个文件级硬链接归档，MV-SV-KD30K尚未产出，保留空类别；旧SFT5K/H9 25K不删除。ACL-only采用原始Object75.20%、平均59.35%；58.90%对应H9 30K推理关闭注入。来源、真实步数、推理配置、四套成功数记录于`experiments/curated-checkpoints.yaml`。不复制权重块、不移动或删除checkpoint、不改任务；移除被替代的空目录backview_loss_only_bs64。 |
 | 2026-10-16 | 管理 | 浅层核对精选目录`curated`：4类、8个模型目录，实存teacher30K、backview SFT5K、H9 25K三个checkpoint，其余五目录为空；teacher无优化器状态。建立`experiments/checkpoint-index.md`，记录归档来源、四视角student及主要SFT/ACL-only原路径，修正文档过期状态；不复制、移动或删除checkpoint，不改变任务。 |
 | 2026-10-15 | 结果 | Leftview ACPD-v2-Fixed补训32K/33K完成全量验证：1631/2000=81.55%、1600/2000=80.00%，分别比已有35K高1.90/0.35点；32K为目前leftview最高观测点，四套85.20/79.40/84.80/76.80%。未计算配对区间，不作显著性判断；两个视角34K尚无完整结果。证据：`experiments/student/acpd-v2-trajectory-31k-34k/evaluation-backview-leftview.md`。 |
 | 2026-10-15 | 结果 | Leftview ACPD-v2-Fixed补训31K完成全量验证：1620/2000=81.00%，四套83.00/83.40/83.40/74.20%；比已有35K的79.65%高1.35点，四套点估计均较高。未计算配对区间，不作显著性判断；checkpoint选择为探索性。证据：`experiments/student/acpd-v2-trajectory-31k-34k/evaluation-backview-leftview.md`。 |

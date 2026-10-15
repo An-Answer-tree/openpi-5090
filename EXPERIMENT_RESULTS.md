@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-16（核对精选checkpoint与路径索引；三视角SFT BS64 30K→32K已提交）
+更新时间：2026-10-16（精选模型按指定步数硬链接归档，消融分为五类；三视角SFT 30K→32K已提交）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -231,30 +231,36 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 ## 精选 Checkpoint
 
 根目录：[/opt/liutong/openpi_checkpoints/fixed_dataset/curated](/opt/liutong/openpi_checkpoints/fixed_dataset/curated)。
-2026-10-16浅层核对：4类、8个模型目录，实际归档3个checkpoint，其余5个目录为空。
+2026-10-16按用户指定更新：四视角SFT选30K，student中backview选35K，其余视角选32K。
 
-| 分类 | 模型 | 实际归档 | 说明 |
+| 分类 | 模型 | 当前选择 | 平均成功率 |
 |---|---|---|---|
-| teacher | agentview+wrist | `29999`（30K） | 仅params/assets，无train_state，不能恢复优化器状态 |
-| baseline | backview BS64 | `4999`（5K） | 有train_state及完成元数据 |
-| baseline | leftview BS64 | 无 | 空目录；原训练checkpoint另存 |
-| baseline | rightview BS64 | 无 | 空目录；原训练checkpoint另存 |
-| baseline | topview BS64 | 无 | 空目录；原训练checkpoint另存 |
-| student | backview ACPD-v2 layer 10 BS64 | `24999`（25K） | 有train_state及完成元数据 |
-| ablation | backview ACL-only BS64 | 无 | 空目录；35K等checkpoint仍在原训练目录 |
-| ablation | backview loss-only BS64 | 无 | 空目录；仅有5K训练与验证结果 |
+| teacher | agentview+wrist | `29999`（30K） | —；无优化器状态 |
+| baseline | backview BS64 | `29999`（30K） | 60.45% |
+| baseline | leftview BS64 | `29999`（30K） | 78.65% |
+| baseline | rightview BS64 | `29999`（30K） | 77.00% |
+| baseline | topview BS64 | `29999`（30K） | 71.55% |
+| student | backview ACPD-v2 BS64 | `34999`（35K） | 61.05% |
+| student | leftview ACPD-v2 BS64 | `31999`（32K） | 81.55% |
+| student | rightview ACPD-v2 BS64 | `31999`（32K） | 81.00% |
+| student | topview ACPD-v2 BS64 | `31999`（32K） | 75.50% |
+| ablation | MV-SV-KD | 类别已建；30K尚未产出，训练142275进行中 | 尚无结论 |
+| ablation | ACL Only | `34999`（35K、BS64） | 59.35%；原始Object75.20%，不是图中的73.20% |
+| ablation | ACL+CrossattnDistillationLoss | `49999`（50K、BS32，原论文ACPD） | 53.10% |
+| ablation | ACL + DistillationLoss | `29999`（H9 30K、BS64，推理关闭注入） | 58.90%；不是从头训练的H13 |
+| ablation | ACL+DistillationLoss+Injection | `34999`（H9 35K、BS64） | 61.05% |
 
-该目录尚未补齐当前终点或最高观测点。四视角ACPD-v2主要checkpoint、SFT30K/60K、
-ACL-only35K的明确路径及验证证据统一见[Checkpoint检索表](experiments/checkpoint-index.md)。
-三个归档抽查元数据文件的inode与来源相同；本次只更新索引，不移动或删除checkpoint。
-H11不进入精选集合。
+已新增12个文件级硬链接归档，原checkpoint及已有SFT5K/H9 25K归档保留。
+当前选择共13个已归档checkpoint入口和1个待完成类别；真实步数与推理配置见
+[Checkpoint检索表](experiments/checkpoint-index.md)及[清单](experiments/curated-checkpoints.yaml)。
+分类不代表BS/步数匹配的受控消融；58.90%需要关闭推理注入，61.05%开启注入。
 
 ## 证据路径
 
 | 内容 | 路径 |
 |---|---|
 | 实验目录索引 | `experiments/README.md` |
-| Checkpoint归档实存与主要模型路径 | [Checkpoint检索表](experiments/checkpoint-index.md)；区分实际归档、空目录与原训练目录 |
+| Checkpoint归档实存与主要模型路径 | [Checkpoint检索表](experiments/checkpoint-index.md)、[精确清单](experiments/curated-checkpoints.yaml)；来源、归档、推理配置与验证数值一一对应 |
 | ACPD-v2 back/left/right 31K–34K补训及验证 | [训练协议](experiments/student/acpd-v2-trajectory-31k-34k/protocol.md)、[执行](experiments/student/acpd-v2-trajectory-31k-34k/execution.md)；checkpoint：`/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/trajectory_31k_34k/{view}/pi05_libero_{view}_acpd_v2_layer10/pi05_libero_{view}_acpd_v2_layer10_lora_fsdp4_bs64_resume_34k/{30999,31999,32999,33999}`；训练日志：`/opt/liutong/openpi-5090-research/acpd-v2-trajectory-31k-34k/slurm-log/`；148740/148741/148742；[back/left验证任务与结果](experiments/student/acpd-v2-trajectory-31k-34k/evaluation-backview-leftview.md)、[rightview验证任务](experiments/student/acpd-v2-trajectory-31k-34k/evaluation-rightview.md)；验证根目录`/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/{view}/{step}/`，每点`summary.txt`为最终汇总，`logs/`为四套日志，`slurm-log/`为调度日志，`{suite}/videos/`为视频 |
 | 原论文ACPD backview 50K验证 | `experiments/student/acpd-original-backview-bs32-30k/evaluation-50k.md`；checkpoint为原`acpd_original/backview_bs32_30k`实验目录中的`49999`；验证根目录`/opt/liutong/openpi-5090-evals/acpd-original-backview-bs32-50k/49999/`，`summary.txt`为最终53.10%；四套日志`logs/`、视频各suite的`videos/`、Slurm日志`slurm-log/`；验证148343，汇总148347；配对分析`experiments/student/acpd-original-backview-bs32-30k/results/paired-h9-35k.json` |
 | MV-SV-KD协议、执行与配置路径 | `experiments/baseline/mv-sv-kd-backview-bs64-30k/`；checkpoint根目录`/opt/liutong/openpi_checkpoints/fixed_dataset/baseline/mv_sv_kd/backview_bs64_30k/`；日志根目录`/opt/liutong/openpi-5090-research/mv-sv-kd-backview-bs64-30k/slurm-log/`；训练运行，尚无验证结果 |

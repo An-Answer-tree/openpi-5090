@@ -1,65 +1,71 @@
 # Checkpoint 检索表
 
-核对日期：2026-10-16。存储根目录：`/opt/liutong/openpi_checkpoints/fixed_dataset`。
-本表区分实际归档与原训练目录，未列出的历史 checkpoint 不代表已删除。
+更新时间：2026-10-16。精选根目录：
+[/opt/liutong/openpi_checkpoints/fixed_dataset/curated](/opt/liutong/openpi_checkpoints/fixed_dataset/curated)。
+本次按用户指定更新正式选择；[机器可读清单](curated-checkpoints.yaml)保存来源、
+归档相对路径、真实步数、推理配置及四套验证成功数。
 
-## 精选目录实际内容
+## Teacher、SFT 与 student
 
-目录：[/opt/liutong/openpi_checkpoints/fixed_dataset/curated](/opt/liutong/openpi_checkpoints/fixed_dataset/curated)。
-共4类、8个模型目录，实际归档3个 checkpoint，另外5个目录为空。
-这是尚未补齐的精选集合，不是当前全部终点或最高观测点的集合。
+以下路径均相对于精选根目录，已建立文件级硬链接。teacher仅含推理权重，
+其余模型保留训练状态；原训练目录不变。
 
-| 分类 | 模型目录 | 已归档 checkpoint | 内容 |
-|---|---|---|---|
-| teacher | `teacher/agentview_wrist` | `29999`（30K） | `params`、`assets`；无 `train_state`，不能恢复优化器状态 |
-| baseline | `baseline/backview_bs64` | `4999`（5K） | 含 `params`、`assets`、`train_state`、`_CHECKPOINT_METADATA` |
-| baseline | `baseline/leftview_bs64` | 无 | 空目录 |
-| baseline | `baseline/rightview_bs64` | 无 | 空目录 |
-| baseline | `baseline/topview_bs64` | 无 | 空目录 |
-| student | `student/backview_acpdv2_layer10_bs64` | `24999`（25K） | 含 `params`、`assets`、`train_state`、`_CHECKPOINT_METADATA` |
-| ablation | `ablation/backview_acl_only_bs64` | 无 | 空目录 |
-| ablation | `ablation/backview_loss_only_bs64` | 无 | 空目录 |
+| 分类 | 模型 | 实际训练步数 | 当前选择 | 四套平均成功率 |
+|---|---|---:|---|---:|
+| teacher | agentview+wrist | 30K | `teacher/agentview_wrist/29999` | — |
+| baseline | backview SFT BS64 | 30K | `baseline/backview_bs64/29999` | 60.45% |
+| baseline | leftview SFT BS64 | 30K | `baseline/leftview_bs64/29999` | 78.65% |
+| baseline | rightview SFT BS64 | 30K | `baseline/rightview_bs64/29999` | 77.00% |
+| baseline | topview SFT BS64 | 30K | `baseline/topview_bs64/29999` | 71.55% |
+| student | backview ACPD-v2 BS64 | 35K | `student/backview_acpdv2_layer10_bs64/34999` | 61.05% |
+| student | leftview ACPD-v2 BS64 | 32K | `student/leftview_acpdv2_layer10_bs64/31999` | 81.55% |
+| student | rightview ACPD-v2 BS64 | 32K | `student/rightview_acpdv2_layer10_bs64/31999` | 81.00% |
+| student | topview ACPD-v2 BS64 | 32K | `student/topview_acpdv2_layer10_bs64/31999` | 75.50% |
 
-精选目录尚无 leftview/rightview/topview student 子目录。H11不进入精选集合。
+## 消融与第三方方法：五类
 
-### 三个归档的来源
+按用户图中除SFT外的五行分类，依据验证数值识别模型，不沿用图中统一的30K标注。
+所有成功率均来自四套各500回合的完整结果，LIBERO-10对应图中的long。
 
-| 归档 | 原始 checkpoint |
+| 图中类别 | 实际模型 | Spatial | Object | Goal | LIBERO-10 | 平均 | 精选相对路径 |
+|---|---|---:|---:|---:|---:|---:|---|
+| Multi-View-to-Single-View Knowledge Distillation | MV-SV-KD，目标30K、BS64；训练142275进行中 | — | — | — | — | — | `ablation/backview_mv_sv_kd_bs64/`，空目录，尚无30K模型与验证结果 |
+| ACL Only | ACL-only，35K、BS64 | 67.00% | **75.20%** | 63.60% | 31.60% | **59.35%** | `ablation/backview_acl_only_bs64/34999` |
+| ACL+CrossattnDistillationLoss | 原论文ACPD，50K、BS32 | 60.20% | 62.80% | 64.60% | 24.80% | 53.10% | `ablation/backview_acl_crossattn_bs32/49999` |
+| ACL + DistillationLoss | H9 30K、BS64，仅推理关闭注入 | 65.00% | 73.00% | 64.40% | 33.20% | 58.90% | `ablation/backview_acl_distillation_no_injection_bs64/29999` |
+| ACL+DistillationLoss+Injection (Ours ACPD) | H9 35K、BS64，开启注入 | 73.20% | 73.80% | 63.60% | 33.60% | 61.05% | `ablation/backview_acpd_v2_full_bs64/34999` |
+
+图中ACL-only的Object 73.20%、平均58.85%与原始记录不符；原始记录为376/500
+（75.20%），四套合计1187/2000（59.35%），本表采用原始记录。
+图中SFT的57.15%实际为35K；按用户本次要求，baseline归档统一使用30K，backview为60.45%。
+
+58.90%不是H13从头训练的无注入消融。它复用有注入训练的H9 30K权重，必须使用
+`pi05_libero_backview_acpd_v2_layer10_loss_only_lora`推理，才对应上述数值。
+61.05%使用`pi05_libero_backview_acpd_v2_layer10_lora`。
+模型目录名本身不会切换推理配置。
+
+这五类是存储分类；实际BS、训练步数和推理设置不同，不视为仅改变单个组件的受控消融。
+
+## 验证证据
+
+各模型的精确来源和汇总文件见[清单](curated-checkpoints.yaml)。
+详细结果继续维护于[实验结果台账](../EXPERIMENT_RESULTS.md)。
+
+| 内容 | 证据 |
 |---|---|
-| teacher 30K | [sft/agentview_wrist/29999](/opt/liutong/openpi_checkpoints/fixed_dataset/sft/agentview_wrist/29999) |
-| backview SFT 5K | [backview_bs64_5k / 4999](/opt/liutong/openpi_checkpoints/fixed_dataset/sft/backview_bs64_5k/pi05_libero_backview_lora/pi05_libero_backview_lora_fsdp4_bs64_5k/4999) |
-| backview ACPD-v2 25K | [batch_scaling_30k / 24999](/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/24999) |
+| 四视角SFT 30K | `sft-{view}-bs64-30k/29999/summary.txt`，位于`/opt/liutong/openpi-5090-evals/` |
+| backview ACPD-v2 35K | `/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/summary.txt` |
+| left/rightview ACPD-v2 32K | `/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/{view}/31999/summary.txt` |
+| topview ACPD-v2 32K | `/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/summary.txt` |
+| ACL-only 35K | `/opt/liutong/openpi-5090-evals/acpd-v2-acl-only-bs64-35k/34999/summary.txt` |
+| 原论文ACPD 50K | `/opt/liutong/openpi-5090-evals/acpd-original-backview-bs32-50k/49999/summary.txt` |
+| H9 30K推理关闭注入 | `/opt/liutong/openpi-5090-evals/acpd-v2-h9-inference-ablation/29999/summary.txt` |
 
-三个归档均抽查 `params/_METADATA`：归档与来源的设备号、inode相同，链接数至少2。
-这与文件级硬链接归档一致；本次未逐文件检查或读取模型权重，不作完整性认证。
+## 保留与核对
 
-## 仍在原训练目录的主要模型
-
-以下明确路径均已核对存在 `params/_METADATA`、`assets`、`train_state` 和
-`_CHECKPOINT_METADATA`，尚未加入上述精选目录。本次未加载模型或测试恢复训练。
-成功率沿用已有正式结果，每点四套各500回合；完整比较见[结果台账](../EXPERIMENT_RESULTS.md)。
-
-| 模型 | 步数 | Checkpoint | 成功率与验证证据 |
-|---|---:|---|---|
-| ACPD-v2-Fixed backview | 35K | [34999](/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/34999) | [61.05%](/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/summary.txt) |
-| ACPD-v2-Fixed leftview | 32K | [31999](/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/trajectory_31k_34k/leftview/pi05_libero_leftview_acpd_v2_layer10/pi05_libero_leftview_acpd_v2_layer10_lora_fsdp4_bs64_resume_34k/31999) | [81.55%](/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/leftview/31999/summary.txt) |
-| ACPD-v2-Fixed rightview | 32K | [31999](/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/trajectory_31k_34k/rightview/pi05_libero_rightview_acpd_v2_layer10/pi05_libero_rightview_acpd_v2_layer10_lora_fsdp4_bs64_resume_34k/31999) | [81.00%](/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview/31999/summary.txt) |
-| ACPD-v2-Fixed topview | 32K | [31999](/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k/topview/pi05_libero_topview_acpd_v2_layer10/pi05_libero_topview_acpd_v2_layer10_lora_fsdp4_bs64_35k/31999) | [75.50%](/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/summary.txt) |
-| SFT backview BS64 | 30K | [29999](/opt/liutong/openpi_checkpoints/fixed_dataset/sft/backview_bs64_5k/pi05_libero_backview_lora/pi05_libero_backview_lora_fsdp4_bs64_5k/29999) | [60.45%](/opt/liutong/openpi-5090-evals/sft-backview-bs64-30k/29999/summary.txt) |
-| SFT leftview BS64 | 30K | [29999](/opt/liutong/openpi_checkpoints/fixed_dataset/sft/leftview_bs64_30k/pi05_libero_leftview_lora/pi05_libero_leftview_lora_fsdp4_bs64_30k/29999) | [78.65%](/opt/liutong/openpi-5090-evals/sft-leftview-bs64-30k/29999/summary.txt) |
-| SFT rightview BS64 | 30K | [29999](/opt/liutong/openpi_checkpoints/fixed_dataset/sft/rightview_bs64_30k/pi05_libero_rightview_lora/pi05_libero_rightview_lora_fsdp4_bs64_30k/29999) | [77.00%](/opt/liutong/openpi-5090-evals/sft-rightview-bs64-30k/29999/summary.txt) |
-| SFT topview BS64 | 30K | [29999](/opt/liutong/openpi_checkpoints/fixed_dataset/sft/topview_bs64_30k/pi05_libero_topview_lora/pi05_libero_topview_lora_fsdp4_bs64_30k/29999) | [71.55%](/opt/liutong/openpi-5090-evals/sft-topview-bs64-30k/29999/summary.txt) |
-| SFT backview BS64 | 60K | [59999](/opt/liutong/openpi_checkpoints/fixed_dataset/sft/backview_bs64_5k/pi05_libero_backview_lora/pi05_libero_backview_lora_fsdp4_bs64_5k/59999) | [62.05%](/opt/liutong/openpi-5090-evals/sft-backview-bs64-training-trajectory/59999/summary.txt) |
-| ACL-only backview BS64 | 35K | [34999](/opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_acl_only_bs64_35k/pi05_libero_backview_acl_only_bs64_35k/pi05_libero_backview_acl_only_lora_fsdp4_bs64_35k/34999) | [59.35%](/opt/liutong/openpi-5090-evals/acpd-v2-acl-only-bs64-35k/34999/summary.txt) |
-
-四个ACPD-v2点为已有完整评测中的最高观测点，属于探索性checkpoint选择，
-不代表独立seed最优或统计显著优势。rightview 34K在最近记录中尚未完成全量评测。
-三视角SFT 30K→32K已提交，不将预期新增checkpoint列为现存文件。
-H13仅有5K训练与验证结果，不把曾计划的30K记为已完成；其他历史模型路径见结果台账。
-
-## 维护规则
-
-- 本次仅检查精选目录的浅层条目和上述明确路径；未递归扫盘，未复制、移动或删除checkpoint。
-- 空归档目录不表示模型不存在；应先按上表和结果台账检索原路径。
-- 归档只处理已完成、且无任务正在写入的checkpoint；沿用[归档规则](README.md#归档规则)。
-- 后续补充归档时更新本表；保留中间checkpoint，不以最高观测点替代训练轨迹。
+- 正式选择共14项：13个checkpoint路径已归档，MV-SV-KD一项待30K完成；teacher无优化器状态。
+- 实存共15个checkpoint目录：13个当前选择，加历史SFT5K与H9 25K两个；完整H9 35K在student与ablation各有一个硬链接入口。
+- 历史归档`baseline/backview_bs64/4999`、`student/backview_acpdv2_layer10_bs64/24999`仍保留，不作为当前正式选择。
+- 新增12个硬链接归档，不复制权重数据块；抽查每项元数据及一个权重分片的设备号/inode与来源一致，未逐文件认证或测试模型加载。
+- 仅处理清单中的明确checkpoint，未扫描其他训练目录；不移动、删除或改写原checkpoint，不改变正在运行或排队任务。
+- 已删除被新分类替代的空目录`ablation/backview_loss_only_bs64`，其中原本没有checkpoint。

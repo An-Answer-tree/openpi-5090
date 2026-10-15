@@ -2467,14 +2467,25 @@ workspace:
   findings: "findings.md"
   experiments: "experiments/README.md"
   checkpoint_index: "experiments/checkpoint-index.md"
+  checkpoint_manifest: "experiments/curated-checkpoints.yaml"
   checkpoint_root: "/opt/liutong/openpi_checkpoints/fixed_dataset/curated"
   checkpoint_inventory:
     checked_date: "2026-10-16"
-    archived_checkpoints: 3
-    model_directories: 8
-    empty_model_directories: 5
-    archived_paths: [teacher/agentview_wrist/29999, baseline/backview_bs64/4999, student/backview_acpdv2_layer10_bs64/24999]
+    archived_checkpoint_directories: 15
+    selected_checkpoint_directories: 13
+    pending_selected_checkpoints: 1
+    historical_checkpoint_directories: 2
+    model_directories: 14
+    empty_model_directories: 1
+    new_hardlink_archives: 12
+    baseline_steps: {backview: 30000, leftview: 30000, rightview: 30000, topview: 30000}
+    student_steps: {backview: 35000, leftview: 32000, rightview: 32000, topview: 32000}
+    ablation_classes: [mv_sv_kd, acl_only, acl_crossattn_distillation, acl_distillation_no_injection, full_acpd]
+    pending_class: mv_sv_kd
+    historical_archives_preserved: [baseline/backview_bs64/4999, student/backview_acpdv2_layer10_bs64/24999]
     teacher_has_optimizer_state: false
-    current_main_models_in_source_directories: true
-    verification: shallow_entries_and_explicit_metadata_paths_only
-    checkpoint_files_copied_moved_deleted: false
+    source_directories_preserved: true
+    verification: final_markers_and_result_counts_checked_metadata_and_weight_shard_inodes_sampled
+    checkpoint_weight_data_copied: false
+    checkpoint_files_moved_deleted: false
+    empty_directory_removed: ablation/backview_loss_only_bs64

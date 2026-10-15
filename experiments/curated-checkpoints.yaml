@@ -1,0 +1,123 @@
+checked_date: "2026-10-16"
+status: archived_except_pending_mv_sv_kd
+archive_root: /opt/liutong/openpi_checkpoints/fixed_dataset/curated
+suite_order: [spatial, object, goal, libero_10]
+episodes_per_suite: 500
+models:
+  teacher:
+    label: teacher agentview+wrist
+    source: /opt/liutong/openpi_checkpoints/fixed_dataset/sft/agentview_wrist/29999
+    archive: teacher/agentview_wrist/29999
+    optimizer_steps: 30000
+    optimizer_state: false
+  sft_backview:
+    label: SFT backview BS64
+    source: /opt/liutong/openpi_checkpoints/fixed_dataset/sft/backview_bs64_5k/pi05_libero_backview_lora/pi05_libero_backview_lora_fsdp4_bs64_5k/29999
+    archive: baseline/backview_bs64/29999
+    optimizer_steps: 30000
+    policy_config: pi05_libero_backview_lora
+    result_summary: /opt/liutong/openpi-5090-evals/sft-backview-bs64-30k/29999/summary.txt
+    successes: [350, 349, 341, 169]
+  sft_leftview:
+    label: SFT leftview BS64
+    source: /opt/liutong/openpi_checkpoints/fixed_dataset/sft/leftview_bs64_30k/pi05_libero_leftview_lora/pi05_libero_leftview_lora_fsdp4_bs64_30k/29999
+    archive: baseline/leftview_bs64/29999
+    optimizer_steps: 30000
+    policy_config: pi05_libero_leftview_lora
+    result_summary: /opt/liutong/openpi-5090-evals/sft-leftview-bs64-30k/29999/summary.txt
+    successes: [420, 398, 397, 358]
+  sft_rightview:
+    label: SFT rightview BS64
+    source: /opt/liutong/openpi_checkpoints/fixed_dataset/sft/rightview_bs64_30k/pi05_libero_rightview_lora/pi05_libero_rightview_lora_fsdp4_bs64_30k/29999
+    archive: baseline/rightview_bs64/29999
+    optimizer_steps: 30000
+    policy_config: pi05_libero_rightview_lora
+    result_summary: /opt/liutong/openpi-5090-evals/sft-rightview-bs64-30k/29999/summary.txt
+    successes: [425, 424, 420, 271]
+  sft_topview:
+    label: SFT topview BS64
+    source: /opt/liutong/openpi_checkpoints/fixed_dataset/sft/topview_bs64_30k/pi05_libero_topview_lora/pi05_libero_topview_lora_fsdp4_bs64_30k/29999
+    archive: baseline/topview_bs64/29999
+    optimizer_steps: 30000
+    policy_config: pi05_libero_topview_lora
+    result_summary: /opt/liutong/openpi-5090-evals/sft-topview-bs64-30k/29999/summary.txt
+    successes: [405, 403, 396, 227]
+  student_backview:
+    label: ACPD-v2 backview BS64
+    source: &h9_35k /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/34999
+    archive: student/backview_acpdv2_layer10_bs64/34999
+    optimizer_steps: 35000
+    policy_config: pi05_libero_backview_acpd_v2_layer10_lora
+    result_summary: &h9_35k_result /opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/summary.txt
+    successes: &h9_35k_successes [366, 369, 318, 168]
+  student_leftview:
+    label: ACPD-v2 leftview BS64
+    source: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/trajectory_31k_34k/leftview/pi05_libero_leftview_acpd_v2_layer10/pi05_libero_leftview_acpd_v2_layer10_lora_fsdp4_bs64_resume_34k/31999
+    archive: student/leftview_acpdv2_layer10_bs64/31999
+    optimizer_steps: 32000
+    policy_config: pi05_libero_leftview_acpd_v2_layer10_lora
+    result_summary: /opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/leftview/31999/summary.txt
+    successes: [426, 397, 424, 384]
+  student_rightview:
+    label: ACPD-v2 rightview BS64
+    source: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/trajectory_31k_34k/rightview/pi05_libero_rightview_acpd_v2_layer10/pi05_libero_rightview_acpd_v2_layer10_lora_fsdp4_bs64_resume_34k/31999
+    archive: student/rightview_acpdv2_layer10_bs64/31999
+    optimizer_steps: 32000
+    policy_config: pi05_libero_rightview_acpd_v2_layer10_lora
+    result_summary: /opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview/31999/summary.txt
+    successes: [451, 443, 429, 297]
+  student_topview:
+    label: ACPD-v2 topview BS64
+    source: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k/topview/pi05_libero_topview_acpd_v2_layer10/pi05_libero_topview_acpd_v2_layer10_lora_fsdp4_bs64_35k/31999
+    archive: student/topview_acpdv2_layer10_bs64/31999
+    optimizer_steps: 32000
+    policy_config: pi05_libero_topview_acpd_v2_layer10_lora
+    result_summary: /opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/summary.txt
+    successes: [425, 408, 403, 274]
+  mv_sv_kd:
+    label: Multi-View-to-Single-View Knowledge Distillation
+    status: pending_checkpoint
+    source: /opt/liutong/openpi_checkpoints/fixed_dataset/baseline/mv_sv_kd/backview_bs64_30k/pi05_libero_backview_mv_sv_kd/pi05_libero_backview_mv_sv_kd_lora_fsdp4_bs64_30k/29999
+    archive: ablation/backview_mv_sv_kd_bs64/29999
+    optimizer_steps: 30000
+    policy_config: pi05_libero_backview_lora
+    train_job: 142275
+  acl_only:
+    label: ACL Only
+    source: /opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_acl_only_bs64_35k/pi05_libero_backview_acl_only_bs64_35k/pi05_libero_backview_acl_only_lora_fsdp4_bs64_35k/34999
+    archive: ablation/backview_acl_only_bs64/34999
+    optimizer_steps: 35000
+    policy_config: pi05_libero_backview_lora
+    result_summary: /opt/liutong/openpi-5090-evals/acpd-v2-acl-only-bs64-35k/34999/summary.txt
+    successes: [335, 376, 318, 158]
+    image_difference: "图中Object为73.20%、平均58.85%；原始结果为75.20%、平均59.35%。"
+  acl_crossattn_distillation:
+    label: ACL+CrossattnDistillationLoss
+    source: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_original/backview_bs32_30k/pi05_libero_backview_acpd_original_layers6_12/pi05_libero_backview_acpd_original_lora_fsdp4_bs32_30k/49999
+    archive: ablation/backview_acl_crossattn_bs32/49999
+    optimizer_steps: 50000
+    policy_config: pi05_libero_backview_lora
+    result_summary: /opt/liutong/openpi-5090-evals/acpd-original-backview-bs32-50k/49999/summary.txt
+    successes: [301, 314, 323, 124]
+  acl_distillation_no_injection:
+    label: ACL + DistillationLoss
+    source: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/29999
+    archive: ablation/backview_acl_distillation_no_injection_bs64/29999
+    optimizer_steps: 30000
+    policy_config: pi05_libero_backview_acpd_v2_layer10_loss_only_lora
+    exact_contribution_injection: false
+    result_summary: /opt/liutong/openpi-5090-evals/acpd-v2-h9-inference-ablation/29999/summary.txt
+    successes: [325, 365, 322, 166]
+    note: "H9完整训练后的推理期关闭注入；不是H13从头训练的无注入模型。"
+  full_acpd:
+    label: ACL+DistillationLoss+Injection (Ours ACPD)
+    source: *h9_35k
+    archive: ablation/backview_acpd_v2_full_bs64/34999
+    optimizer_steps: 35000
+    policy_config: pi05_libero_backview_acpd_v2_layer10_lora
+    exact_contribution_injection: true
+    result_summary: *h9_35k_result
+    successes: *h9_35k_successes
+historical_archives:
+  - baseline/backview_bs64/4999
+  - student/backview_acpdv2_layer10_bs64/24999
