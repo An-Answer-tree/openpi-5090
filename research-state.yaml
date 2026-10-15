@@ -2466,4 +2466,15 @@ workspace:
   results: "EXPERIMENT_RESULTS.md"
   findings: "findings.md"
   experiments: "experiments/README.md"
+  checkpoint_index: "experiments/checkpoint-index.md"
   checkpoint_root: "/opt/liutong/openpi_checkpoints/fixed_dataset/curated"
+  checkpoint_inventory:
+    checked_date: "2026-10-16"
+    archived_checkpoints: 3
+    model_directories: 8
+    empty_model_directories: 5
+    archived_paths: [teacher/agentview_wrist/29999, baseline/backview_bs64/4999, student/backview_acpdv2_layer10_bs64/24999]
+    teacher_has_optimizer_state: false
+    current_main_models_in_source_directories: true
+    verification: shallow_entries_and_explicit_metadata_paths_only
+    checkpoint_files_copied_moved_deleted: false

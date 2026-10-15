@@ -52,15 +52,15 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 | 类别 | 实验 | 协议/分析 | 状态 |
 |---|---|---|---|
 | baseline | left/right/topview BS64 30K→32K | `baseline/sft-multiview-bs64-resume-32k/` | 149303/149304/149305已提交，Priority排队；4卡BS64、累计1，自动选节点；每1K全部保留，新增31000/31999；尚无新增验证结论 |
-| student | H9-Fixed back/left/right 31K–34K轨迹补训 | `student/acpd-v2-trajectory-31k-34k/` | 30K完整状态分支；4卡BS64、累计1，每1K全部保留；148740首步通过，148741/148742排队；已有35K不变，尚无新增验证结论 |
+| student | H9-Fixed back/left/right 31K–34K轨迹补训 | `student/acpd-v2-trajectory-31k-34k/` | 三视角31K–34K训练完成且全部保留；back/left验证完成，right31K–33K完成、34K尚无完整结论；已有35K不变 |
 | baseline | backview BS64 5K--30K | `baseline/sft-backview-bs64-5k/` | 10K/15K/20K/25K/30K 正式验证完成 |
-| student | 原论文 ACPD backview BS32 5K→50K | `student/acpd-original-backview-bs32-30k/` | 30K训练完成；30K部分验证按用户要求取消；续训147971在gpu04已恢复step30000，等待数据初始化，目标50K，每1K全部保留，尚无全量结论 |
+| student | 原论文 ACPD backview BS32 5K→50K | `student/acpd-original-backview-bs32-30k/` | 50K训练及全量验证完成，pooled53.10%；30K部分验证已取消；BS32不同于正式BS64对照 |
 | baseline | backview BS64 30K--60K | `baseline/sft-backview-bs64-trajectory-60k/` | 续训与验证完成；30K `60.45%`，40K/50K/60K分别为`60.55/61.30/62.05%` |
 | baseline | top/left/right BS64 30K | `baseline/sft-multiview-bs64-30k/` | 全部完成 |
 | baseline | MV-SV-KD backview BS64 30K | `baseline/mv-sv-kd-backview-bs64-30k/` | CPU检查及单卡2步smoke通过；正式142275在gpu02训练；尚无结论 |
 | student | H9-Fixed 主实验（原H9-scale-b） | `student/acpd-v2-h9-batch-scaling-30k/` | 固定contribution=0.2；5K/10K/15K/20K/25K/30K/35K/40K有正式结果 |
-| student | ACPD-v2 多视角 35K | `student/acpd-v2-multiview-35k/` | 三视角35K训练完成；left/right35K为79.65%/79.30%；top30K/31K/32K/35K为73.20%/73.50%/75.50%/73.50%，33K/34K验证继续；与SFT30K对比须注明训练进度 |
-| student | H19-FeatureFusion BS64 30K→35K | `student/acpd-v2-h19-feature-fusion-30k/protocol.md` | 5K/10K/25K/30K四套验证完成；pooled `21.20%/36.55%/55.35%/60.10%`；35K续训完成，31K–35K每1K全部完整保存；全量验证147342等待资源，汇总147343等待依赖 |
+| student | ACPD-v2 多视角 35K | `student/acpd-v2-multiview-35k/` | 三视角35K训练完成；left/right35K为79.65%/79.30%；top30K–35K验证均完成，32K最高观测75.50%；与SFT30K对比须注明训练进度 |
+| student | H19-FeatureFusion BS64 30K→35K | `student/acpd-v2-h19-feature-fusion-30k/protocol.md` | 5K/10K/25K/30K四套验证完成；pooled `21.20%/36.55%/55.35%/60.10%`；35K续训完成，31K–35K每1K保留；35K验证与汇总按用户要求取消，只有部分结果 |
 | mechanism | H15a ACPD-v2 梯度冲突诊断 | `mechanism/acpd-v2-h15a-gradient-conflict/` | 完成；不支持后期梯度冲突假设 |
 | mechanism | H18-ActionReadout 冻结贡献动作读出诊断 | `mechanism/acpd-v2-h18-action-readout/` | 完成；离线MSE未检测到contribution独立收益，无仿真 |
 | ablation | H9 Agentview-only 注入 10K | `ablation/acpd-v2-agent-only-injection-10k/` | 已停止，无结论；训练双分支、推理只保留一支，存在分布不一致 |
@@ -82,26 +82,15 @@ Distillation**；`ACL` 写作 **Action-Consistency Learning**。不同 batch siz
 H11 已归档，不进入正式 checkpoint 集合，也不继续训练。
 H9-Fixed 的恢复、早中期验证及延长训练是同一方法的不同执行阶段，不作为独立消融。
 
-## 精选 Checkpoint 完整性
+## 精选 Checkpoint
 
-根目录：`/opt/liutong/openpi_checkpoints/fixed_dataset/curated`
+根目录：`/opt/liutong/openpi_checkpoints/fixed_dataset/curated`。
+2026-10-16核对仅有teacher30K、backview SFT5K、backview ACPD-v2 25K三个归档；
+另外五个模型目录为空。teacher只有推理权重，没有优化器状态。
 
-符号说明：`Y` 已硬链接归档，`C` 已完成但未归档，`R` 正在运行或恢复，`Q` 已提交排队，`P` 待后续补训，`-` 不适用。
-
-| 模型 | 5K | 10K | 15K | 20K | 25K | 30K |
-|---|:---:|:---:|:---:|:---:|:---:|:---:|
-| teacher/agentview_wrist | - | - | - | - | - | Y |
-| baseline/backview_bs64 | Y | C | C | C | C | C |
-| baseline/topview_bs64 | C | C | C | C | C | C |
-| baseline/leftview_bs64 | C | C | C | C | C | C |
-| baseline/rightview_bs64 | C | C | C | C | C | C |
-| student/backview_acpdv2_layer10_bs64（H9-Fixed） | C | C | C | C | Y | C |
-| ablation/H17-Decay | - | 起点为H9-Fixed 10K | Q | Q | - | - |
-| ablation/backview_loss_only_bs64 | C | P | P | P | P | P |
-| ablation/backview_acl_only_bs64 | C | C | C | C | C | C |
-
-H9-Fixed 35K/40K/45K checkpoint 已完整写入但未归档。原目录中的 checkpoint
-本次不移动、不删除。旧 BS16/BS32 checkpoint 不进入该表，仍保留在原路径。
+实际归档内容、来源以及当前四视角student、SFT和ACL-only的原路径统一维护于
+[Checkpoint检索表](checkpoint-index.md)。空归档目录不表示原checkpoint不存在，
+已训练完成也不表示已归档。旧BS16/BS32 checkpoint仍保留原路径。
 
 ## 归档规则
 

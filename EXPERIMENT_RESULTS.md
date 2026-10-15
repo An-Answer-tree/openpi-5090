@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-16 00:14 CST（三视角SFT BS64 30K→32K续训已提交，保留31K附近和32K）
+更新时间：2026-10-16（核对精选checkpoint与路径索引；三视角SFT BS64 30K→32K已提交）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -230,28 +230,31 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 
 ## 精选 Checkpoint
 
-精选目录使用文件级硬链接，不复制模型数据。原 checkpoint 本次不移动、不删除。
+根目录：[/opt/liutong/openpi_checkpoints/fixed_dataset/curated](/opt/liutong/openpi_checkpoints/fixed_dataset/curated)。
+2026-10-16浅层核对：4类、8个模型目录，实际归档3个checkpoint，其余5个目录为空。
 
-根目录：`/opt/liutong/openpi_checkpoints/fixed_dataset/curated`
-
-| 分类 | 模型 | 已归档 | 状态 |
+| 分类 | 模型 | 实际归档 | 说明 |
 |---|---|---|---|
-| teacher | agentview+wrist | `29999` | 完整 |
-| baseline | backview BS64 | `4999` | 5K--60K checkpoint 完整；20K--60K 已测各点验证完成 |
-| baseline | topview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
-| baseline | leftview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
-| baseline | rightview BS64 | - | 5K--30K checkpoint 和 30K 验证完整 |
-| student | backview ACPD-v2 layer 10 BS64 | `24999` | 恢复轨迹至20K、延长轨迹至45K的 checkpoint 完整；40K验证完成，45K验证已取消 |
-| ablation | backview loss-only BS64 | - | 5K checkpoint 和验证完整；之后补至 30K |
-| ablation | backview ACL-only BS64 | - | 25K/30K/35K checkpoint 与全量验证完整 |
+| teacher | agentview+wrist | `29999`（30K） | 仅params/assets，无train_state，不能恢复优化器状态 |
+| baseline | backview BS64 | `4999`（5K） | 有train_state及完成元数据 |
+| baseline | leftview BS64 | 无 | 空目录；原训练checkpoint另存 |
+| baseline | rightview BS64 | 无 | 空目录；原训练checkpoint另存 |
+| baseline | topview BS64 | 无 | 空目录；原训练checkpoint另存 |
+| student | backview ACPD-v2 layer 10 BS64 | `24999`（25K） | 有train_state及完成元数据 |
+| ablation | backview ACL-only BS64 | 无 | 空目录；35K等checkpoint仍在原训练目录 |
+| ablation | backview loss-only BS64 | 无 | 空目录；仅有5K训练与验证结果 |
 
-H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，也不进入正式索引。
+该目录尚未补齐当前终点或最高观测点。四视角ACPD-v2主要checkpoint、SFT30K/60K、
+ACL-only35K的明确路径及验证证据统一见[Checkpoint检索表](experiments/checkpoint-index.md)。
+三个归档抽查元数据文件的inode与来源相同；本次只更新索引，不移动或删除checkpoint。
+H11不进入精选集合。
 
 ## 证据路径
 
 | 内容 | 路径 |
 |---|---|
 | 实验目录索引 | `experiments/README.md` |
+| Checkpoint归档实存与主要模型路径 | [Checkpoint检索表](experiments/checkpoint-index.md)；区分实际归档、空目录与原训练目录 |
 | ACPD-v2 back/left/right 31K–34K补训及验证 | [训练协议](experiments/student/acpd-v2-trajectory-31k-34k/protocol.md)、[执行](experiments/student/acpd-v2-trajectory-31k-34k/execution.md)；checkpoint：`/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/trajectory_31k_34k/{view}/pi05_libero_{view}_acpd_v2_layer10/pi05_libero_{view}_acpd_v2_layer10_lora_fsdp4_bs64_resume_34k/{30999,31999,32999,33999}`；训练日志：`/opt/liutong/openpi-5090-research/acpd-v2-trajectory-31k-34k/slurm-log/`；148740/148741/148742；[back/left验证任务与结果](experiments/student/acpd-v2-trajectory-31k-34k/evaluation-backview-leftview.md)、[rightview验证任务](experiments/student/acpd-v2-trajectory-31k-34k/evaluation-rightview.md)；验证根目录`/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/{view}/{step}/`，每点`summary.txt`为最终汇总，`logs/`为四套日志，`slurm-log/`为调度日志，`{suite}/videos/`为视频 |
 | 原论文ACPD backview 50K验证 | `experiments/student/acpd-original-backview-bs32-30k/evaluation-50k.md`；checkpoint为原`acpd_original/backview_bs32_30k`实验目录中的`49999`；验证根目录`/opt/liutong/openpi-5090-evals/acpd-original-backview-bs32-50k/49999/`，`summary.txt`为最终53.10%；四套日志`logs/`、视频各suite的`videos/`、Slurm日志`slurm-log/`；验证148343，汇总148347；配对分析`experiments/student/acpd-original-backview-bs32-30k/results/paired-h9-35k.json` |
 | MV-SV-KD协议、执行与配置路径 | `experiments/baseline/mv-sv-kd-backview-bs64-30k/`；checkpoint根目录`/opt/liutong/openpi_checkpoints/fixed_dataset/baseline/mv_sv_kd/backview_bs64_30k/`；日志根目录`/opt/liutong/openpi-5090-research/mv-sv-kd-backview-bs64-30k/slurm-log/`；训练运行，尚无验证结果 |
@@ -300,8 +303,8 @@ H11 不进入精选 checkpoint 目录。旧 BS16/BS32 checkpoint 暂不删除，
 | H19-FeatureFusion checkpoint | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/{4999,9999,14999,19999,24999,29999}/` |
 | H19-FeatureFusion 训练日志 | `/opt/liutong/openpi-5090-research/acpd-v2-h19-feature-fusion/slurm-log/pi05-bv-acpdv2-feature-fusion-bs64-30k_136345.out` |
 | H19-FeatureFusion 验证 | 有效5K/10K：`/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/{4999,9999}/`，任务 `138746/138748`、`138747/138749`；25K：`/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/24999-rerun-50-per-task/`（139046/139049）；30K：`/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/29999-rerun-50-per-task/`（139418/139419），pooled `60.10%` |
-| H19-FeatureFusion 35K续训 | 任务`147300`，4卡BS64、累计1；31K–35K每1K全部完整保存。源checkpoint：`/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999`；目标根目录：`/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k`；[执行记录](experiments/student/acpd-v2-h19-feature-fusion-30k/execution-35k.md)；训练完成，尚无35K验证结果 |
-| H19-FeatureFusion 35K自动验证 | 数组`147342_[0-3]`10月13日10:44:47在gpu04全部启动；汇总`147343`等待四套成功；四套各500回合，结果`/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/34999/summary.txt`，日志和视频在同目录归档；尚无结论 |
+| H19-FeatureFusion 35K续训 | 任务`147300`，4卡BS64、累计1；31K–35K每1K全部完整保存。源checkpoint：`/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_30k/pi05_libero_backview_acpd_v2_feature_fusion/pi05_libero_backview_acpd_v2_feature_fusion_lora_fsdp4_bs64_30k/29999`；目标根目录：`/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/feature_fusion_35k`；[执行记录](experiments/student/acpd-v2-h19-feature-fusion-30k/execution-35k.md)；训练完成，35K只有部分验证结果 |
+| H19-FeatureFusion 35K验证（提前停止） | 数组`147342_[0-3]`与汇总`147343`按用户要求取消；完成1232/2000回合，未生成全量`summary.txt`。日志和视频位于`/opt/liutong/openpi-5090-evals/acpd-v2-h19-feature-fusion/34999/`；[部分结果](experiments/student/acpd-v2-h19-feature-fusion-30k/evaluation-35k-partial.md)，尚无全量结论 |
 | ACPD-v2 多视角 35K 协议 | `experiments/student/acpd-v2-multiview-35k/protocol.md` |
 | ACPD-v2 多视角 35K 训练脚本 | `scripts/train_slurm/pi05_libero_{leftview,rightview,topview}_acpd_v2_layer10_lora_fsdp4_bs64_35k.sbatch` |
 | ACPD-v2 多视角 35K checkpoint 根目录 | `/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/multiview_35k/{leftview,rightview,topview}/`；三视角`34999`均完整保存；topview147628从20K恢复，2026-10-14 17:19完成最终保存；30K后每1K保存，全部保留 |

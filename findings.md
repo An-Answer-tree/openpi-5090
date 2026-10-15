@@ -232,7 +232,7 @@ MV-SV-KD142275仍在训练，未修改任务。
 - 原始正式对照除 teacher 外使用4 GPU、physical global BS64。H19 30K→35K续训已完成，保持4 GPU、BS64、累计1，数据从原配置batch 30000接续；实际GPU恢复与训练已验证。此前2卡micro BS32、累计2方案未实际训练。
 - 改变GPU数量恢复训练时，参数和优化器状态都必须显式指定当前设备的分片布局，不能沿用checkpoint内保存的布局。4→2设备的数值、优化器、步数和源文件只读检查已通过；147003已在启动前取消，实际GPU续训尚未验证。
 - 蒸馏 checkpoint 使用零起始目录编号；需要保留每 5K 时设置 `keep_period=1`。
-- 精选 checkpoint 只在完整写入后建立硬链接，不移动或删除原 checkpoint。
+- 精选 checkpoint 只在完整写入后建立硬链接，不移动或删除原 checkpoint。2026-10-16核对`curated`实际仅归档teacher30K、backview SFT5K、H9 25K，其余五个模型目录为空；teacher无优化器状态。当前主要模型仍在原训练目录，路径统一维护于`experiments/checkpoint-index.md`。
 - 活动任务的 checkpoint、数据集、脚本和输出路径不得修改。
 - teacher 特征依赖 noisy action 和 flow time，不能预计算而不改变方法。
 - 早期 supervised loss 不能代替任务成功率筛选 ACPD 组件。
