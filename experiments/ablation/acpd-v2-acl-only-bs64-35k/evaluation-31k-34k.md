@@ -51,3 +51,24 @@ evaluation:
 记录每套成功/总数；不合并不同checkpoint回合。
 最高观测点属于探索性选择；未计算配对区间时不作显著性判断。
 协议先commit，实际任务号与执行状态随后记录；目前尚无新增成功率结论。
+
+## 实际提交
+
+协议commit：`0e307c1`。2026-10-16 10:17 CST提交，10:18核对：
+
+| Checkpoint | 四套单卡数组 | 自动汇总 | 状态 |
+|---|---|---|---|
+| 31K / 30999 | 149556_[0-3] | 149557 | 等待Priority；checkpoint完整 |
+| 32K / 31999 | 149558_[0-3] | 149559 | 等待Priority；checkpoint完整 |
+| 33K / 32999 | 149560_[0-3] | 149561 | 等待Priority；checkpoint完整 |
+| 34K / 33999 | 149562_[0-3] | 149563 | afterok等待149325；checkpoint尚未产出 |
+
+四个汇总分别afterok依赖对应整个验证数组。已核对每项1GPU/8CPU/24G/8小时、
+未绑定节点、排除gpu03、没有数组并发上限，四组日志路径与模型一一对应。
+31K–33K完成标记和三个JSON元数据均有效；CPU导入确认推理模型layer10、
+action_horizon10、action_dim32、injection=False、feature_fusion=False。
+bash语法、git diff与五项Slurm test-only通过。复用现有验证流程，未另提交GPU测试。
+
+此时训练149325仍在gpu04运行，进度约33.9K；最新完整loss记录为33800，数值有限。
+验证尚未获得GPU，不能视为已经正常开始仿真，尚无新增成功率结果。
+没有修改其他活动任务或操作checkpoint文件。

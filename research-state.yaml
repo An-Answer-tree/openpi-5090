@@ -12,8 +12,8 @@ experiment_names:
     execution: experiments/ablation/acpd-v2-acl-only-bs64-35k/trajectory-31k-34k-execution.md
     protocol_commit: 8e96607
     submitted_at: "2026-10-16 00:58:31 CST"
-    checked_at: "2026-10-16 01:01 CST"
-    status: running_model_and_data_restored_teacher_loading
+    checked_at: "2026-10-16 10:18 CST"
+    status: training_approx_33900_31k_33k_complete_full_evals_submitted
     study_type: checkpoint_trajectory_reconstruction_not_new_method
     train_job: 149325
     node: gpu04
@@ -49,8 +49,42 @@ experiment_names:
     gpu_restore_verified: true
     gpu_restore_at: "2026-10-16 00:59:38 CST"
     data_start_batch_verified: 30000
-    first_train_step_verified: false
-    evaluation_submitted: false
+    training_loss_verified: true
+    latest_logged_step: 33800
+    approximate_progress: 33900
+    complete_checkpoint_steps: [30999, 31999, 32999]
+    pending_checkpoint_steps: [33999]
+    evaluation_submitted: true
+    evaluation:
+      protocol: experiments/ablation/acpd-v2-acl-only-bs64-35k/evaluation-31k-34k.md
+      protocol_commit: 0e307c1
+      submitted_at: "2026-10-16 10:17 CST"
+      checked_at: "2026-10-16 10:18 CST"
+      status: queued_not_started
+      study_type: exploratory_checkpoint_comparison
+      policy_config: pi05_libero_backview_acpd_v2_layer10_loss_only_lora
+      base_image_key: backview_image
+      injection: false
+      trials_per_task: 50
+      episodes_per_checkpoint: 2000
+      seed: 7
+      array: "0-3"
+      array_concurrency_limit: null
+      partition: batch
+      requested_node: null
+      requested_reservation: null
+      excluded_nodes: [gpu03]
+      resources_per_task: 1gpu_8cpu_24g
+      time_limit: "08:00:00"
+      output_root: /opt/liutong/openpi-5090-evals/acpd-v2-acl-only-bs64-trajectory-31k-34k
+      array_jobs: {"31k": 149556, "32k": 149558, "33k": 149560, "34k": 149562}
+      summary_jobs: {"31k": 149557, "32k": 149559, "33k": 149561, "34k": 149563}
+      states: {"31k": pending_priority, "32k": pending_priority, "33k": pending_priority, "34k": pending_training_dependency}
+      training_dependencies: {"34k": 149325}
+      summary_dependency: afterok_entire_corresponding_array
+      summary_resources: 1cpu_2g_15min
+      metadata_config_bash_slurm_checks: passed
+      conclusion: 尚无结论
     conclusion: 尚无结论
   sft_multiview_bs64_resume_32k:
     display_name: "SFT-View left/right/topview BS64 30K→32K"
@@ -1159,7 +1193,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-16 01:01 CST (SFT resume32K jobs149303/149304/149305 cancelled by user; ACL-only 30K→34K149325 running on gpu04, optimizer step30000 and data batch30000 restored; other historical entries retain their own snapshots)"
+  checked_at: "2026-10-16 10:18 CST (ACL-only149325 running approx33.9K on gpu04; 31K–33K complete; full eval arrays149556/149558/149560 pending Priority,149562 waiting training; four summaries submitted; other historical entries retain their own snapshots)"
   cache_maintenance:
     checked_at: "2026-10-14 21:46 CST"
     freed_gib_approx: 122
@@ -1191,7 +1225,15 @@ current_execution:
     pending_jobs_bound_in_place: [145280_2, 145280_3, 147057, 147059, 145282, 147058, 147060]
     note: reservation_does_not_preempt_existing_jobs_resource_counts_are_a_snapshot
   jobs:
-    - {id: 149325, experiment: acl_only_bs64_checkpoint_trajectory_31k_34k, state: running_model_and_data_restored, resources: 4gpu_32cpu_96g, time_limit: "1-00:00:00", requested_node: null, node: gpu04, reservation: res_gpu04}
+    - {id: 149325, experiment: acl_only_bs64_checkpoint_trajectory_31k_34k, state: running_approx_33900, resources: 4gpu_32cpu_96g, time_limit: "1-00:00:00", requested_node: null, node: gpu04, reservation: res_gpu04}
+    - {id: 149556, experiment: acl_only_bs64_31k_full_evaluation, state: pending_priority, array: "0-3", resources_per_task: 1gpu_8cpu_24g, time_limit: "08:00:00", requested_node: null, summary_job: 149557}
+    - {id: 149558, experiment: acl_only_bs64_32k_full_evaluation, state: pending_priority, array: "0-3", resources_per_task: 1gpu_8cpu_24g, time_limit: "08:00:00", requested_node: null, summary_job: 149559}
+    - {id: 149560, experiment: acl_only_bs64_33k_full_evaluation, state: pending_priority, array: "0-3", resources_per_task: 1gpu_8cpu_24g, time_limit: "08:00:00", requested_node: null, summary_job: 149561}
+    - {id: 149562, experiment: acl_only_bs64_34k_full_evaluation, state: pending_dependency, depends_on: 149325, array: "0-3", resources_per_task: 1gpu_8cpu_24g, time_limit: "08:00:00", requested_node: null, summary_job: 149563}
+    - {id: 149557, experiment: acl_only_bs64_31k_summary, state: pending_dependency, depends_on: 149556, resources: 1cpu_2g}
+    - {id: 149559, experiment: acl_only_bs64_32k_summary, state: pending_dependency, depends_on: 149558, resources: 1cpu_2g}
+    - {id: 149561, experiment: acl_only_bs64_33k_summary, state: pending_dependency, depends_on: 149560, resources: 1cpu_2g}
+    - {id: 149563, experiment: acl_only_bs64_34k_summary, state: pending_dependency, depends_on: 149562, resources: 1cpu_2g}
     - {id: 149303, experiment: sft_leftview_bs64_resume_32k, state: cancelled_by_user, resources: 4gpu_32cpu_96g, time_limit: "1-00:00:00", requested_node: null, reservation: null}
     - {id: 149304, experiment: sft_rightview_bs64_resume_32k, state: cancelled_by_user, resources: 4gpu_32cpu_96g, time_limit: "1-00:00:00", requested_node: null, reservation: null}
     - {id: 149305, experiment: sft_topview_bs64_resume_32k, state: cancelled_by_user, resources: 4gpu_32cpu_96g, time_limit: "1-00:00:00", requested_node: null, reservation: null}

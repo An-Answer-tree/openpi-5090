@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-16（三视角SFT续训按用户要求取消；优先补齐ACL-only 31K–34K checkpoint）
+更新时间：2026-10-16（ACL-only续训约33.9K；31K–34K四组全量验证已提交）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -9,7 +9,8 @@
 
 | 实验 | 目的 | 配置 | 状态 | 结论 |
 |---|---|---|---|---|
-| ACL-only backview 30K→34K | 补齐31K–34K checkpoint轨迹 | 沿用原ACL-only；4×5090 FSDP、BS64、累计1；flow/ACL=1/0.5、contribution=0、无注入；模型/Adam和data batch30000接续；LR保持2.5e-6；每1K全部保留、独立输出 | 149325于00:58在gpu04启动；已确认恢复step30000和data batch30000，首步待确认 | 尚无结论；已有35K不变，未提交验证；[协议](experiments/ablation/acpd-v2-acl-only-bs64-35k/trajectory-31k-34k-protocol.md)、[执行](experiments/ablation/acpd-v2-acl-only-bs64-35k/trajectory-31k-34k-execution.md) |
+| ACL-only backview 30K→34K | 补齐31K–34K checkpoint轨迹 | 沿用原ACL-only；4×5090 FSDP、BS64、累计1；flow/ACL=1/0.5、contribution=0、无注入；模型/Adam和data batch30000接续；LR保持2.5e-6；每1K全部保留、独立输出 | 149325在gpu04运行；10:18约33.9K，31K–33K完整保存，34K尚未产出；最新33800步loss有限 | 尚无新增成功率结论；已有35K不变；[协议](experiments/ablation/acpd-v2-acl-only-bs64-35k/trajectory-31k-34k-protocol.md)、[执行](experiments/ablation/acpd-v2-acl-only-bs64-35k/trajectory-31k-34k-execution.md) |
+| ACL-only backview 31K–34K验证 | 测量ACL-only后期成功率轨迹 | 关闭注入，与训练一致；每模型四套各500回合；4个单卡子任务及1个汇总，无数组并发上限 | 31K/32K/33K数组149556/149558/149560等待Priority；34K数组149562等待训练149325成功；汇总149557/149559/149561/149563依赖对应数组 | 尚无结论；[验证协议、路径与任务](experiments/ablation/acpd-v2-acl-only-bs64-35k/evaluation-31k-34k.md) |
 | SFT-View leftview 30K→32K | 补齐同视角32K基线 | 4×5090 FSDP、BS64、累计1；恢复模型/优化器及数据batch30000；LR保持2.5e-6；每1K全部保留，batch自动选节点 | 149303已启动，00:56按用户要求取消，优先ACL-only | 尚无新增验证结论；[执行](experiments/baseline/sft-multiview-bs64-resume-32k/execution.md) |
 | SFT-View rightview 30K→32K | 补齐同视角32K基线 | 同上，仅改变视角与原30K checkpoint | 149304启动前按用户要求取消 | 尚无结论；[执行](experiments/baseline/sft-multiview-bs64-resume-32k/execution.md) |
 | SFT-View topview 30K→32K | 补齐同视角32K基线 | 同上，仅改变视角与原30K checkpoint | 149305启动前按用户要求取消 | 尚无结论；[执行](experiments/baseline/sft-multiview-bs64-resume-32k/execution.md) |
@@ -331,6 +332,7 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | ACL-only BS64 协议 | `experiments/ablation/acpd-v2-acl-only-bs64-35k/protocol.md` |
 | ACL-only BS64 checkpoint | `/opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_acl_only_bs64_35k/pi05_libero_backview_acl_only_bs64_35k/pi05_libero_backview_acl_only_lora_fsdp4_bs64_35k/{24999,29999,34999}/` |
 | ACL-only BS64 验证与分析 | `/opt/liutong/openpi-5090-evals/acpd-v2-acl-only-bs64-35k/{24999,29999,34999}/`；分析日志 `135729`、`135728` |
+| ACL-only BS64 31K–34K轨迹验证 | [协议与任务](experiments/ablation/acpd-v2-acl-only-bs64-35k/evaluation-31k-34k.md)；checkpoint：`/opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_acl_only_bs64_trajectory_31k_34k/pi05_libero_backview_acl_only_bs64_35k/pi05_libero_backview_acl_only_lora_fsdp4_bs64_resume_34k/{30999,31999,32999,33999}`；验证：`/opt/liutong/openpi-5090-evals/acpd-v2-acl-only-bs64-trajectory-31k-34k/{step}/`，`summary.txt`为最终汇总、`logs/`为四套日志、`slurm-log/`为调度日志、`{suite}/videos/`为视频；当前尚无验证结果 |
 | ACPD-v2-TDCA 协议 | `experiments/ablation/acpd-v2-tdca-5k/protocol.md` |
 | ACPD-v2-TDCA checkpoint | `/opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_tdca_5k/pi05_libero_backview_acpd_v2_tdca/pi05_libero_backview_acpd_v2_tdca_lora_fsdp4_bs64_5k/4999` |
 | ACPD-v2-TDCA 验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-tdca-5k/4999/summary.txt` |

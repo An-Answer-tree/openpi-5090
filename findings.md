@@ -23,9 +23,13 @@ leftview已恢复且记录step30000的有限loss，right/top尚未启动；无�
 保持原flow/ACL=1/0.5、contribution=0和关闭注入，从29999恢复模型/Adam和数据batch30000，
 LR保持2.5e-6；独立输出，每1K保存并全部保留30999/31999/32999/33999。
 8项CPU恢复/保存/数据接续测试、CLI与Slurm试提交通过；00:59已确认GPU恢复step30000
-和data batch30000，首步训练尚待确认；
-本次未提交验证，尚无新增成功率结论。原35K及其他已有checkpoint不变。
-证据：`experiments/ablation/acpd-v2-acl-only-bs64-35k/trajectory-31k-34k-execution.md`。
+和data batch30000。10:18训练约33.9K，31K–33K完整保存，34K尚未产出；
+最新step33800的loss有限。已提交31K–34K全量验证149556/149558/149560/149562，
+每模型4个单卡子任务及1个CPU汇总、四套共2000回合，无数组并发上限。
+推理配置关闭注入，与ACL-only训练一致；前三组等待Priority，34K等待149325成功。
+尚无新增成功率结论。原35K及其他已有checkpoint不变。
+证据：`experiments/ablation/acpd-v2-acl-only-bs64-35k/trajectory-31k-34k-execution.md`、
+`experiments/ablation/acpd-v2-acl-only-bs64-35k/evaluation-31k-34k.md`。
 
 2026-10-14补齐backview/leftview/rightview的31K–34K：从各自30K完整状态分支，
 保持4卡BS64、累计1、原loss与30K后LR，每1K全部保留，已有35K不变。
