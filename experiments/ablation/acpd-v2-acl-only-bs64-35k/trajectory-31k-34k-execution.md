@@ -32,3 +32,7 @@
 norm stats均存在且JSON可解析；34K四项文件尚未产出。10:07日志step33800的
 supervised_loss=0.0177、action_corr_loss=0.0247、total_loss=0.0301，
 contribution权重和注入gate均为0。训练仍正常推进；loss不代表任务成功率。
+
+2026-10-17核对：149325已于10月16日10:34完成，日志10:34:07确认最终33999
+保存成功、无后台保存错误；31K–34K全部保留。验证31K/32K已完成，33K/34K
+尚未完整，计数及证据见[evaluation-31k-34k.md](evaluation-31k-34k.md#已完成结果)。
