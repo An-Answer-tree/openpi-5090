@@ -10,7 +10,7 @@
 | 实验 | 目的 | 配置 | 状态 | 结论 |
 |---|---|---|---|---|
 | ACL-only backview 30K→34K | 补齐31K–34K checkpoint轨迹 | 沿用原ACL-only；4×5090 FSDP、BS64、累计1；flow/ACL=1/0.5、contribution=0、无注入；模型/Adam和data batch30000接续；LR保持2.5e-6；每1K全部保留、独立输出 | 149325完成；10月16日10:34最终33999保存成功，31K–34K全部保留 | 训练完成；验证见下行；已有35K不变；[协议](experiments/ablation/acpd-v2-acl-only-bs64-35k/trajectory-31k-34k-protocol.md)、[执行](experiments/ablation/acpd-v2-acl-only-bs64-35k/trajectory-31k-34k-execution.md) |
-| ACL-only backview 31K–34K验证 | 测量ACL-only后期成功率轨迹 | 关闭注入，与训练一致；每模型四套各500回合；4个单卡子任务及1个汇总，无数组并发上限 | 10月17日11:09：31K/32K四套及汇总完成；33K前三套完成，LIBERO-10未完成；34K前三套完成，149562_3验证LIBERO-10 | 31K为1195/2000=`59.75%`，32K为1175/2000=`58.75%`；33K/34K尚无完整结论；未计算配对区间，不作显著性判断；[四套计数与证据](experiments/ablation/acpd-v2-acl-only-bs64-35k/evaluation-31k-34k.md#已完成结果) |
+| ACL-only backview 31K–34K验证 | 测量ACL-only后期成功率轨迹 | 关闭注入，与训练一致；每模型四套各500回合；4个单卡子任务及1个汇总，无数组并发上限 | 10月17日11:17：31K/32K四套及汇总完成；33K前三套完成，LIBERO-10补跑150185_3在gpu04开始仿真，汇总149561等待补跑；34K前三套完成，149562_3验证LIBERO-10 | 31K为1195/2000=`59.75%`，32K为1175/2000=`58.75%`；33K/34K尚无完整结论；未计算配对区间，不作显著性判断；[四套计数与证据](experiments/ablation/acpd-v2-acl-only-bs64-35k/evaluation-31k-34k.md#已完成结果) |
 | SFT-View leftview 30K→32K | 补齐同视角32K基线 | 4×5090 FSDP、BS64、累计1；恢复模型/优化器及数据batch30000；LR保持2.5e-6；每1K全部保留，batch自动选节点 | 149303已启动，00:56按用户要求取消，优先ACL-only | 尚无新增验证结论；[执行](experiments/baseline/sft-multiview-bs64-resume-32k/execution.md) |
 | SFT-View rightview 30K→32K | 补齐同视角32K基线 | 同上，仅改变视角与原30K checkpoint | 149304启动前按用户要求取消 | 尚无结论；[执行](experiments/baseline/sft-multiview-bs64-resume-32k/execution.md) |
 | SFT-View topview 30K→32K | 补齐同视角32K基线 | 同上，仅改变视角与原30K checkpoint | 149305启动前按用户要求取消 | 尚无结论；[执行](experiments/baseline/sft-multiview-bs64-resume-32k/execution.md) |
