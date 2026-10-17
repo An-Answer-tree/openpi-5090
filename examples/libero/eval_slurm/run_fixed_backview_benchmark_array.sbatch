@@ -34,7 +34,8 @@ test -f "${checkpoint_dir}/_CHECKPOINT_METADATA"
 mkdir -p "${eval_dir}/logs"
 
 gpu_id=${CUDA_VISIBLE_DEVICES%%,*}
-port=$((20000 + (SLURM_ARRAY_JOB_ID % 10000) * 4 + task_id))
+# Keep policy ports below Linux's ephemeral range (32768-60999).
+port=$((20000 + (SLURM_ARRAY_JOB_ID % 2500) * 4 + task_id))
 
 cd /home/liutong/Projects/openpi-5090
 bash examples/libero/eval_slurm/run_fixed_backview_suite.bash \
