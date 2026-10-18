@@ -38,3 +38,18 @@ evaluation:
 同进度参考结果：SFT30K为60.45%、H9-Fixed30K为58.00%、H19-FeatureFusion30K
 为60.10%；均四套各500回合，证据索引见`EXPERIMENT_RESULTS.md`。
 本模型尚无成功率结论。
+
+## 实际提交
+
+协议commit：`9d656ef`。2026-10-18 10:41提交，提交前checkpoint完成标记、
+params元数据、norm stats与CPU配置导入检查通过，action_horizon10、action_dim32；
+三个复用脚本bash语法及两项Slurm test-only通过。未另申请GPU smoke。
+
+| 任务 | Job | 提交后状态 |
+|---|---|---|
+| 四套全量验证 | `152012_[0-3]` | 等待Priority；每项1GPU/8CPU/24G/8小时，无并发上限 |
+| 自动汇总 | `152013` | afterok等待152012整个数组；1CPU/2G/15分钟 |
+
+Slurm确认未绑定节点或预约，排除gpu03；可自动使用可用的磁性预约。
+当时gpu04八张GPU全部分配，验证尚未开始；不能将成功提交视为已开始仿真。
+未修改其他活动任务或checkpoint。日志与视频均使用上述独立目录。

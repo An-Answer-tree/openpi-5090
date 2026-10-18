@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-18（ACL-only 31K–34K全量验证完成；MV-SV-KD完成30K训练，尚未提交验证）
+更新时间：2026-10-18（ACL-only 31K–34K全量验证完成；MV-SV-KD完成30K训练，全量验证已提交）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -92,7 +92,7 @@ H19 30K→35K续训已在gpu04完成，4 GPU、physical global BS64、累计1。
 | ID | 目的 | 实际配置 | Job | 状态 | 结果 |
 |---|---|---|---:|---|---|
 | Teacher | 提供 agentview+wrist 特权信息 | 全量 SFT，30K | 历史任务 | 完成 | checkpoint `29999` |
-| MV-SV-KD（pi0.5适配） | 提供多视角到单视角第三方蒸馏对照 | 冻结既有agentview+wrist teacher，backview LoRA；4卡BS64，累计1，30K，GT/输出/最终动作特征loss=1/0.5/0.1；无ACPD/ACL/注入，每5K全部保留 | smoke 142274；正式142275 | 10月17日22:55完成30K并保存29999；5K–30K六个checkpoint完整；尚未提交验证 | 尚无任务成功率结论；离线flow与最终action hidden适配，不是原论文完整复现；[协议与执行](experiments/baseline/mv-sv-kd-backview-bs64-30k/) |
+| MV-SV-KD（pi0.5适配） | 提供多视角到单视角第三方蒸馏对照 | 冻结既有agentview+wrist teacher，backview LoRA；4卡BS64，累计1，30K，GT/输出/最终动作特征loss=1/0.5/0.1；无ACPD/ACL/注入，每5K全部保留 | smoke 142274；正式142275；30K验证152012_[0-3]，汇总152013 | 30K训练完成、5K–30K六个checkpoint完整；10月18日10:41验证等待Priority，每套500回合，四个单卡子任务无并发上限 | 尚无任务成功率结论；离线flow与最终action hidden适配，不是原论文完整复现；[训练](experiments/baseline/mv-sv-kd-backview-bs64-30k/)、[验证](experiments/baseline/mv-sv-kd-backview-bs64-30k/evaluation-30k.md) |
 | H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 60K | 130285/130491/130762/132791；35K验证134992/134995；后期验证134998 | 60K训练与40K/50K/60K验证完成 | 5K `13.85%`；20K `47.20%`；25K `55.80%`；30K `60.45%`；35K `57.15%`；40K `60.55%`；50K `61.30%`；60K `62.05%` |
 | H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669/130890；取消5K验证140298/140301 | 30K完成；5K验证未启动即取消，优先H19续训 | 30K pooled `71.55%`；5K尚无结论 |
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891；取消5K验证140296/140299 | 30K完成；5K验证未启动即取消，优先H19续训 | 30K pooled `78.65%`；5K尚无结论 |
@@ -269,7 +269,7 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | Checkpoint归档实存与主要模型路径 | [Checkpoint检索表](experiments/checkpoint-index.md)、[精确清单](experiments/curated-checkpoints.yaml)；来源、归档、推理配置与验证数值一一对应 |
 | ACPD-v2 back/left/right 31K–34K补训及验证 | [训练协议](experiments/student/acpd-v2-trajectory-31k-34k/protocol.md)、[执行](experiments/student/acpd-v2-trajectory-31k-34k/execution.md)；checkpoint：`/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/trajectory_31k_34k/{view}/pi05_libero_{view}_acpd_v2_layer10/pi05_libero_{view}_acpd_v2_layer10_lora_fsdp4_bs64_resume_34k/{30999,31999,32999,33999}`；训练日志：`/opt/liutong/openpi-5090-research/acpd-v2-trajectory-31k-34k/slurm-log/`；148740/148741/148742；[back/left验证任务与结果](experiments/student/acpd-v2-trajectory-31k-34k/evaluation-backview-leftview.md)、[rightview验证任务](experiments/student/acpd-v2-trajectory-31k-34k/evaluation-rightview.md)；验证根目录`/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/{view}/{step}/`，每点`summary.txt`为最终汇总，`logs/`为四套日志，`slurm-log/`为调度日志，`{suite}/videos/`为视频 |
 | 原论文ACPD backview 50K验证 | `experiments/student/acpd-original-backview-bs32-30k/evaluation-50k.md`；checkpoint为原`acpd_original/backview_bs32_30k`实验目录中的`49999`；验证根目录`/opt/liutong/openpi-5090-evals/acpd-original-backview-bs32-50k/49999/`，`summary.txt`为最终53.10%；四套日志`logs/`、视频各suite的`videos/`、Slurm日志`slurm-log/`；验证148343，汇总148347；配对分析`experiments/student/acpd-original-backview-bs32-30k/results/paired-h9-35k.json` |
-| MV-SV-KD协议、执行与配置路径 | `experiments/baseline/mv-sv-kd-backview-bs64-30k/`；checkpoint根目录`/opt/liutong/openpi_checkpoints/fixed_dataset/baseline/mv_sv_kd/backview_bs64_30k/`；日志根目录`/opt/liutong/openpi-5090-research/mv-sv-kd-backview-bs64-30k/slurm-log/`；30K训练完成，尚未提交验证 |
+| MV-SV-KD协议、执行与配置路径 | `experiments/baseline/mv-sv-kd-backview-bs64-30k/`；checkpoint根目录`/opt/liutong/openpi_checkpoints/fixed_dataset/baseline/mv_sv_kd/backview_bs64_30k/`；训练日志根目录`/opt/liutong/openpi-5090-research/mv-sv-kd-backview-bs64-30k/slurm-log/`；30K训练完成；验证数组152012、汇总152013，输出`/opt/liutong/openpi-5090-evals/mv-sv-kd-backview-bs64-30k/29999/`，logs为原始日志、各suite的videos为视频、slurm-log为调度日志、summary.txt为最终汇总；[验证协议与执行](experiments/baseline/mv-sv-kd-backview-bs64-30k/evaluation-30k.md) |
 | H7/H7.1 原始指标 | `/opt/liutong/openpi-5090-research/acpd-exact-attention-probe/results/` |
 | H9 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-pbs32-5k_129710.out` |
 | H9-scale-b 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-fsdp4-bs64-30k_129728.out` |

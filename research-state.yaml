@@ -514,7 +514,7 @@ experiment_names:
     protocol: experiments/baseline/mv-sv-kd-backview-bs64-30k/protocol.md
     execution: experiments/baseline/mv-sv-kd-backview-bs64-30k/execution.md
     reference: https://arxiv.org/html/2303.07026v2
-    status: training_complete_evaluation_not_submitted
+    status: training_complete_evaluation_pending
     smoke_job: 142274
     smoke_status: complete_two_steps_finite_loss
     train_job: 142275
@@ -523,8 +523,37 @@ experiment_names:
     train_node: gpu02
     observed_steps_approx: 30000
     final_checkpoint_saved_at: "2026-10-17 22:55:28 CST"
-    evaluation_submitted: false
-    evaluation_status: no_automatic_chain_in_training_protocol
+    evaluation_submitted: true
+    evaluation_status: pending_priority
+    evaluation:
+      protocol: experiments/baseline/mv-sv-kd-backview-bs64-30k/evaluation-30k.md
+      protocol_commit: 9d656ef
+      submitted_at: "2026-10-18 10:41 CST"
+      checked_at: "2026-10-18 10:41 CST"
+      array_job: 152012
+      array: "0-3"
+      array_concurrency_limit: null
+      summary_job: 152013
+      summary_dependency: afterok_152012_entire_array
+      status: pending_priority
+      partition: batch
+      requested_node: null
+      requested_reservation: null
+      excluded_nodes: [gpu03]
+      resources_per_task: 1gpu_8cpu_24g
+      time_limit: "08:00:00"
+      summary_resources: 1cpu_2g_15min
+      policy_config: pi05_libero_backview_lora
+      checkpoint_step: 29999
+      base_image_key: backview_image
+      seed: 7
+      trials_per_task: 50
+      episodes_per_suite: 500
+      episodes_total: 2000
+      output_dir: /opt/liutong/openpi-5090-evals/mv-sv-kd-backview-bs64-30k/29999
+      metadata_config_bash_slurm_checks: passed
+      simulation_started_verified: false
+      conclusion: 尚无结论
     dependency: afterok:142274
     teacher_params: /opt/liutong/openpi_checkpoints/fixed_dataset/sft/agentview_wrist/29999/params
     student_config: pi05_libero_backview_lora
@@ -1219,7 +1248,7 @@ experiment_names:
   note: "Academic display names only; original checkpoint paths, job names and experiment IDs remain valid. BS32 H9 is a preliminary experiment."
 
 current_execution:
-  checked_at: "2026-10-18 10:36 CST (ACL-only31K-34K all evaluations and summaries complete; MV-SV-KD142275 complete30K and finalized29999, evaluation not submitted; no user GPU jobs running/pending;148533 remains admin-held CPU summary; other historical entries retain their own snapshots)"
+  checked_at: "2026-10-18 10:41 CST (ACL-only31K-34K all evaluations and summaries complete; MV-SV-KD142275 complete30K, evaluation152012_[0-3] pending Priority, summary152013 pending dependency;148533 remains admin-held CPU summary; other historical entries retain their own snapshots)"
   cache_maintenance:
     checked_at: "2026-10-14 21:46 CST"
     freed_gib_approx: 122
@@ -1251,6 +1280,8 @@ current_execution:
     pending_jobs_bound_in_place: [145280_2, 145280_3, 147057, 147059, 145282, 147058, 147060]
     note: reservation_does_not_preempt_existing_jobs_resource_counts_are_a_snapshot
   jobs:
+    - {id: 152012, experiment: mv_sv_kd_backview_30k_full_evaluation, state: pending_priority, array: "0-3", resources_per_task: 1gpu_8cpu_24g, time_limit: "08:00:00", requested_node: null, summary_job: 152013}
+    - {id: 152013, experiment: mv_sv_kd_backview_30k_summary, state: pending_dependency, depends_on: 152012, resources: 1cpu_2g, time_limit: "00:15:00"}
     - {id: 149325, experiment: acl_only_bs64_checkpoint_trajectory_31k_34k, state: complete_34k, resources: 4gpu_32cpu_96g, time_limit: "1-00:00:00", requested_node: null, node: gpu04, reservation: res_gpu04}
     - {id: 149556, experiment: acl_only_bs64_31k_full_evaluation, state: complete, array: "0-3", resources_per_task: 1gpu_8cpu_24g, time_limit: "08:00:00", requested_node: null, summary_job: 149557}
     - {id: 149558, experiment: acl_only_bs64_32k_full_evaluation, state: complete, array: "0-3", resources_per_task: 1gpu_8cpu_24g, time_limit: "08:00:00", requested_node: null, summary_job: 149559}

@@ -130,7 +130,8 @@ pi0.5，使用相同既有teacher、fixed_dataset和backview学生。该适配�
 与最终action hidden替代原论文SAC动作和视觉编码特征，不属于完整复现。
 CPU检查及单卡2步smoke通过；30K正式任务142275已完成，10月17日22:55:28
 保存29999完成。5K–30K六个checkpoint均完整，训练用时约6天44分钟。
-原协议未设置自动验证链；10月18日核对尚未提交30K验证，尚无任务成功率结论。
+原协议未设置自动验证链；10月18日10:41按用户要求提交30K全量验证152012_[0-3]
+及汇总152013，四套各500回合，无并发上限，等待Priority；尚无任务成功率结论。
 协议和任务号：`experiments/baseline/mv-sv-kd-backview-bs64-30k/`。
 
 Lopez-Paz et al. (2015) 将 privileged information 表述为只在训练阶段可见的
