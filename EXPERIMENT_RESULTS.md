@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-17（ACL-only续训完成34K；31K/32K全量验证完成，33K/34K尚未完整）
+更新时间：2026-10-18（ACL-only 31K–34K全量验证完成；MV-SV-KD完成30K训练，尚未提交验证）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -10,7 +10,7 @@
 | 实验 | 目的 | 配置 | 状态 | 结论 |
 |---|---|---|---|---|
 | ACL-only backview 30K→34K | 补齐31K–34K checkpoint轨迹 | 沿用原ACL-only；4×5090 FSDP、BS64、累计1；flow/ACL=1/0.5、contribution=0、无注入；模型/Adam和data batch30000接续；LR保持2.5e-6；每1K全部保留、独立输出 | 149325完成；10月16日10:34最终33999保存成功，31K–34K全部保留 | 训练完成；验证见下行；已有35K不变；[协议](experiments/ablation/acpd-v2-acl-only-bs64-35k/trajectory-31k-34k-protocol.md)、[执行](experiments/ablation/acpd-v2-acl-only-bs64-35k/trajectory-31k-34k-execution.md) |
-| ACL-only backview 31K–34K验证 | 测量ACL-only后期成功率轨迹 | 关闭注入，与训练一致；每模型四套各500回合；4个单卡子任务及1个汇总，无数组并发上限 | 10月17日11:17：31K/32K四套及汇总完成；33K前三套完成，LIBERO-10补跑150185_3在gpu04开始仿真，汇总149561等待补跑；34K前三套完成，149562_3验证LIBERO-10 | 31K为1195/2000=`59.75%`，32K为1175/2000=`58.75%`；33K/34K尚无完整结论；未计算配对区间，不作显著性判断；[四套计数与证据](experiments/ablation/acpd-v2-acl-only-bs64-35k/evaluation-31k-34k.md#已完成结果) |
+| ACL-only backview 31K–34K验证 | 测量ACL-only后期成功率轨迹 | 关闭注入，与训练一致；每模型四套各500回合；4个单卡子任务及1个汇总，无数组并发上限 | 10月18日核对：四个模型全部完成四套验证及汇总；33K补跑150185_3完成 | 31K/32K/33K/34K分别`59.75%/58.75%/57.40%/59.25%`，各2000回合；31K为新增点中最高观测值；未计算配对区间，不作显著性判断；[四套计数与证据](experiments/ablation/acpd-v2-acl-only-bs64-35k/evaluation-31k-34k.md#已完成结果) |
 | SFT-View leftview 30K→32K | 补齐同视角32K基线 | 4×5090 FSDP、BS64、累计1；恢复模型/优化器及数据batch30000；LR保持2.5e-6；每1K全部保留，batch自动选节点 | 149303已启动，00:56按用户要求取消，优先ACL-only | 尚无新增验证结论；[执行](experiments/baseline/sft-multiview-bs64-resume-32k/execution.md) |
 | SFT-View rightview 30K→32K | 补齐同视角32K基线 | 同上，仅改变视角与原30K checkpoint | 149304启动前按用户要求取消 | 尚无结论；[执行](experiments/baseline/sft-multiview-bs64-resume-32k/execution.md) |
 | SFT-View topview 30K→32K | 补齐同视角32K基线 | 同上，仅改变视角与原30K checkpoint | 149305启动前按用户要求取消 | 尚无结论；[执行](experiments/baseline/sft-multiview-bs64-resume-32k/execution.md) |
@@ -92,7 +92,7 @@ H19 30K→35K续训已在gpu04完成，4 GPU、physical global BS64、累计1。
 | ID | 目的 | 实际配置 | Job | 状态 | 结果 |
 |---|---|---|---:|---|---|
 | Teacher | 提供 agentview+wrist 特权信息 | 全量 SFT，30K | 历史任务 | 完成 | checkpoint `29999` |
-| MV-SV-KD（pi0.5适配） | 提供多视角到单视角第三方蒸馏对照 | 冻结既有agentview+wrist teacher，backview LoRA；4卡BS64，累计1，30K，GT/输出/最终动作特征loss=1/0.5/0.1；无ACPD/ACL/注入，每5K全部保留 | smoke 142274；正式142275 | CPU测试26项及单卡2步smoke通过；正式训练在gpu02运行 | 尚无结论；离线flow与最终action hidden适配，不是原论文完整复现；[协议与执行](experiments/baseline/mv-sv-kd-backview-bs64-30k/) |
+| MV-SV-KD（pi0.5适配） | 提供多视角到单视角第三方蒸馏对照 | 冻结既有agentview+wrist teacher，backview LoRA；4卡BS64，累计1，30K，GT/输出/最终动作特征loss=1/0.5/0.1；无ACPD/ACL/注入，每5K全部保留 | smoke 142274；正式142275 | 10月17日22:55完成30K并保存29999；5K–30K六个checkpoint完整；尚未提交验证 | 尚无任务成功率结论；离线flow与最终action hidden适配，不是原论文完整复现；[协议与执行](experiments/baseline/mv-sv-kd-backview-bs64-30k/) |
 | H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 60K | 130285/130491/130762/132791；35K验证134992/134995；后期验证134998 | 60K训练与40K/50K/60K验证完成 | 5K `13.85%`；20K `47.20%`；25K `55.80%`；30K `60.45%`；35K `57.15%`；40K `60.55%`；50K `61.30%`；60K `62.05%` |
 | H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669/130890；取消5K验证140298/140301 | 30K完成；5K验证未启动即取消，优先H19续训 | 30K pooled `71.55%`；5K尚无结论 |
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891；取消5K验证140296/140299 | 30K完成；5K验证未启动即取消，优先H19续训 | 30K pooled `78.65%`；5K尚无结论 |
@@ -210,6 +210,8 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | ACL-only backview BS64 30K | 61.20% | 71.00% | 60.00% | 25.20% | 54.35% |
 | ACL-only backview BS64 31K | 69.00% | 72.80% | 65.60% | 31.60% | 59.75% |
 | ACL-only backview BS64 32K | 68.40% | 74.80% | 63.40% | 28.40% | 58.75% |
+| ACL-only backview BS64 33K | 64.60% | 74.40% | 63.80% | 26.80% | 57.40% |
+| ACL-only backview BS64 34K | 68.00% | 71.20% | 69.20% | 28.60% | 59.25% |
 | ACL-only backview BS64 35K | 67.00% | 75.20% | 63.60% | 31.60% | 59.35% |
 | H13-LossOnly backview BS64 5K | 19.40% | 35.60% | 25.00% | 2.40% | 20.60% |
 | ACPD-v2-TDCA backview BS64 5K | 18.20% | 35.00% | 28.40% | 3.80% | 21.35% |
@@ -248,7 +250,7 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | student | leftview ACPD-v2 BS64 | `31999`（32K） | 81.55% |
 | student | rightview ACPD-v2 BS64 | `31999`（32K） | 81.00% |
 | student | topview ACPD-v2 BS64 | `31999`（32K） | 75.50% |
-| ablation | MV-SV-KD | 类别已建；30K尚未产出，训练142275进行中 | 尚无结论 |
+| ablation | MV-SV-KD | 类别已建；30K完整产出，尚未加入精选归档 | 尚无验证结论 |
 | ablation | ACL Only | `34999`（35K、BS64） | 59.35%；原始Object75.20%，不是图中的73.20% |
 | ablation | ACL+CrossattnDistillationLoss | `49999`（50K、BS32，原论文ACPD） | 53.10% |
 | ablation | ACL + DistillationLoss | `29999`（H9 30K、BS64，推理关闭注入） | 58.90%；不是从头训练的H13 |
@@ -267,7 +269,7 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | Checkpoint归档实存与主要模型路径 | [Checkpoint检索表](experiments/checkpoint-index.md)、[精确清单](experiments/curated-checkpoints.yaml)；来源、归档、推理配置与验证数值一一对应 |
 | ACPD-v2 back/left/right 31K–34K补训及验证 | [训练协议](experiments/student/acpd-v2-trajectory-31k-34k/protocol.md)、[执行](experiments/student/acpd-v2-trajectory-31k-34k/execution.md)；checkpoint：`/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/trajectory_31k_34k/{view}/pi05_libero_{view}_acpd_v2_layer10/pi05_libero_{view}_acpd_v2_layer10_lora_fsdp4_bs64_resume_34k/{30999,31999,32999,33999}`；训练日志：`/opt/liutong/openpi-5090-research/acpd-v2-trajectory-31k-34k/slurm-log/`；148740/148741/148742；[back/left验证任务与结果](experiments/student/acpd-v2-trajectory-31k-34k/evaluation-backview-leftview.md)、[rightview验证任务](experiments/student/acpd-v2-trajectory-31k-34k/evaluation-rightview.md)；验证根目录`/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/{view}/{step}/`，每点`summary.txt`为最终汇总，`logs/`为四套日志，`slurm-log/`为调度日志，`{suite}/videos/`为视频 |
 | 原论文ACPD backview 50K验证 | `experiments/student/acpd-original-backview-bs32-30k/evaluation-50k.md`；checkpoint为原`acpd_original/backview_bs32_30k`实验目录中的`49999`；验证根目录`/opt/liutong/openpi-5090-evals/acpd-original-backview-bs32-50k/49999/`，`summary.txt`为最终53.10%；四套日志`logs/`、视频各suite的`videos/`、Slurm日志`slurm-log/`；验证148343，汇总148347；配对分析`experiments/student/acpd-original-backview-bs32-30k/results/paired-h9-35k.json` |
-| MV-SV-KD协议、执行与配置路径 | `experiments/baseline/mv-sv-kd-backview-bs64-30k/`；checkpoint根目录`/opt/liutong/openpi_checkpoints/fixed_dataset/baseline/mv_sv_kd/backview_bs64_30k/`；日志根目录`/opt/liutong/openpi-5090-research/mv-sv-kd-backview-bs64-30k/slurm-log/`；训练运行，尚无验证结果 |
+| MV-SV-KD协议、执行与配置路径 | `experiments/baseline/mv-sv-kd-backview-bs64-30k/`；checkpoint根目录`/opt/liutong/openpi_checkpoints/fixed_dataset/baseline/mv_sv_kd/backview_bs64_30k/`；日志根目录`/opt/liutong/openpi-5090-research/mv-sv-kd-backview-bs64-30k/slurm-log/`；30K训练完成，尚未提交验证 |
 | H7/H7.1 原始指标 | `/opt/liutong/openpi-5090-research/acpd-exact-attention-probe/results/` |
 | H9 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-pbs32-5k_129710.out` |
 | H9-scale-b 训练日志 | `slurm-log/pi05-bv-acpdv2-l10-fsdp4-bs64-30k_129728.out` |
@@ -334,7 +336,7 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | ACL-only BS64 协议 | `experiments/ablation/acpd-v2-acl-only-bs64-35k/protocol.md` |
 | ACL-only BS64 checkpoint | `/opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_acl_only_bs64_35k/pi05_libero_backview_acl_only_bs64_35k/pi05_libero_backview_acl_only_lora_fsdp4_bs64_35k/{24999,29999,34999}/` |
 | ACL-only BS64 验证与分析 | `/opt/liutong/openpi-5090-evals/acpd-v2-acl-only-bs64-35k/{24999,29999,34999}/`；分析日志 `135729`、`135728` |
-| ACL-only BS64 31K–34K轨迹验证 | [协议与结果](experiments/ablation/acpd-v2-acl-only-bs64-35k/evaluation-31k-34k.md)；checkpoint：`/opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_acl_only_bs64_trajectory_31k_34k/pi05_libero_backview_acl_only_bs64_35k/pi05_libero_backview_acl_only_lora_fsdp4_bs64_resume_34k/{30999,31999,32999,33999}`；验证：`/opt/liutong/openpi-5090-evals/acpd-v2-acl-only-bs64-trajectory-31k-34k/{step}/`，`summary.txt`为最终汇总、`logs/`为四套日志、`slurm-log/`为调度日志、`{suite}/videos/`为视频；31K/32K完成，33K/34K尚未完整 |
+| ACL-only BS64 31K–34K轨迹验证 | [协议与结果](experiments/ablation/acpd-v2-acl-only-bs64-35k/evaluation-31k-34k.md)；checkpoint：`/opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_acl_only_bs64_trajectory_31k_34k/pi05_libero_backview_acl_only_bs64_35k/pi05_libero_backview_acl_only_lora_fsdp4_bs64_resume_34k/{30999,31999,32999,33999}`；验证：`/opt/liutong/openpi-5090-evals/acpd-v2-acl-only-bs64-trajectory-31k-34k/{step}/`，`summary.txt`为最终汇总、`logs/`为四套日志、`slurm-log/`为调度日志、`{suite}/videos/`为视频；四个模型全量完成，各2000回合 |
 | ACPD-v2-TDCA 协议 | `experiments/ablation/acpd-v2-tdca-5k/protocol.md` |
 | ACPD-v2-TDCA checkpoint | `/opt/liutong/openpi_checkpoints/fixed_dataset/ablation/acpd_v2_tdca_5k/pi05_libero_backview_acpd_v2_tdca/pi05_libero_backview_acpd_v2_tdca_lora_fsdp4_bs64_5k/4999` |
 | ACPD-v2-TDCA 验证 | `/opt/liutong/openpi-5090-evals/acpd-v2-tdca-5k/4999/summary.txt` |
