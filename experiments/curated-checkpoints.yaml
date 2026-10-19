@@ -143,8 +143,10 @@ models:
     result_summary: *h9_35k_result
     result_archive: results/ablation/backview_acpd_v2_full_bs64/34999
     successes: *h9_35k_successes
-historical_archives:
+historical_archives: []
+removed_historical_archives:
   - baseline/backview_bs64/4999
   - student/backview_acpdv2_layer10_bs64/24999
   - baseline/backview_bs64/29999
   - ablation/backview_acl_only_bs64/34999
+cleanup_record: /home/liutong/Projects/openpi-5090/experiments/checkpoint-archive-cleanup-2026-10-19.md

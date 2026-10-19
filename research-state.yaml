@@ -2263,7 +2263,7 @@ current_execution:
       checkpoint: 29999
     - id: 130703
       experiment: h9_restore_25k
-      checkpoint: curated/student/backview_acpdv2_layer10_bs64/24999
+      checkpoint: /opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/24999
     - id: 130599
       experiment: h13_loss_only_5k
       checkpoint: 4999
@@ -2630,10 +2630,10 @@ workspace:
   checkpoint_inventory:
     checked_date: "2026-10-19"
     selection_basis: user_final_image_suite_success_rates_not_step_labels
-    archived_checkpoint_directories: 18
+    archived_checkpoint_directories: 14
     selected_checkpoint_directories: 14
     pending_selected_checkpoints: 0
-    historical_checkpoint_directories: 4
+    historical_checkpoint_directories: 0
     model_directories: 14
     empty_model_directories: 0
     new_hardlink_archives: 3
@@ -2644,7 +2644,10 @@ workspace:
     acl_only_mean_percent: 59.75
     acl_only_image_mean_percent: 57.75
     pending_class: null
-    historical_archives_preserved: [baseline/backview_bs64/4999, student/backview_acpdv2_layer10_bs64/24999, baseline/backview_bs64/29999, ablation/backview_acl_only_bs64/34999]
+    historical_archives_preserved: []
+    historical_archive_entries_removed: [baseline/backview_bs64/4999, student/backview_acpdv2_layer10_bs64/24999, baseline/backview_bs64/29999, ablation/backview_acl_only_bs64/34999]
+    archive_cleanup_record: experiments/checkpoint-archive-cleanup-2026-10-19.md
+    removed_archive_source_files_verified: 104
     evaluation_archive_entries: 13
     distinct_evaluation_sources: 12
     evaluation_hardlink_files: 65
@@ -2654,4 +2657,6 @@ workspace:
     source_directories_preserved: true
     verification: all_suite_counts_checked_new_checkpoints_all_file_inodes_checked_existing_checkpoint_metadata_and_weight_shard_inodes_sampled
     checkpoint_weight_data_copied: false
-    checkpoint_files_moved_deleted: false
+    checkpoint_files_moved: false
+    original_checkpoint_files_deleted: false
+    selected_checkpoint_files_deleted: false

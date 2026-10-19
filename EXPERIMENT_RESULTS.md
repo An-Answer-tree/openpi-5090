@@ -256,11 +256,12 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | ablation | ACL + DistillationLoss | `29999`（H9 30K、BS64，推理关闭注入） | 58.90%；不是从头训练的H13 |
 | ablation | ACL+DistillationLoss+Injection | `34999`（H9 35K、BS64） | 61.05% |
 
-当前选择14个checkpoint入口均已归档，另保留4个历史入口，共18个checkpoint目录。
+当前选择14个checkpoint入口均已归档；按用户要求清理了4个非当前选择的历史硬链接入口，汇总目录仅保留这14个checkpoint入口。
 本次补齐3个checkpoint及13组验证文件入口（12组独立来源），均使用硬链接；
 未移动或删除原文件，视频保留原路径索引。真实步数、推理配置及完整四套结果见
 [Checkpoint检索表](experiments/checkpoint-index.md)及[清单](experiments/curated-checkpoints.yaml)。
 分类不代表BS/步数匹配的受控消融；58.90%需要关闭推理注入，61.05%开启注入。
+历史入口的原训练checkpoint均保留，可恢复入口；[清理记录](experiments/checkpoint-archive-cleanup-2026-10-19.md)。
 
 ## 证据路径
 

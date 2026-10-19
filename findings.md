@@ -253,7 +253,7 @@ MV-SV-KD142275仍在训练，未修改任务。
 - 原始正式对照除 teacher 外使用4 GPU、physical global BS64。H19 30K→35K续训已完成，保持4 GPU、BS64、累计1，数据从原配置batch 30000接续；实际GPU恢复与训练已验证。此前2卡micro BS32、累计2方案未实际训练。
 - 改变GPU数量恢复训练时，参数和优化器状态都必须显式指定当前设备的分片布局，不能沿用checkpoint内保存的布局。4→2设备的数值、优化器、步数和源文件只读检查已通过；147003已在启动前取消，实际GPU续训尚未验证。
 - 蒸馏 checkpoint 使用零起始目录编号；需要保留每 5K 时设置 `keep_period=1`。
-- 精选checkpoint只在完整写入后建立硬链接，不移动或删除原checkpoint。2026-10-19按用户最终图片的四套成功率更新：backview SFT选35000（57.15%），其余SFT30K；backview student35K，其余student32K；ACL-only选31K（四套69.00/72.80/65.60/31.60%，实际平均59.75%，图片57.75%为算术差异）；MV-SV-KD30K已归档（52.40%）。58.90%为H9 30K仅推理关闭注入，不是H13。14个当前模型入口及13组验证证据均归档，保留4个历史入口；teacher无优化器状态。精确来源、配置和证据见`experiments/{checkpoint-index.md,curated-checkpoints.yaml}`。这些按结果选取的类别并非步数/BS匹配的受控消融。
+- 精选checkpoint只在完整写入后建立硬链接，不移动或删除原checkpoint。2026-10-19按用户最终图片的四套成功率更新：backview SFT选35000（57.15%），其余SFT30K；backview student35K，其余student32K；ACL-only选31K（四套69.00/72.80/65.60/31.60%，实际平均59.75%，图片57.75%为算术差异）；MV-SV-KD30K已归档（52.40%）。58.90%为H9 30K仅推理关闭注入，不是H13。14个当前模型入口及13组验证证据均归档；按用户要求清理4个旧历史硬链接入口，原训练checkpoint保留，可恢复入口；teacher无优化器状态。精确来源、配置和证据见`experiments/{checkpoint-index.md,curated-checkpoints.yaml}`，清理记录见`experiments/checkpoint-archive-cleanup-2026-10-19.md`。这些按结果选取的类别并非步数/BS匹配的受控消融。
 - 活动任务的 checkpoint、数据集、脚本和输出路径不得修改。
 - teacher 特征依赖 noisy action 和 flow time，不能预计算而不改变方法。
 - 早期 supervised loss 不能代替任务成功率筛选 ACPD 组件。

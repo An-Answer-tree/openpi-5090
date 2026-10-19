@@ -64,9 +64,9 @@ ACL-only四套成功率与图片完全一致，平均应为59.75%，图片的57.
 
 - 当前选择14个checkpoint入口：teacher 1、baseline 4、student 4、ablation 5，均已归档。
 - 验证结果13个入口、12组独立来源；完整ACPD与backview student共用模型和验证来源。
-- 共18个checkpoint目录；四个历史入口保留：`baseline/backview_bs64/4999`、`baseline/backview_bs64/29999`、`student/backview_acpdv2_layer10_bs64/24999`、`ablation/backview_acl_only_bs64/34999`。
+- 汇总目录当前仅保留上述14个checkpoint入口；按用户要求删除了4个不再选用的历史硬链接入口。原训练checkpoint保留，可重新建立硬链接恢复入口；[清理记录](checkpoint-archive-cleanup-2026-10-19.md)列出准确路径。
 - 本次新增3个checkpoint及65个验证文件入口，使用文件硬链接，不复制权重数据块。不得改写硬链接文件，否则原文件也会改变。
 - 新增checkpoint逐文件核对inode；其余选择抽查元数据及一个权重分片。验证汇总与原始日志的四套成功数已逐项核对，未重新加载GPU模型。
-- 原checkpoint、数据、验证文件及运行任务保持原路径，未移动或删除。未扫描大型目录。
+- 原checkpoint、数据、验证文件及运行任务保持原路径，未移动或删除。清理仅删除汇总目录中的4个历史入口，未释放原权重占用的数据块；未扫描大型目录。
 
 完整实验记录见[实验结果台账](/home/liutong/Projects/openpi-5090/EXPERIMENT_RESULTS.md)。
