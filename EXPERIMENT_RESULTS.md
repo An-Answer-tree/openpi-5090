@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-19（MV-SV-KD 30K四套全量验证及汇总完成，52.40%）
+更新时间：2026-10-19（按最终图片成功率归档模型与验证证据；MV-SV-KD 30K为52.40%）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -237,12 +237,12 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 ## 精选 Checkpoint
 
 根目录：[/opt/liutong/openpi_checkpoints/fixed_dataset/curated](/opt/liutong/openpi_checkpoints/fixed_dataset/curated)。
-2026-10-16按用户指定更新：四视角SFT选30K，student中backview选35K，其余视角选32K。
+2026-10-19按用户最终图片的四套成功率匹配，保留真实checkpoint编号；不沿用图片step。
 
 | 分类 | 模型 | 当前选择 | 平均成功率 |
 |---|---|---|---|
 | teacher | agentview+wrist | `29999`（30K） | —；无优化器状态 |
-| baseline | backview BS64 | `29999`（30K） | 60.45% |
+| baseline | backview BS64 | `35000`（35001次更新，通常称35K） | 57.15% |
 | baseline | leftview BS64 | `29999`（30K） | 78.65% |
 | baseline | rightview BS64 | `29999`（30K） | 77.00% |
 | baseline | topview BS64 | `29999`（30K） | 71.55% |
@@ -250,14 +250,15 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | student | leftview ACPD-v2 BS64 | `31999`（32K） | 81.55% |
 | student | rightview ACPD-v2 BS64 | `31999`（32K） | 81.00% |
 | student | topview ACPD-v2 BS64 | `31999`（32K） | 75.50% |
-| ablation | MV-SV-KD | 类别已建；30K完整产出，尚未加入精选归档 | 52.40%（1048/2000） |
-| ablation | ACL Only | `34999`（35K、BS64） | 59.35%；原始Object75.20%，不是图中的73.20% |
+| ablation | MV-SV-KD | `29999`（30K、BS64） | 52.40%（1048/2000） |
+| ablation | ACL Only | `30999`（31K、BS64） | 59.75%（1195/2000）；四套匹配图片，图片平均57.75%为算术差异 |
 | ablation | ACL+CrossattnDistillationLoss | `49999`（50K、BS32，原论文ACPD） | 53.10% |
 | ablation | ACL + DistillationLoss | `29999`（H9 30K、BS64，推理关闭注入） | 58.90%；不是从头训练的H13 |
 | ablation | ACL+DistillationLoss+Injection | `34999`（H9 35K、BS64） | 61.05% |
 
-已新增12个文件级硬链接归档，原checkpoint及已有SFT5K/H9 25K归档保留。
-当前选择共13个已归档checkpoint入口和1个待完成类别；真实步数与推理配置见
+当前选择14个checkpoint入口均已归档，另保留4个历史入口，共18个checkpoint目录。
+本次补齐3个checkpoint及13组验证文件入口（12组独立来源），均使用硬链接；
+未移动或删除原文件，视频保留原路径索引。真实步数、推理配置及完整四套结果见
 [Checkpoint检索表](experiments/checkpoint-index.md)及[清单](experiments/curated-checkpoints.yaml)。
 分类不代表BS/步数匹配的受控消融；58.90%需要关闭推理注入，61.05%开启注入。
 

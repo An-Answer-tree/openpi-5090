@@ -2628,22 +2628,30 @@ workspace:
   checkpoint_manifest: "experiments/curated-checkpoints.yaml"
   checkpoint_root: "/opt/liutong/openpi_checkpoints/fixed_dataset/curated"
   checkpoint_inventory:
-    checked_date: "2026-10-16"
-    archived_checkpoint_directories: 15
-    selected_checkpoint_directories: 13
-    pending_selected_checkpoints: 1
-    historical_checkpoint_directories: 2
+    checked_date: "2026-10-19"
+    selection_basis: user_final_image_suite_success_rates_not_step_labels
+    archived_checkpoint_directories: 18
+    selected_checkpoint_directories: 14
+    pending_selected_checkpoints: 0
+    historical_checkpoint_directories: 4
     model_directories: 14
-    empty_model_directories: 1
-    new_hardlink_archives: 12
-    baseline_steps: {backview: 30000, leftview: 30000, rightview: 30000, topview: 30000}
+    empty_model_directories: 0
+    new_hardlink_archives: 3
+    baseline_steps: {backview: 35001, leftview: 30000, rightview: 30000, topview: 30000}
     student_steps: {backview: 35000, leftview: 32000, rightview: 32000, topview: 32000}
     ablation_classes: [mv_sv_kd, acl_only, acl_crossattn_distillation, acl_distillation_no_injection, full_acpd]
-    pending_class: mv_sv_kd
-    historical_archives_preserved: [baseline/backview_bs64/4999, student/backview_acpdv2_layer10_bs64/24999]
+    acl_only_step: 31000
+    acl_only_mean_percent: 59.75
+    acl_only_image_mean_percent: 57.75
+    pending_class: null
+    historical_archives_preserved: [baseline/backview_bs64/4999, student/backview_acpdv2_layer10_bs64/24999, baseline/backview_bs64/29999, ablation/backview_acl_only_bs64/34999]
+    evaluation_archive_entries: 13
+    distinct_evaluation_sources: 12
+    evaluation_hardlink_files: 65
+    evaluation_payload: [summary.txt, logs/spatial.log, logs/object.log, logs/goal.log, logs/libero_10.log]
+    videos: original_paths_indexed_not_scanned_or_archived
     teacher_has_optimizer_state: false
     source_directories_preserved: true
-    verification: final_markers_and_result_counts_checked_metadata_and_weight_shard_inodes_sampled
+    verification: all_suite_counts_checked_new_checkpoints_all_file_inodes_checked_existing_checkpoint_metadata_and_weight_shard_inodes_sampled
     checkpoint_weight_data_copied: false
     checkpoint_files_moved_deleted: false
-    empty_directory_removed: ablation/backview_loss_only_bs64
