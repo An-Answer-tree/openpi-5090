@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-18（ACL-only 31K–34K全量验证完成；MV-SV-KD完成30K训练，全量验证已提交）
+更新时间：2026-10-19（MV-SV-KD 30K四套全量验证及汇总完成，52.40%）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -92,7 +92,7 @@ H19 30K→35K续训已在gpu04完成，4 GPU、physical global BS64、累计1。
 | ID | 目的 | 实际配置 | Job | 状态 | 结果 |
 |---|---|---|---:|---|---|
 | Teacher | 提供 agentview+wrist 特权信息 | 全量 SFT，30K | 历史任务 | 完成 | checkpoint `29999` |
-| MV-SV-KD（pi0.5适配） | 提供多视角到单视角第三方蒸馏对照 | 冻结既有agentview+wrist teacher，backview LoRA；4卡BS64，累计1，30K，GT/输出/最终动作特征loss=1/0.5/0.1；无ACPD/ACL/注入，每5K全部保留 | smoke 142274；正式142275；30K验证152012_[0-3]，汇总152013 | 30K训练完成、5K–30K六个checkpoint完整；10月18日10:41验证等待Priority，每套500回合，四个单卡子任务无并发上限 | 尚无任务成功率结论；离线flow与最终action hidden适配，不是原论文完整复现；[训练](experiments/baseline/mv-sv-kd-backview-bs64-30k/)、[验证](experiments/baseline/mv-sv-kd-backview-bs64-30k/evaluation-30k.md) |
+| MV-SV-KD（pi0.5适配） | 提供多视角到单视角第三方蒸馏对照 | 冻结既有agentview+wrist teacher，backview LoRA；4卡BS64，累计1，30K，GT/输出/最终动作特征loss=1/0.5/0.1；无ACPD/ACL/注入，每5K全部保留 | smoke 142274；正式142275；30K验证152012_[0-3]，汇总152013 | 30K训练、四套各500回合验证及汇总完成；5K–30K六个checkpoint完整 | 1048/2000=`52.40%`；同为30K，比H9低5.60点、比SFT低8.05点；未计算配对区间。离线flow与最终action hidden适配，不是原论文完整复现；[训练](experiments/baseline/mv-sv-kd-backview-bs64-30k/)、[四套结果](experiments/baseline/mv-sv-kd-backview-bs64-30k/evaluation-30k.md#已完成结果) |
 | H12 | backview 单视角 baseline | LoRA，BS64，5K 后确定性续训至 60K | 130285/130491/130762/132791；35K验证134992/134995；后期验证134998 | 60K训练与40K/50K/60K验证完成 | 5K `13.85%`；20K `47.20%`；25K `55.80%`；30K `60.45%`；35K `57.15%`；40K `60.55%`；50K `61.30%`；60K `62.05%` |
 | H14-top | topview baseline | LoRA，BS64，30K，每 5K 保存 | 130669/130890；取消5K验证140298/140301 | 30K完成；5K验证未启动即取消，优先H19续训 | 30K pooled `71.55%`；5K尚无结论 |
 | H14-left | leftview baseline | LoRA，BS64，30K，每 5K 保存 | 130670/130891；取消5K验证140296/140299 | 30K完成；5K验证未启动即取消，优先H19续训 | 30K pooled `78.65%`；5K尚无结论 |
@@ -250,7 +250,7 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | student | leftview ACPD-v2 BS64 | `31999`（32K） | 81.55% |
 | student | rightview ACPD-v2 BS64 | `31999`（32K） | 81.00% |
 | student | topview ACPD-v2 BS64 | `31999`（32K） | 75.50% |
-| ablation | MV-SV-KD | 类别已建；30K完整产出，尚未加入精选归档 | 尚无验证结论 |
+| ablation | MV-SV-KD | 类别已建；30K完整产出，尚未加入精选归档 | 52.40%（1048/2000） |
 | ablation | ACL Only | `34999`（35K、BS64） | 59.35%；原始Object75.20%，不是图中的73.20% |
 | ablation | ACL+CrossattnDistillationLoss | `49999`（50K、BS32，原论文ACPD） | 53.10% |
 | ablation | ACL + DistillationLoss | `29999`（H9 30K、BS64，推理关闭注入） | 58.90%；不是从头训练的H13 |

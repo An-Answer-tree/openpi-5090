@@ -131,7 +131,10 @@ pi0.5，使用相同既有teacher、fixed_dataset和backview学生。该适配�
 CPU检查及单卡2步smoke通过；30K正式任务142275已完成，10月17日22:55:28
 保存29999完成。5K–30K六个checkpoint均完整，训练用时约6天44分钟。
 原协议未设置自动验证链；10月18日10:41按用户要求提交30K全量验证152012_[0-3]
-及汇总152013，四套各500回合，无并发上限，等待Priority；尚无任务成功率结论。
+及汇总152013。10月19日16:43核对四套各500回合及汇总完成，Spatial/Object/Goal/
+LIBERO-10分别309/299/305/135成功，合计1048/2000=52.40%。同为backview、BS64、
+30K，比H9-Fixed低5.60点，比SFT低8.05点；未计算配对区间，不作显著性判断。
+这是当前pi0.5适配的单seed结果，不推广到原论文完整方法。
 协议和任务号：`experiments/baseline/mv-sv-kd-backview-bs64-30k/`。
 
 Lopez-Paz et al. (2015) 将 privileged information 表述为只在训练阶段可见的
