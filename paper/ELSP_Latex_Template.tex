@@ -1,0 +1,657 @@
+\documentclass{ELSP}
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+	\usepackage[]{microtype}
+	\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\IfFileExists{parskip.sty}{%
+	\usepackage{parskip}
+}
+\makeatother
+\usepackage[table,xcdraw,RGB]{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+	pdfcreator={ELSP}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+	\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{times}
+\usepackage{mathptmx}
+\usepackage{color}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{geometry}
+\geometry{a4paper,top=2.5cm,bottom=1.9cm,left=1.75cm,right=1.75cm,headsep=12bp}
+\usepackage{float}
+\usepackage{enumerate}
+\usepackage{enumitem}
+\usepackage{stfloats}
+\usepackage{ragged2e}
+\usepackage{titlesec}
+\usepackage{ragged2e}
+
+%\titleformat*{\section}{\fontsize{12pt}{12pt}\selectfont\bfseries}
+%\titleformat*{\subsection}{\fontsize{12pt}{12pt}\selectfont\emph}
+%\titleformat*{\subsubsection}{\fontsize{12pt}{12pt}\selectfont}
+
+\titleformat{\section}[hang]
+  {\fontsize{12pt}{12pt}\selectfont\bfseries\color[RGB]{0,131,255}} 
+  {\thesection}{0.5em}{}
+
+\titleformat{\subsection}[hang]
+  {\fontsize{12pt}{12pt}\selectfont\itshape} 
+  {\thesubsection}{0.5em}{}
+
+\titleformat{\subsubsection}[hang]
+  {\fontsize{12pt}{12pt}\selectfont} 
+  {\thesubsubsection}{0.5em}{}
+
+\setlength{\parindent}{2em}
+\setlength{\baselineskip}{17pt}
+\setlength{\parskip}{0pt}
+
+% \setlength{\bibitemsep}{\baselineskip}
+% \setlength{\parskip}{12pt}
+
+% \usepackage{fontspec}
+% \setmainfont{Times New Roman}
+%ELSP fancy
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\sffamily \fontsize{9pt}{8pt}\selectfont \textbf{\textcolor[RGB]{0,131,255}{Paper Type}}}
+\fancyhead[L]{\sffamily \fontsize{9pt}{8pt}\selectfont \textbf{\textcolor[RGB]{0,131,255}{Journal}}}
+\fancyfoot[R]{\footnotesize\thepage}
+\renewcommand{\headrulewidth}{1.4pt}
+\fancypagestyle{firstpage}
+{
+	\fancyhf{}
+	\setlength{\headsep}{6bp}
+	\fancyhead[R]{\sffamily \fontsize{9pt}{8pt}\selectfont \textbf{\textcolor[RGB]{0,131,255}{Journal}}}
+	\fancyhead[L]{\sffamily \fontsize{9pt}{8pt}\selectfont \textbf{\textcolor[RGB]{0,131,255}{ELSP}}}
+	%\fancyfoot[R]{\thepage}
+	\fancyfoot[L]{\sffamily \fontsize{9pt}{8pt}\selectfont Author Journal Year(Issue):XXXX}
+}
+
+\captionsetup{labelfont={bf},labelformat={default},labelsep=period,margin=4em,format=plain}
+\hypersetup{
+    colorlinks=false, % 
+    pdfborder={0 0 0}, % 
+    hidelinks % 
+}
+\usepackage[utf8]{inputenc}
+\usepackage{enumitem}
+\bibliographystyle{aiasbst}
+\usepackage[numbers,sort,compress]{natbib} 
+\usepackage{natbib}
+\setcitestyle{numbers,square,comma,sort&compress}
+\newlength\mylen
+\settowidth\mylen{\space}
+\setcitestyle{citesep={,\kern-\mylen}}
+\renewcommand\bibnumfmt[1]{\makebox[1.5em][l]{[#1]}} %1.5em这个数值可以根据情况调整
+\setlength{\bibsep}{0pt} 
+\usepackage{changepage}
+\usepackage[none]{hyphenat}
+\usepackage{amssymb}
+% Compatibility command required by the template's existing bibliography style.
+\providecommand{\doi}[1]{\href{https://doi.org/#1}{\nolinkurl{#1}}}
+\begin{document}
+
+
+
+%\hfill \textbf{\large Type of the paper}
+\thispagestyle{firstpage}
+
+\let\thefootnote\relax
+\footnotetext{
+\newline
+\vspace{12pt}
+    \raisebox{-\height}[0pt][0pt]{ % 精确控制垂直位置
+        \begin{minipage}[h]{\linewidth}
+            \begin{minipage}[h]{0.15\linewidth}
+                \includegraphics[width=\linewidth, height=1cm]{fig/cc.png} % 控制图片尺寸
+            \end{minipage}
+            \hfill
+            \begin{minipage}[h]{0.82\linewidth}
+            \justifying
+                \footnotesize Copyright©Year by the authors. Published by ELSP. 
+                This work is licensed under Creative Commons Attribution 4.0 
+                International License, which permits unrestricted use, distribution, 
+                and reproduction in any medium provided the original work is properly cited.
+            \end{minipage}
+        \end{minipage}
+    }
+}
+ % 减少页面可用高度，将内容上推
+ % 确保从顶部开始
+
+\setstretch{1.24}
+\begin{flushleft}
+% \papertype{paper type}
+{\sffamily \small \noindent {Paper Type $\mid$ Received date; Revised date; Accepted date; Published date}}\\[-0.7ex]
+%Example
+%\timeline{15 May 2022}{17 July 2022}{20 September 2022}
+{\sffamily\small{https://doi.org/10.55092/xxxx}}
+
+\vspace{8pt}
+{\raggedright
+\papertitle{What the Weak View Misses: Action-Conditioned Privileged Distillation for Vision-Language-Action Policies%
+\hfill
+\href{https://crossmark.crossref.org/dialog/?doi=10.55092/XXXX}{%
+\raisebox{-0.2em}{\includegraphics[width=0.93cm,height=0.93cm]{fig/Check for updates.png}}%
+}}
+}
+ 
+\vspace{12pt}
+\authorname{Anonymous} {Submission} {}
+% TODO: The AAAI source is anonymous and provides no affiliations or correspondence details.
+\end{flushleft}
+
+% TODO: Highlights are absent from the source; the template block is retained below as comments.
+% \vspace{12pt}
+% \noindent\textbf{\textcolor[RGB]{0,131,255}{Highlights:}}
+% 
+% \vspace{+12pt}
+% \noindent Highlights are three to five bullet points that help increase the discoverability of your article via search engines. These bullet points should capture the novel results of your research as well as new methods that were used during the study (if any). Think of them as the “elevator pitch” of your article. Please include terms that you know your readers will be looking for online. Don't try to capture all ideas, concepts or conclusions as highlights are meant to be short: 85 characters or fewer, including spaces.
+% \vspace{12pt}
+% \begin{itemize}[left=0pt, labelwidth=0pt, labelsep=17pt, itemsep=0pt]
+%     \item Highlight 1
+%     \item Highlight 2
+%     \item Highlight 3
+% \end{itemize}
+% 
+
+\vspace{10pt}
+\noindent\textbf{\textbf{\textcolor[RGB]{0,131,255}{Abstract:}}} Vision-language-action (VLA) policies can degrade when the deployment view provides insufficient task-relevant evidence for action prediction.
+Existing approaches typically improve viewpoint robustness by synthesizing novel views or learning 3D representations that preserve scene structure across viewpoints. However, they do not explicitly determine which visual evidence a weak-view policy needs for each action prediction. We introduce \textbf{Action-Conditioned Privileged Distillation (ACPD)}, which uses a frozen privileged-view teacher to supervise a weak-view student. ACPD trains the student to predict action-relevant visual cues extracted from the teacher's attention outputs and use them for action generation. An action correlation loss aligns the relative variation of teacher and student flow-velocity predictions. At deployment, the student uses a single camera view and operates without the teacher.
+We evaluate ACPD using synchronized multi-view demonstrations from four LIBERO suites. Across three weak-view deployment settings on LIBERO-Spatial and LIBERO-Long, ACPD raises the mean success rate from 56.0\% to 57.4\%. A separate four-suite ablation shows that full ACPD achieves an average task success rate of 43.2\%, compared with 35.8\% for single-view fine-tuning, corresponding to a 20.7\% relative improvement.
+
+% TODO: Keywords are absent from the source; the template block is retained below as comments.
+% \vspace{+12pt}
+% \noindent\textbf{\textcolor[RGB]{0,131,255}{Keywords:}} Please supply up to 10 keywords, main 3 or 4 key phrases and at least 3 or 4 additional key words to make it more discoverable in search engines like google, web of science.
+% 
+% 
+
+\section{Introduction}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.5\linewidth]{Figures/motivation.pdf}
+\caption{Single-view fine-tuning is sensitive to camera viewpoint on LIBERO. Each policy is trained and evaluated using only the indicated view, and the bars show mean task success rate across four LIBERO suites. The agent-view policy serves as the reference, with gap labels showing absolute differences in percentage points. The example observations show the same task-relevant object clearly visible in some views but occluded in others.}
+\label{fig:motivation}
+\end{figure}
+
+Vision-language-action (VLA) policies map language instructions and visual observations to robot actions, providing a general framework for language-conditioned manipulation. 
+%We focus on VLA policies with diffusion or flow-matching action generators, which model continuous action trajectories for robot control~\cite{chi2025diffusionpolicy,wen2025diffusionvla,black2025pi0}. 
+Recent VLA policies increasingly employ diffusion or flow-matching action generators to model continuous action trajectories for robot control~\cite{chi2025diffusionpolicy,wen2025diffusionvla,black2025pi0}.
+However, their performance is constrained by the visual evidence available from the camera view at deployment. 
+When object pose, spatial relations, or gripper-object contact are occluded or only weakly visible, a policy relying on that view can perform substantially worse than one with access to a more informative view (Figure~\ref{fig:motivation}). 
+In practical systems, workspace geometry and robot hardware can constrain camera placement, leaving the policy with a less informative deployment view. 
+This practical constraint motivates weak-view policy learning, where a policy is deployed with a limited camera view but can receive training-time supervision from a more informative view.
+%To address this gap, we study weak-view policy learning, where a policy is deployed with a limited camera view but can receive training-time supervision from a more informative view.
+
+Prior work has addressed viewpoint sensitivity by showing the policy more camera views during training or by preserving task-relevant scene structure across viewpoints. View-diversity methods train on synchronized multi-camera demonstrations or synthesized novel views~\cite{ablett2021multiview,tian2025vista}, while geometry-aware methods encode scenes as 3D representations that retain task-relevant spatial structure across camera viewpoints~\cite{seo2023multiview}. These strategies improve robustness to camera changes, but they do not explicitly identify which visual evidence matters to each action prediction under weak-view deployment.
+
+Privileged distillation offers a more targeted alternative by supervising the weak-view policy with a teacher that observes a more informative view during training. In the cross-view setting, however, this supervision faces a correspondence problem. Relevant evidence may be occluded in the weak view, while shared scene elements can appear at different image locations and token positions. Consequently, matching complete representations from informative and weak views can impose poorly aligned targets on the weak-view policy. Effective cross-view supervision must identify teacher information useful for action prediction despite this misalignment. It must also adapt across the action horizon because different future actions may depend on different visual evidence. 
+
+To address these challenges, we propose \textbf{Action-Conditioned Privileged Distillation (ACPD)}, a cross-view distillation framework that constructs a compact privileged cue for each student action token.
+%ACPD further complements this representation-level supervision with an action-level correlation objective that aligns the prediction patterns of the teacher and student.
+%We propose \textbf{Action-Conditioned Privileged Distillation (ACPD)}, which selects compact, action-conditioned cues from the informative view and complements this representation-level supervision with action-level guidance that encourages consistent teacher and student predictions.
+%Specifically, 
+ACPD trains the weak-view student alongside a frozen teacher that observes the same episode from a more informative view. The synchronized observations share the instruction, robot state, and action target. Only the available camera evidence differs. At the representation level, ACPD uses the hidden state of each student action token to query the teacher's visual tokens and action-expert states, selecting a compact \textit{privileged cue} conditioned on that state. A cue-prediction objective then trains the corresponding weak-view hidden state to predict the selected cue rather than reconstructing the teacher's full representation.
+At the action level, ACPD applies an \textit{action correlation loss} (ACL) to the flow velocities predicted by the teacher and student. 
+ACL uses Pearson correlation to align their relative variation, while the ground-truth flow objective continues to supervise the student's absolute velocity values. Together, privileged-cue distillation and ACL provide complementary supervision at the representation and action levels. Both objectives are used only during training, so the deployed policy remains a standard weak-view model with no added inference cost.
+
+Experimental results demonstrate that ACPD improves weak-view manipulation across multiple deployment viewpoints. Averaged over the back, top, and left views on LIBERO-Spatial and LIBERO-Long, ACPD increases the mean success rate from 56.0\% to 57.4\%. Controlled ablations across all four LIBERO suites show a 7.4-percentage-point improvement over single-view fine-tuning, with privileged-cue distillation contributing the largest gain and ACL providing complementary benefits.
+%We evaluate ACPD on four LIBERO suites using synchronized multi-view demonstrations. The main comparison evaluates ACPD on LIBERO-Spatial and LIBERO-Long with the back, top, and left cameras as deployment views. Averaged across the three views and two suites, ACPD raises success from 56.0\% to 57.4\%. A separate reduced-budget back-view ablation covers all four suites, adding LIBERO-Object and LIBERO-Goal to assess the method components across a broader range of tasks. Full ACPD improves average success over single-view fine-tuning by 7.4 percentage points, equivalent to a 20.7\% relative gain. Within this sequential ablation, privileged-cue distillation contributes 5.7 percentage points, while ACL and wrist-view teacher input add a further 0.8 and 0.9 points, respectively.
+
+
+Our contributions are:
+\begin{itemize}
+    \item We introduce action-conditioned privileged cues as compact targets for cross-view distillation. A student-conditioned selector extracts a separate teacher cue for each action token without directly aligning the full teacher and student representations.
+    \item We propose an action correlation loss that aligns the relative variation of teacher and student flow-velocity predictions. 
+    %We propose ACPD, which combines privileged-cue prediction with an action correlation loss (ACL) that aligns the relative variation of teacher and student flow-velocity predictions. The teacher and auxiliary modules are removed after training, adding no deployment cost.
+    \item Extensive experiments on synchronized multi-view LIBERO demonstrations validate ACPD across diverse weak-view settings, while controlled ablations confirm the effectiveness of privileged-cue distillation and ACL.
+    %We construct synchronized multi-view data for four LIBERO suites and evaluate ACPD across three weak-view deployment settings with matched student training schedules. A separate four-suite ablation shows a 20.7\% relative improvement over single-view fine-tuning, with privileged-cue distillation accounting for most of the observed gain.
+\end{itemize}
+
+\section{Related Work}
+
+\subsection{Generative VLA Policies}
+
+Vision-language-action (VLA) policies map visual observations and language instructions to robot actions. Generalist systems learn from diverse robot demonstrations to operate across tasks and embodiments~\cite{brohan2023rt1,zitkovich2023rt2}. Large-scale datasets such as BridgeData V2, Open X-Embodiment, and DROID increase the scale and diversity of available robot demonstrations~\cite{walke2023bridgev2,oneill2024oxe,khazatsky2024droid}, while Octo and OpenVLA use heterogeneous robot data to pretrain reusable policies~\cite{ghosh2024octo,kim2025openvla}. 
+
+Action generation is another design axis. ACT predicts action chunks, FAST tokenizes action sequences, and OpenVLA-OFT fine-tunes a pretrained VLA with continuous action regression and parallel action-chunk decoding~\cite{zhao2023act,pertsch2025fast,kim2025openvlaoft}. Diffusion Policy and DP3 generate action chunks through denoising~\cite{chi2025diffusionpolicy,ze2024dp3}. RDT and DiffusionVLA extend diffusion-based generation to language-conditioned control, whereas $\pi_0$ and $\pi_{0.5}$ use flow matching~\cite{liu2025rdt,wen2025diffusionvla,black2025pi0,black2025pi05}. Rather than introducing a new action-generation mechanism, ACPD builds on flow matching and focuses on cross-view supervision during training.
+
+
+\subsection{Viewpoint Robustness in Robot Manipulation}
+
+Viewpoint changes alter the visibility and image location of task-relevant evidence. Prior work uses multi-camera demonstrations or auxiliary views for representation learning~\cite{ablett2021multiview,seo2023multiview}. View-augmentation methods such as SPARTN, VISTA, and RoVi-Aug synthesize or re-render observations from additional camera poses~\cite{zhou2023spartn,tian2025vista,chen2025roviaug}.
+
+Another line of work represents scene geometry explicitly. PerAct operates on voxelized scenes, while RVT projects 3D observations into virtual views~\cite{shridhar2023peract,goyal2023rvt}. 3D-MVP learns geometric representations through multi-view pretraining, whereas Act3D uses a continuous 3D feature field~\cite{qian20253dmvp,gervet2023act3d}. DP3 combines point-cloud observations with diffusion-based action generation~\cite{ze2024dp3}.
+
+These approaches address viewpoint variation through visual diversity or explicit geometry. ACPD instead considers a setting in which informative views are available to the teacher only during training, while the student is deployed with one fixed weak view. It transfers supervision from synchronized privileged views without synthesizing student observations or constructing an explicit 3D representation.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{Figures/ACPD_method_overview.pdf}
+\caption{ACPD uses a frozen privileged-view teacher to supervise a trainable weak-view flow-matching student. (A) Each student action-token state queries the teacher's visual tokens and action-expert states to construct a compact privileged cue, and a cue predictor estimates the selected cue from the same student state. (B) ACL is one minus the Pearson correlation between the flattened flow-velocity predictions of the teacher and student. (C) The complete objective adds privileged-cue distillation and ACL to the base flow-matching loss. Only the weak-view student is retained for deployment.}
+\label{fig:framework}
+\end{figure}
+
+
+\subsection{Privileged Distillation for Weak-View Policies}
+
+Learning with privileged information allows a model to use training-only signals that are unavailable at deployment~\cite{vapnik2015lupi}. Generalized distillation casts this setting as teacher--student learning, in which privileged teacher outputs or representations supervise the student~\cite{lopezpaz2016generalized,hinton2015distilling}. Methods for embodied control provide such supervision through state-based critics, privileged sensors, state-based teachers, and depth-guided teachers~\cite{pinto2018asymmetric,hu2024scaffolder,xu2024humanvla,wang2025monolift}.
+
+Acar et al. are most closely related to our camera setting. Their multi-camera reinforcement-learning teacher supervises a single-camera student trained with camera-view augmentation~\cite{acar2024multicamera}. Directly matching complete representations across views may be suboptimal because camera viewpoints can differ in visible content and in the image locations of shared scene elements. ACPD instead constructs action-conditioned targets from privileged teacher representations and applies distillation to flow-matching VLA policies.
+
+\section{Action-Conditioned Privileged Distillation}
+
+ACPD uses a frozen privileged-view teacher to supervise a weak-view flow-matching student during training (Figure~\ref{fig:framework}). At the representation level, privileged-cue distillation selects a compact teacher cue for each student action token and trains the corresponding student hidden state to predict it. At the action level, the action correlation loss (ACL) encourages consistent variation between the teacher and student flow-velocity predictions. 
+
+
+\subsection{Problem Formulation}
+
+Each training sample $(o^s,o^t,\mathbf{a})\sim\mathcal{D}$ contains synchronized student and teacher conditions from the same episode and timestep, together with a shared action target $\mathbf{a}$. The two conditions contain the same language instruction and proprioceptive state but differ in their camera observations. The student condition $o^s$ contains a single weak view, whereas the teacher condition $o^t$ contains one or more informative views available only during training. The goal is to improve the student through supervision from $o^t$ while requiring only $o^s$ at deployment.
+
+Both the teacher and student are flow-matching VLA policies. The action chunk $\mathbf{a}=(\mathbf{a}_1,\ldots,\mathbf{a}_H)\in\mathbb{R}^{H\times d}$ contains the next $H$ actions, each of dimension $d$. For each training sample, a flow time $\tau\in[0,1]$ and Gaussian noise $\boldsymbol{\epsilon}\sim\mathcal{N}(0,\mathbf{I})$ with the same shape as $\mathbf{a}$ are sampled. The noisy action at flow time $\tau$ is $\mathbf{a}^{\tau}=\tau\boldsymbol{\epsilon}+(1-\tau)\mathbf{a}$. The action expert represents this noisy action chunk as $H$ action tokens and denoises them. The target velocity is $\mathbf{u}=\boldsymbol{\epsilon}-\mathbf{a}$, which points from the action chunk toward the sampled noise.
+The student is trained by minimizing the mean-squared error between its predicted velocity and the target velocity $\mathbf{u}$:
+\begin{equation}
+\mathcal{L}_{\text{flow}}
+=
+\mathbb{E}\!\left[
+\big\|
+\mathbf{v}_{\theta}(\mathbf{a}^{\tau},\tau,o^s)-\mathbf{u}
+\big\|_2^2
+\right].
+\label{eq:flow}
+\end{equation}
+The parameters $\theta$ and $\theta_{\mathrm{T}}$ denote the trainable student and frozen teacher parameters, respectively. The teacher predicts $\mathbf{v}_{\theta_{\mathrm{T}}}(\mathbf{a}^{\tau},\tau,o^t)$ from the same interpolated action and flow time. 
+
+
+\subsection{Action-Conditioned Privileged Cue Selection}
+
+The teacher and student observe the same scene from different camera viewpoints. As a result, task-relevant evidence available to the teacher may be absent from the weak view, while the same scene element may appear at different image locations and token positions. Directly matching their full representations may therefore provide poorly aligned supervision. ACPD instead constructs an \textit{action-conditioned privileged cue} for each student action token.
+
+At each selected action-expert layer $\ell\in\mathcal{S}$, the selector uses two sources of teacher information. The visual tokens $\mathbf{Z}^{t}$ are extracted by the teacher's visual backbone from its privileged-view input. The action-expert states $\mathbf{G}_{\ell}^{t}$ are the hidden states produced at layer $\ell$ of the teacher's action expert when it processes $(\mathbf{a}^{\tau},\tau,o^t)$. They therefore incorporate all camera views in $o^t$ together with the action context. Layer-specific projectors map both token sequences to the cue dimension $D_c$ and concatenate them along the token dimension to form the privileged feature sequence
+\begin{equation*}
+\mathbf{F}_{\ell}^{t}
+=
+\left[
+\phi_{v}^{(\ell)}(\mathbf{Z}^{t});
+\phi_{a}^{(\ell)}(\mathbf{G}_{\ell}^{t})
+\right].
+\end{equation*}
+
+Let $\mathbf{h}_{\ell,i}^{s}$ denote the student hidden state for action token $i$ at layer $\ell$, computed from $(\mathbf{a}^{\tau},\tau,o^s)$. The selector uses this state to query the privileged feature sequence:
+\begin{equation}
+\mathbf{c}_{\ell,i}
+=
+\operatorname{Attn}\!\left(
+Q_{\ell}(\operatorname{sg}[\mathbf{h}_{\ell,i}^{s}]),
+K_{\ell}(\mathbf{F}_{\ell}^{t}),
+V_{\ell}(\mathbf{F}_{\ell}^{t})
+\right).
+\label{eq:cue}
+\end{equation}
+In Equation~\eqref{eq:cue}, $\operatorname{Attn}$ denotes cross-attention, and $Q_{\ell}$, $K_{\ell}$, and $V_{\ell}$ are learned layer-specific projections. The stop-gradient operator $\operatorname{sg}[\cdot]$ blocks the cue-selection branch from updating the student through its query, while leaving the selector trainable. Each action-token state provides a separate query to the full teacher feature sequence. The selected teacher information therefore depends on that state, making cue selection action-conditioned.
+
+% \subsection{Privileged-Cue Distillation}
+
+% Privileged-cue distillation instead uses the selected cue as a compact target for the weak-view student. At each layer $\ell\in\mathcal{S}$, a layer-specific cue predictor $f_{\ell}$ estimates this target from the student hidden state:
+% \begin{equation*}
+% \hat{\mathbf{c}}_{\ell,i}
+% =
+% f_{\ell}(\mathbf{h}_{\ell,i}^{s}).
+% \end{equation*}
+% The prediction term averages cosine distance over the selected action-expert layers $\mathcal{S}$ and the $H$ action tokens in the chunk:
+% \begin{equation*}
+% \mathcal{L}_{\mathrm{pred}}
+% =
+% \mathbb{E}\!\left[
+% \frac{1}{|\mathcal{S}|H}
+% \sum_{\ell\in\mathcal{S}}\sum_{i=1}^{H}
+% \left(
+% 1-\cos\!\left(
+% \hat{\mathbf{c}}_{\ell,i},
+% \mathbf{c}_{\ell,i}
+% \right)
+% \right)
+% \right].
+% \end{equation*}
+% For each training sample, $\mathcal{L}_{\mathrm{pred}}$ and $\mathcal{L}_{\mathrm{flow}}$ are computed from the same noisy action $\mathbf{a}^{\tau}$, constructed using the same sampled flow time $\tau$ and noise $\boldsymbol{\epsilon}$.
+
+% Because the selector and predictor are optimized jointly, cosine matching alone may lead to a collapsed solution. We therefore apply a minibatch variance regularizer $\mathcal{L}_{\mathrm{var}}$ to the normalized selected cues, encouraging them to retain variation across samples and action tokens. Its weight is controlled by $\lambda_{\mathrm{var}}$. The complete privileged-cue objective is
+% \begin{equation}
+% \mathcal{L}_{\mathrm{cue}}
+% =
+% \mathcal{L}_{\mathrm{pred}}
+% +
+% \lambda_{\mathrm{var}}\mathcal{L}_{\mathrm{var}}.
+% \label{eq:cue_loss}
+% \end{equation}
+% Equation~\eqref{eq:cue_loss} therefore supervises the student with compact, action-conditioned teacher targets rather than the teacher's complete representation.
+\subsection{Privileged-Cue Distillation}
+
+Directly matching complete teacher and student representations can provide poorly aligned supervision across camera views. Privileged-cue distillation instead trains the student to predict the compact cues selected in the previous subsection. At each layer $\ell\in\mathcal{S}$, a layer-specific predictor $f_{\ell}$ maps the student action-token state to a predicted cue:
+\begin{equation*}
+\hat{\mathbf{c}}_{\ell,i}
+=
+f_{\ell}(\mathbf{h}_{\ell,i}^{s}).
+\end{equation*}
+
+For a minibatch of size $B$, the prediction loss averages the cosine distance over the selected layers and the $H$ action tokens:
+\begin{equation}
+\mathcal{L}_{\mathrm{pred}}
+=
+\frac{1}{B|\mathcal{S}|H}
+\sum_{b=1}^{B}
+\sum_{\ell\in\mathcal{S}}
+\sum_{i=1}^{H}
+\left[
+1-
+\cos\!\left(
+\hat{\mathbf{c}}_{b,\ell,i},
+\mathbf{c}_{b,\ell,i}
+\right)
+\right].
+\label{eq:cue_prediction}
+\end{equation}
+Here, $\cos(\cdot,\cdot)$ denotes cosine similarity. For each training sample, the cue and flow losses use the same noisy action $\mathbf{a}^{\tau}$, flow time $\tau$, and noise $\boldsymbol{\epsilon}$.
+
+Because the selector and predictor are optimized jointly, cosine matching alone does not prevent cue collapse. We therefore regularize the variation of the selected cues within each minibatch. Each cue is first normalized as
+\begin{equation*}
+\widetilde{\mathbf{c}}_{b,\ell,i}
+=
+\sqrt{D_c}\,
+\frac{\mathbf{c}_{b,\ell,i}}
+{\max\!\left(
+\|\mathbf{c}_{b,\ell,i}\|_2,
+\varepsilon_n
+\right)},
+\end{equation*}
+where $\varepsilon_n=10^{-6}$. For cue coordinate $j$ at layer $\ell$, we compute
+\begin{equation*}
+\sigma_{\ell,j}
+=
+\sqrt{
+\operatorname{Var}_{b,i}
+\!\left[
+\widetilde{c}_{b,\ell,i,j}
+\right]
++
+\varepsilon_v
+},
+\end{equation*}
+where the population variance is computed over all $BH$ normalized cues at that layer and $\varepsilon_v=10^{-4}$. The variance regularizer penalizes coordinates whose standard deviation falls below one:
+\begin{equation}
+\mathcal{L}_{\mathrm{var}}
+=
+\frac{1}{|\mathcal{S}|D_c}
+\sum_{\ell\in\mathcal{S}}
+\sum_{j=1}^{D_c}
+\left[
+1-\sigma_{\ell,j}
+\right]_{+},
+\label{eq:cue_variance}
+\end{equation}
+where $[x]_{+}=\max(0,x)$. The complete privileged-cue objective is
+\begin{equation}
+\mathcal{L}_{\mathrm{cue}}
+=
+\mathcal{L}_{\mathrm{pred}}
++
+\lambda_{\mathrm{var}}
+\mathcal{L}_{\mathrm{var}}.
+\label{eq:cue_loss}
+\end{equation}
+
+The prediction term uses the selected teacher cues to supervise the student's intermediate action representations. The variance term discourages the jointly trained selector and predictor from converging to collapsed cues.
+
+\begin{figure}[!t]
+\centering
+\includegraphics[width=\linewidth]{Figures/synchronized_multiview.pdf}
+\caption{Synchronized multi-view rendering of one LIBERO demonstration. Each column shows the same trajectory timestep across all five camera views. The agent and wrist views provide the default teacher input, while the back, top, and left views define the weak-view deployment settings. At each timestep, the views share the language instruction, proprioceptive state, and target action chunk; only the camera observation differs.}
+\label{fig:multiview_examples}
+\end{figure}
+
+
+\subsection{Action Correlation Loss}
+
+At the representation level, privileged-cue distillation supervises the student's intermediate action-token states. At the action level, ACL aligns the teacher's and student's flow-velocity predictions through correlation rather than direct value matching.
+
+Let $\mathbf{v}^{s}$ and $\mathbf{v}^{t}$ denote the student and teacher flow-velocity predictions computed from the same interpolated action $\mathbf{a}^{\tau}$ and flow time $\tau$, conditioned on $o^s$ and $o^t$, respectively. We flatten the action horizon and action dimensions as $\mathbf{x}^{s}=\operatorname{vec}(\mathbf{v}^{s})$ and $\mathbf{x}^{t}=\operatorname{vec}(\mathbf{v}^{t})$. The resulting loss is
+\begin{equation}
+\mathcal{L}_{\text{ACL}}
+=
+\mathbb{E}\!\left[
+1-
+\rho\!\left(
+\mathbf{x}^{s},
+\operatorname{sg}[\mathbf{x}^{t}]
+\right)
+\right].
+\label{eq:acl}
+\end{equation}
+In Equation~\eqref{eq:acl}, $\rho$ denotes Pearson correlation. The operator $\operatorname{sg}[\cdot]$ stops gradients through the teacher prediction.
+
+Pearson correlation compares centered and normalized vectors, making ACL invariant to a global offset and positive rescaling of the flattened velocity chunk. Minimizing ACL therefore encourages the teacher and student predictions to exhibit a similar centered pattern across their velocity entries. The flow loss continues to anchor the velocity values to the ground-truth target $\mathbf{u}$, while ACL provides complementary guidance on their relative variation.
+
+\subsection{Training Objective and Deployment}
+
+The complete ACPD objective combines the base flow loss with the two auxiliary training objectives:
+\begin{equation}
+\mathcal{L}
+=
+\mathcal{L}_{\text{flow}}
++
+\lambda_{\text{cue}}\mathcal{L}_{\text{cue}}
++
+\lambda_{\text{ACL}}\mathcal{L}_{\text{ACL}}.
+\label{eq:total}
+\end{equation}
+The teacher remains frozen, while the student, cue selector, and cue predictor are optimized jointly.
+
+After training, the teacher, cue selector, and cue predictor are discarded. The remaining student receives only $o^s$ and retains the original flow-matching VLA architecture. ACPD therefore adds neither privileged inputs nor auxiliary inference modules at deployment.
+
+
+\section{Experiments}
+
+We evaluate ACPD on LIBERO using synchronized multi-view data obtained by re-rendering each demonstration from multiple camera viewpoints. The main evaluation measures weak-view performance across three deployment views on LIBERO-Spatial and LIBERO-Long (Table~\ref{tab:main_results}). We then conduct back-view ablations on these two suites together with LIBERO-Object and LIBERO-Goal to assess the contributions of privileged-cue distillation, ACL, and the teacher's wrist-view input (Table~\ref{tab:controlled_ablations}).
+
+\begin{table}[htbp]
+\centering
+\caption{Task success rates (\%) for single-view fine-tuning (SFT) and ACPD on LIBERO-Spatial and LIBERO-Long. Each SFT--ACPD pair uses the same deployment camera and student training protocol; ACPD additionally receives training-only supervision from a frozen teacher observing the agent and wrist views (A+W). \textit{Avg.} is the mean of Spatial and Long, while \textit{Overall} averages the corresponding metric across the three deployment views. $\Delta_{\mathrm{FT}}$ is the ACPD--SFT difference in \textit{Avg.}, measured in percentage points. Bold indicates the higher result within each pair.}\label{tab:main_results}
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+Deployment view & Method & Spatial & Long & Avg. & $\Delta_{\mathrm{FT}}$ (pp) \\
+\midrule
+Back view & SFT & 68.8 & 31.0 & 49.9 & -- \\
+& ACPD & \textbf{71.8} & \textbf{32.0} & \textbf{51.9} & +2.0 \\
+\midrule
+Top view & SFT & 83.8 & 46.0 & 64.9 & -- \\
+& ACPD & \textbf{86.0} & \textbf{46.2} & \textbf{66.1} & +1.2 \\
+\midrule
+Left view & SFT & 49.4 & \textbf{56.8} & 53.1 & -- \\
+& ACPD & \textbf{53.2} & 55.0 & \textbf{54.1} & +1.0 \\
+\midrule
+Overall & SFT & 67.3 & \textbf{44.6} & 56.0 & -- \\
+& ACPD & \textbf{70.3} & 44.4 & \textbf{57.4} & +1.4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\caption{Component ablations for a back-view student, measured by task success rates (\%) across all four LIBERO suites. All variants share the reduced student training protocol of 15K updates and a batch size of 128. A and W denote the agent and wrist inputs to the frozen teacher, respectively, while \textit{Cue} and ACL denote privileged-cue distillation and the action correlation loss. $\Delta_{\mathrm{FT}}$ is the difference from Single-view FT in \textit{Avg.}, measured in percentage points.}\label{tab:controlled_ablations}
+\begin{tabular}{@{}
+>{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.220}}
+>{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.130}}
+>{\centering\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.060}}
+>{\centering\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.070}}
+>{\centering\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.090}}
+>{\centering\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.085}}
+>{\centering\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.080}}
+>{\centering\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.080}}
+>{\centering\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.080}}
+>{\centering\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.105}}
+@{}}
+\toprule
+Variant & Teacher input & Cue & ACL & Spatial & Object & Goal & Long & Avg. & $\Delta_{\mathrm{FT}}$ \\
+\midrule
+Single-view FT & -- & -- & --
+& 39.8 & 38.6 & 46.0 & 18.6 & 35.8 & -- \\
+Privileged cue only & A & \checkmark & --
+& 48.0 & 39.8 & 57.8 & 20.2 & 41.5 & +5.7 \\
+ACPD & A & \checkmark & \checkmark
+& 48.0 & 48.4 & 53.2 & 19.6 & 42.3 & +6.5 \\
+ACPD & A+W & \checkmark & \checkmark
+& 48.8 & 47.4 & 57.8 & 18.8 & 43.2 & +7.4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{Figures/leftview_visibility.pdf}
+\caption{Representative LIBERO-Long rollouts under the left-view camera. Columns show normalized rollout progress from 0 to 100\%. In the high-visibility rollout (top), the robot arm and end effector remain largely within the camera frame. In the limited-visibility rollout (bottom), most of the robot arm is outside the frame.}
+\label{fig:leftview_visibility}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.5\linewidth]{Figures/camera_view.pdf}
+\caption{Schematic camera configuration used for synchronized multi-view rendering. LIBERO provides the fixed agent camera and robot-mounted wrist camera; we add fixed back, top, and left cameras for the weak-view deployment settings.}
+\label{fig:camera_layout}
+\end{figure}
+
+
+\subsection{Synchronized Multi-View Data Construction}
+
+LIBERO is a language-conditioned robot manipulation benchmark with human-teleoperated demonstrations~\cite{liu2023libero}. We use four suites: LIBERO-Spatial varies the spatial relation identifying the target bowl; LIBERO-Object varies the manipulated object; LIBERO-Goal changes the task goal while keeping the scene fixed; and LIBERO-Long contains 10 long-horizon tasks with diverse interactions and motor skills.
+
+We construct synchronized multi-view data by re-rendering all demonstrations from five cameras. As shown in Figure~\ref{fig:camera_layout}, the setup includes
+LIBERO's fixed third-person \textit{agent view}, robot-mounted \textit{wrist view}, and three additional fixed views: back, top, and left. Each timestep is rendered from all five views, producing synchronized frames as illustrated in Figure~\ref{fig:multiview_examples}. Frames across views share the same language instruction, proprioceptive state, and target action chunk.
+
+
+\subsection{Experimental Setup}
+
+\paragraph{Cross-view comparisons.}
+We evaluate ACPD under three weak-view deployment settings, where the student observes only the back, top, or left camera. For each setting, Single-view FT serves as the matched baseline: it is initialized from the pretrained $\pi_{0.5}$ checkpoint~\cite{black2025pi05} and optimized using only the standard flow-matching objective. To ensure a controlled comparison, the ACPD student uses the same initialization, weak-view observations, demonstrations, and number of training updates as its Single-view FT counterpart. The only difference is the additional supervision provided during training by a separately fine-tuned and frozen $\pi_{0.5}$ teacher, which observes synchronized agent and wrist views (A+W). Accordingly, the ACPD student is trained with the flow-matching objective together with privileged-cue distillation and ACL. We additionally consider an agent-view-only teacher (A) in the ablations to measure the contribution of the wrist view. At deployment, the teacher and all auxiliary modules are discarded, and the student operates solely on its designated weak view.
+
+
+\paragraph{Training and evaluation.}
+We fine-tune two teachers with A and A+W camera inputs from the pretrained $\pi_{0.5}$ checkpoint for 30K updates with a batch size of 256. In the main comparison, Single-view FT and ACPD students are trained for 30K updates with a batch size of 256. To reduce computational cost, all back-view students in the ablation study are trained for 15K updates with a batch size of 128. Within each experimental setting, all student variants share the same demonstrations, training budget, AdamW optimizer, and learning-rate schedule. The learning rate is linearly warmed up to $5\times10^{-5}$ over the first 10K updates and then decayed using a cosine schedule. All experiments are conducted on a server equipped with $8\times$ NVIDIA H20 GPUs.
+
+For all policies, we follow the standard $\pi_{0.5}$ flow-time sampling scheme. The action horizon is $H=10$, and the policy replans after executing five actions. For ACPD, we set the cue dimension to $D_c=1024$ and select action-expert layers $\mathcal{S}=\{6,12\}$. The loss weights are $\lambda_{\text{cue}}=0.2$, $\lambda_{\text{var}}=0.1$, and $\lambda_{\text{ACL}}=0.5$.
+
+We evaluate each task over 50 rollouts using the same environment seeds and task-initialization sequence for all compared policies. For each LIBERO suite, we average success rates across its tasks. \textit{Avg.} is the unweighted mean across the suites included in each table.
+
+
+\subsection{Overall Weak-View Performance}
+
+The frozen A+W teacher achieves success rates of 98.0\% on LIBERO-Spatial and 95.8\% on LIBERO-Long, establishing a strong privileged reference for distillation. Because this teacher requires both views at deployment, it is not directly comparable with the weak-view policies. Table~\ref{tab:main_results} compares ACPD with Single-view FT under the back, top, and left view deployment settings. For each setting, \textit{Avg.} denotes the mean success rate over Spatial and Long.
+
+ACPD improves the two-suite average under all three deployment views. The gains are 2.0 percentage points for the back view, 1.2 points for the top view, and 1.0 point for the left view. Averaged across the three views, ACPD increases success from 56.0\% to 57.4\%. The positive gains across different baseline performance levels indicate that the improvement is not confined to a single camera configuration.
+
+The overall improvement is primarily driven by LIBERO-Spatial. ACPD improves success under every deployment view, increasing the mean Spatial score from 67.3\% to 70.3\%. This suite requires the policy to identify target objects from language-specified spatial relations, making its action predictions sensitive to object visibility and relative position. The consistent gains are therefore aligned with the intended role of privileged cues in supplementing spatial evidence that is incomplete or ambiguous in the weak view.
+
+ACPD provides modest improvements on LIBERO-Long under two of the three deployment views. It increases success by 1.0 percentage point on the back view and 0.2 points on the top view, while the left-view score decreases by 1.8 points. Consequently, the mean Long score remains nearly unchanged, moving from 44.6\% to 44.4\%. Manual inspection of the 500 Long rollouts found that the robot arm and end effector were largely visible in 250 rollouts but mostly outside the frame in the remaining 250, even when the manipulated objects remained visible (Figure~\ref{fig:leftview_visibility}). This observation suggests that the left-view decline may be associated with limited robot-state evidence rather than a consistent degradation across long-horizon settings. Overall, ACPD improves Long performance under the back and top views, although its gains are less consistent than those observed on LIBERO-Spatial.
+
+
+\subsection{Ablations}
+
+Table~\ref{tab:controlled_ablations} isolates the contributions of privileged-cue distillation, ACL, and the teacher's wrist-view input using matched back-view students. Privileged-cue distillation raises average success from 35.8\% to 41.5\%, providing the largest individual gain. Adding ACL with the same agent-view teacher increases the average to 42.3\%, while including the wrist view raises it further to 43.2\%. Full ACPD therefore improves over Single-view FT by 7.4 percentage points, or 20.7\% relative. These results identify privileged-cue distillation as the primary contributor. ACL and the teacher's wrist-view input provide complementary gains.
+
+\section{Conclusion}
+We have introduced ACPD for training weak-view VLA policies with privileged camera observations. ACPD combines compact, action-conditioned teacher cues with action-level correlation while preserving the original student policy at deployment. Experiments across three deployment views show improved weak-view performance, and four-suite ablations show positive contributions from all evaluated components. These results demonstrate the value of action-conditioned cross-view supervision without requiring additional deployment inputs.
+
+% TODO: The AAAI source provides none of the following journal declarations.
+% Original template blocks are kept as comments; no factual declarations have been invented.
+% \section*{Data availability statement}
+% ELSP journals promote transparency, reproducibility, and replicability in research. Authors are required to include a Data Availability Statement (DAS) in all research articles, specifying where the data supporting the findings can be accessed, including repository names, DOIs or URLs, and any access conditions. If no new data were generated or analyzed, or if the data cannot be shared due to privacy, ethical, or commercial restrictions, an explanatory statement is still required. Authors are encouraged to deposit data in trusted repositories and provide persistent identifiers and metadata to enable reproducibility, please visit here on how to deposit “Research data”: \url{{https://www.elspub.com/about/editorial_policies.}}
+% 
+% \vspace{+12pt}
+% \noindent\textbf{{Example statements:}}
+% \vspace{+12pt}
+% \begin{itemize}
+% \item The data or datasets generated or analyzed in this study are available in [repository name] at [DOI or URL].
+% \item If the article includes a supplementary file, please indicate that a supplementary file is provided with this article, and add a brief and clear descriptive note for the supplementary file.
+% \item No supplementary or additional data were generated in this study. 
+% \end{itemize}
+% 
+% \section*{Declaration of generative AI and AI-assisted technologies}
+% Authors must disclose any use of generative AI or AI-assisted tools (such as large language models) in the preparation of this manuscript. Such tools may be used only for language and copy editing purposes and must not be used to generate or develop the manuscript’s scientific content. Authors remain fully responsible for the integrity, originality, and accuracy of the content.
+% 
+% \vspace{+12pt}
+% \noindent\textbf{{Example statements:}}
+% \vspace{+12pt}
+% \begin{itemize}
+% \item The authors did not use generative AI or AI-assisted technologies in the writing of this manuscript.
+% \item During the preparation of this manuscript, the authors used generative AI tools only to improve language and readability. Specifically, the authors used ChatGPT, Grammarly, \textit{etc.} for language polishing only/for drafting/for rewriting/for idea development in limited sections/substantial portions/entire manuscript. The authors take full responsibility for the content of the manuscript. 
+% \end{itemize}
+% 
+% \section*{Acknowledgments}
+%  
+% Funding: All sources of financial support for the project \textbf{must}
+% be disclosed in the acknowledgements section. The name of the funding
+% agency and the grant number should be given, for example: This work was
+% funded by the National Foundation of Science with grant number
+% XXX. Author should fill the grant number information during the
+% submission stage. Please make sure the grant number is correctly
+% written. 
+% 
+% \section*{Authors’ contribution}
+% 
+% Please make specific attributions of author
+% contribution and responsibility in this part and follow
+% \href{https://casrai.org/credit/}{CRediT} to define the roles of
+% co-authors. The following statements should be used “Conceptualization, X.X. and Y.Y.; methodology, X.X.; software, X.X.; validation, X.X., Y.Y. and Z.Z.; formal analysis, X.X.; investigation, X.X.; resources, X.X.; data curation, X.X.; writing—original draft preparation, X.X.; writing—review and editing, X.X.; visualization, X.X.; supervision, X.X.; project administration, X.X.; funding acquisition, Y.Y. All authors have read and agreed to the published version of the manuscript.”.
+% 
+% \section*{Conflicts of interest}
+% 
+% Authors are required to disclose any potential
+% conflict(s) of interest like employment, consulting fees, research
+% contracts, stock ownership, patent licenses, honoraria, advisory
+% affiliations \textit{etc.}
+% 
+% \vspace{+12pt}
+% \noindent\textbf{{Example statements:}}
+% \vspace{+12pt}
+% \begin{itemize}
+% \item The author(s) declare(s) no conflicts of interest.
+% \item Author A holds the position of XX for Journal Name and has not peer reviewed or made any editorial decisions for this paper. The author(s) declare(s) no other conflicts of interest.
+% \item Author A and Author B are employees of [Company Name]. The authors declare that this affiliation does not influence the design, analysis, interpretation, or presentation of the results reported in this manuscript. The author(s) declare(s) no other conflicts of interest.
+% \end{itemize}
+% 
+% \section*{Ethical statement}
+% 
+% For research involving human experiments, please add “The study was performed in accordance with the Declaration of Helsinki and approved by the name of the Ethics Committee or Institutional Review Board (approval date, and approval number must be included)”.
+% 
+% For research involving animal experiments, please add “The study was approved by the name of the Ethics Committee or Institutional Review Board (approval date, and approval number must be included)”.
+% 
+% If ethical approval is not required, authors must provide an exemption from the Ethics Committee or Institutional Review Board, or a detailed statement because approval is not required.
+% 
+
+\bibliography{ref}
+
+\end{document}
