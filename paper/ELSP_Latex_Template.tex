@@ -225,10 +225,10 @@ We evaluate ACPD with $\pi_{0.5}$ across four LIBERO suites and four single-view
 
 Our contributions are:
 \begin{itemize}
-    \item We introduce action-conditioned privileged cues as compact targets for cross-view distillation. A student-conditioned selector extracts a separate teacher cue for each action token without directly aligning the full teacher and student representations.
-    \item We propose an action correlation loss that aligns the relative variation of teacher and student flow-velocity predictions. 
+    \item We introduce ACPD, a cross-view distillation framework that trains a weak-view student to predict and use action-conditioned visual cues extracted from a privileged-view teacher's attention outputs.
+    \item We propose an action correlation loss that uses Pearson correlation to align the relative variation of teacher and student flow-velocity predictions, complementing ground-truth flow-matching supervision.
     %We propose ACPD, which combines privileged-cue prediction with an action correlation loss (ACL) that aligns the relative variation of teacher and student flow-velocity predictions. The teacher and auxiliary modules are removed after training, adding no deployment cost.
-    \item Extensive experiments on synchronized multi-view LIBERO demonstrations validate ACPD across diverse weak-view settings, while controlled ablations confirm the effectiveness of privileged-cue distillation and ACL.
+    \item Experiments across four LIBERO suites demonstrate gains over single-view fine-tuning in all four deployment views. In the back-view setting, ACPD also outperforms a multi-view-to-single-view distillation baseline.
     %We construct synchronized multi-view data for four LIBERO suites and evaluate ACPD across three weak-view deployment settings with matched student training schedules. A separate four-suite ablation shows a 20.7\% relative improvement over single-view fine-tuning, with privileged-cue distillation accounting for most of the observed gain.
 \end{itemize}
 
