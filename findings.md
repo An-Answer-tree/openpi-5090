@@ -220,6 +220,13 @@ H17-Decay只改变该权重；它不能同时证明不可恢复信息、LoRA容�
 
 ## 工程约束
 
+- 2026-10-24按用户确认，将精选归档`/opt/liutong/openpi_checkpoints/fixed_dataset/curated`
+  转为不含显式训练步数的推理版：14个模型仅含`params/`和`assets/`，13组成功率不变。
+  原完整归档在`/data0/liutong/ACPD_archive`保持不变；原训练checkpoint未修改。
+  仓库内部清单保留真实步数和完整备份映射。199个权重及归一化文件inode一致，
+  14个模型通过CPU动作输出层恢复；当前推理归档无优化器状态，不能直接断点续训。
+  记录：`experiments/checkpoint-inference-export-2026-10-24.md`。
+
 - 2026-10-14删除未被活动任务映射的`/home` Hugging Face Arrow缓存约122 GiB；
   conda openpi/openpi-libero之后激活默认使用`/opt/liutong/huggingface/datasets`。
   三项topview验证因`/dev/shm`临时父目录消失而启动失败，未见OOM证据；

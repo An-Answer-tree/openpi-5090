@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-19（按最终图片成功率归档模型与验证证据；MV-SV-KD 30K为52.40%）
+更新时间：2026-10-24（精选归档转为推理版；实验数值与真实训练记录不变）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -237,7 +237,9 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 ## 精选 Checkpoint
 
 根目录：[/opt/liutong/openpi_checkpoints/fixed_dataset/curated](/opt/liutong/openpi_checkpoints/fixed_dataset/curated)。
-2026-10-19按用户最终图片的四套成功率匹配，保留真实checkpoint编号；不沿用图片step。
+2026-10-19按用户最终图片的四套成功率匹配，不沿用图片step。
+2026-10-24按用户要求转为无显式步数的推理归档，仅保留权重和归一化参数。
+下表的真实训练信息保留在本台账；当前推理路径见[检索表](experiments/checkpoint-index.md)。
 
 | 分类 | 模型 | 当前选择 | 平均成功率 |
 |---|---|---|---|
@@ -256,12 +258,14 @@ H9-Fixed 的快速验证在运行前升级为正式2,000回合，因此没有400
 | ablation | ACL + DistillationLoss | `29999`（H9 30K、BS64，推理关闭注入） | 58.90%；不是从头训练的H13 |
 | ablation | ACL+DistillationLoss+Injection | `34999`（H9 35K、BS64） | 61.05% |
 
-当前选择14个checkpoint入口均已归档；按用户要求清理了4个非当前选择的历史硬链接入口，汇总目录仅保留这14个checkpoint入口。
-本次补齐3个checkpoint及13组验证文件入口（12组独立来源），均使用硬链接；
-未移动或删除原文件，视频保留原路径索引。真实步数、推理配置及完整四套结果见
+当前14个推理模型、13组验证结果入口（12组独立来源）已归档，数值不变。
+完整版本保留在`/data0/liutong/ACPD_archive`，含原编号、训练状态和原始验证日志；
+当前归档仅含`params/`、`assets/`、加载配置及重新生成的成功率汇总，不能直接续训。
+原训练checkpoint及视频路径不变。真实步数、推理配置及完整四套结果见
 [Checkpoint检索表](experiments/checkpoint-index.md)及[清单](experiments/curated-checkpoints.yaml)。
 分类不代表BS/步数匹配的受控消融；58.90%需要关闭推理注入，61.05%开启注入。
-历史入口的原训练checkpoint均保留，可恢复入口；[清理记录](experiments/checkpoint-archive-cleanup-2026-10-19.md)。
+199个权重/归一化文件inode一致，14个模型通过CPU动作输出层恢复；
+[转换记录](experiments/checkpoint-inference-export-2026-10-24.md)记录备份核对和移除范围。
 
 ## 证据路径
 

@@ -2628,7 +2628,20 @@ workspace:
   checkpoint_manifest: "experiments/curated-checkpoints.yaml"
   checkpoint_root: "/opt/liutong/openpi_checkpoints/fixed_dataset/curated"
   checkpoint_inventory:
-    checked_date: "2026-10-19"
+    checked_date: "2026-10-24"
+    format: openpi_inference
+    explicit_training_step_metadata: false
+    optimizer_state_preserved: false
+    full_backup_root: /data0/liutong/ACPD_archive
+    full_backup_completed_at: "2026-10-19 20:14:56 CST"
+    full_backup_rsync_exit_code: 0
+    full_backup_original_archive_files_size_checked: 432
+    full_backup_checkpoint_files_size_checked: 363
+    full_backup_metadata_files_content_checked: 40
+    inference_export_record: experiments/checkpoint-inference-export-2026-10-24.md
+    verified_inference_hardlink_files: 199
+    cpu_action_projection_restored_models: 14
+    original_training_steps_recorded_in: experiments/curated-checkpoints.yaml
     selection_basis: user_final_image_suite_success_rates_not_step_labels
     archived_checkpoint_directories: 14
     selected_checkpoint_directories: 14
@@ -2636,7 +2649,6 @@ workspace:
     historical_checkpoint_directories: 0
     model_directories: 14
     empty_model_directories: 0
-    new_hardlink_archives: 3
     baseline_steps: {backview: 35001, leftview: 30000, rightview: 30000, topview: 30000}
     student_steps: {backview: 35000, leftview: 32000, rightview: 32000, topview: 32000}
     ablation_classes: [mv_sv_kd, acl_only, acl_crossattn_distillation, acl_distillation_no_injection, full_acpd]
@@ -2650,13 +2662,15 @@ workspace:
     removed_archive_source_files_verified: 104
     evaluation_archive_entries: 13
     distinct_evaluation_sources: 12
-    evaluation_hardlink_files: 65
-    evaluation_payload: [summary.txt, logs/spatial.log, logs/object.log, logs/goal.log, logs/libero_10.log]
+    evaluation_generated_files: 26
+    evaluation_payload: [summary.json, summary.txt]
+    original_evaluation_logs: full_backup_and_original_evaluation_directories
     videos: original_paths_indexed_not_scanned_or_archived
     teacher_has_optimizer_state: false
     source_directories_preserved: true
-    verification: all_suite_counts_checked_new_checkpoints_all_file_inodes_checked_existing_checkpoint_metadata_and_weight_shard_inodes_sampled
+    verification: all_inference_file_inodes_sizes_and_suite_counts_checked_all_models_cpu_action_projection_restore_passed
     checkpoint_weight_data_copied: false
-    checkpoint_files_moved: false
+    original_checkpoint_files_moved: false
     original_checkpoint_files_deleted: false
-    selected_checkpoint_files_deleted: false
+    selected_checkpoint_training_states_removed_from_curated: true
+    selected_checkpoint_training_states_preserved_in_full_backup: true
