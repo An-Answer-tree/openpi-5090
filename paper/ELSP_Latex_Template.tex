@@ -292,9 +292,17 @@ The parameters $\theta$ and $\theta_{\mathrm{T}}$ denote the trainable student a
 \subsection{Action-Conditioned Visual Cue Extraction}
 \label{sec:cue_extraction}
 
-ACPD extracts visual cues from a frozen multi-view teacher and uses them as prediction targets for the single-view student. At the selected layer of the teacher's flow-matching action expert, the action block $\mathbf{a}^{\tau}$ is represented by $H$ hidden states, one for each future control step. We refer to these states as action tokens. Their queries determine how the teacher aggregates visual information for each action position. For every privileged view $r$, ACPD constructs one cue for each action token.
+ACPD extracts action-conditioned visual cues from a frozen multi-view
+teacher as prediction targets for a single-view student. At a selected
+layer of the teacher's flow-matching action expert, the noisy action
+block $\mathbf{a}^{\tau}$ is represented by $H$ action tokens, one per
+future control step. Their queries guide the extraction of a separate
+cue for each action position and privileged view.
 
-For attention head $m$, let $\mathbf{Q}^{(m)}$ contain the queries from the action tokens, and let $\mathbf{K}^{(m)}$ and $\mathbf{V}^{(m)}$ contain the keys and values of the teacher's token sequence. The teacher computes
+For attention head $m$, let $\mathbf{Q}^{(m)}$ denote the action-token
+queries, and let $\mathbf{K}^{(m)}$ and $\mathbf{V}^{(m)}$ denote the
+keys and values of the teacher's token sequence. The attention weights
+are
 \begin{equation}
 \mathbf{A}^{(m)}
 =
@@ -303,17 +311,28 @@ For attention head $m$, let $\mathbf{Q}^{(m)}$ contain the queries from the acti
 +\mathbf{B}
 \right),
 \end{equation}
-where $d_h$ is the head dimension and $\mathbf{B}$ is the teacher's native attention bias or mask. The softmax is applied over the key positions permitted by the teacher's attention pattern.
+where $d_h$ is the head dimension and $\mathbf{B}$ is the teacher's
+native additive attention bias, including any masking. For each action
+token, softmax normalizes the attention weights across the tokens it
+can attend to.
 
-For privileged view $r$, we select the columns of $\mathbf{A}^{(m)}$ corresponding to its image tokens and the matching rows of $\mathbf{V}^{(m)}$, denoted by $\mathbf{A}_r^{(m)}$ and $\mathbf{V}_r^{(m)}$. The view-specific aggregation is
+For privileged view $r$, let $\mathbf{A}_r^{(m)}$ and
+$\mathbf{V}_r^{(m)}$ denote the attention columns and value rows
+corresponding to its image-token positions. The contribution of
+these positions to the attention output is
 \begin{equation}
 \mathbf{Z}_r^{(m)}
 =
 \mathbf{A}_r^{(m)}\mathbf{V}_r^{(m)}.
 \end{equation}
-The selected weights are taken directly from the teacher's full attention distribution and are not renormalized within view $r$. Thus, $\mathbf{Z}_r^{(m)}$ retains both the visual content of view $r$ and the amount of attention assigned to that view for each action position.
+We retain the teacher's original attention weights without renormalizing
+them within view $r$. This preserves the attention mass assigned to
+that view for each action position. The selected values are
+contextualized representations at that view's image-token positions
+and may incorporate information from other tokens.
 
-We concatenate the outputs of the $M$ attention heads and apply the teacher's native output projection and scaling:
+We concatenate the contributions across the $M$ attention heads and
+apply the teacher's output projection and time-conditioned scaling:
 \begin{equation}
 \mathbf{C}_r
 =
@@ -324,9 +343,17 @@ We concatenate the outputs of the $M$ attention heads and apply the teacher's na
 \odot\mathbf{s}(\tau).
 \label{eq:cue}
 \end{equation}
-Here, $\mathbf{W}_O$ is the attention output projection and $\mathbf{s}(\tau)$ is the teacher's elementwise output scaling. All quantities used for cue extraction are computed by the frozen teacher.
+Here, $\mathbf{W}_O$ denotes the attention output projection and
+$\mathbf{s}(\tau)$ denotes the time-conditioned elementwise scale.
+Cue extraction uses only frozen teacher parameters.
 
-The resulting cue matrix $\mathbf{C}_r\in\mathbb{R}^{H\times D}$ contains one $D$-dimensional target for each future control step. Its attention weights are determined by the corresponding action query, while its value vectors are contextualized representations produced inside the teacher's Transformer. The cue therefore provides the student with a compact, action-aligned target in the teacher's action feature space, without requiring full hidden-state distillation or spatial correspondence between teacher and student image tokens.
+The resulting matrix $\mathbf{C}_r\in\mathbb{R}^{H\times D}$ provides
+one $D$-dimensional prediction target per future control step. Each
+target is conditioned on the corresponding action-token query and
+lies in the teacher's action feature space. These cues provide
+action-aligned supervision without requiring full hidden-state
+distillation or spatial correspondence between teacher and student
+image tokens.
 
 % \subsection{Privileged-Cue Distillation}
 
