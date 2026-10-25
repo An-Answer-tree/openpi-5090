@@ -200,36 +200,28 @@ We evaluate ACPD with $\pi_{0.5}$ using synchronized multi-view demonstrations f
 \end{figure}
 
 Vision-language-action (VLA) policies map language instructions and visual observations to robot actions, providing a general framework for language-conditioned manipulation. 
-%We focus on VLA policies with diffusion or flow-matching action generators, which model continuous action trajectories for robot control~\cite{chi2025diffusionpolicy,wen2025diffusionvla,black2025pi0}. 
 Recent VLA policies increasingly employ diffusion or flow-matching action generators to model continuous action trajectories for robot control~\cite{chi2025diffusionpolicy,wen2025diffusionvla,black2025pi0}.
 However, their performance is constrained by the visual evidence available from the camera view at deployment. 
 When object pose, spatial relations, or gripper-object contact are occluded or only weakly visible, a policy relying on that view can perform substantially worse than one with access to a more informative view (Figure~\ref{fig:motivation}). 
 In practical systems, workspace geometry and robot hardware can constrain camera placement, leaving the policy with a less informative deployment view. 
 This practical constraint motivates weak-view policy learning, where a policy is deployed with a limited camera view but can receive training-time supervision from a more informative view.
-%To address this gap, we study weak-view policy learning, where a policy is deployed with a limited camera view but can receive training-time supervision from a more informative view.
 
 Prior work has addressed viewpoint sensitivity by showing the policy more camera views during training or by preserving task-relevant scene structure across viewpoints. View-diversity methods train on synchronized multi-camera demonstrations or synthesized novel views~\cite{ablett2021multiview,tian2025vista}. Auxiliary views also support visual representation learning~\cite{seo2023multiview}, while geometry-aware methods encode scenes using explicit 3D representations~\cite{shridhar2023peract,goyal2023rvt}. These strategies improve robustness to camera changes, but they do not explicitly identify which visual evidence matters to each action prediction under weak-view deployment.
 
 Privileged distillation offers a more targeted alternative by supervising the weak-view policy with a teacher that observes a more informative view during training. Prior work transfers knowledge from a multi-camera teacher to a single-camera policy by matching teacher actions and visual features~\cite{acar2024multicamera}. In the cross-view setting, however, this supervision faces a correspondence problem. Relevant evidence may be occluded in the weak view, while shared scene elements can appear at different image locations and token positions. Consequently, matching complete representations from informative and weak views can impose poorly aligned targets on the weak-view policy. Effective cross-view supervision must identify teacher information useful for action prediction despite this misalignment. It must also adapt across the action horizon because different future actions may depend on different visual evidence.
 
 To address these challenges, we propose \textbf{Action-Conditioned Privileged Distillation (ACPD)}, a cross-view distillation framework that transfers action-conditioned visual cues from a privileged-view teacher to a weak-view student.
-%ACPD further complements this representation-level supervision with an action-level correlation objective that aligns the prediction patterns of the teacher and student.
-%We propose \textbf{Action-Conditioned Privileged Distillation (ACPD)}, which selects compact, action-conditioned cues from the informative view and complements this representation-level supervision with action-level guidance that encourages consistent teacher and student predictions.
-%Specifically, 
 ACPD trains the student alongside a frozen teacher using synchronized observations with the same instruction, robot state, and action target. The teacher receives informative camera views, while the student receives a single weak view. For each action token, ACPD extracts a compact visual cue from the teacher's attention output. These cues provide supervision for corresponding student action tokens without requiring visual-token alignment across camera views. The student learns to predict the cues from its own action representations and incorporates them into action generation.
 At the action level, ACPD introduces an \textit{action correlation loss} (ACL) that uses Pearson correlation to align the relative variation of teacher and student flow-velocity predictions. The ground-truth flow-matching objective supervises the student's absolute velocity values. Together, privileged-cue prediction and ACL provide supervision at the representation and action levels. At deployment, the student predicts and uses these cues from a single camera view, independently of the teacher.
 
 We evaluate ACPD with $\pi_{0.5}$ across four LIBERO suites and four single-view deployment settings. ACPD improves mean success over single-view fine-tuning in all four views, with gains of 2.90--4.00 percentage points and an overall increase from 71.09\% to 74.78\%. In the back-view setting, ACPD achieves 61.05\% success, exceeding the evaluated multi-view-to-single-view distillation baseline by 8.65 percentage points.
-%We evaluate ACPD on four LIBERO suites using synchronized multi-view demonstrations. The main comparison evaluates ACPD on LIBERO-Spatial and LIBERO-Long with the back, top, and left cameras as deployment views. Averaged across the three views and two suites, ACPD raises success from 56.0\% to 57.4\%. A separate reduced-budget back-view ablation covers all four suites, adding LIBERO-Object and LIBERO-Goal to assess the method components across a broader range of tasks. Full ACPD improves average success over single-view fine-tuning by 7.4 percentage points, equivalent to a 20.7\% relative gain. Within this sequential ablation, privileged-cue distillation contributes 5.7 percentage points, while ACL and wrist-view teacher input add a further 0.8 and 0.9 points, respectively.
 
 
 Our contributions are:
 \begin{itemize}
     \item We introduce ACPD, a cross-view distillation framework that trains a weak-view student to predict and use action-conditioned visual cues extracted from a privileged-view teacher's attention outputs.
     \item We propose an action correlation loss that uses Pearson correlation to align the relative variation of teacher and student flow-velocity predictions, complementing ground-truth flow-matching supervision.
-    %We propose ACPD, which combines privileged-cue prediction with an action correlation loss (ACL) that aligns the relative variation of teacher and student flow-velocity predictions. The teacher and auxiliary modules are removed after training, adding no deployment cost.
     \item Experiments across four LIBERO suites demonstrate gains over single-view fine-tuning in all four deployment views. In the back-view setting, ACPD also outperforms a multi-view-to-single-view distillation baseline.
-    %We construct synchronized multi-view data for four LIBERO suites and evaluate ACPD across three weak-view deployment settings with matched student training schedules. A separate four-suite ablation shows a 20.7\% relative improvement over single-view fine-tuning, with privileged-cue distillation accounting for most of the observed gain.
 \end{itemize}
 
 \section{Related Work}
@@ -355,41 +347,6 @@ action-aligned supervision without requiring full hidden-state
 distillation or spatial correspondence between teacher and student
 image tokens.
 
-% \subsection{Privileged-Cue Distillation}
-
-% Privileged-cue distillation instead uses the selected cue as a compact target for the weak-view student. At each layer $\ell\in\mathcal{S}$, a layer-specific cue predictor $f_{\ell}$ estimates this target from the student hidden state:
-% \begin{equation*}
-% \hat{\mathbf{c}}_{\ell,i}
-% =
-% f_{\ell}(\mathbf{h}_{\ell,i}^{s}).
-% \end{equation*}
-% The prediction term averages cosine distance over the selected action-expert layers $\mathcal{S}$ and the $H$ action tokens in the chunk:
-% \begin{equation*}
-% \mathcal{L}_{\mathrm{pred}}
-% =
-% \mathbb{E}\!\left[
-% \frac{1}{|\mathcal{S}|H}
-% \sum_{\ell\in\mathcal{S}}\sum_{i=1}^{H}
-% \left(
-% 1-\cos\!\left(
-% \hat{\mathbf{c}}_{\ell,i},
-% \mathbf{c}_{\ell,i}
-% \right)
-% \right)
-% \right].
-% \end{equation*}
-% For each training sample, $\mathcal{L}_{\mathrm{pred}}$ and $\mathcal{L}_{\mathrm{flow}}$ are computed from the same noisy action $\mathbf{a}^{\tau}$, constructed using the same sampled flow time $\tau$ and noise $\boldsymbol{\epsilon}$.
-
-% Because the selector and predictor are optimized jointly, cosine matching alone may lead to a collapsed solution. We therefore apply a minibatch variance regularizer $\mathcal{L}_{\mathrm{var}}$ to the normalized selected cues, encouraging them to retain variation across samples and action tokens. Its weight is controlled by $\lambda_{\mathrm{var}}$. The complete privileged-cue objective is
-% \begin{equation}
-% \mathcal{L}_{\mathrm{cue}}
-% =
-% \mathcal{L}_{\mathrm{pred}}
-% +
-% \lambda_{\mathrm{var}}\mathcal{L}_{\mathrm{var}}.
-% \label{eq:cue_loss}
-% \end{equation}
-% Equation~\eqref{eq:cue_loss} therefore supervises the student with compact, action-conditioned teacher targets rather than the teacher's complete representation.
 \subsection{Privileged-Cue Distillation}
 \label{sec:cue_fusion}
 
