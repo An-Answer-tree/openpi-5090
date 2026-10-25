@@ -292,23 +292,42 @@ The parameters $\theta$ and $\theta_{\mathrm{T}}$ denote the trainable student a
 \subsection{Action-Conditioned Visual Cue Extraction}
 \label{sec:cue_extraction}
 
-ACPD extracts a separate visual cue for each privileged view using the teacher's attention during action prediction. At a selected layer of the teacher's action expert, we group image-token positions by camera and retain their contributions to the attention output. We omit the layer index below for clarity.
+ACPD extracts visual cues by separating the teacher's attention update according to camera view. The teacher processes the privileged observations $o^t$ together with the noisy action chunk $\mathbf{a}^{\tau}$ and flow time $\tau$. At a selected layer of its action expert, each action token queries the teacher's token representations. We use the resulting attention weights to aggregate information from each privileged view separately.
 
-For attention head $m$ and view $r$, let $\mathbf{A}_{\mathrm{T}}^{(r,m)}\in\mathbb{R}^{H\times N_r}$ contain the attention weights from the teacher's $H$ action tokens to the $N_r$ image tokens of that view. Let $\mathbf{V}_{\mathrm{T}}^{(r,m)}\in\mathbb{R}^{N_r\times d_h}$ contain the corresponding value vectors, where $d_h$ is the head dimension. Both are computed from $(\mathbf{a}^{\tau},\tau,o^t)$. The weights retain the teacher's original normalization over all key positions permitted by its attention mask; they are not renormalized within each view. The cue matrix is
+For attention head $m$, let $\mathbf{Q}^{(m)}$ contain the queries of the $H$ teacher action tokens, and let $\mathbf{K}^{(m)}$ and $\mathbf{V}^{(m)}$ contain the keys and values of the teacher's token sequence. The teacher's existing attention computes
+\begin{equation}
+\mathbf{A}^{(m)}
+=
+\operatorname{softmax}\!\left(
+\frac{\mathbf{Q}^{(m)}(\mathbf{K}^{(m)})^{\top}}{\sqrt{d_h}}
++\mathbf{B}
+\right),
+\end{equation}
+where $d_h$ is the head dimension and $\mathbf{B}$ is the attention mask, with zero at permitted positions and $-\infty$ elsewhere. The softmax operates over key positions, so each row of $\mathbf{A}^{(m)}$ gives the attention weights for one action token.
+
+Let $\mathcal{I}_r$ contain the image-token positions of privileged view $r$. We select the corresponding columns of the attention matrix and rows of the value matrix. Their product gives this view's weighted visual information for all $H$ action tokens:
+\begin{equation}
+\mathbf{Z}^{(r,m)}
+=
+\mathbf{A}^{(m)}_{:,\mathcal{I}_r}
+\mathbf{V}^{(m)}_{\mathcal{I}_r,:}.
+\end{equation}
+The attention weights retain their normalization over the full set of permitted key positions; they are not renormalized within a view. The selected values are contextualized representations at that camera's image-token positions.
+
+We concatenate the outputs of the $M$ attention heads and apply the teacher's original output projection and time-conditioned scaling to obtain the cue:
 \begin{equation}
 \mathbf{C}^{(r)}
 =
-\mathcal{P}_{\mathrm{T}}\!\left(
-\operatorname{Concat}_{m=1}^{M}\!\left[
-\mathbf{A}_{\mathrm{T}}^{(r,m)}
-\mathbf{V}_{\mathrm{T}}^{(r,m)}
+\left[
+\operatorname{Concat}_{m=1}^{M}\!\left(\mathbf{Z}^{(r,m)}\right)
+\mathbf{W}_O
 \right]
-\right).
+\odot\mathbf{s}(\tau).
 \label{eq:cue}
 \end{equation}
-Here, $M$ is the number of attention heads, and $\operatorname{Concat}$ joins their outputs along the feature dimension. The operator $\mathcal{P}_{\mathrm{T}}$ applies the teacher's existing attention output projection followed by its time-conditioned elementwise scaling, as in the teacher's attention residual update. All extraction operations reuse frozen teacher parameters.
+Here, $\mathbf{W}_O$ is the attention output projection, and $\mathbf{s}(\tau)$ is the teacher's existing elementwise scaling vector, shared across action positions. All parameters used in extraction belong to the frozen teacher.
 
-Each row of $\mathbf{C}^{(r)}\in\mathbb{R}^{H\times D}$ is a cue for one action position, where $D$ is the action-expert hidden dimension. It summarizes contextualized representations at the image-token positions of view $r$, weighted by the teacher's query for that action token. This dependence on the action query makes the cue action-conditioned. The cues provide supervision at corresponding action positions without requiring spatial alignment between teacher and student visual tokens.
+Each row of $\mathbf{C}^{(r)}\in\mathbb{R}^{H\times D}$ is the contribution of view $r$ to one action-token attention update, where $D$ is the action-expert hidden dimension. Because each action token supplies its own query, the cue depends on that token's action context. These cues supervise the student at corresponding action positions without requiring spatial alignment between teacher and student image tokens.
 
 % \subsection{Privileged-Cue Distillation}
 
