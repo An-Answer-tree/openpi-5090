@@ -475,24 +475,34 @@ to assess the contributions of ACPD's components.
 
 \begin{table}[htbp]
 \centering
-\caption{Task success rates (\%) for single-view supervised fine-tuning (Single-view SFT) and ACPD on LIBERO-Spatial and LIBERO-Long. Each baseline--ACPD pair uses the same deployment camera and student training protocol; ACPD additionally receives training-only supervision from a frozen teacher observing the agent and wrist views (A+W). \textit{Avg.} is the mean of Spatial and Long, while \textit{Overall} averages the corresponding metric across the three deployment views. $\Delta_{\mathrm{FT}}$ is the difference between ACPD and Single-view SFT in \textit{Avg.}, measured in percentage points. Bold indicates the higher result within each pair.}\label{tab:main_results}
-\begin{tabular}{@{}llrrrr@{}}
+\caption{Task success rates (\%) across four deployment views and four LIBERO suites. \textit{Avg.} averages the four suites; \textit{Overall} averages each metric across deployment views. $\Delta$ denotes the gain over Single-view SFT in \textit{Avg.}, measured in percentage points.}
+\label{tab:main_results}
+\begin{tabular*}{0.95\columnwidth}{@{\extracolsep{\fill}}llrrrrrr@{}}
 \toprule
-Deployment view & Method & Spatial & Long & Avg. & $\Delta_{\mathrm{FT}}$ (pp) \\
+View & Method & Spatial $\uparrow$ & Object $\uparrow$
+& Goal $\uparrow$ & Long $\uparrow$ & Avg. $\uparrow$ & $\Delta$ (pp) \\
 \midrule
-Back view & Single-view SFT & 68.8 & 31.0 & 49.9 & -- \\
-& ACPD & \textbf{71.8} & \textbf{32.0} & \textbf{51.9} & +2.0 \\
+Back & Single-view SFT & 65.80 & 68.40 & \textbf{64.60} & 29.80 & 57.15 & -- \\
+& ACPD & \textbf{73.20} & \textbf{73.80} & 63.60 & \textbf{33.60}
+& \textbf{61.05} & +3.90 \\
 \midrule
-Top view & Single-view SFT & 83.8 & 46.0 & 64.9 & -- \\
-& ACPD & \textbf{86.0} & \textbf{46.2} & \textbf{66.1} & +1.2 \\
+Left & Single-view SFT & 84.00 & \textbf{79.60} & 79.40 & 71.60 & 78.65 & -- \\
+& ACPD & \textbf{85.20} & 79.40 & \textbf{84.80} & \textbf{76.80}
+& \textbf{81.55} & +2.90 \\
 \midrule
-Left view & Single-view SFT & 49.4 & \textbf{56.8} & 53.1 & -- \\
-& ACPD & \textbf{53.2} & 55.0 & \textbf{54.1} & +1.0 \\
+Right & Single-view SFT & 85.00 & 84.80 & 84.00 & 54.20 & 77.00 & -- \\
+& ACPD & \textbf{90.20} & \textbf{88.60} & \textbf{85.80} & \textbf{59.40}
+& \textbf{81.00} & +4.00 \\
 \midrule
-Overall & Single-view SFT & 67.3 & \textbf{44.6} & 56.0 & -- \\
-& ACPD & \textbf{70.3} & 44.4 & \textbf{57.4} & +1.4 \\
+Top & Single-view SFT & 81.00 & 80.60 & 79.20 & 45.40 & 71.55 & -- \\
+& ACPD & \textbf{85.00} & \textbf{81.60} & \textbf{80.60} & \textbf{54.80}
+& \textbf{75.50} & +3.95 \\
+\midrule
+Overall & Single-view SFT & 78.95 & 78.35 & 76.80 & 50.25 & 71.09 & -- \\
+& ACPD & \textbf{83.40} & \textbf{80.85} & \textbf{78.70} & \textbf{56.15}
+& \textbf{74.78} & +3.69 \\
 \bottomrule
-\end{tabular}
+\end{tabular*}
 \end{table}
 
 \begin{table}[htbp]
@@ -664,15 +674,29 @@ Layer & Prediction $R^2$ $\uparrow$
 \end{table}
 
 
-\subsection{Overall Weak-View Performance}
+\subsection{Overall Performance}
 
-The frozen A+W teacher achieves success rates of 98.0\% on LIBERO-Spatial and 95.8\% on LIBERO-Long, establishing a strong privileged reference for distillation. Because this teacher requires both views at deployment, it is not directly comparable with the weak-view policies. Table~\ref{tab:main_results} compares ACPD with Single-view SFT under the back, top, and left view deployment settings. For each setting, \textit{Avg.} denotes the mean success rate over Spatial and Long.
+Table~\ref{tab:main_results} compares ACPD with Single-view SFT
+across four deployment views and four LIBERO suites.
+Averaged equally over views and suites, ACPD raises task success
+from 71.09\% to 74.78\%, a gain of 3.69 percentage points.
+The four-suite average improves for every deployment view:
+by 3.90 points for back, 2.90 for left, 4.00 for right,
+and 3.95 for top. The gains persist across camera configurations
+whose Single-view SFT success ranges from 57.15\% to 78.65\%.
 
-ACPD improves the two-suite average under all three deployment views. The gains are 2.0 percentage points for the back view, 1.2 points for the top view, and 1.0 point for the left view. Averaged across the three views, ACPD increases success from 56.0\% to 57.4\%. The positive gains across different baseline performance levels indicate that the improvement is not confined to a single camera configuration.
-
-The overall improvement is primarily driven by LIBERO-Spatial. ACPD improves success under every deployment view, increasing the mean Spatial score from 67.3\% to 70.3\%. This suite requires the policy to identify target objects from language-specified spatial relations, making its action predictions sensitive to object visibility and relative position. The consistent gains are therefore aligned with the intended role of privileged cues in supplementing spatial evidence that is incomplete or ambiguous in the weak view.
-
-ACPD provides modest improvements on LIBERO-Long under two of the three deployment views. It increases success by 1.0 percentage point on the back view and 0.2 points on the top view, while the left-view score decreases by 1.8 points. Consequently, the mean Long score remains nearly unchanged, moving from 44.6\% to 44.4\%. Manual inspection of the 500 Long rollouts found that the robot arm and end effector were largely visible in 250 rollouts but mostly outside the frame in the remaining 250, even when the manipulated objects remained visible (Figure~\ref{fig:leftview_visibility}). This observation suggests that the left-view decline may be associated with limited robot-state evidence rather than a consistent degradation across long-horizon settings. Overall, ACPD improves Long performance under the back and top views, although its gains are less consistent than those observed on LIBERO-Spatial.
+ACPD improves success in 14 of the 16 view--suite settings,
+and the average over deployment views increases on every suite.
+LIBERO-Spatial improves from 78.95\% to 83.40\%, while
+LIBERO-Object and LIBERO-Goal gain 2.50 and 1.90 percentage
+points, respectively.
+The largest suite-level gain occurs on LIBERO-Long, where
+mean success rises from 50.25\% to 56.15\%.
+Long-horizon performance improves under all four views,
+with the largest gain in the top view, from 45.40\% to 54.80\%.
+Together, these results demonstrate improved single-view
+performance across camera configurations and task suites,
+including long-horizon manipulation.
 
 
 \subsection{Ablations}
