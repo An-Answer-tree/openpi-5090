@@ -743,11 +743,12 @@ Configuration & Spatial $\uparrow$ & Object $\uparrow$
 \midrule
 (a) Single-view SFT & 65.80 & 68.40
 & \underline{64.60} & 29.80 & 57.15 \\
-(b) ACL only & \underline{69.00} & \underline{72.80}
-& \textbf{65.60} & \underline{31.60} & \underline{59.75} \\
+(b) ACL only & \underline{69.00} & 72.80
+& \textbf{65.60} & 31.60 & \underline{59.75} \\
 (c) ACL + LCD & 60.20 & 62.80
 & \underline{64.60} & 24.80 & 53.10 \\
-(d) ACL + PCD & & & & & \\
+(d) ACL + PCD & 65.00 & \underline{73.00}
+& 64.40 & \underline{33.20} & 58.90 \\
 (e) ACL + PCD + GCF (ACPD, ours)
 & \textbf{73.20} & \textbf{73.80} & 63.60
 & \textbf{33.60} & \textbf{61.05} \\
@@ -780,34 +781,38 @@ Selected cues serve only as training targets and are not injected
 into action generation. This configuration uses a batch size of
 32; the other configurations use 64.
 
-Row (e), the complete ACPD model, combines ACL, PCD, and GCF.
-PCD uses the normalized cue-prediction MSE in
-Equation~\eqref{eq:cue_loss}, with teacher-attention cues
-extracted at layer 10.
-The LCD configuration reaches 53.10\%, below ACL
-alone on every suite, whereas ACPD achieves 61.05\%.
-The two formulations differ in how their targets are defined:
-LCD jointly optimizes the cue selector and student predictor,
-whereas PCD extracts action-conditioned visual targets from
-the frozen teacher's own attention computation.
-The results favor the complete ACPD configuration over the
-LCD configuration evaluated here.
-Compared with ACL alone, ACPD gains 1.30 percentage points
-on average and improves three suites, with the largest gain
-on Spatial (+4.20 points). Goal remains higher with ACL alone,
-showing that the additional benefit varies across suites.
+Row (d) combines ACL with PCD, using the normalized
+cue-prediction MSE in Equation~\eqref{eq:cue_loss} and
+teacher-attention cues extracted at layer 10, without cue fusion
+during training or inference.
+Unlike LCD, which jointly optimizes the cue selector and
+student predictor, PCD defines its targets using the frozen
+teacher's own attention computation.
+ACL + PCD reaches 58.90\%, compared with 53.10\% for
+ACL + LCD, a gain of 5.80 percentage points with higher
+success on three suites.
+Relative to ACL alone, PCD improves Object and Long but
+reduces the four-suite mean by 0.85 percentage points.
+Cue prediction alone therefore does not provide an additional
+mean success gain over ACL in this setting.
 
 \paragraph{Gated cue fusion.}
-Row (d) combines ACL with PCD and trains without cue fusion.
 Row (e) additionally uses GCF to add predicted cues to the
 student's final action representations through a learnable gate,
 as defined in Equation~\eqref{eq:cue_fusion}.
-Comparing rows (b) and (d) assesses PCD beyond ACL, while
-comparing rows (d) and (e) assesses the effect of GCF.
+GCF raises mean success from 58.90\% to 61.05\%, a gain of
+2.15 percentage points, with improvements on three suites.
+The largest gain is on Spatial, from 65.00\% to 73.20\%;
+Object and Long also improve, while Goal decreases from
+64.40\% to 63.60\%.
+The complete ACPD model exceeds ACL alone by 1.30 percentage
+points and Single-view SFT by 3.90 points on average.
+These results support coupling privileged-cue prediction
+with gated fusion to improve task success.
 
 \FloatBarrier
 \section{Conclusion}
-We have introduced ACPD for training weak-view VLA policies with privileged camera observations. ACPD combines compact, action-conditioned teacher cues with action-level correlation while preserving the original student policy at deployment. Experiments across three deployment views show improved weak-view performance, and four-suite ablations show positive contributions from all evaluated components. These results demonstrate the value of action-conditioned cross-view supervision without requiring additional deployment inputs.
+We have introduced ACPD for training weak-view VLA policies with privileged camera observations. ACPD combines compact, action-conditioned teacher cues with action-level correlation while retaining single-view inputs at deployment. Experiments across four deployment views show improved weak-view performance, and back-view ablations show higher mean success when cue prediction is combined with gated fusion. These results demonstrate the value of action-conditioned cross-view supervision without requiring additional deployment inputs.
 
 % TODO: The AAAI source provides none of the following journal declarations.
 % Original template blocks are kept as comments; no factual declarations have been invented.

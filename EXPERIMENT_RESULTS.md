@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-24（精选归档转为推理版；实验数值与真实训练记录不变）
+更新时间：2026-10-26（新增用户报告的训练期无注入重跑结果）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -9,6 +9,7 @@
 
 | 实验 | 目的 | 配置 | 状态 | 结论 |
 |---|---|---|---|---|
+| ACL + PCD，无注入重跑 | 补齐论文训练期无GCF消融 | 用户说明为重新运行的无注入实验；保留ACL与PCD，训练和推理均无GCF；任务号、checkpoint及原始日志尚未提供 | 用户报告验证完成；均值复核通过 | Spatial/Object/Goal/Long为`65.00/73.00/64.40/33.20%`，均值`58.90%`；比论文ACL only低0.85点，比完整ACPD低2.15点。与历史仅推理关闭注入的记录分别保留；[结果与来源](experiments/ablation/acpd-v2-no-injection-rerun-2026-10-26.md) |
 | ACL-only backview 30K→34K | 补齐31K–34K checkpoint轨迹 | 沿用原ACL-only；4×5090 FSDP、BS64、累计1；flow/ACL=1/0.5、contribution=0、无注入；模型/Adam和data batch30000接续；LR保持2.5e-6；每1K全部保留、独立输出 | 149325完成；10月16日10:34最终33999保存成功，31K–34K全部保留 | 训练完成；验证见下行；已有35K不变；[协议](experiments/ablation/acpd-v2-acl-only-bs64-35k/trajectory-31k-34k-protocol.md)、[执行](experiments/ablation/acpd-v2-acl-only-bs64-35k/trajectory-31k-34k-execution.md) |
 | ACL-only backview 31K–34K验证 | 测量ACL-only后期成功率轨迹 | 关闭注入，与训练一致；每模型四套各500回合；4个单卡子任务及1个汇总，无数组并发上限 | 10月18日核对：四个模型全部完成四套验证及汇总；33K补跑150185_3完成 | 31K/32K/33K/34K分别`59.75%/58.75%/57.40%/59.25%`，各2000回合；31K为新增点中最高观测值；未计算配对区间，不作显著性判断；[四套计数与证据](experiments/ablation/acpd-v2-acl-only-bs64-35k/evaluation-31k-34k.md#已完成结果) |
 | SFT-View leftview 30K→32K | 补齐同视角32K基线 | 4×5090 FSDP、BS64、累计1；恢复模型/优化器及数据batch30000；LR保持2.5e-6；每1K全部保留，batch自动选节点 | 149303已启动，00:56按用户要求取消，优先ACL-only | 尚无新增验证结论；[执行](experiments/baseline/sft-multiview-bs64-resume-32k/execution.md) |
