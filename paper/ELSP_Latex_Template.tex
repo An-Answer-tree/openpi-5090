@@ -41,6 +41,7 @@
 \usepackage{geometry}
 \geometry{a4paper,top=2.5cm,bottom=1.9cm,left=1.75cm,right=1.75cm,headsep=12bp}
 \usepackage{float}
+\usepackage{placeins}
 \usepackage{enumerate}
 \usepackage{enumitem}
 \usepackage{stfloats}
@@ -473,38 +474,6 @@ multi-view-to-single-view distillation baseline. We also investigate
 alternative distillation objectives and conduct ablation studies
 to assess the contributions of ACPD's components.
 
-\begin{table}[htbp]
-\centering
-\caption{Task success rates (\%) across four deployment views and four LIBERO suites. \textit{Avg.} averages the four suites; \textit{Overall} averages each metric across deployment views. $\Delta$ denotes the gain over Single-view SFT in \textit{Avg.}, measured in percentage points.}
-\label{tab:main_results}
-\begin{tabular*}{0.95\columnwidth}{@{\extracolsep{\fill}}llrrrrrr@{}}
-\toprule
-View & Method & Spatial $\uparrow$ & Object $\uparrow$
-& Goal $\uparrow$ & Long $\uparrow$ & Avg. $\uparrow$ & $\Delta$ (pp) \\
-\midrule
-Back & Single-view SFT & 65.80 & 68.40 & \textbf{64.60} & 29.80 & 57.15 & -- \\
-& ACPD & \textbf{73.20} & \textbf{73.80} & 63.60 & \textbf{33.60}
-& \textbf{61.05} & +3.90 \\
-\midrule
-Left & Single-view SFT & 84.00 & \textbf{79.60} & 79.40 & 71.60 & 78.65 & -- \\
-& ACPD & \textbf{85.20} & 79.40 & \textbf{84.80} & \textbf{76.80}
-& \textbf{81.55} & +2.90 \\
-\midrule
-Right & Single-view SFT & 85.00 & 84.80 & 84.00 & 54.20 & 77.00 & -- \\
-& ACPD & \textbf{90.20} & \textbf{88.60} & \textbf{85.80} & \textbf{59.40}
-& \textbf{81.00} & +4.00 \\
-\midrule
-Top & Single-view SFT & 81.00 & 80.60 & 79.20 & 45.40 & 71.55 & -- \\
-& ACPD & \textbf{85.00} & \textbf{81.60} & \textbf{80.60} & \textbf{54.80}
-& \textbf{75.50} & +3.95 \\
-\midrule
-Overall & Single-view SFT & 78.95 & 78.35 & 76.80 & 50.25 & 71.09 & -- \\
-& ACPD & \textbf{83.40} & \textbf{80.85} & \textbf{78.70} & \textbf{56.15}
-& \textbf{74.78} & +3.69 \\
-\bottomrule
-\end{tabular*}
-\end{table}
-
 % \begin{figure}[t]
 % \centering
 % \includegraphics[width=\linewidth]{Figures/leftview_visibility.pdf}
@@ -610,14 +579,8 @@ samples. Both metrics are averaged over the agent and
 wrist views.
 
 Table~\ref{tab:layer_selection} summarizes the results.
-Layer 10 achieves the largest cosine gap of 0.3992 and
-the highest prediction $R^2$ of 0.3556 among the evaluated
-layers. Its cosine gap exceeds that of the next-ranked
-layer, layer 11, by 0.0485.
-We therefore use layer 10 for teacher cue extraction
-and student cue prediction in the subsequent experiments.
 
-\begin{table}[t]
+\begin{table}[!htbp]
 \centering
 \caption{Distillation layer selection based on teacher-cue
 prediction for a back-view student. Metrics are evaluated
@@ -642,11 +605,51 @@ Layer & Prediction $R^2$ $\uparrow$
 \end{tabular*}
 \end{table}
 
+Layer 10 achieves the largest cosine gap of 0.3992 and
+the highest prediction $R^2$ of 0.3556 among the evaluated
+layers. Its cosine gap exceeds that of the next-ranked
+layer, layer 11, by 0.0485.
+We therefore use layer 10 for teacher cue extraction
+and student cue prediction in the subsequent experiments.
 
+\FloatBarrier
 \subsection{Overall Performance}
 
 Table~\ref{tab:main_results} compares ACPD with Single-view SFT
 across four deployment views and four LIBERO suites.
+
+\begin{table}[!htbp]
+\centering
+\caption{Task success rates (\%) across four deployment views and four LIBERO suites. \textit{Avg.} averages the four suites; \textit{Overall} averages each metric across deployment views. $\Delta$ denotes the gain over Single-view SFT in \textit{Avg.}, measured in percentage points.}
+\label{tab:main_results}
+\begin{tabular*}{0.95\columnwidth}{@{\extracolsep{\fill}}llrrrrrr@{}}
+\toprule
+View & Method & Spatial $\uparrow$ & Object $\uparrow$
+& Goal $\uparrow$ & Long $\uparrow$ & Avg. $\uparrow$ & $\Delta$ (pp) \\
+\midrule
+Back & Single-view SFT & 65.80 & 68.40 & \textbf{64.60} & 29.80 & 57.15 & -- \\
+& ACPD & \textbf{73.20} & \textbf{73.80} & 63.60 & \textbf{33.60}
+& \textbf{61.05} & +3.90 \\
+\midrule
+Left & Single-view SFT & 84.00 & \textbf{79.60} & 79.40 & 71.60 & 78.65 & -- \\
+& ACPD & \textbf{85.20} & 79.40 & \textbf{84.80} & \textbf{76.80}
+& \textbf{81.55} & +2.90 \\
+\midrule
+Right & Single-view SFT & 85.00 & 84.80 & 84.00 & 54.20 & 77.00 & -- \\
+& ACPD & \textbf{90.20} & \textbf{88.60} & \textbf{85.80} & \textbf{59.40}
+& \textbf{81.00} & +4.00 \\
+\midrule
+Top & Single-view SFT & 81.00 & 80.60 & 79.20 & 45.40 & 71.55 & -- \\
+& ACPD & \textbf{85.00} & \textbf{81.60} & \textbf{80.60} & \textbf{54.80}
+& \textbf{75.50} & +3.95 \\
+\midrule
+Overall & Single-view SFT & 78.95 & 78.35 & 76.80 & 50.25 & 71.09 & -- \\
+& ACPD & \textbf{83.40} & \textbf{80.85} & \textbf{78.70} & \textbf{56.15}
+& \textbf{74.78} & +3.69 \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
 Averaged equally over views and suites, ACPD raises task success
 from 71.09\% to 74.78\%, a gain of 3.69 percentage points.
 The four-suite average improves for every deployment view:
@@ -667,7 +670,7 @@ Together, these results demonstrate improved single-view
 performance across camera configurations and task suites,
 including long-horizon manipulation.
 
-
+\FloatBarrier
 \subsection{Comparison with Multi-View Distillation}
 \label{sec:distillation_comparison}
 
@@ -687,15 +690,8 @@ respectively. Teacher and student receive the same noisy action
 block and flow time when computing these losses.
 
 Table~\ref{tab:distillation_baseline} reports the results.
-ACPD achieves a mean success rate of 61.05\%, compared with
-52.40\% for MV-SV-KD, an improvement of 8.65 percentage points.
-ACPD outperforms this baseline on all four suites, with the
-largest gain on LIBERO-Object, from 59.80\% to 73.80\%.
-Together with its improvement over Single-view SFT,
-these results favor ACPD's transfer formulation in the
-evaluated back-view setting.
 
-\begin{table}[t]
+\begin{table}[!htbp]
 \centering
 \caption{Back-view task success rates (\%) for Single-view SFT, the $\pi_{0.5}$ adaptation of MV-SV-KD, and ACPD. \textit{Avg.} is the mean across the four LIBERO suites.}
 \label{tab:distillation_baseline}
@@ -713,7 +709,15 @@ ACPD & \textbf{73.20} & \textbf{73.80} & \underline{63.60}
 \end{tabular*}
 \end{table}
 
+ACPD achieves a mean success rate of 61.05\%, compared with
+52.40\% for MV-SV-KD, an improvement of 8.65 percentage points.
+ACPD outperforms this baseline on all four suites, with the
+largest gain on LIBERO-Object, from 59.80\% to 73.80\%.
+Together with its improvement over Single-view SFT,
+these results favor ACPD's transfer formulation in the
+evaluated back-view setting.
 
+\FloatBarrier
 \subsection{Ablation Studies}
 \label{sec:ablations}
 
@@ -795,6 +799,7 @@ and action generation. Comparing rows (b) and (d) assesses cue
 supervision beyond ACL, while comparing rows (d) and (e)
 assesses the effect of gated cue injection.
 
+\FloatBarrier
 \section{Conclusion}
 We have introduced ACPD for training weak-view VLA policies with privileged camera observations. ACPD combines compact, action-conditioned teacher cues with action-level correlation while preserving the original student policy at deployment. Experiments across three deployment views show improved weak-view performance, and four-suite ablations show positive contributions from all evaluated components. These results demonstrate the value of action-conditioned cross-view supervision without requiring additional deployment inputs.
 
