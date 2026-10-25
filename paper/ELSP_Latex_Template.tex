@@ -265,7 +265,7 @@ More directly related to weak-view deployment, Acar et al. distill a multi-camer
 
 \section{Action-Conditioned Privileged Distillation}
 
-ACPD uses a frozen privileged-view teacher to supervise a weak-view flow-matching student during training (Figure~\ref{fig:framework}). At the representation level, privileged-cue distillation selects a compact teacher cue for each student action token and trains the corresponding student hidden state to predict it. At the action level, the action correlation loss (ACL) encourages consistent variation between the teacher and student flow-velocity predictions. 
+ACPD uses a frozen privileged-view teacher to supervise a weak-view flow-matching student during training (Figure~\ref{fig:framework}). We extract visual cues from each privileged view using the teacher's attention during action prediction. The student learns to predict these cues from its own observations. A learned gate controls how strongly the predicted cues are added to the student's action representations. An action correlation loss (ACL) aligns the relative variation of teacher and student flow-velocity predictions, complementing ground-truth flow-matching supervision.
 
 
 \subsection{Problem Formulation}
