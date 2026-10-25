@@ -292,7 +292,7 @@ The parameters $\theta$ and $\theta_{\mathrm{T}}$ denote the trainable student a
 \subsection{Action-Conditioned Visual Cue Extraction}
 \label{sec:cue_extraction}
 
-To provide visual supervision aligned with each action position, ACPD extracts each privileged view's contribution to the teacher's scaled attention output. The teacher processes the privileged observations $o^t$ together with the noisy action chunk $\mathbf{a}^{\tau}$ and flow time $\tau$. At a selected layer of its action expert, each action token queries the teacher's token representations. The resulting attention weights are used to compute a weighted sum of the image-token value vectors from each view separately; the resulting view-specific outputs are then projected and scaled using the teacher's native attention operation to form the cues used to supervise the student.
+To provide visual supervision aligned with each action position, ACPD uses the teacher's native attention computation to form a separate cue for each privileged camera view. The teacher processes the privileged observations $o^t$ together with the noisy action chunk $\mathbf{a}^{\tau}$ and flow time $\tau$. At a selected layer of its action expert, each action token queries the teacher's token representations. For each action token, ACPD weights that view's image-token value vectors by the corresponding attention weights and then applies the original attention projection and scaling.
 
 For attention head $m$, let $\mathbf{Q}^{(m)}$ contain the queries of the $H$ teacher action tokens, and let $\mathbf{K}^{(m)}$ and $\mathbf{V}^{(m)}$ contain the keys and values of the teacher's token sequence. The teacher's existing attention computes
 \begin{equation}
