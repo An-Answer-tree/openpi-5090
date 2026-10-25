@@ -292,9 +292,9 @@ The parameters $\theta$ and $\theta_{\mathrm{T}}$ denote the trainable student a
 \subsection{Action-Conditioned Visual Cue Extraction}
 \label{sec:cue_extraction}
 
-ACPD constructs action-conditioned visual cues from a frozen multi-view teacher as prediction targets for the single-view student. For each teacher action token, ACPD computes a separate weighted sum of the image-token value vectors from each privileged view using the corresponding attention weights. The student learns to predict these cues from its own observations and incorporates them into action generation.
+ACPD extracts visual cues from a frozen multi-view teacher and uses them as prediction targets for the single-view student. At the selected teacher layer, the action block $\mathbf{a}^{\tau}$ is represented by $H$ hidden states, one for each future control step. We refer to these states as action tokens. Their queries determine how the teacher aggregates visual information for each action position. For every privileged view $r$, ACPD constructs one cue for each action token.
 
-The teacher's action tokens are hidden representations of the $H$ actions in $\mathbf{a}^{\tau}$, with one token per future control step. At a selected attention layer, queries derived from these representations determine how visual information is aggregated for each action prediction. For attention head $m$, let $\mathbf{Q}^{(m)}$ contain the action-token queries, and let $\mathbf{K}^{(m)}$ and $\mathbf{V}^{(m)}$ contain the keys and values of the teacher's token sequence. The teacher computes
+For attention head $m$, let $\mathbf{Q}^{(m)}$ contain the queries from the action tokens, and let $\mathbf{K}^{(m)}$ and $\mathbf{V}^{(m)}$ contain the keys and values of the teacher's token sequence. The teacher computes
 \begin{equation}
 \mathbf{A}^{(m)}
 =
@@ -303,17 +303,17 @@ The teacher's action tokens are hidden representations of the $H$ actions in $\m
 +\mathbf{B}
 \right),
 \end{equation}
-where $d_h$ is the head dimension and $\mathbf{B}$ is the teacher's native attention bias or mask. Softmax is applied over key positions, yielding one attention distribution for each action token.
+where $d_h$ is the head dimension and $\mathbf{B}$ is the teacher's native attention bias or mask. The softmax is applied over the key positions permitted by the teacher's attention pattern.
 
-For privileged view $r$, we select the columns of $\mathbf{A}^{(m)}$ corresponding to its image tokens and the matching rows of $\mathbf{V}^{(m)}$, denoted by $\mathbf{A}_r^{(m)}$ and $\mathbf{V}_r^{(m)}$. Their product aggregates the visual information from view $r$ for each future control step:
+For privileged view $r$, we select the columns of $\mathbf{A}^{(m)}$ corresponding to its image tokens and the matching rows of $\mathbf{V}^{(m)}$, denoted by $\mathbf{A}_r^{(m)}$ and $\mathbf{V}_r^{(m)}$. The view-specific aggregation is
 \begin{equation}
 \mathbf{Z}_r^{(m)}
 =
 \mathbf{A}_r^{(m)}\mathbf{V}_r^{(m)}.
 \end{equation}
-We use the attention weights computed over the teacher's complete attendable token sequence and do not renormalize them within each view. Thus, each cue preserves the teacher's relative attention allocation to view $r$ for the corresponding action position. The selected value vectors are contextualized representations produced within the teacher's Transformer, and therefore encode visual content in the representation used by the teacher's action computation. After the original output projection, the cue becomes a compact target in the action expert's feature space, with one target for each future control step. Predicting this target directs the student toward privileged visual information that is already organized by action position and linked to action generation, without requiring it to reproduce the teacher's complete hidden representation or align image tokens across views.
+The selected weights are taken directly from the teacher's full attention distribution and are not renormalized within view $r$. Thus, $\mathbf{Z}_r^{(m)}$ retains both the visual content of view $r$ and the amount of attention assigned to that view for each action position.
 
-We concatenate the outputs of the $M$ attention heads and apply the teacher's original output projection and native output scaling:
+We concatenate the outputs of the $M$ attention heads and apply the teacher's native output projection and scaling:
 \begin{equation}
 \mathbf{C}_r
 =
@@ -324,9 +324,9 @@ We concatenate the outputs of the $M$ attention heads and apply the teacher's or
 \odot\mathbf{s}(\tau).
 \label{eq:cue}
 \end{equation}
-Here, $\mathbf{W}_O$ is the attention output projection, and $\mathbf{s}(\tau)$ is the teacher's elementwise output scaling, shared across action positions. All extraction parameters belong to the frozen teacher.
+Here, $\mathbf{W}_O$ is the attention output projection and $\mathbf{s}(\tau)$ is the teacher's elementwise output scaling. All quantities used for cue extraction are computed by the frozen teacher.
 
-Each row of $\mathbf{C}_r\in\mathbb{R}^{H\times D}$ represents the information aggregated from view $r$ for one future control step, expressed in the action expert's $D$-dimensional feature space. The cue is action-conditioned because its weights are determined by the query for the corresponding action position, and view-specific because it uses only the image-token values selected from view $r$. These properties provide action-aligned supervision for the student without requiring spatial correspondence between teacher and student image tokens.
+The resulting cue matrix $\mathbf{C}_r\in\mathbb{R}^{H\times D}$ contains one $D$-dimensional target for each future control step. Its attention weights are determined by the corresponding action query, while its value vectors are contextualized representations produced inside the teacher's Transformer. The cue therefore provides the student with a compact, action-aligned target in the teacher's action feature space, without requiring full hidden-state distillation or spatial correspondence between teacher and student image tokens.
 
 % \subsection{Privileged-Cue Distillation}
 
