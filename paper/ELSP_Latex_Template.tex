@@ -724,6 +724,30 @@ Teacher-based variants use the same frozen teacher with agent and
 wrist inputs. Table~\ref{tab:controlled_ablations} reports success
 on the four suites and their equally weighted mean.
 
+\begin{table}[!htbp]
+\centering
+\caption{Back-view ablation configurations and task success
+rates (\%). \textit{Avg.} is the mean across the four LIBERO
+suites.}
+\label{tab:controlled_ablations}
+\begin{tabular*}{0.95\columnwidth}{@{\extracolsep{\fill}}lrrrrr@{}}
+\toprule
+Configuration & Spatial $\uparrow$ & Object $\uparrow$
+& Goal $\uparrow$ & Long $\uparrow$ & Avg. $\uparrow$ \\
+\midrule
+(a) Single-view SFT & 65.80 & 68.40
+& \underline{64.60} & 29.80 & 57.15 \\
+(b) ACL only & \underline{69.00} & \underline{72.80}
+& \textbf{65.60} & \underline{31.60} & \underline{59.75} \\
+(c) ACL + Cross-attention & 60.20 & 62.80
+& \underline{64.60} & 24.80 & 53.10 \\
+(d) ACPD w/o injection & & & & & \\
+(e) ACPD & \textbf{73.20} & \textbf{73.80} & 63.60
+& \textbf{33.60} & \textbf{61.05} \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
 \paragraph{Action correlation supervision.}
 Row (a) uses only flow-matching supervision.
 Row (b) adds ACL with weight 0.5, without cue supervision or
@@ -770,30 +794,6 @@ omits gated addition of the predicted cues throughout training
 and action generation. Comparing rows (b) and (d) assesses cue
 supervision beyond ACL, while comparing rows (d) and (e)
 assesses the effect of gated cue injection.
-
-\begin{table}[t]
-\centering
-\caption{Back-view ablation configurations and task success
-rates (\%). \textit{Avg.} is the mean across the four LIBERO
-suites.}
-\label{tab:controlled_ablations}
-\begin{tabular*}{0.95\columnwidth}{@{\extracolsep{\fill}}lrrrrr@{}}
-\toprule
-Configuration & Spatial $\uparrow$ & Object $\uparrow$
-& Goal $\uparrow$ & Long $\uparrow$ & Avg. $\uparrow$ \\
-\midrule
-(a) Single-view SFT & 65.80 & 68.40
-& \underline{64.60} & 29.80 & 57.15 \\
-(b) ACL only & \underline{69.00} & \underline{72.80}
-& \textbf{65.60} & \underline{31.60} & \underline{59.75} \\
-(c) ACL + Cross-attention & 60.20 & 62.80
-& \underline{64.60} & 24.80 & 53.10 \\
-(d) ACPD w/o injection & & & & & \\
-(e) ACPD & \textbf{73.20} & \textbf{73.80} & 63.60
-& \textbf{33.60} & \textbf{61.05} \\
-\bottomrule
-\end{tabular*}
-\end{table}
 
 \section{Conclusion}
 We have introduced ACPD for training weak-view VLA policies with privileged camera observations. ACPD combines compact, action-conditioned teacher cues with action-level correlation while preserving the original student policy at deployment. Experiments across three deployment views show improved weak-view performance, and four-suite ablations show positive contributions from all evaluated components. These results demonstrate the value of action-conditioned cross-view supervision without requiring additional deployment inputs.
