@@ -621,19 +621,18 @@ Teacher and student receive the same noisy action block and
 flow time. We reserve 10\% of demonstration episodes for
 validation and average results over three probe initializations.
 
-To assess alignment with the corresponding visual input,
-we construct control cues by shuffling the target view's keys
-and values across samples while keeping the action queries
-and all other keys and values fixed.
-We report the cosine gap: the cosine similarity between a
-prediction and its original teacher cue minus its similarity
-to the control cue. We also report explained variance,
-measuring prediction error relative to a mean-target predictor.
-Both metrics are averaged over the two privileged views.
+We evaluate cue prediction using two metrics.
+Prediction $R^2$ measures the reduction in mean squared
+error relative to predicting the mean teacher cue.
+The cosine gap measures how much more similar a prediction
+is to the original teacher cue than to a control cue
+constructed by shuffling one view's visual features across
+samples. Both metrics are averaged over the agent and
+wrist views.
 
 Table~\ref{tab:layer_selection} summarizes the results.
 Layer 10 achieves the largest cosine gap of 0.3992 and
-the highest explained variance of 0.3556 among the evaluated
+the highest prediction $R^2$ of 0.3556 among the evaluated
 layers. Its cosine gap exceeds that of the next-ranked
 layer, layer 11, by 0.0485.
 We therefore use layer 10 for teacher cue extraction
@@ -643,13 +642,13 @@ and student cue prediction in the subsequent experiments.
 \centering
 \caption{Prediction of teacher visual cues across action-expert
 layers. Metrics are averaged over the agent and wrist views
-and three probe initializations. Confidence intervals are
-obtained by episode-level bootstrap resampling.
+and three probe initializations. Confidence intervals for
+cosine gaps are obtained by episode-level bootstrap resampling.
 Higher values indicate better prediction quality.}
 \label{tab:layer_selection}
 \begin{tabular}{@{}lrrr@{}}
 \toprule
-Layer & Cosine gap & 95\% CI & Explained variance \\
+Layer & Cosine gap & 95\% CI & Prediction $R^2$ \\
 \midrule
 6  & 0.0997 & [0.0846, 0.1091] & -0.1468 \\
 7  & 0.3261 & [0.2938, 0.3602] &  0.2833 \\
