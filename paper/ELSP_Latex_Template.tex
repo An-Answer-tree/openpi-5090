@@ -565,7 +565,10 @@ left, right, and top cameras. Each student receives its designated
 camera view, the language instruction, and the robot state.
 Single-view supervised fine-tuning (Single-view SFT) optimizes the standard flow-matching
 objective. ACPD additionally uses a frozen $\pi_{0.5}$ teacher
-fine-tuned with synchronized agent and wrist views.
+fine-tuned with the fixed third-person agent view and
+robot-mounted wrist view. These two views provide
+privileged visual inputs during distillation, while
+each student receives only its designated deployment view.
 All students are initialized from the same pretrained
 $\pi_{0.5}$ checkpoint~\cite{black2025pi05}.
 At deployment, ACPD retains its cue predictors and fusion gate,
@@ -607,10 +610,11 @@ the four suites.
 \subsection{Distillation Layer Selection}
 \label{sec:layer_selection}
 
-We select the distillation layer by evaluating how well the
-student can predict the teacher's visual cues. We examine
-action-expert layers 6--12 using a frozen back-view
-Single-view SFT policy and the frozen multi-view teacher.
+For layer selection, we use the frozen teacher with
+agent and wrist inputs and a frozen back-view student
+trained with Single-view SFT. We examine action-expert
+layers 6--12 by evaluating how well the student can
+predict the teacher's visual cues.
 At each layer, separate affine probes predict the agent-view
 and wrist-view cues from the student's action representations.
 Teacher and student receive the same noisy action block and
