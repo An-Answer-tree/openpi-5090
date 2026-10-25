@@ -311,7 +311,7 @@ For privileged view $r$, let $\mathbf{A}_r^{(m)}$ contain the columns of $\mathb
 =
 \mathbf{A}_r^{(m)}\mathbf{V}_r^{(m)}.
 \end{equation}
-The attention weights retain their normalization over the full set of permitted key positions; they are not renormalized within a view. Consequently, each cue preserves the attention mass that the teacher assigned to that view, rather than rescaling every view to have equal weight. The selected values are contextualized representations at that camera's image-token positions, not outputs of an independent per-view encoder.
+We retain the teacher's original attention weights without renormalizing them within each view. The selected values are contextualized representations at that view's image-token positions. The resulting cues therefore preserve the teacher's attention allocation across views while turning contextualized visual information into action-conditioned prediction targets for the student.
 
 We concatenate the outputs of the $M$ attention heads and apply the teacher's original output projection and any native output scaling to obtain the cue:
 \begin{equation}
