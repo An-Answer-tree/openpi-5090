@@ -565,7 +565,7 @@ left, right, and top cameras. Each student receives its designated
 camera view, the language instruction, and the robot state.
 Single-view fine-tuning (SFT) optimizes the standard flow-matching
 objective. ACPD additionally uses a frozen $\pi_{0.5}$ teacher
-fine-tuned for 30K updates with synchronized agent and wrist views.
+fine-tuned with synchronized agent and wrist views.
 All students are initialized from the same pretrained
 $\pi_{0.5}$ checkpoint~\cite{black2025pi05}.
 At deployment, ACPD retains its cue predictors and fusion gate,
@@ -577,19 +577,17 @@ vision-language backbone and 32 for the action expert.
 Training uses four NVIDIA RTX 5090 GPUs with fully sharded data
 parallelism and a global batch size of 64.
 We use AdamW with gradient clipping at a norm of 1.0.
-The learning rate increases linearly to $2.5\times10^{-5}$
-during the first 1K updates, then follows a cosine schedule
-to $2.5\times10^{-6}$ at 30K updates and remains constant
-thereafter. The training seed is 42.
+The learning rate follows a linear warmup to $2.5\times10^{-5}$,
+followed by cosine decay to $2.5\times10^{-6}$ and a constant
+learning rate thereafter. The training seed is 42.
 For ACPD, cues are extracted and predicted at action-expert
 layer 10, with feature dimension $D=1024$.
 We set $\lambda_{\mathrm{cue}}=0.2$ and
 $\lambda_{\mathrm{ACL}}=0.5$.
 
-\paragraph{Reported checkpoints.}
-The main comparison reports the 35K checkpoint for both
-back-view SFT and ACPD. For the left, right, and top views,
-we report SFT at 30K and ACPD at 32K.
+Within each deployment view, SFT and ACPD share the training
+demonstrations, student inputs, pretrained initialization,
+and optimization settings.
 The configurations used for the distillation baseline and
 component studies are specified in their respective subsections.
 
