@@ -717,8 +717,8 @@ ACPD & \textbf{73.20} & \textbf{73.80} & \underline{63.60}
 \subsection{Ablation Studies}
 \label{sec:ablations}
 
-We examine action correlation supervision and visual-cue construction
-for a back-view student.
+We examine action correlation supervision, visual-cue construction,
+and cue injection for a back-view student.
 All configurations retain the ground-truth flow-matching objective.
 Teacher-based variants use the same frozen teacher with agent and
 wrist inputs. Table~\ref{tab:controlled_ablations} reports success
@@ -748,7 +748,7 @@ Selected cues serve only as training targets and are not injected
 into action generation. This configuration uses a batch size of
 32; the other configurations use 64.
 
-Row (d) uses the complete ACPD formulation: teacher-attention
+Row (e) uses the complete ACPD formulation: teacher-attention
 cues extracted at layer 10, normalized cue-prediction MSE,
 ACL, and gated injection of predicted cues.
 The cross-attention configuration reaches 53.10\%, below ACL
@@ -763,6 +763,13 @@ Compared with ACL alone, ACPD gains 1.30 percentage points
 on average and improves three suites, with the largest gain
 on Spatial (+4.20 points). Goal remains higher with ACL alone,
 showing that the additional benefit varies across suites.
+
+\paragraph{Cue injection.}
+Row (d) retains ACL and teacher-attention cue supervision but
+omits gated addition of the predicted cues throughout training
+and action generation. Comparing rows (b) and (d) assesses cue
+supervision beyond ACL, while comparing rows (d) and (e)
+assesses the effect of gated cue injection.
 
 \begin{table}[t]
 \centering
@@ -781,7 +788,8 @@ Configuration & Spatial $\uparrow$ & Object $\uparrow$
 & \textbf{65.60} & \underline{31.60} & \underline{59.75} \\
 (c) ACL + Cross-attention & 60.20 & 62.80
 & \underline{64.60} & 24.80 & 53.10 \\
-(d) ACPD & \textbf{73.20} & \textbf{73.80} & 63.60
+(d) ACPD w/o injection & & & & & \\
+(e) ACPD & \textbf{73.20} & \textbf{73.80} & 63.60
 & \textbf{33.60} & \textbf{61.05} \\
 \bottomrule
 \end{tabular*}
