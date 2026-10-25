@@ -395,25 +395,25 @@ image tokens.
 
 ACPD trains the student to predict the visual cues defined in
 Section~\ref{sec:cue_extraction} and uses these predictions to augment
-its action representations. Let $\mathbf{h}_i^s$ denote the hidden
-state at action position $i$ in the corresponding layer of the
-student's flow-matching action expert. A separate affine predictor
-$f_r$ estimates the cue for each privileged view:
+its action representations. Let $\mathbf{H}^s\in\mathbb{R}^{H\times D}$
+collect the hidden states at the corresponding layer of the
+student's flow-matching action expert, with one row per action
+position. A separate affine predictor $f_r$ estimates the cue matrix
+$\hat{\mathbf{C}}_r\in\mathbb{R}^{H\times D}$ for each privileged view:
 \begin{equation}
-\hat{\mathbf{c}}_{r,i}
+\hat{\mathbf{C}}_r
 =
-f_r\!\left(\operatorname{LN}(\mathbf{h}_i^s)\right),
+f_r\!\left(\operatorname{LN}(\mathbf{H}^s)\right),
 \end{equation}
 where $\operatorname{LN}$ is parameter-free layer normalization.
-Each predictor shares its parameters across action positions.
+Both operations are applied row-wise, with predictor parameters
+shared across action positions.
 Teacher cues and student predictions use the same noisy action
 block $\mathbf{a}^{\tau}$ and flow time $\tau$.
 
 Cue prediction is supervised separately for each view using
 mean-squared error normalized by the teacher cue energy.
-Let $\hat{\mathbf{C}}_r\in\mathbb{R}^{H\times D}$ stack the
-predicted cues across action positions. For $R$ privileged views,
-we define
+For $R$ privileged views, we define
 \begin{equation}
 \mathcal{L}_{\mathrm{cue}}
 =
@@ -435,15 +435,15 @@ of the teacher cues for subsequent fusion. View-wise normalization
 expresses the prediction error relative to each view's target scale.
 
 The student combines the predicted cues through gated addition
-to its final action representations:
+to its final action representations $\mathbf{H}_{\mathrm{final}}^s$:
 \begin{equation}
-\tilde{\mathbf{h}}_i^s
+\tilde{\mathbf{H}}^s
 =
-\mathbf{h}_{i,\mathrm{final}}^s
+\mathbf{H}_{\mathrm{final}}^s
 +
 \tanh(\gamma)
 \sum_{r=1}^{R}
-\operatorname{sg}\!\left[\hat{\mathbf{c}}_{r,i}\right].
+\operatorname{sg}\!\left[\hat{\mathbf{C}}_r\right].
 \label{eq:cue_fusion}
 \end{equation}
 The learned scalar $\gamma$, shared across views and action
@@ -451,7 +451,7 @@ positions, controls the contribution of the predicted cues.
 It is initialized to zero, leaving the original action
 representations unchanged at initialization.
 The original action output projection maps the fused
-representations $\tilde{\mathbf{h}}_i^s$ to flow-velocity predictions.
+representations $\tilde{\mathbf{H}}^s$ to flow-velocity predictions.
 
 The stop-gradient operator $\operatorname{sg}$ prevents the
 flow-matching and action correlation losses from backpropagating
