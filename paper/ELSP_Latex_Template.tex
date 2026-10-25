@@ -292,7 +292,7 @@ The parameters $\theta$ and $\theta_{\mathrm{T}}$ denote the trainable student a
 \subsection{Action-Conditioned Visual Cue Extraction}
 \label{sec:cue_extraction}
 
-ACPD forms a separate visual cue from each privileged view for each action token using the teacher's attention weights. The teacher processes the privileged observations $o^t$ together with the noisy action chunk $\mathbf{a}^{\tau}$ and flow time $\tau$. At a selected layer of its action expert, each action token queries the teacher's token representations. We use the resulting weights to compute a weighted sum of the image-token value vectors from each view separately.
+To provide visual supervision aligned with each action position, ACPD extracts each privileged view's contribution to the teacher's scaled attention output. The teacher processes the privileged observations $o^t$ together with the noisy action chunk $\mathbf{a}^{\tau}$ and flow time $\tau$. At a selected layer of its action expert, each action token queries the teacher's token representations. The resulting attention weights are used to compute a weighted sum of the image-token value vectors from each view separately; the resulting view-specific outputs are then projected and scaled using the teacher's native attention operation to form the cues used to supervise the student.
 
 For attention head $m$, let $\mathbf{Q}^{(m)}$ contain the queries of the $H$ teacher action tokens, and let $\mathbf{K}^{(m)}$ and $\mathbf{V}^{(m)}$ contain the keys and values of the teacher's token sequence. The teacher's existing attention computes
 \begin{equation}
@@ -311,7 +311,7 @@ For privileged view $r$, let $\mathbf{A}_r^{(m)}$ contain the columns of $\mathb
 =
 \mathbf{A}_r^{(m)}\mathbf{V}_r^{(m)}.
 \end{equation}
-The attention weights retain their normalization over the full set of permitted key positions; they are not renormalized within a view. The selected values are contextualized representations at that camera's image-token positions.
+The attention weights retain their normalization over the full set of permitted key positions; they are not renormalized within a view. Consequently, each cue preserves the attention mass that the teacher assigned to that view, rather than rescaling every view to have equal weight. The selected values are contextualized representations at that camera's image-token positions, not outputs of an independent per-view encoder.
 
 We concatenate the outputs of the $M$ attention heads and apply the teacher's original output projection and time-conditioned scaling to obtain the cue:
 \begin{equation}
@@ -326,7 +326,7 @@ We concatenate the outputs of the $M$ attention heads and apply the teacher's or
 \end{equation}
 Here, $\mathbf{W}_O$ is the attention output projection, and $\mathbf{s}(\tau)$ is the teacher's existing elementwise scaling vector, shared across action positions. All parameters used in extraction belong to the frozen teacher.
 
-Each row of $\mathbf{C}_r\in\mathbb{R}^{H\times D}$ is the cue from view $r$ for one action position, expressed in the action expert's $D$-dimensional feature space. Because each action token supplies its own query, the cue depends on that token's action context. These cues supervise the student at corresponding action positions without requiring spatial alignment between teacher and student image tokens.
+Each row of $\mathbf{C}_r\in\mathbb{R}^{H\times D}$ is the cue from view $r$ for one action position, expressed in the action expert's $D$-dimensional feature space. The cue is action-conditioned because its weights come from the query of the corresponding action token, and view-specific because it uses only the image-token values selected from view $r$. These properties make the cues suitable as action-aligned supervision for the student without requiring spatial alignment between teacher and student image tokens.
 
 % \subsection{Privileged-Cue Distillation}
 
