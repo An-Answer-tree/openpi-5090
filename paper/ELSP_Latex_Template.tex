@@ -604,6 +604,62 @@ over tasks and the overall score averaged equally over
 the four suites.
 
 
+\subsection{Distillation Layer Selection}
+\label{sec:layer_selection}
+
+We select the distillation layer by evaluating how well the
+student can predict the teacher's visual cues. We examine
+action-expert layers 6--12 using a frozen back-view
+Single-view SFT policy and the frozen multi-view teacher.
+At each layer, separate affine probes predict the agent-view
+and wrist-view cues from the student's action representations.
+Teacher and student receive the same noisy action block and
+flow time. We reserve 10\% of demonstration episodes for
+validation and average results over three probe initializations.
+
+To assess alignment with the corresponding visual input,
+we construct control cues by shuffling the target view's keys
+and values across samples while keeping the action queries
+and all other keys and values fixed.
+We report the cosine gap: the cosine similarity between a
+prediction and its original teacher cue minus its similarity
+to the control cue. We also report explained variance,
+measuring prediction error relative to a mean-target predictor.
+Both metrics are averaged over the two privileged views.
+
+Table~\ref{tab:layer_selection} summarizes the results.
+Layer 10 achieves the largest cosine gap of 0.3992 and
+the highest explained variance of 0.3556 among the evaluated
+layers. Its cosine gap exceeds that of the next-ranked
+layer, layer 11, by 0.0485.
+We therefore use layer 10 for teacher cue extraction
+and student cue prediction in the subsequent experiments.
+
+\begin{table}[t]
+\centering
+\caption{Prediction of teacher visual cues across action-expert
+layers. Metrics are averaged over the agent and wrist views
+and three probe initializations. Confidence intervals are
+obtained by episode-level bootstrap resampling.
+Higher values indicate better prediction quality.}
+\label{tab:layer_selection}
+\begin{tabular}{@{}lrrr@{}}
+\toprule
+Layer & Cosine gap & 95\% CI & Explained variance \\
+\midrule
+6  & 0.0997 & [0.0846, 0.1091] & -0.1468 \\
+7  & 0.3261 & [0.2938, 0.3602] &  0.2833 \\
+8  & 0.2858 & [0.2491, 0.3030] &  0.3420 \\
+9  & 0.3417 & [0.3095, 0.3756] &  0.2822 \\
+10 & \textbf{0.3992} & [0.3524, 0.4312]
+   & \textbf{0.3556} \\
+11 & 0.3508 & [0.3170, 0.3824] &  0.3113 \\
+12 & 0.2367 & [0.2127, 0.2546] &  0.0903 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
 \subsection{Overall Weak-View Performance}
 
 The frozen A+W teacher achieves success rates of 98.0\% on LIBERO-Spatial and 95.8\% on LIBERO-Long, establishing a strong privileged reference for distillation. Because this teacher requires both views at deployment, it is not directly comparable with the weak-view policies. Table~\ref{tab:main_results} compares ACPD with Single-view SFT under the back, top, and left view deployment settings. For each setting, \textit{Avg.} denotes the mean success rate over Spatial and Long.
