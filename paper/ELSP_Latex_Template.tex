@@ -507,7 +507,14 @@ After training, the teacher is discarded. The deployed student receives only $o^
 
 \section{Experiments}
 
-We evaluate ACPD on LIBERO using synchronized multi-view data obtained by re-rendering each demonstration from multiple camera viewpoints. The main evaluation measures weak-view performance across three deployment views on LIBERO-Spatial and LIBERO-Long (Table~\ref{tab:main_results}). We then conduct back-view ablations on these two suites together with LIBERO-Object and LIBERO-Goal to assess the contributions of privileged-cue distillation, ACL, and the teacher's wrist-view input (Table~\ref{tab:controlled_ablations}).
+We evaluate ACPD on four LIBERO suites using synchronized multi-view
+data obtained by re-rendering demonstrations from multiple camera
+viewpoints. We examine layer selection for privileged-cue distillation
+and compare ACPD with single-view fine-tuning across four deployment
+views. In the back-view setting, we further compare ACPD with a
+multi-view-to-single-view distillation baseline. We also investigate
+alternative distillation objectives and conduct ablation studies
+to assess the contributions of ACPD's components.
 
 \begin{table}[htbp]
 \centering
