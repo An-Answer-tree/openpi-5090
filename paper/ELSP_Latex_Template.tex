@@ -699,6 +699,52 @@ performance across camera configurations and task suites,
 including long-horizon manipulation.
 
 
+\subsection{Comparison with Multi-View Distillation}
+\label{sec:distillation_comparison}
+
+We compare ACPD with a $\pi_{0.5}$ adaptation of the joint
+output and feature distillation proposed by Acar et
+al.~\cite{acar2024multicamera}, denoted MV-SV-KD.
+Both methods use the same frozen teacher observing the agent
+and wrist views, and train a back-view student on the same
+demonstrations.
+We adapt the baseline to offline flow-matching training by
+matching flow-velocity predictions and normalized final
+action-expert features in place of the original action and
+visual-encoder targets.
+The student retains the ground-truth flow-matching objective,
+with weights of 0.5 and 0.1 for output and feature distillation,
+respectively. Teacher and student receive the same noisy action
+block and flow time when computing these losses.
+
+Table~\ref{tab:distillation_baseline} reports the results.
+ACPD achieves a mean success rate of 61.05\%, compared with
+52.40\% for MV-SV-KD, an improvement of 8.65 percentage points.
+ACPD outperforms this baseline on all four suites, with the
+largest gain on LIBERO-Object, from 59.80\% to 73.80\%.
+Together with its improvement over Single-view SFT,
+these results favor ACPD's transfer formulation in the
+evaluated back-view setting.
+
+\begin{table}[t]
+\centering
+\caption{Back-view task success rates (\%) for Single-view SFT, the $\pi_{0.5}$ adaptation of MV-SV-KD, and ACPD. \textit{Avg.} is the mean across the four LIBERO suites.}
+\label{tab:distillation_baseline}
+\begin{tabular*}{0.95\columnwidth}{@{\extracolsep{\fill}}lrrrrr@{}}
+\toprule
+Method & Spatial $\uparrow$ & Object $\uparrow$
+& Goal $\uparrow$ & Long $\uparrow$ & Avg. $\uparrow$ \\
+\midrule
+Single-view SFT & \underline{65.80} & \underline{68.40}
+& \textbf{64.60} & \underline{29.80} & \underline{57.15} \\
+MV-SV-KD & 61.80 & 59.80 & 61.00 & 27.00 & 52.40 \\
+ACPD & \textbf{73.20} & \textbf{73.80} & \underline{63.60}
+& \textbf{33.60} & \textbf{61.05} \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+
 \subsection{Ablations}
 
 Table~\ref{tab:controlled_ablations} isolates the contributions of privileged-cue distillation, ACL, and the teacher's wrist-view input using matched back-view students. Privileged-cue distillation raises average success from 35.8\% to 41.5\%, providing the largest individual gain. Adding ACL with the same agent-view teacher increases the average to 42.3\%, while including the wrist view raises it further to 43.2\%. Full ACPD therefore improves over Single-view SFT by 7.4 percentage points, or 20.7\% relative. These results identify privileged-cue distillation as the primary contributor. ACL and the teacher's wrist-view input provide complementary gains.
