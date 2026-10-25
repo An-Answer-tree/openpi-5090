@@ -505,36 +505,6 @@ Overall & Single-view SFT & 78.95 & 78.35 & 76.80 & 50.25 & 71.09 & -- \\
 \end{tabular*}
 \end{table}
 
-\begin{table}[htbp]
-\centering
-\caption{Component ablations for a back-view student, measured by task success rates (\%) across all four LIBERO suites. All variants share the reduced student training protocol of 15K updates and a batch size of 128. A and W denote the agent and wrist inputs to the frozen teacher, respectively, while \textit{Cue} and ACL denote privileged-cue distillation and the action correlation loss. $\Delta_{\mathrm{FT}}$ is the difference from Single-view SFT in \textit{Avg.}, measured in percentage points.}\label{tab:controlled_ablations}
-\begin{tabular}{@{}
->{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.220}}
->{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.130}}
->{\centering\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.060}}
->{\centering\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.070}}
->{\centering\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.090}}
->{\centering\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.085}}
->{\centering\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.080}}
->{\centering\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.080}}
->{\centering\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.080}}
->{\centering\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.105}}
-@{}}
-\toprule
-Variant & Teacher input & Cue & ACL & Spatial & Object & Goal & Long & Avg. & $\Delta_{\mathrm{FT}}$ \\
-\midrule
-Single-view SFT & -- & -- & --
-& 39.8 & 38.6 & 46.0 & 18.6 & 35.8 & -- \\
-Privileged cue only & A & \checkmark & --
-& 48.0 & 39.8 & 57.8 & 20.2 & 41.5 & +5.7 \\
-ACPD & A & \checkmark & \checkmark
-& 48.0 & 48.4 & 53.2 & 19.6 & 42.3 & +6.5 \\
-ACPD & A+W & \checkmark & \checkmark
-& 48.8 & 47.4 & 57.8 & 18.8 & 43.2 & +7.4 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
 \begin{figure}[t]
 \centering
 \includegraphics[width=\linewidth]{Figures/leftview_visibility.pdf}
@@ -745,9 +715,119 @@ ACPD & \textbf{73.20} & \textbf{73.80} & \underline{63.60}
 \end{table}
 
 
-\subsection{Ablations}
+\subsection{Ablation Studies}
+\label{sec:ablations}
 
-Table~\ref{tab:controlled_ablations} isolates the contributions of privileged-cue distillation, ACL, and the teacher's wrist-view input using matched back-view students. Privileged-cue distillation raises average success from 35.8\% to 41.5\%, providing the largest individual gain. Adding ACL with the same agent-view teacher increases the average to 42.3\%, while including the wrist view raises it further to 43.2\%. Full ACPD therefore improves over Single-view SFT by 7.4 percentage points, or 20.7\% relative. These results identify privileged-cue distillation as the primary contributor. ACL and the teacher's wrist-view input provide complementary gains.
+We examine action correlation supervision, visual-cue construction,
+and cue injection for a back-view student.
+All configurations retain the ground-truth flow-matching objective.
+Teacher-based variants use the same frozen teacher with agent and
+wrist inputs. Table~\ref{tab:controlled_ablations} reports success
+on the four suites and their equally weighted mean.
+
+\paragraph{Action correlation supervision.}
+Row (a) uses only flow-matching supervision.
+Row (b) adds ACL with weight 0.5, without cue supervision or
+injection during training or inference.
+ACL raises mean success from 57.15\% to 59.75\%, with gains
+on all four suites. This improvement establishes a useful
+action-level transfer signal before introducing visual-cue learning.
+
+\paragraph{Visual-cue construction.}
+Row (c) combines ACL with an alternative cue loss based on a
+learned cross-attention selector. At action-expert layers 6 and 12,
+the selector uses projected student action representations as
+queries and concatenated teacher image and action representations
+as keys and values. Three-layer MLPs project these representations
+into a shared 1024-dimensional space. A separate three-layer
+student predictor estimates the selected cues.
+The selector and predictor are optimized jointly using cosine
+prediction loss and a variance penalty that discourages constant
+cue targets. The combined cue loss has weight 0.2, with relative
+weight 0.1 for the variance term; ACL retains weight 0.5.
+Selected cues serve only as training targets and are not injected
+into action generation. This configuration uses a batch size of
+32; the other configurations use 64.
+
+Row (e) uses the complete ACPD formulation: teacher-attention
+cues extracted at layer 10, normalized cue-prediction MSE,
+ACL, and gated injection of predicted cues.
+The cross-attention configuration reaches 53.10\%, below ACL
+alone on every suite, whereas ACPD achieves 61.05\%.
+The two formulations differ in how their targets are defined:
+the cross-attention selector learns its targets jointly with
+the student predictor, while ACPD anchors its targets to visual
+contributions in the frozen teacher's own action computation.
+The results favor the complete teacher-attention formulation
+over the learned-selection configuration evaluated here.
+Compared with ACL alone, ACPD gains 1.30 percentage points
+on average and improves three suites, with the largest gain
+on Spatial (+4.20 points). Goal remains higher with ACL alone,
+showing that the additional benefit varies across suites.
+
+\begin{table}[t]
+\centering
+\caption{Back-view ablation configurations and task success
+rates (\%). \textit{Avg.} is the mean across the four LIBERO
+suites. $\dagger$ denotes injection disabled only at inference,
+using a different checkpoint from row (e).}
+\label{tab:controlled_ablations}
+\begin{tabular*}{0.95\columnwidth}{@{\extracolsep{\fill}}lrrrrr@{}}
+\toprule
+Configuration & Spatial $\uparrow$ & Object $\uparrow$
+& Goal $\uparrow$ & Long $\uparrow$ & Avg. $\uparrow$ \\
+\midrule
+(a) Single-view SFT & 65.80 & 68.40
+& \underline{64.60} & 29.80 & 57.15 \\
+(b) ACL only & \underline{69.00} & 72.80
+& \textbf{65.60} & 31.60 & \underline{59.75} \\
+(c) ACL + Cross-attention & 60.20 & 62.80
+& \underline{64.60} & 24.80 & 53.10 \\
+(d) ACPD, injection off$^\dagger$ & 65.00 & \underline{73.00}
+& 64.40 & \underline{33.20} & 58.90 \\
+(e) ACPD & \textbf{73.20} & \textbf{73.80} & 63.60
+& \textbf{33.60} & \textbf{61.05} \\
+\bottomrule
+\end{tabular*}
+\end{table}
+
+\paragraph{Cue injection at inference.}
+Row (d) disables injection only during evaluation of a separately
+selected ACPD checkpoint. Its training retains both cue supervision
+and injection, so this row is not a model trained with cue loss
+alone. To isolate the inference effect, we also evaluate the
+checkpoint in row (e) with injection switched off
+(Table~\ref{tab:inference_injection}).
+Enabling injection increases Spatial success by 5.00 percentage
+points but reduces Goal success by 4.80 points.
+Mean success is 61.05\% with injection and 61.30\% without it;
+the paired 95\% interval for the difference is
+[-2.65, +2.15] percentage points, estimated from 10,000 bootstrap
+resamples of paired episodes within each task.
+Thus, inference-time injection changes the balance across suites
+without an established overall gain. This test measures the
+policy's reliance on the predicted residual at deployment;
+removing injection throughout training is a separate intervention.
+
+\begin{table}[t]
+\centering
+\caption{Inference-time injection ablation using the same ACPD
+checkpoint as row (e) of Table~\ref{tab:controlled_ablations}.
+Both settings use identical weights and 2,000 paired evaluation
+episodes. Entries are task success rates (\%).}
+\label{tab:inference_injection}
+\begin{tabular*}{0.95\columnwidth}{@{\extracolsep{\fill}}lrrrrr@{}}
+\toprule
+Injection & Spatial $\uparrow$ & Object $\uparrow$
+& Goal $\uparrow$ & Long $\uparrow$ & Avg. $\uparrow$ \\
+\midrule
+On & \textbf{73.20} & \underline{73.80} & \underline{63.60}
+& \underline{33.60} & \underline{61.05} \\
+Off & \underline{68.20} & \textbf{74.60} & \textbf{68.40}
+& \textbf{34.00} & \textbf{61.30} \\
+\bottomrule
+\end{tabular*}
+\end{table}
 
 \section{Conclusion}
 We have introduced ACPD for training weak-view VLA policies with privileged camera observations. ACPD combines compact, action-conditioned teacher cues with action-level correlation while preserving the original student policy at deployment. Experiments across three deployment views show improved weak-view performance, and four-suite ablations show positive contributions from all evaluated components. These results demonstrate the value of action-conditioned cross-view supervision without requiring additional deployment inputs.
