@@ -303,7 +303,7 @@ The teacher processes the privileged observations $o^t$ together with the noisy 
 +\mathbf{B}
 \right),
 \end{equation}
-where $d_h$ is the head dimension and $\mathbf{B}$ is the attention mask, with zero at permitted positions and $-\infty$ elsewhere. The softmax operates over key positions, so each row of $\mathbf{A}^{(m)}$ gives the attention weights for one action token.
+where $d_h$ is the head dimension and $\mathbf{B}$ denotes the teacher's native attention bias or mask. The softmax operates over key positions, so each row of $\mathbf{A}^{(m)}$ gives the attention weights for one action token.
 
 For privileged view $r$, let $\mathbf{A}_r^{(m)}$ contain the columns of $\mathbf{A}^{(m)}$ corresponding to that view's image tokens, and let $\mathbf{V}_r^{(m)}$ contain the matching rows of $\mathbf{V}^{(m)}$. Their product gives this view's weighted visual information for all $H$ action tokens:
 \begin{equation}
@@ -313,7 +313,7 @@ For privileged view $r$, let $\mathbf{A}_r^{(m)}$ contain the columns of $\mathb
 \end{equation}
 The attention weights retain their normalization over the full set of permitted key positions; they are not renormalized within a view. Consequently, each cue preserves the attention mass that the teacher assigned to that view, rather than rescaling every view to have equal weight. The selected values are contextualized representations at that camera's image-token positions, not outputs of an independent per-view encoder.
 
-We concatenate the outputs of the $M$ attention heads and apply the teacher's original output projection and time-conditioned scaling to obtain the cue:
+We concatenate the outputs of the $M$ attention heads and apply the teacher's original output projection and any native output scaling to obtain the cue:
 \begin{equation}
 \mathbf{C}_r
 =
@@ -324,7 +324,7 @@ We concatenate the outputs of the $M$ attention heads and apply the teacher's or
 \odot\mathbf{s}(\tau).
 \label{eq:cue}
 \end{equation}
-Here, $\mathbf{W}_O$ is the attention output projection, and $\mathbf{s}(\tau)$ is the teacher's existing elementwise scaling vector, shared across action positions. All parameters used in extraction belong to the frozen teacher.
+Here, $\mathbf{W}_O$ is the attention output projection, and $\mathbf{s}(\tau)$ denotes the teacher's native elementwise output scaling, shared across action positions. For teachers without this scaling, $\mathbf{s}(\tau)=\mathbf{1}$. All parameters used in extraction belong to the frozen teacher.
 
 Each row of $\mathbf{C}_r\in\mathbb{R}^{H\times D}$ is the cue from view $r$ for one action position, expressed in the action expert's $D$-dimensional feature space. The cue is action-conditioned because its weights come from the query of the corresponding action token, and view-specific because it uses only the image-token values selected from view $r$. These properties make the cues suitable as action-aligned supervision for the student without requiring spatial alignment between teacher and student image tokens.
 
