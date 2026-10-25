@@ -394,11 +394,13 @@ image tokens.
 \label{sec:cue_fusion}
 
 ACPD trains the student to predict the visual cues defined in
-Section~\ref{sec:cue_extraction} and uses these predictions to augment
-its action representations. Let $\mathbf{H}^s\in\mathbb{R}^{H\times D}$
-collect the hidden states at the corresponding layer of the
-student's flow-matching action expert, with one row per action
-position. A separate affine predictor $f_r$ estimates the cue matrix
+Section~\ref{sec:cue_extraction}. The predicted cues are injected into
+the student's final action representations through a learnable gate,
+providing auxiliary information for action decoding.
+Let $\mathbf{H}^s\in\mathbb{R}^{H\times D}$ denote the hidden states
+of the student's flow-matching action expert at the same layer index
+used for teacher cue extraction.
+A separate affine predictor $f_r$ estimates the cue matrix
 $\hat{\mathbf{C}}_r\in\mathbb{R}^{H\times D}$ for each privileged view:
 \begin{equation}
 \hat{\mathbf{C}}_r
@@ -406,8 +408,7 @@ $\hat{\mathbf{C}}_r\in\mathbb{R}^{H\times D}$ for each privileged view:
 f_r\!\left(\operatorname{LN}(\mathbf{H}^s)\right),
 \end{equation}
 where $\operatorname{LN}$ is parameter-free layer normalization.
-Both operations are applied row-wise, with predictor parameters
-shared across action positions.
+Each predictor is shared across action positions.
 Teacher cues and student predictions use the same noisy action
 block $\mathbf{a}^{\tau}$ and flow time $\tau$.
 
