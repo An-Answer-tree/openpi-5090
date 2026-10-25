@@ -292,7 +292,7 @@ The parameters $\theta$ and $\theta_{\mathrm{T}}$ denote the trainable student a
 \subsection{Action-Conditioned Visual Cue Extraction}
 \label{sec:cue_extraction}
 
-ACPD constructs action-conditioned visual cues from a frozen multi-view teacher as prediction targets for the single-view student. Each cue aggregates information from a privileged camera view using the teacher's attention during action prediction. The student learns to predict these cues from its own observations and incorporates them into action generation.
+ACPD constructs action-conditioned visual cues from a frozen multi-view teacher as prediction targets for the single-view student. For each teacher action token, ACPD computes a separate weighted sum of the image-token value vectors from each privileged view using the corresponding attention weights. The student learns to predict these cues from its own observations and incorporates them into action generation.
 
 The teacher's action tokens are hidden representations of the $H$ actions in $\mathbf{a}^{\tau}$, with one token per future control step. At a selected attention layer, queries derived from these representations determine how visual information is aggregated for each action prediction. For attention head $m$, let $\mathbf{Q}^{(m)}$ contain the action-token queries, and let $\mathbf{K}^{(m)}$ and $\mathbf{V}^{(m)}$ contain the keys and values of the teacher's token sequence. The teacher computes
 \begin{equation}
@@ -324,7 +324,7 @@ We concatenate the outputs of the $M$ attention heads and apply the teacher's or
 \odot\mathbf{s}(\tau).
 \label{eq:cue}
 \end{equation}
-Here, $\mathbf{W}_O$ is the attention output projection, and $\mathbf{s}(\tau)$ is the teacher's elementwise output scaling, shared across action positions. For teachers without this scaling, $\mathbf{s}(\tau)=\mathbf{1}$. All extraction parameters belong to the frozen teacher.
+Here, $\mathbf{W}_O$ is the attention output projection, and $\mathbf{s}(\tau)$ is the teacher's elementwise output scaling, shared across action positions. All extraction parameters belong to the frozen teacher.
 
 Each row of $\mathbf{C}_r\in\mathbb{R}^{H\times D}$ represents the information aggregated from view $r$ for one future control step, expressed in the action expert's $D$-dimensional feature space. The cue is action-conditioned because its weights are determined by the query for the corresponding action position, and view-specific because it uses only the image-token values selected from view $r$. These properties provide action-aligned supervision for the student without requiring spatial correspondence between teacher and student image tokens.
 
