@@ -267,8 +267,10 @@ More directly related to weak-view deployment, Acar et al. distill a multi-camer
 
 ACPD uses a frozen privileged-view teacher to supervise a weak-view flow-matching student during training (Figure~\ref{fig:framework}). We extract visual cues from each privileged view using the teacher's attention during action prediction. The student learns to predict these cues from its own observations. A learned gate controls how strongly the predicted cues are added to the student's action representations. An action correlation loss (ACL) aligns the relative variation of teacher and student flow-velocity predictions, complementing ground-truth flow-matching supervision.
 
+We first formulate the learning problem in Section~\ref{sec:problem}. Sections~\ref{sec:cue_extraction} and~\ref{sec:cue_fusion} describe visual cue extraction and student cue prediction with gated fusion, respectively. We then introduce ACL in Section~\ref{sec:acl} and present the overall training objective and deployment procedure in Section~\ref{sec:training}.
 
 \subsection{Problem Formulation}
+\label{sec:problem}
 
 Each training sample $(o^s,o^t,\mathbf{a})\sim\mathcal{D}$ contains synchronized student and teacher conditions from the same episode and timestep, together with a shared action target $\mathbf{a}$. The two conditions contain the same language instruction and proprioceptive state but differ in their camera observations. The student condition $o^s$ contains a single weak view, whereas the teacher condition $o^t$ contains one or more informative views available only during training. The goal is to improve the student through supervision from $o^t$ while requiring only $o^s$ at deployment.
 
@@ -288,6 +290,7 @@ The parameters $\theta$ and $\theta_{\mathrm{T}}$ denote the trainable student a
 
 
 \subsection{Action-Conditioned Visual Cue Extraction}
+\label{sec:cue_extraction}
 
 ACPD extracts visual cues from the teacher's attention during action prediction. At a selected layer $\ell$ of the teacher's action expert, we group image-token positions by camera and compute their contributions to the attention output. This produces a separate cue for each privileged view and each action position in the chunk.
 
@@ -381,6 +384,7 @@ student visual tokens.
 % \end{equation}
 % Equation~\eqref{eq:cue_loss} therefore supervises the student with compact, action-conditioned teacher targets rather than the teacher's complete representation.
 \subsection{Privileged-Cue Distillation}
+\label{sec:cue_fusion}
 
 Directly matching complete teacher and student representations can provide poorly aligned supervision across camera views. Privileged-cue distillation instead trains the student to predict the compact cues selected in the previous subsection. At each layer $\ell\in\mathcal{S}$, a layer-specific predictor $f_{\ell}$ maps the student action-token state to a predicted cue:
 \begin{equation*}
@@ -466,6 +470,7 @@ The prediction term uses the selected teacher cues to supervise the student's in
 
 
 \subsection{Action Correlation Loss}
+\label{sec:acl}
 
 At the representation level, privileged-cue distillation supervises the student's intermediate action-token states. At the action level, ACL aligns the teacher's and student's flow-velocity predictions through correlation rather than direct value matching.
 
@@ -487,6 +492,7 @@ In Equation~\eqref{eq:acl}, $\rho$ denotes Pearson correlation. The operator $\o
 Pearson correlation compares centered and normalized vectors, making ACL invariant to a global offset and positive rescaling of the flattened velocity chunk. Minimizing ACL therefore encourages the teacher and student predictions to exhibit a similar centered pattern across their velocity entries. The flow loss continues to anchor the velocity values to the ground-truth target $\mathbf{u}$, while ACL provides complementary guidance on their relative variation.
 
 \subsection{Training Objective and Deployment}
+\label{sec:training}
 
 The complete ACPD objective combines the base flow loss with the two auxiliary training objectives:
 \begin{equation}
