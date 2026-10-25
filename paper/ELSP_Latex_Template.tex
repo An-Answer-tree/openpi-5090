@@ -292,9 +292,9 @@ The parameters $\theta$ and $\theta_{\mathrm{T}}$ denote the trainable student a
 \subsection{Action-Conditioned Visual Cue Extraction}
 \label{sec:cue_extraction}
 
-To provide visual supervision aligned with each action position, ACPD uses the teacher's native attention computation to form a separate cue for each privileged camera view. The teacher processes the privileged observations $o^t$ together with the noisy action chunk $\mathbf{a}^{\tau}$ and flow time $\tau$. At a selected layer of its action expert, each action token queries the teacher's token representations. For each action token, ACPD weights that view's image-token value vectors by the corresponding attention weights and then applies the original attention projection and scaling.
+ACPD trains the single-view student to predict visual cues extracted from a multi-view teacher and use the predicted cues for action generation. To construct these prediction targets, we aggregate image-token value vectors from each privileged view using the attention weights of each teacher action token, then apply the teacher's original output projection and scaling.
 
-For attention head $m$, let $\mathbf{Q}^{(m)}$ contain the queries of the $H$ teacher action tokens, and let $\mathbf{K}^{(m)}$ and $\mathbf{V}^{(m)}$ contain the keys and values of the teacher's token sequence. The teacher's existing attention computes
+The teacher processes the privileged observations $o^t$ together with the noisy action chunk $\mathbf{a}^{\tau}$ and flow time $\tau$. At a selected layer of its action expert, each action token queries the teacher's token representations. For attention head $m$, let $\mathbf{Q}^{(m)}$ contain the queries of the $H$ teacher action tokens, and let $\mathbf{K}^{(m)}$ and $\mathbf{V}^{(m)}$ contain the keys and values of the teacher's token sequence. The teacher's existing attention computes
 \begin{equation}
 \mathbf{A}^{(m)}
 =
