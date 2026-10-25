@@ -192,17 +192,17 @@ We evaluate ACPD with $\pi_{0.5}$ using synchronized multi-view demonstrations f
 
 \section{Introduction}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.5\linewidth]{Figures/motivation.pdf}
-\caption{Single-view fine-tuning is sensitive to camera viewpoint on LIBERO. Each policy is trained and evaluated using only the indicated view, and the bars show mean task success rate across four LIBERO suites. The agent-view policy serves as the reference, with gap labels showing absolute differences in percentage points. The example observations show the same task-relevant object clearly visible in some views but occluded in others.}
-\label{fig:motivation}
-\end{figure}
+% \begin{figure}[t]
+% \centering
+% \includegraphics[width=0.5\linewidth]{Figures/motivation.pdf}
+% \caption{Single-view fine-tuning is sensitive to camera viewpoint on LIBERO. Each policy is trained and evaluated using only the indicated view, and the bars show mean task success rate across four LIBERO suites. The agent-view policy serves as the reference, with gap labels showing absolute differences in percentage points. The example observations show the same task-relevant object clearly visible in some views but occluded in others.}
+% \label{fig:motivation}
+% \end{figure}
 
 Vision-language-action (VLA) policies map language instructions and visual observations to robot actions, providing a general framework for language-conditioned manipulation. 
 Recent VLA policies increasingly employ diffusion or flow-matching action generators to model continuous action trajectories for robot control~\cite{chi2025diffusionpolicy,wen2025diffusionvla,black2025pi0}.
 However, their performance is constrained by the visual evidence available from the camera view at deployment. 
-When object pose, spatial relations, or gripper-object contact are occluded or only weakly visible, a policy relying on that view can perform substantially worse than one with access to a more informative view (Figure~\ref{fig:motivation}). 
+When object pose, spatial relations, or gripper-object contact are occluded or only weakly visible, a policy relying on that view can perform substantially worse than one with access to a more informative view.
 In practical systems, workspace geometry and robot hardware can constrain camera placement, leaving the policy with a less informative deployment view. 
 This practical constraint motivates weak-view policy learning, where a policy is deployed with a limited camera view but can receive training-time supervision from a more informative view.
 
@@ -241,12 +241,12 @@ Another line of work represents scene geometry explicitly. PerAct operates on vo
 
 Prior work addresses viewpoint variation through visual diversity, auxiliary-view representation learning, or explicit geometry. ACPD transfers action-conditioned visual cues from synchronized privileged views to a fixed-view student. These cues capture privileged-view contributions to the teacher's action-token attention outputs, providing supervision directly linked to action generation.
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{Figures/ACPD_method_overview.pdf}
-\caption{ACPD uses a frozen privileged-view teacher to supervise a trainable weak-view flow-matching student. (A) Each student action-token state queries the teacher's visual tokens and action-expert states to construct a compact privileged cue, and a cue predictor estimates the selected cue from the same student state. (B) ACL is one minus the Pearson correlation between the flattened flow-velocity predictions of the teacher and student. (C) The complete objective adds privileged-cue distillation and ACL to the base flow-matching loss. Only the weak-view student is retained for deployment.}
-\label{fig:framework}
-\end{figure}
+% \begin{figure}[t]
+% \centering
+% \includegraphics[width=\linewidth]{Figures/ACPD_method_overview.pdf}
+% \caption{ACPD uses a frozen privileged-view teacher to supervise a trainable weak-view flow-matching student. (A) Each student action-token state queries the teacher's visual tokens and action-expert states to construct a compact privileged cue, and a cue predictor estimates the selected cue from the same student state. (B) ACL is one minus the Pearson correlation between the flattened flow-velocity predictions of the teacher and student. (C) The complete objective adds privileged-cue distillation and ACL to the base flow-matching loss. Only the weak-view student is retained for deployment.}
+% \label{fig:framework}
+% \end{figure}
 
 
 \subsection{Privileged Distillation for Weak-View Policies}
@@ -257,7 +257,7 @@ More directly related to weak-view deployment, Acar et al. distill a multi-camer
 
 \section{Action-Conditioned Privileged Distillation}
 
-ACPD uses a frozen privileged-view teacher to supervise a weak-view flow-matching student during training (Figure~\ref{fig:framework}). We extract visual cues from each privileged view using the teacher's attention during action prediction. The student learns to predict these cues from its own observations. A learned gate controls how strongly the predicted cues are added to the student's action representations. An action correlation loss (ACL) aligns the relative variation of teacher and student flow-velocity predictions, complementing ground-truth flow-matching supervision.
+ACPD uses a frozen privileged-view teacher to supervise a weak-view flow-matching student during training. We extract visual cues from each privileged view using the teacher's attention during action prediction. The student learns to predict these cues from its own observations. A learned gate controls how strongly the predicted cues are added to the student's action representations. An action correlation loss (ACL) aligns the relative variation of teacher and student flow-velocity predictions, complementing ground-truth flow-matching supervision.
 
 We first formulate the learning problem in Section~\ref{sec:problem}. Sections~\ref{sec:cue_extraction} and~\ref{sec:cue_fusion} describe visual cue extraction and student cue prediction with gated fusion, respectively. We then introduce ACL in Section~\ref{sec:acl} and present the overall training objective and deployment procedure in Section~\ref{sec:training}.
 
@@ -413,12 +413,12 @@ The cue loss updates the predictors and their upstream student
 parameters, while the action losses update the gate and the
 student through its action-generation path.
 
-\begin{figure}[!t]
-\centering
-\includegraphics[width=\linewidth]{Figures/synchronized_multiview.pdf}
-\caption{Synchronized multi-view rendering of one LIBERO demonstration. Each column shows the same trajectory timestep across all five camera views. The agent and wrist views provide the default teacher input, while the back, top, and left views define the weak-view deployment settings. At each timestep, the views share the language instruction, proprioceptive state, and target action chunk; only the camera observation differs.}
-\label{fig:multiview_examples}
-\end{figure}
+% \begin{figure}[!t]
+% \centering
+% \includegraphics[width=\linewidth]{Figures/synchronized_multiview.pdf}
+% \caption{Synchronized multi-view rendering of one LIBERO demonstration. Each column shows the same trajectory timestep across all five camera views. The agent and wrist views provide the default teacher input, while the back, top, and left views define the weak-view deployment settings. At each timestep, the views share the language instruction, proprioceptive state, and target action chunk; only the camera observation differs.}
+% \label{fig:multiview_examples}
+% \end{figure}
 
 
 \subsection{Action Correlation Loss}
@@ -505,19 +505,19 @@ Overall & Single-view SFT & 78.95 & 78.35 & 76.80 & 50.25 & 71.09 & -- \\
 \end{tabular*}
 \end{table}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=\linewidth]{Figures/leftview_visibility.pdf}
-\caption{Representative LIBERO-Long rollouts under the left-view camera. Columns show normalized rollout progress from 0 to 100\%. In the high-visibility rollout (top), the robot arm and end effector remain largely within the camera frame. In the limited-visibility rollout (bottom), most of the robot arm is outside the frame.}
-\label{fig:leftview_visibility}
-\end{figure}
+% \begin{figure}[t]
+% \centering
+% \includegraphics[width=\linewidth]{Figures/leftview_visibility.pdf}
+% \caption{Representative LIBERO-Long rollouts under the left-view camera. Columns show normalized rollout progress from 0 to 100\%. In the high-visibility rollout (top), the robot arm and end effector remain largely within the camera frame. In the limited-visibility rollout (bottom), most of the robot arm is outside the frame.}
+% \label{fig:leftview_visibility}
+% \end{figure}
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=0.5\linewidth]{Figures/camera_view.pdf}
-\caption{Schematic camera configuration used for synchronized multi-view rendering. LIBERO provides the fixed agent camera and robot-mounted wrist camera; we add fixed back, top, and left cameras for the weak-view deployment settings.}
-\label{fig:camera_layout}
-\end{figure}
+% \begin{figure}[ht]
+% \centering
+% \includegraphics[width=0.5\linewidth]{Figures/camera_view.pdf}
+% \caption{Schematic camera configuration used for synchronized multi-view rendering. LIBERO provides the fixed agent camera and robot-mounted wrist camera; we add fixed back, top, and left cameras for the weak-view deployment settings.}
+% \label{fig:camera_layout}
+% \end{figure}
 
 
 \subsection{Synchronized Multi-View Data Construction}
@@ -525,14 +525,13 @@ Overall & Single-view SFT & 78.95 & 78.35 & 76.80 & 50.25 & 71.09 & -- \\
 LIBERO is a language-conditioned robot manipulation benchmark with human-teleoperated demonstrations~\cite{liu2023libero}. We use four suites: LIBERO-Spatial varies the spatial relation identifying the target bowl; LIBERO-Object varies the manipulated object; LIBERO-Goal changes the task goal while keeping the scene fixed; and LIBERO-Long contains 10 long-horizon tasks with diverse interactions and motor skills.
 
 We construct synchronized multi-view data by re-rendering all
-demonstrations from six cameras. As shown in Figure~\ref{fig:camera_layout},
-the setup includes LIBERO's fixed third-person \textit{agent view},
+demonstrations from six cameras. The setup includes LIBERO's
+fixed third-person \textit{agent view},
 the robot-mounted \textit{wrist view}, and four additional fixed views:
 back, top, left, and right. We manually inspect the additional camera
 placements across task scenes to obtain distinct viewing perspectives
 while retaining task-relevant visual information. Each timestep is
-rendered from all six views, producing synchronized frames as
-illustrated in Figure~\ref{fig:multiview_examples}. Frames across views
+rendered from all six views, producing synchronized frames. Frames across views
 share the same language instruction, proprioceptive state, and target
 action chunk.
 
