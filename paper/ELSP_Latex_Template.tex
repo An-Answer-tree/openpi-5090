@@ -475,21 +475,21 @@ to assess the contributions of ACPD's components.
 
 \begin{table}[htbp]
 \centering
-\caption{Task success rates (\%) for single-view fine-tuning (SFT) and ACPD on LIBERO-Spatial and LIBERO-Long. Each SFT--ACPD pair uses the same deployment camera and student training protocol; ACPD additionally receives training-only supervision from a frozen teacher observing the agent and wrist views (A+W). \textit{Avg.} is the mean of Spatial and Long, while \textit{Overall} averages the corresponding metric across the three deployment views. $\Delta_{\mathrm{FT}}$ is the ACPD--SFT difference in \textit{Avg.}, measured in percentage points. Bold indicates the higher result within each pair.}\label{tab:main_results}
+\caption{Task success rates (\%) for single-view supervised fine-tuning (Single-view SFT) and ACPD on LIBERO-Spatial and LIBERO-Long. Each baseline--ACPD pair uses the same deployment camera and student training protocol; ACPD additionally receives training-only supervision from a frozen teacher observing the agent and wrist views (A+W). \textit{Avg.} is the mean of Spatial and Long, while \textit{Overall} averages the corresponding metric across the three deployment views. $\Delta_{\mathrm{FT}}$ is the difference between ACPD and Single-view SFT in \textit{Avg.}, measured in percentage points. Bold indicates the higher result within each pair.}\label{tab:main_results}
 \begin{tabular}{@{}llrrrr@{}}
 \toprule
 Deployment view & Method & Spatial & Long & Avg. & $\Delta_{\mathrm{FT}}$ (pp) \\
 \midrule
-Back view & SFT & 68.8 & 31.0 & 49.9 & -- \\
+Back view & Single-view SFT & 68.8 & 31.0 & 49.9 & -- \\
 & ACPD & \textbf{71.8} & \textbf{32.0} & \textbf{51.9} & +2.0 \\
 \midrule
-Top view & SFT & 83.8 & 46.0 & 64.9 & -- \\
+Top view & Single-view SFT & 83.8 & 46.0 & 64.9 & -- \\
 & ACPD & \textbf{86.0} & \textbf{46.2} & \textbf{66.1} & +1.2 \\
 \midrule
-Left view & SFT & 49.4 & \textbf{56.8} & 53.1 & -- \\
+Left view & Single-view SFT & 49.4 & \textbf{56.8} & 53.1 & -- \\
 & ACPD & \textbf{53.2} & 55.0 & \textbf{54.1} & +1.0 \\
 \midrule
-Overall & SFT & 67.3 & \textbf{44.6} & 56.0 & -- \\
+Overall & Single-view SFT & 67.3 & \textbf{44.6} & 56.0 & -- \\
 & ACPD & \textbf{70.3} & 44.4 & \textbf{57.4} & +1.4 \\
 \bottomrule
 \end{tabular}
@@ -497,7 +497,7 @@ Overall & SFT & 67.3 & \textbf{44.6} & 56.0 & -- \\
 
 \begin{table}[htbp]
 \centering
-\caption{Component ablations for a back-view student, measured by task success rates (\%) across all four LIBERO suites. All variants share the reduced student training protocol of 15K updates and a batch size of 128. A and W denote the agent and wrist inputs to the frozen teacher, respectively, while \textit{Cue} and ACL denote privileged-cue distillation and the action correlation loss. $\Delta_{\mathrm{FT}}$ is the difference from Single-view FT in \textit{Avg.}, measured in percentage points.}\label{tab:controlled_ablations}
+\caption{Component ablations for a back-view student, measured by task success rates (\%) across all four LIBERO suites. All variants share the reduced student training protocol of 15K updates and a batch size of 128. A and W denote the agent and wrist inputs to the frozen teacher, respectively, while \textit{Cue} and ACL denote privileged-cue distillation and the action correlation loss. $\Delta_{\mathrm{FT}}$ is the difference from Single-view SFT in \textit{Avg.}, measured in percentage points.}\label{tab:controlled_ablations}
 \begin{tabular}{@{}
 >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.220}}
 >{\raggedright\arraybackslash}p{(\columnwidth - 18\tabcolsep) * \real{0.130}}
@@ -513,7 +513,7 @@ Overall & SFT & 67.3 & \textbf{44.6} & 56.0 & -- \\
 \toprule
 Variant & Teacher input & Cue & ACL & Spatial & Object & Goal & Long & Avg. & $\Delta_{\mathrm{FT}}$ \\
 \midrule
-Single-view FT & -- & -- & --
+Single-view SFT & -- & -- & --
 & 39.8 & 38.6 & 46.0 & 18.6 & 35.8 & -- \\
 Privileged cue only & A & \checkmark & --
 & 48.0 & 39.8 & 57.8 & 20.2 & 41.5 & +5.7 \\
@@ -563,7 +563,7 @@ action chunk.
 We evaluate four single-view deployment settings using the back,
 left, right, and top cameras. Each student receives its designated
 camera view, the language instruction, and the robot state.
-Single-view fine-tuning (SFT) optimizes the standard flow-matching
+Single-view supervised fine-tuning (Single-view SFT) optimizes the standard flow-matching
 objective. ACPD additionally uses a frozen $\pi_{0.5}$ teacher
 fine-tuned with synchronized agent and wrist views.
 All students are initialized from the same pretrained
@@ -585,7 +585,7 @@ layer 10, with feature dimension $D=1024$.
 We set $\lambda_{\mathrm{cue}}=0.2$ and
 $\lambda_{\mathrm{ACL}}=0.5$.
 
-Within each deployment view, SFT and ACPD share the training
+Within each deployment view, Single-view SFT and ACPD share the training
 demonstrations, student inputs, pretrained initialization,
 and optimization settings.
 The configurations used for the distillation baseline and
@@ -606,7 +606,7 @@ the four suites.
 
 \subsection{Overall Weak-View Performance}
 
-The frozen A+W teacher achieves success rates of 98.0\% on LIBERO-Spatial and 95.8\% on LIBERO-Long, establishing a strong privileged reference for distillation. Because this teacher requires both views at deployment, it is not directly comparable with the weak-view policies. Table~\ref{tab:main_results} compares ACPD with Single-view FT under the back, top, and left view deployment settings. For each setting, \textit{Avg.} denotes the mean success rate over Spatial and Long.
+The frozen A+W teacher achieves success rates of 98.0\% on LIBERO-Spatial and 95.8\% on LIBERO-Long, establishing a strong privileged reference for distillation. Because this teacher requires both views at deployment, it is not directly comparable with the weak-view policies. Table~\ref{tab:main_results} compares ACPD with Single-view SFT under the back, top, and left view deployment settings. For each setting, \textit{Avg.} denotes the mean success rate over Spatial and Long.
 
 ACPD improves the two-suite average under all three deployment views. The gains are 2.0 percentage points for the back view, 1.2 points for the top view, and 1.0 point for the left view. Averaged across the three views, ACPD increases success from 56.0\% to 57.4\%. The positive gains across different baseline performance levels indicate that the improvement is not confined to a single camera configuration.
 
@@ -617,7 +617,7 @@ ACPD provides modest improvements on LIBERO-Long under two of the three deployme
 
 \subsection{Ablations}
 
-Table~\ref{tab:controlled_ablations} isolates the contributions of privileged-cue distillation, ACL, and the teacher's wrist-view input using matched back-view students. Privileged-cue distillation raises average success from 35.8\% to 41.5\%, providing the largest individual gain. Adding ACL with the same agent-view teacher increases the average to 42.3\%, while including the wrist view raises it further to 43.2\%. Full ACPD therefore improves over Single-view FT by 7.4 percentage points, or 20.7\% relative. These results identify privileged-cue distillation as the primary contributor. ACL and the teacher's wrist-view input provide complementary gains.
+Table~\ref{tab:controlled_ablations} isolates the contributions of privileged-cue distillation, ACL, and the teacher's wrist-view input using matched back-view students. Privileged-cue distillation raises average success from 35.8\% to 41.5\%, providing the largest individual gain. Adding ACL with the same agent-view teacher increases the average to 42.3\%, while including the wrist view raises it further to 43.2\%. Full ACPD therefore improves over Single-view SFT by 7.4 percentage points, or 20.7\% relative. These results identify privileged-cue distillation as the primary contributor. ACL and the teacher's wrist-view input provide complementary gains.
 
 \section{Conclusion}
 We have introduced ACPD for training weak-view VLA policies with privileged camera observations. ACPD combines compact, action-conditioned teacher cues with action-level correlation while preserving the original student policy at deployment. Experiments across three deployment views show improved weak-view performance, and four-suite ablations show positive contributions from all evaluated components. These results demonstrate the value of action-conditioned cross-view supervision without requiring additional deployment inputs.
