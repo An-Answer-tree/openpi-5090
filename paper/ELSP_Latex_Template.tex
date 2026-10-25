@@ -469,7 +469,7 @@ student through its action-generation path.
 
 At the representation level, privileged-cue distillation supervises the student's intermediate action-token states. At the action level, ACL aligns the teacher's and student's flow-velocity predictions through correlation rather than direct value matching.
 
-Let $\mathbf{v}^{s}$ and $\mathbf{v}^{t}$ denote the student and teacher flow-velocity predictions computed from the same interpolated action $\mathbf{a}^{\tau}$ and flow time $\tau$, conditioned on $o^s$ and $o^t$, respectively. We flatten the action horizon and action dimensions as $\mathbf{x}^{s}=\operatorname{vec}(\mathbf{v}^{s})$ and $\mathbf{x}^{t}=\operatorname{vec}(\mathbf{v}^{t})$. The resulting loss is
+Let $\mathbf{v}^{s}$ and $\mathbf{v}^{t}$ denote the student and teacher flow-velocity predictions over the task's action dimensions (seven in LIBERO), computed from the same interpolated action $\mathbf{a}^{\tau}$ and flow time $\tau$, conditioned on $o^s$ and $o^t$, respectively. We flatten the action horizon and action dimensions for each sample as $\mathbf{x}^{s}=\operatorname{vec}(\mathbf{v}^{s})$ and $\mathbf{x}^{t}=\operatorname{vec}(\mathbf{v}^{t})$. The resulting loss is
 \begin{equation}
 \mathcal{L}_{\text{ACL}}
 =
@@ -500,9 +500,9 @@ The complete ACPD objective combines the base flow loss with the two auxiliary t
 \lambda_{\text{ACL}}\mathcal{L}_{\text{ACL}}.
 \label{eq:total}
 \end{equation}
-The teacher remains frozen, while the student, cue selector, and cue predictor are optimized jointly.
+The teacher remains frozen, while the student, cue predictors, and fusion gate are optimized jointly.
 
-After training, the teacher, cue selector, and cue predictor are discarded. The remaining student receives only $o^s$ and retains the original flow-matching VLA architecture. ACPD therefore adds neither privileged inputs nor auxiliary inference modules at deployment.
+After training, the teacher is discarded. The deployed student receives only $o^s$ and retains the cue predictors and fusion gate, using the same cue prediction and gated fusion as during training.
 
 
 \section{Experiments}
