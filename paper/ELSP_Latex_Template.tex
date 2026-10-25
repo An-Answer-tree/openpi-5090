@@ -393,28 +393,26 @@ image tokens.
 \subsection{Privileged-Cue Distillation}
 \label{sec:cue_fusion}
 
-ACPD trains the student to predict the visual cues defined in
-Section~\ref{sec:cue_extraction}. The predicted cues are injected into
-the student's final action representations through a learnable gate,
-providing auxiliary information for action decoding.
-Let $\mathbf{H}^s\in\mathbb{R}^{H\times D}$ denote the hidden states
-of the student's flow-matching action expert at the same layer index
-used for teacher cue extraction.
-A separate affine predictor $f_r$ estimates the cue matrix
-$\hat{\mathbf{C}}_r\in\mathbb{R}^{H\times D}$ for each privileged view:
+ACPD trains the student to predict the teacher cues defined in
+Section~\ref{sec:cue_extraction} and incorporates the predictions
+into its final action representations through gated addition.
+Let $\mathbf{H}^s\in\mathbb{R}^{H\times D}$ denote the student's
+action-token hidden states at the same layer index used for
+teacher cue extraction. For each privileged view $r$, a separate
+affine predictor $f_r$, shared across action positions, estimates
 \begin{equation}
 \hat{\mathbf{C}}_r
 =
 f_r\!\left(\operatorname{LN}(\mathbf{H}^s)\right),
 \end{equation}
-where $\operatorname{LN}$ is parameter-free layer normalization.
-Each predictor is shared across action positions.
-Teacher cues and student predictions use the same noisy action
-block $\mathbf{a}^{\tau}$ and flow time $\tau$.
+where $\operatorname{LN}$ denotes layer normalization without
+learnable affine parameters.
+Teacher targets and student predictions are computed using the
+same noisy action block $\mathbf{a}^{\tau}$ and flow time $\tau$.
 
-Cue prediction is supervised separately for each view using
-mean-squared error normalized by the teacher cue energy.
-For $R$ privileged views, we define
+Each predictor regresses the teacher cue directly, with the
+prediction error normalized by the mean squared target magnitude
+for its view. For $R$ privileged views, the cue loss is
 \begin{equation}
 \mathcal{L}_{\mathrm{cue}}
 =
@@ -431,12 +429,9 @@ For $R$ privileged views, we define
 Both $\operatorname{MSE}$ and $\operatorname{Mean}$ average over
 minibatch samples, action positions, and feature dimensions,
 with $\varepsilon=10^{-8}$.
-The regression objective retains both the direction and magnitude
-of the teacher cues for subsequent fusion. View-wise normalization
-expresses the prediction error relative to each view's target scale.
 
-The student combines the predicted cues through gated addition
-to its final action representations $\mathbf{H}_{\mathrm{final}}^s$:
+The predicted cues are fused with the student's final action
+representations $\mathbf{H}_{\mathrm{final}}^s$:
 \begin{equation}
 \tilde{\mathbf{H}}^s
 =
@@ -447,19 +442,19 @@ to its final action representations $\mathbf{H}_{\mathrm{final}}^s$:
 \operatorname{sg}\!\left[\hat{\mathbf{C}}_r\right].
 \label{eq:cue_fusion}
 \end{equation}
-The learned scalar $\gamma$, shared across views and action
-positions, controls the contribution of the predicted cues.
-It is initialized to zero, leaving the original action
-representations unchanged at initialization.
-The original action output projection maps the fused
-representations $\tilde{\mathbf{H}}^s$ to flow-velocity predictions.
+The learnable scalar $\gamma$ is shared across views and action
+positions. It is initialized to zero, so that
+$\tilde{\mathbf{H}}^s=\mathbf{H}_{\mathrm{final}}^s$
+at initialization.
+The student's existing action output projection maps
+$\tilde{\mathbf{H}}^s$ to flow-velocity predictions.
 
-The stop-gradient operator $\operatorname{sg}$ prevents the
-flow-matching and action correlation losses from backpropagating
-through the cue predictions. The cue loss supervises the predictors
-and the student's intermediate action representations; the action
-losses train the gate and update the student through its original
-action-generation path.
+The stop-gradient operator $\operatorname{sg}$ blocks gradients
+from the flow-matching and action correlation losses through
+the cue-prediction branch.
+The cue loss updates the predictors and their upstream student
+parameters, while the action losses update the gate and the
+student through its action-generation path.
 
 \begin{figure}[!t]
 \centering
