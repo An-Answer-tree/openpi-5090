@@ -411,34 +411,25 @@ block $\mathbf{a}^{\tau}$ and flow time $\tau$.
 
 Cue prediction is supervised separately for each view using
 mean-squared error normalized by the teacher cue energy.
-For a minibatch of $B$ samples and $R$ privileged views, we define
+Let $\hat{\mathbf{C}}_r\in\mathbb{R}^{H\times D}$ stack the
+predicted cues across action positions. For $R$ privileged views,
+we define
 \begin{equation}
-\begin{aligned}
-p_r
-&=
-\frac{1}{BHD}
-\sum_{b=1}^{B}
-\left\|\mathbf{C}_{b,r}\right\|_F^2,
-\\
 \mathcal{L}_{\mathrm{cue}}
-&=
+=
 \frac{1}{R}
 \sum_{r=1}^{R}
 \frac{
-\sum_{b=1}^{B}
-\left\|
-\hat{\mathbf{C}}_{b,r}-\mathbf{C}_{b,r}
-\right\|_F^2
+\operatorname{MSE}(\hat{\mathbf{C}}_r,\mathbf{C}_r)
 }{
-BHD\,\max(p_r,\varepsilon)
+\max\!\left(\operatorname{Mean}(\mathbf{C}_r\odot\mathbf{C}_r),
+\varepsilon\right)
 }.
-\end{aligned}
 \label{eq:cue_loss}
 \end{equation}
-Here, $\hat{\mathbf{C}}_{b,r}\in\mathbb{R}^{H\times D}$ contains
-the predicted cues for sample $b$ and view $r$,
-$p_r$ is the mean squared magnitude of that view's teacher cues,
-and $\varepsilon=10^{-8}$.
+Both $\operatorname{MSE}$ and $\operatorname{Mean}$ average over
+minibatch samples, action positions, and feature dimensions,
+with $\varepsilon=10^{-8}$.
 The regression objective retains both the direction and magnitude
 of the teacher cues for subsequent fusion. View-wise normalization
 expresses the prediction error relative to each view's target scale.
