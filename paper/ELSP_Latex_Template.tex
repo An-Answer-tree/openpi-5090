@@ -587,8 +587,17 @@ ACPD & A+W & \checkmark & \checkmark
 
 LIBERO is a language-conditioned robot manipulation benchmark with human-teleoperated demonstrations~\cite{liu2023libero}. We use four suites: LIBERO-Spatial varies the spatial relation identifying the target bowl; LIBERO-Object varies the manipulated object; LIBERO-Goal changes the task goal while keeping the scene fixed; and LIBERO-Long contains 10 long-horizon tasks with diverse interactions and motor skills.
 
-We construct synchronized multi-view data by re-rendering all demonstrations from five cameras. As shown in Figure~\ref{fig:camera_layout}, the setup includes
-LIBERO's fixed third-person \textit{agent view}, robot-mounted \textit{wrist view}, and three additional fixed views: back, top, and left. Each timestep is rendered from all five views, producing synchronized frames as illustrated in Figure~\ref{fig:multiview_examples}. Frames across views share the same language instruction, proprioceptive state, and target action chunk.
+We construct synchronized multi-view data by re-rendering all
+demonstrations from six cameras. As shown in Figure~\ref{fig:camera_layout},
+the setup includes LIBERO's fixed third-person \textit{agent view},
+the robot-mounted \textit{wrist view}, and four additional fixed views:
+back, top, left, and right. We manually inspect the additional camera
+placements across task scenes to obtain distinct viewing perspectives
+while retaining task-relevant visual information. Each timestep is
+rendered from all six views, producing synchronized frames as
+illustrated in Figure~\ref{fig:multiview_examples}. Frames across views
+share the same language instruction, proprioceptive state, and target
+action chunk.
 
 
 \subsection{Experimental Setup}
