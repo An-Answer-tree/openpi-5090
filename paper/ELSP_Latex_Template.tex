@@ -287,32 +287,63 @@ The student is trained by minimizing the mean-squared error between its predicte
 The parameters $\theta$ and $\theta_{\mathrm{T}}$ denote the trainable student and frozen teacher parameters, respectively. The teacher predicts $\mathbf{v}_{\theta_{\mathrm{T}}}(\mathbf{a}^{\tau},\tau,o^t)$ from the same interpolated action and flow time. 
 
 
-\subsection{Action-Conditioned Privileged Cue Selection}
+\subsection{Action-Conditioned Visual Cue Extraction}
 
-The teacher and student observe the same scene from different camera viewpoints. As a result, task-relevant evidence available to the teacher may be absent from the weak view, while the same scene element may appear at different image locations and token positions. Directly matching their full representations may therefore provide poorly aligned supervision. ACPD instead constructs an \textit{action-conditioned privileged cue} for each student action token.
+ACPD extracts visual cues from the teacher's attention during action prediction. At a selected layer $\ell$ of the teacher's action expert, we group image-token positions by camera and compute their contributions to the attention output. This produces a separate cue for each privileged view and each action position in the chunk.
 
-At each selected action-expert layer $\ell\in\mathcal{S}$, the selector uses two sources of teacher information. The visual tokens $\mathbf{Z}^{t}$ are extracted by the teacher's visual backbone from its privileged-view input. The action-expert states $\mathbf{G}_{\ell}^{t}$ are the hidden states produced at layer $\ell$ of the teacher's action expert when it processes $(\mathbf{a}^{\tau},\tau,o^t)$. They therefore incorporate all camera views in $o^t$ together with the action context. Layer-specific projectors map both token sequences to the cue dimension $D_c$ and concatenate them along the token dimension to form the privileged feature sequence
-\begin{equation*}
-\mathbf{F}_{\ell}^{t}
-=
-\left[
-\phi_{v}^{(\ell)}(\mathbf{Z}^{t});
-\phi_{a}^{(\ell)}(\mathbf{G}_{\ell}^{t})
-\right].
-\end{equation*}
-
-Let $\mathbf{h}_{\ell,i}^{s}$ denote the student hidden state for action token $i$ at layer $\ell$, computed from $(\mathbf{a}^{\tau},\tau,o^s)$. The selector uses this state to query the privileged feature sequence:
+Let $\mathbf{q}_{\ell,i}^{(m)}$ denote the teacher's query for action position $i$ in attention head $m$, and let $\mathbf{k}_{\ell,j}^{(m)}$ and $\mathbf{v}_{\ell,j}^{(m)}$ denote the key and value at token position $j$. All quantities are computed from the teacher input $(\mathbf{a}^{\tau},\tau,o^t)$. The attention weight is
 \begin{equation}
-\mathbf{c}_{\ell,i}
+\alpha_{\ell,ij}^{(m)}
 =
-\operatorname{Attn}\!\left(
-Q_{\ell}(\operatorname{sg}[\mathbf{h}_{\ell,i}^{s}]),
-K_{\ell}(\mathbf{F}_{\ell}^{t}),
-V_{\ell}(\mathbf{F}_{\ell}^{t})
-\right).
+\frac{
+\exp\!\left(
+(\mathbf{q}_{\ell,i}^{(m)})^{\top}
+\mathbf{k}_{\ell,j}^{(m)}/\sqrt{d_h}
+\right)
+}{
+\sum_{j'\in\mathcal{K}_i}
+\exp\!\left(
+(\mathbf{q}_{\ell,i}^{(m)})^{\top}
+\mathbf{k}_{\ell,j'}^{(m)}/\sqrt{d_h}
+\right)
+},
+\end{equation}
+where $d_h$ is the head dimension and $\mathcal{K}_i$ contains all key positions permitted by the teacher's attention mask.
+
+For privileged view $r$, let $\mathcal{I}_r$ contain its image-token positions. We aggregate the corresponding values using the teacher's original attention weights:
+\begin{equation}
+\begin{aligned}
+\mathbf{z}_{\ell,i}^{(r,m)}
+&=
+\sum_{j\in\mathcal{I}_r}
+\alpha_{\ell,ij}^{(m)}
+\mathbf{v}_{\ell,j}^{(m)},\\
+\mathbf{c}_{\ell,i}^{(r)}
+&=
+\mathbf{s}_{\ell}^{t}(\tau)
+\odot
+\mathbf{W}_{\ell,O}^{t}
+\operatorname{Concat}_{m=1}^{M}
+\!\left(\mathbf{z}_{\ell,i}^{(r,m)}\right).
+\end{aligned}
 \label{eq:cue}
 \end{equation}
-In Equation~\eqref{eq:cue}, $\operatorname{Attn}$ denotes cross-attention, and $Q_{\ell}$, $K_{\ell}$, and $V_{\ell}$ are learned layer-specific projections. The stop-gradient operator $\operatorname{sg}[\cdot]$ blocks the cue-selection branch from updating the student through its query, while leaving the selector trainable. Each action-token state provides a separate query to the full teacher feature sequence. The selected teacher information therefore depends on that state, making cue selection action-conditioned.
+Here, $M$ is the number of attention heads,
+$\mathbf{W}_{\ell,O}^{t}$ is the teacher's attention output projection,
+and $\mathbf{s}_{\ell}^{t}(\tau)$ is its existing time-conditioned
+scaling vector, applied before the attention update is added to the
+hidden state. The attention weights retain their normalization over
+$\mathcal{K}_i$, preserving each view's contribution to the full
+attention update. All extraction operations reuse frozen teacher
+parameters.
+
+Each cue $\mathbf{c}_{\ell,i}^{(r)}\in\mathbb{R}^{D}$ summarizes the
+contextualized representations at one camera's image-token positions,
+weighted by the teacher's query for the corresponding action.
+This dependence on the action query makes the cue action-conditioned.
+The resulting cues provide supervision at corresponding action
+positions without requiring spatial alignment between teacher and
+student visual tokens.
 
 % \subsection{Privileged-Cue Distillation}
 
