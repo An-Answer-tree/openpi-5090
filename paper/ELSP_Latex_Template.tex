@@ -469,7 +469,7 @@ student through its action-generation path.
 
 At the representation level, privileged-cue distillation supervises the student's intermediate action-token states. At the action level, ACL aligns the teacher's and student's flow-velocity predictions through correlation rather than direct value matching.
 
-Let $\mathbf{v}^{s}$ and $\mathbf{v}^{t}$ denote the student and teacher flow-velocity predictions over the task's action dimensions (seven in LIBERO), computed from the same interpolated action $\mathbf{a}^{\tau}$ and flow time $\tau$, conditioned on $o^s$ and $o^t$, respectively. We flatten the action horizon and action dimensions for each sample as $\mathbf{x}^{s}=\operatorname{vec}(\mathbf{v}^{s})$ and $\mathbf{x}^{t}=\operatorname{vec}(\mathbf{v}^{t})$. The resulting loss is
+Let $\mathbf{v}^{s}$ and $\mathbf{v}^{t}$ denote the student and teacher flow-velocity predictions over the task's action dimensions, computed from the same interpolated action $\mathbf{a}^{\tau}$ and flow time $\tau$, conditioned on $o^s$ and $o^t$, respectively. We flatten the action horizon and action dimensions for each sample as $\mathbf{x}^{s}=\operatorname{vec}(\mathbf{v}^{s})$ and $\mathbf{x}^{t}=\operatorname{vec}(\mathbf{v}^{t})$. The resulting loss is
 \begin{equation}
 \mathcal{L}_{\text{ACL}}
 =
