@@ -559,16 +559,51 @@ action chunk.
 
 \subsection{Experimental Setup}
 
-\paragraph{Cross-view comparisons.}
-We evaluate ACPD under three weak-view deployment settings, where the student observes only the back, top, or left camera. For each setting, Single-view FT serves as the matched baseline: it is initialized from the pretrained $\pi_{0.5}$ checkpoint~\cite{black2025pi05} and optimized using only the standard flow-matching objective. To ensure a controlled comparison, the ACPD student uses the same initialization, weak-view observations, demonstrations, and number of training updates as its Single-view FT counterpart. The only difference is the additional supervision provided during training by a separately fine-tuned and frozen $\pi_{0.5}$ teacher, which observes synchronized agent and wrist views (A+W). Accordingly, the ACPD student is trained with the flow-matching objective together with privileged-cue distillation and ACL. We additionally consider an agent-view-only teacher (A) in the ablations to measure the contribution of the wrist view. At deployment, the teacher and all auxiliary modules are discarded, and the student operates solely on its designated weak view.
+\paragraph{Policy configurations.}
+We evaluate four single-view deployment settings using the back,
+left, right, and top cameras. Each student receives its designated
+camera view, the language instruction, and the robot state.
+Single-view fine-tuning (SFT) optimizes the standard flow-matching
+objective. ACPD additionally uses a frozen $\pi_{0.5}$ teacher
+fine-tuned for 30K updates with synchronized agent and wrist views.
+All students are initialized from the same pretrained
+$\pi_{0.5}$ checkpoint~\cite{black2025pi05}.
+At deployment, ACPD retains its cue predictors and fusion gate,
+and requires only the student's designated camera view.
 
+\paragraph{Training settings.}
+Students are fine-tuned using LoRA with ranks of 16 for the
+vision-language backbone and 32 for the action expert.
+Training uses four NVIDIA RTX 5090 GPUs with fully sharded data
+parallelism and a global batch size of 64.
+We use AdamW with gradient clipping at a norm of 1.0.
+The learning rate increases linearly to $2.5\times10^{-5}$
+during the first 1K updates, then follows a cosine schedule
+to $2.5\times10^{-6}$ at 30K updates and remains constant
+thereafter. The training seed is 42.
+For ACPD, cues are extracted and predicted at action-expert
+layer 10, with feature dimension $D=1024$.
+We set $\lambda_{\mathrm{cue}}=0.2$ and
+$\lambda_{\mathrm{ACL}}=0.5$.
 
-\paragraph{Training and evaluation.}
-We fine-tune two teachers with A and A+W camera inputs from the pretrained $\pi_{0.5}$ checkpoint for 30K updates with a batch size of 256. In the main comparison, Single-view FT and ACPD students are trained for 30K updates with a batch size of 256. To reduce computational cost, all back-view students in the ablation study are trained for 15K updates with a batch size of 128. Within each experimental setting, all student variants share the same demonstrations, training budget, AdamW optimizer, and learning-rate schedule. The learning rate is linearly warmed up to $5\times10^{-5}$ over the first 10K updates and then decayed using a cosine schedule. All experiments are conducted on a server equipped with $8\times$ NVIDIA H20 GPUs.
+\paragraph{Reported checkpoints.}
+The main comparison reports the 35K checkpoint for both
+back-view SFT and ACPD. For the left, right, and top views,
+we report SFT at 30K and ACPD at 32K.
+The configurations used for the distillation baseline and
+component studies are specified in their respective subsections.
 
-For all policies, we follow the standard $\pi_{0.5}$ flow-time sampling scheme. The action horizon is $H=10$, and the policy replans after executing five actions. For ACPD, we set the cue dimension to $D_c=1024$ and select action-expert layers $\mathcal{S}=\{6,12\}$. The loss weights are $\lambda_{\text{cue}}=0.2$, $\lambda_{\text{var}}=0.1$, and $\lambda_{\text{ACL}}=0.5$.
-
-We evaluate each task over 50 rollouts using the same environment seeds and task-initialization sequence for all compared policies. For each LIBERO suite, we average success rates across its tasks. \textit{Avg.} is the unweighted mean across the suites included in each table.
+\paragraph{Evaluation protocol.}
+All policies predict action chunks of length $H=10$ and
+replan after executing five actions.
+We evaluate each policy on all four LIBERO suites, using
+50 rollouts per task and the same initial-state sequence
+and evaluation seed of 7.
+Each suite contains 10 tasks, yielding 500 rollouts per suite
+and 2,000 rollouts per policy.
+We report task success rates, with suite scores averaged
+over tasks and the overall score averaged equally over
+the four suites.
 
 
 \subsection{Overall Weak-View Performance}
