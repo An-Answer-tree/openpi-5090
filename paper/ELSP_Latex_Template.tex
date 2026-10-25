@@ -243,7 +243,7 @@ To capture temporal structure, policies predict action chunks~\cite{zhao2023act}
 
 \subsection{Viewpoint Robustness in Robot Manipulation}
 
-Viewpoint changes alter the visibility and image location of task-relevant evidence. Prior work uses multi-camera demonstrations or auxiliary views for representation learning~\cite{ablett2021multiview,seo2023multiview}. View-augmentation methods such as SPARTN, VISTA, and RoVi-Aug synthesize or re-render observations from additional camera poses~\cite{zhou2023spartn,tian2025vista,chen2025roviaug}.
+Viewpoint changes alter the visibility and appearance of task-relevant cues. Prior work addresses this variation using demonstrations collected across viewpoints~\cite{ablett2021multiview} or auxiliary views for representation learning~\cite{seo2023multiview}. To expand viewpoint coverage without additional demonstrations, SPARTN, VISTA, and RoVi-Aug synthesize training observations from alternative camera poses~\cite{zhou2023spartn,tian2025vista,chen2025roviaug}.
 
 Another line of work represents scene geometry explicitly. PerAct operates on voxelized scenes, while RVT projects 3D observations into virtual views~\cite{shridhar2023peract,goyal2023rvt}. 3D-MVP learns geometric representations through multi-view pretraining, whereas Act3D uses a continuous 3D feature field~\cite{qian20253dmvp,gervet2023act3d}. DP3 combines point-cloud observations with diffusion-based action generation~\cite{ze2024dp3}.
 
