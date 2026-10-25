@@ -292,7 +292,7 @@ The parameters $\theta$ and $\theta_{\mathrm{T}}$ denote the trainable student a
 \subsection{Action-Conditioned Visual Cue Extraction}
 \label{sec:cue_extraction}
 
-ACPD extracts visual cues from a frozen multi-view teacher and uses them as prediction targets for the single-view student. At the selected teacher layer, the action block $\mathbf{a}^{\tau}$ is represented by $H$ hidden states, one for each future control step. We refer to these states as action tokens. Their queries determine how the teacher aggregates visual information for each action position. For every privileged view $r$, ACPD constructs one cue for each action token.
+ACPD extracts visual cues from a frozen multi-view teacher and uses them as prediction targets for the single-view student. At the selected layer of the teacher's flow-matching action expert, the action block $\mathbf{a}^{\tau}$ is represented by $H$ hidden states, one for each future control step. We refer to these states as action tokens. Their queries determine how the teacher aggregates visual information for each action position. For every privileged view $r$, ACPD constructs one cue for each action token.
 
 For attention head $m$, let $\mathbf{Q}^{(m)}$ contain the queries from the action tokens, and let $\mathbf{K}^{(m)}$ and $\mathbf{V}^{(m)}$ contain the keys and values of the teacher's token sequence. The teacher computes
 \begin{equation}
