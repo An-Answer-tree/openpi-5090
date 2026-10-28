@@ -456,7 +456,11 @@ Let $\mathbf{v}^{s}$ and $\mathbf{v}^{t}$ denote the student and teacher predict
 \end{equation}
 Here, $\rho$ is Pearson correlation, and $\operatorname{sg}[\cdot]$ stops gradients through the teacher prediction.
 
-Pearson correlation compares centered, normalized vectors. ACL is therefore invariant to a global offset and positive rescaling of each flattened velocity chunk. It aligns the relative variation across velocity entries. The flow loss anchors their absolute values to the ground-truth target $\mathbf{u}$.
+ACL aligns the relative variation of teacher and student flow-velocity
+predictions across control steps and action dimensions, without requiring
+pointwise value matching. The flow loss provides complementary supervision
+by constraining the student's predicted velocities to the ground-truth
+target $\mathbf{u}$.
 
 \subsection{Training Objective and Deployment}
 \label{sec:training}
