@@ -354,13 +354,13 @@ apply the teacher's output projection and time-conditioned scaling:
 Here, $\mathbf{W}_O$ denotes the attention output projection and
 $\mathbf{s}(\tau)$ denotes the time-conditioned elementwise scale.
 
-The resulting matrix $\mathbf{C}_r\in\mathbb{R}^{H\times D}$ provides
-one $D$-dimensional prediction target per future control step. Each
-target is conditioned on the corresponding action-token query and
-lies in the teacher's action feature space. These cues provide
-action-aligned supervision without requiring full hidden-state
-distillation or spatial correspondence between teacher and student
-image tokens.
+The resulting matrix $\mathbf{C}_r\in\mathbb{R}^{H\times D}$
+provides one $D$-dimensional prediction target per future control
+step. These cues establish supervision at corresponding action
+positions, allowing knowledge transfer across camera views
+without matching individual image tokens. The student learns
+action-related visual cues without reproducing the teacher's
+complete hidden representation.
 
 \subsection{Privileged Cue Distillation}
 \label{sec:cue_fusion}
