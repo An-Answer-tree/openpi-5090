@@ -335,10 +335,9 @@ these positions to the attention output is
 \mathbf{A}_r^{(m)}\mathbf{V}_r^{(m)}.
 \end{equation}
 We retain the teacher's original attention weights without renormalizing
-them within view $r$. This preserves the attention mass assigned to
-that view for each action position. The selected values are
-contextualized representations at that view's image-token positions
-and may incorporate information from other tokens.
+them within each view. This provides the student with visual targets
+that preserve the teacher's relative emphasis on different views for
+each action prediction.
 
 We concatenate the contributions across the $M$ attention heads and
 apply the teacher's output projection and time-conditioned scaling:
