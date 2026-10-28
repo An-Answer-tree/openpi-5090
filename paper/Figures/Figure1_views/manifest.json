@@ -1,0 +1,47 @@
+{
+  "source_hdf5": "/opt/liutong/libero_multiview_tuned_6view_hdf5/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate_demo.hdf5",
+  "suite": "libero_spatial",
+  "task_index_zero_based": 0,
+  "task": "pick up the black bowl between the plate and the ramekin and place it on the plate",
+  "episode": "demo_0",
+  "episode_frames": 98,
+  "step_index_zero_based": 43,
+  "state_sha256": "41d9b1334b3bbacd5fe2a0bb04c3fe9d1ba148525b5be09a3f038d97187a0b1c",
+  "model_xml_sha256": "c549ba497029ea14067e16fdaa2443a805e5057c3d907104124df1b1e6b2ecb0",
+  "selection": "Approach to the target bowl; contrasting visibility across synchronized views.",
+  "rendering": "Recorded XML and state; original cameras; no physics steps; vertical flip to image coordinates.",
+  "resolution": [
+    1536,
+    1536
+  ],
+  "images": [
+    {
+      "view": "backview",
+      "camera": "operation_backview",
+      "file": "backview.png",
+      "native_256px_mean_absolute_error_0_255": 1.0491180419921875,
+      "sha256": "41aa213705e820f2069d3cfe2feb20a949bec693e09845473357c0428757024a"
+    },
+    {
+      "view": "leftview",
+      "camera": "operation_leftview",
+      "file": "leftview.png",
+      "native_256px_mean_absolute_error_0_255": 1.0890909830729167,
+      "sha256": "600d0108c0cdd9b3a94201c558aa794b01588b343f965eb75b21611506223786"
+    },
+    {
+      "view": "rightview",
+      "camera": "operation_rightview",
+      "file": "rightview.png",
+      "native_256px_mean_absolute_error_0_255": 1.0197397867838542,
+      "sha256": "dbe31b32d786a4c7a2ac6015beddd3ffa1094d59391420d06a7831c3be353230"
+    },
+    {
+      "view": "topview",
+      "camera": "operation_topview",
+      "file": "topview.png",
+      "native_256px_mean_absolute_error_0_255": 1.2122853597005208,
+      "sha256": "5c0cecdef736000bced17acc2422f000da274e43a2bef07b285c08b3750dea5d"
+    }
+  ]
+}

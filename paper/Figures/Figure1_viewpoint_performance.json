@@ -5,7 +5,8 @@
   "suite_labels": ["Spatial", "Object", "Goal", "Long"],
   "episodes_per_suite": 500,
   "width_cm": 15.75,
-  "height_cm": 4.0,
+  "height_cm": 7.5,
+  "image_provenance": "Figure1_views/manifest.json",
   "views": [
     {
       "label": "Back",
