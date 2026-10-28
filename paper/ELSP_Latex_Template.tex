@@ -136,6 +136,24 @@
     \end{figure}
 }
 
+% Place the method overview at the top of page 4.
+\afterpage{%
+    \afterpage{%
+        \afterpage{%
+            \begin{figure}[H]
+            \centering
+            \fbox{%
+                \begin{minipage}[c][5cm][c]{0.94\linewidth}
+                    \mbox{}
+                \end{minipage}%
+            }
+            \caption{Overview of the ACPD framework.}
+            \label{fig:framework}
+            \end{figure}
+        }
+    }
+}
+
 \let\thefootnote\relax
 \footnotetext{
 \newline
@@ -265,7 +283,7 @@ More directly related to weak-view deployment, Acar et al. distill a multi-camer
 
 \section{Action-Conditioned Privileged Distillation}
 
-ACPD uses a frozen privileged-view teacher to supervise a weak-view flow-matching student during training. We extract visual cues from each privileged view using the teacher's attention during action prediction. The student learns to predict these cues from its own observations. A learned gate controls how strongly the predicted cues are added to the student's action representations. An action correlation loss (ACL) aligns the relative variation of teacher and student flow-velocity predictions, complementing ground-truth flow-matching supervision.
+ACPD uses a frozen privileged-view teacher to supervise a weak-view flow-matching student during training. We extract visual cues from each privileged view using the teacher's attention during action prediction. The student learns to predict these cues from its own observations. A learned gate controls how strongly the predicted cues are added to the student's action representations. An action correlation loss (ACL) aligns the relative variation of teacher and student flow-velocity predictions, complementing ground-truth flow-matching supervision. The ACPD framework is illustrated in Figure~\ref{fig:framework}.
 
 We first formulate the learning problem in Section~\ref{sec:problem}. Sections~\ref{sec:cue_extraction} and~\ref{sec:cue_fusion} describe visual cue extraction and student cue prediction with gated fusion, respectively. We then introduce ACL in Section~\ref{sec:acl} and present the overall training objective and deployment procedure in Section~\ref{sec:training}.
 
