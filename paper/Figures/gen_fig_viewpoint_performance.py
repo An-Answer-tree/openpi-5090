@@ -46,7 +46,7 @@ def main():
     )
     fig = plt.figure(figsize=(data["width_cm"] / 2.54, data["height_cm"] / 2.54))
     colors = ["#0072B2", "#E69F00", "#009E73", "#CC79A7"]
-    fig.text(0.005, 0.99, "(a) Camera views", va="top", fontsize=9, fontweight="bold")
+    fig.text(0.1645, 0.99, "(a) Camera views", ha="center", va="top", fontsize=9, fontweight="bold")
     image_width = 0.152
     image_height = image_width * data["width_cm"] / data["height_cm"]
     for i, view in enumerate(data["views"]):
@@ -72,7 +72,7 @@ def main():
             fontsize=8.5,
         )
 
-    fig.text(0.392, 0.99, "(b) Single-view SFT success rate (%)", va="top", fontsize=9, fontweight="bold")
+    fig.text(0.694, 0.99, "(b) Single-view SFT success rate (%)", ha="center", va="top", fontsize=9, fontweight="bold")
     for suite_index, suite in enumerate(data["suite_labels"]):
         left = 0.395 + (suite_index % 2) * 0.325
         bottom = 0.569 if suite_index < 2 else 0.116
