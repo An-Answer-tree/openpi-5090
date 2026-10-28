@@ -422,14 +422,6 @@ update the gate and the student's action-generation path. Teacher
 supervision thus guides cue prediction, while the gate learns how
 strongly to use the cues.
 
-% \begin{figure}[!t]
-% \centering
-% \includegraphics[width=\linewidth]{Figures/synchronized_multiview.pdf}
-% \caption{Synchronized multi-view rendering of one LIBERO demonstration. Each column shows the same trajectory timestep across all five camera views. The agent and wrist views provide the default teacher input, while the back, top, and left views define the weak-view deployment settings. At each timestep, the views share the language instruction, proprioceptive state, and target action chunk; only the camera observation differs.}
-% \label{fig:multiview_examples}
-% \end{figure}
-
-
 \subsection{Action Correlation Loss}
 \label{sec:acl}
 
@@ -471,6 +463,16 @@ With the teacher frozen, we jointly optimize the student, cue predictors, and fu
 
 The teacher is discarded at deployment. The student uses only $o^s$, with cue prediction and gated fusion unchanged from training.
 
+\clearpage
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{Figures/Figure3_synchronized_multiview.pdf}
+\caption{Synchronized multi-view observations from a LIBERO demonstration.
+Each column shows the same timestep across six camera views.
+The teacher uses the agent and wrist views; each student uses one of
+the back, top, left, or right views.}
+\label{fig:multiview_examples}
+\end{figure}
 
 \section{Experiments}
 
@@ -509,7 +511,8 @@ the robot-mounted \textit{wrist view}, and four additional fixed views:
 back, top, left, and right. We manually inspect the additional camera
 placements across task scenes to obtain distinct viewing perspectives
 while retaining task-relevant visual information. Each timestep is
-rendered from all six views, producing synchronized frames. Frames across views
+rendered from all six views, producing synchronized frames
+(Figure~\ref{fig:multiview_examples}). Frames across views
 share the same language instruction, proprioceptive state, and target
 action chunk.
 
