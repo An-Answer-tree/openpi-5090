@@ -366,12 +366,10 @@ complete hidden representation.
 \label{sec:cue_fusion}
 
 Privileged cue distillation (PCD) trains the student to predict
-the teacher cues defined in Section~\ref{sec:cue_extraction}.
-Gated cue fusion (GCF) adds these predictions to the student's
-final action representations through a learnable gate.
+the teacher cues in Section~\ref{sec:cue_extraction}.
 Let $\mathbf{H}^s\in\mathbb{R}^{H\times D}$ denote the student's
-action-token hidden states at the same layer index used for
-teacher cue extraction. For each privileged view $r$, a separate
+action-token states at the layer index used for teacher cue
+extraction. For each privileged view $r$, a separate
 affine predictor $f_r$, shared across action positions, estimates
 \begin{equation}
 \hat{\mathbf{C}}_r
@@ -379,12 +377,11 @@ affine predictor $f_r$, shared across action positions, estimates
 f_r\!\left(\operatorname{LN}(\mathbf{H}^s)\right),
 \end{equation}
 where $\operatorname{LN}$ denotes layer normalization without
-learnable affine parameters.
-Teacher targets and student predictions are computed using the
-same noisy action chunk $\mathbf{a}^{\tau}$ and flow time $\tau$.
+learnable affine parameters. Teacher and student use the same
+noisy action chunk $\mathbf{a}^{\tau}$ and flow time $\tau$.
 
-We normalize each view's cue-prediction error by its mean squared
-target magnitude. The loss over $R$ privileged views is
+We normalize each view's prediction error by its mean squared
+target magnitude and average over $R$ privileged views:
 \begin{equation}
 \mathcal{L}_{\mathrm{cue}}
 =
@@ -402,7 +399,7 @@ Both $\operatorname{MSE}$ and $\operatorname{Mean}$ average over
 minibatch samples, action positions, and feature dimensions,
 with $\varepsilon=10^{-8}$.
 
-GCF fuses the predicted cues with the student's final action
+Gated cue fusion (GCF) adds the predictions to the student's final action
 representations $\mathbf{H}_{\mathrm{final}}^s$:
 \begin{equation}
 \tilde{\mathbf{H}}^s
@@ -415,18 +412,15 @@ representations $\mathbf{H}_{\mathrm{final}}^s$:
 \label{eq:cue_fusion}
 \end{equation}
 The learnable scalar $\gamma$ is shared across views and action
-positions. It is initialized to zero, giving
-$\tilde{\mathbf{H}}^s=\mathbf{H}_{\mathrm{final}}^s$.
-The student's existing action output projection maps
-$\tilde{\mathbf{H}}^s$ to flow-velocity predictions.
+positions and initialized to zero. The student's existing action
+output projection maps $\tilde{\mathbf{H}}^s$ to flow-velocity predictions.
 
 The stop-gradient operator $\operatorname{sg}$ blocks flow-matching
 and ACL gradients through the predicted cues. The cue loss updates
-the predictors and their upstream student parameters. The action
-losses optimize the gate and the student's action-generation path.
-This keeps cue prediction guided by teacher supervision while
-allowing the gate to learn how strongly the predicted cues
-contribute to action generation.
+the predictors and upstream student parameters. The action losses
+update the gate and the student's action-generation path. Teacher
+supervision thus guides cue prediction, while the gate learns how
+strongly to use the cues.
 
 % \begin{figure}[!t]
 % \centering
@@ -438,8 +432,6 @@ contribute to action generation.
 
 \subsection{Action Correlation Loss}
 \label{sec:acl}
-
-ACL aligns teacher and student flow-velocity predictions through correlation rather than direct value matching.
 
 Let $\mathbf{v}^{s}$ and $\mathbf{v}^{t}$ denote the student and teacher predictions over the task's action dimensions. Both are computed from the same noisy action $\mathbf{a}^{\tau}$ and flow time $\tau$, conditioned on $o^s$ and $o^t$, respectively. For each sample, we flatten the action horizon and action dimensions as $\mathbf{x}^{s}=\operatorname{vec}(\mathbf{v}^{s})$ and $\mathbf{x}^{t}=\operatorname{vec}(\mathbf{v}^{t})$. The ACL loss is
 \begin{equation}
@@ -454,18 +446,17 @@ Let $\mathbf{v}^{s}$ and $\mathbf{v}^{t}$ denote the student and teacher predict
 \right].
 \label{eq:acl}
 \end{equation}
-Here, $\rho$ is Pearson correlation, and $\operatorname{sg}[\cdot]$ stops gradients through the teacher prediction.
+Here, $\rho$ denotes Pearson correlation.
 
 ACL aligns the relative variation of teacher and student flow-velocity
 predictions across control steps and action dimensions, without requiring
-pointwise value matching. The flow loss provides complementary supervision
-by constraining the student's predicted velocities to the ground-truth
-target $\mathbf{u}$.
+pointwise value matching. The flow loss complements ACL by supervising
+predicted velocities against the ground-truth target $\mathbf{u}$.
 
 \subsection{Training Objective and Deployment}
 \label{sec:training}
 
-The complete ACPD objective combines the base flow loss with the PCD and ACL losses:
+The training objective combines flow, PCD, and ACL losses:
 \begin{equation}
 \mathcal{L}
 =
@@ -476,9 +467,9 @@ The complete ACPD objective combines the base flow loss with the PCD and ACL los
 \lambda_{\text{ACL}}\mathcal{L}_{\text{ACL}}.
 \label{eq:total}
 \end{equation}
-The teacher remains frozen, while the student, cue predictors, and fusion gate are optimized jointly.
+With the teacher frozen, we jointly optimize the student, cue predictors, and fusion gate.
 
-After training, the teacher is discarded. The student receives only $o^s$ and retains the cue predictors and fusion gate. Cue prediction and gated fusion remain the same as during training.
+The teacher is discarded at deployment. The student uses only $o^s$, with cue prediction and gated fusion unchanged from training.
 
 
 \section{Experiments}
