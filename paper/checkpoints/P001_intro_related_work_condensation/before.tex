@@ -1,0 +1,59 @@
+\section{Introduction}
+
+Vision-language-action (VLA) policies map language instructions and visual observations to robot actions, providing a general framework for language-conditioned manipulation. 
+Diffusion and flow-matching action generators have been widely adopted in VLA policies to model continuous action trajectories for robot control~\cite{chi2025diffusionpolicy,wen2025diffusionvla,black2025pi0}.
+However, their performance is constrained by the visual evidence available from the camera view at deployment. 
+When object pose, spatial relations, or gripper-object contact are occluded or only weakly visible, a policy relying on that view can perform substantially worse than one with access to a more informative view.
+On LIBERO, policies trained and evaluated separately for each camera view exhibit substantial differences in task success (Figure~\ref{fig:motivation}).
+In practical systems, workspace geometry and robot hardware can constrain camera placement, leaving the policy with a less informative deployment view. 
+This practical constraint motivates weak-view policy learning, where a policy is deployed with a limited camera view but can receive training-time supervision from a more informative view.
+
+Prior work has addressed viewpoint sensitivity by showing the policy more camera views during training or by preserving task-relevant scene structure across viewpoints. View-diversity methods train on synchronized multi-camera demonstrations or synthesized novel views~\cite{ablett2021multiview,tian2025vista}. Auxiliary views also support visual representation learning~\cite{seo2023multiview}, while geometry-aware methods encode scenes using explicit 3D representations~\cite{shridhar2023peract,goyal2023rvt}. These strategies improve robustness to camera changes, but they do not explicitly identify which visual evidence matters to each action prediction under weak-view deployment.
+
+Privileged distillation offers a more targeted alternative by supervising the weak-view policy with a teacher that observes a more informative view during training. Prior work transfers knowledge from a multi-camera teacher to a single-camera policy by matching teacher actions and visual features~\cite{acar2024multicamera}. In the cross-view setting, however, this supervision faces a correspondence problem. Relevant evidence may be occluded in the weak view, while shared scene elements can appear at different image locations and token positions. Consequently, matching complete representations from informative and weak views can impose poorly aligned targets on the weak-view policy. Effective cross-view supervision must identify teacher information useful for action prediction despite this misalignment. It must also adapt across the action horizon because different future actions may depend on different visual evidence.
+
+To address these challenges, we propose \textbf{Action-Conditioned Privileged Distillation (ACPD)}, a cross-view distillation framework that transfers action-conditioned visual cues from a privileged-view teacher to a weak-view student.
+ACPD trains the student alongside a frozen teacher using synchronized observations with the same instruction, robot state, and action target. The teacher receives informative camera views, while the student receives a single weak view. For each future control step, ACPD uses attention weights from the teacher's action expert to aggregate visual features from each privileged view into a compact cue. The student learns to predict these cues from its own action representations and incorporates them into action generation. This provides supervision for individual steps in the action sequence without requiring visual-token alignment across camera views.
+At the action level, ACPD introduces an \textit{action correlation loss} (ACL) that uses Pearson correlation to align the relative variation of teacher and student flow-velocity predictions. The ground-truth flow-matching objective supervises the student's absolute velocity values. Together, privileged-cue prediction and ACL provide supervision at the representation and action levels. At deployment, the student predicts and uses these cues from a single camera view, independently of the teacher.
+
+We evaluate ACPD with $\pi_{0.5}$ across four LIBERO suites and four single-view deployment settings. ACPD improves mean success over single-view fine-tuning in all four views, with gains of 2.90--4.00 percentage points and an overall increase from 71.09\% to 74.78\%. In the back-view setting, ACPD achieves 61.05\% success, exceeding the evaluated multi-view-to-single-view distillation baseline by 8.65 percentage points.
+
+
+Our contributions are:
+\begin{itemize}
+    \item We introduce ACPD, a cross-view distillation framework that trains a weak-view student to predict and use action-conditioned visual cues extracted from privileged views using the teacher's attention weights.
+    \item We propose an action correlation loss that uses Pearson correlation to align the relative variation of teacher and student flow-velocity predictions, complementing ground-truth flow-matching supervision.
+    \item Experiments across four LIBERO suites demonstrate gains over single-view fine-tuning in all four deployment views. In the back-view setting, ACPD also outperforms a multi-view-to-single-view distillation baseline.
+\end{itemize}
+
+\section{Related Work}
+
+\subsection{Generative VLA Policies}
+
+Language-conditioned robot learning has progressed toward generalist policies trained on diverse demonstrations. Large-scale datasets such as BridgeData V2, Open X-Embodiment, and DROID support this development by broadening task and environment coverage~\cite{walke2023bridgev2,oneill2024oxe,khazatsky2024droid}. RT-1 learns language-conditioned control from visual observations, while RT-2 adapts pretrained vision-language models for action prediction~\cite{brohan2023rt1,zitkovich2023rt2}. Octo and OpenVLA leverage heterogeneous robot data to pretrain generalist policies for adaptation across robot embodiments~\cite{ghosh2024octo,kim2025openvla}.
+
+Beyond data and pretraining, VLA policies also differ in how they represent and generate action sequences. Action chunking enables policies to predict a sequence of future actions~\cite{zhao2023act}. FAST encodes action chunks as discrete tokens, while OpenVLA-OFT predicts continuous action chunks in parallel~\cite{pertsch2025fast,kim2025openvlaoft}. Diffusion-based policies generate continuous action sequences through iterative denoising~\cite{chi2025diffusionpolicy,ze2024dp3,liu2025rdt,wen2025diffusionvla}. Flow-matching VLAs, including $\pi_0$ and $\pi_{0.5}$, generate continuous actions by integrating a learned velocity field~\cite{black2025pi0,black2025pi05}. ACPD builds on flow-matching VLAs to transfer action-conditioned visual cues from a multi-view teacher to a single-view student.
+
+
+\subsection{Viewpoint Robustness in Robot Manipulation}
+
+Viewpoint changes alter the visibility and appearance of task-relevant cues. Prior work addresses this variation using demonstrations collected across viewpoints~\cite{ablett2021multiview} or auxiliary views for representation learning~\cite{seo2023multiview}. To expand viewpoint coverage without additional demonstrations, SPARTN, VISTA, and RoVi-Aug synthesize training observations from alternative camera poses~\cite{zhou2023spartn,tian2025vista,chen2025roviaug}.
+
+Another line of work represents scene geometry explicitly. PerAct operates on voxelized scenes, while RVT projects 3D observations into virtual views~\cite{shridhar2023peract,goyal2023rvt}. 3D-MVP learns geometric representations through multi-view pretraining, whereas Act3D uses a continuous 3D feature field~\cite{qian20253dmvp,gervet2023act3d}. DP3 combines point-cloud observations with diffusion-based action generation~\cite{ze2024dp3}.
+
+Prior work addresses viewpoint variation through visual diversity, auxiliary-view representation learning, or explicit geometry. ACPD transfers action-conditioned visual cues from synchronized privileged views to a fixed-view student. These cues summarize privileged visual information for each future control step, providing supervision directly linked to action generation.
+
+% \begin{figure}[t]
+% \centering
+% \includegraphics[width=\linewidth]{Figures/ACPD_method_overview.pdf}
+% \caption{ACPD uses a frozen privileged-view teacher to supervise a trainable weak-view flow-matching student. (A) Each student action-token state queries the teacher's visual tokens and action-expert states to construct a compact privileged cue, and a cue predictor estimates the selected cue from the same student state. (B) ACL is one minus the Pearson correlation between the flattened flow-velocity predictions of the teacher and student. (C) The complete objective adds privileged-cue distillation and ACL to the base flow-matching loss. Only the weak-view student is retained for deployment.}
+% \label{fig:framework}
+% \end{figure}
+
+
+\subsection{Privileged Distillation for Weak-View Policies}
+
+Learning with privileged information uses additional information available only during training~\cite{vapnik2015lupi}. Knowledge distillation transfers teacher predictions to a student~\cite{hinton2015distilling}. Privileged distillation trains a student using predictions from a teacher with access to additional information unavailable to the student~\cite{lopezpaz2016generalized}. In embodied control, privileged states and sensors support policy learning through asymmetric critics and auxiliary models~\cite{pinto2018asymmetric,hu2024scaffolder}. Teacher--student approaches use state-based or depth-guided teachers to supervise visual policies~\cite{xu2024humanvla,wang2025monolift}.
+
+More directly related to weak-view deployment, Acar et al. distill a multi-camera reinforcement-learning teacher into a single-camera student through action and visual-feature matching, combined with camera-view augmentation~\cite{acar2024multicamera}. However, viewpoint changes alter object visibility and image location, making direct visual-feature matching difficult. ACPD uses the teacher's attention weights to extract a visual cue from each privileged view for every future control step. The student predicts these cues from its own observations and incorporates them into flow-matching action generation.
+

@@ -1,6 +1,7 @@
 # Data directories.
 assets/
 checkpoints/
+!/paper/checkpoints/
 data/
 wandb/
 
