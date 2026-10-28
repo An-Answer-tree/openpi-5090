@@ -1,0 +1,121 @@
+{
+  "source_hdf5": "/opt/liutong/libero_multiview_tuned_6view_hdf5/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate_demo.hdf5",
+  "episode": "demo_0",
+  "step_index_zero_based": 43,
+  "cameras": {
+    "Back": {
+      "name": "operation_backview",
+      "world_position": [
+        -0.811895,
+        0.0,
+        2.20476
+      ],
+      "world_forward": [
+        0.42063558127478373,
+        -0.0,
+        -0.9072296885384787
+      ],
+      "intersection_with_z_0_9_plane": [
+        -0.2069451312316687,
+        0.0,
+        0.8999999999999999
+      ],
+      "fovy_degrees": 45.0
+    },
+    "Left": {
+      "name": "operation_leftview",
+      "world_position": [
+        -0.167801,
+        -1.15751,
+        1.84152
+      ],
+      "world_forward": [
+        -0.07779279473093006,
+        0.8492168925216685,
+        -0.5222824432658942
+      ],
+      "intersection_with_z_0_9_plane": [
+        -0.3080382854753936,
+        0.3733756327761868,
+        0.9
+      ],
+      "fovy_degrees": 45.0
+    },
+    "Right": {
+      "name": "operation_rightview",
+      "world_position": [
+        -0.468547,
+        1.2513,
+        1.62369
+      ],
+      "world_forward": [
+        0.16943839135581681,
+        -0.9306036315776121,
+        -0.3244495529806034
+      ],
+      "intersection_with_z_0_9_plane": [
+        -0.0906119148263067,
+        -0.8244265218875615,
+        0.9000000000000001
+      ],
+      "fovy_degrees": 45.0
+    },
+    "Top": {
+      "name": "operation_topview",
+      "world_position": [
+        0.343002,
+        0.0,
+        2.55162
+      ],
+      "world_forward": [
+        -0.417117171170704,
+        -0.0,
+        -0.9088527193745692
+      ],
+      "intersection_with_z_0_9_plane": [
+        -0.4150075735676962,
+        0.0,
+        0.8999999999999999
+      ],
+      "fovy_degrees": 45.0
+    },
+    "Agent": {
+      "name": "agentview",
+      "world_position": [
+        0.658613,
+        0.0,
+        1.61035
+      ],
+      "world_forward": [
+        -0.777998385479441,
+        -0.0,
+        -0.6282662749116676
+      ],
+      "intersection_with_z_0_9_plane": [
+        -0.22103178628591358,
+        0.0,
+        0.9
+      ],
+      "fovy_degrees": 45.0
+    },
+    "Wrist": {
+      "name": "robot0_eye_in_hand",
+      "world_position": [
+        -0.005906925170934961,
+        0.17356686438780355,
+        1.0264753286175698
+      ],
+      "world_forward": [
+        0.015227528091414953,
+        -0.016979604263580878,
+        -0.9997398738808385
+      ],
+      "intersection_with_z_0_9_plane": [
+        -0.003980517442573678,
+        0.17141880459231254,
+        0.9
+      ],
+      "fovy_degrees": 75.0
+    }
+  }
+}

@@ -1,0 +1,21 @@
+Use case: scientific-educational / precise camera-layout correction for a robot-learning paper.
+Input image 1 is the AUTHORITATIVE GEOMETRY GUIDE, computed from actual MuJoCo camera positions and directions. Input image 2 is a STYLE REFERENCE ONLY; its geometry is wrong and must not be retained.
+Generate a new polished high-resolution scientific illustration on white background. Restyle the line/skeleton guide into the elegant tabletop + Franka Panda + six machine-vision-camera illustration style of image 2, but the camera positions, the arm's pose and the optical viewing directions MUST follow image 1.
+
+ESSENTIAL GEOMETRY:
+Keep the projected arrangement of image 1: blue Back upper-left behind the robot; pink Top upper-center-right, above the FRONT of workspace; green Right at upper-right rear-lateral side; orange Left lower-left lateral side; dark Agent lower-right at the FRONT, separated from green Right by a large vertical/projected gap; Wrist at the gripper on right of robot near table.
+The blue Back and dark Agent cameras are on OPPOSITE front/back sides of the robot, not two corners on the same side. Left and Right are on OPPOSITE lateral sides. Agent is lower than the side cameras. Do not interpret Left and Right from the page alone; use the guide positions.
+The pink Top camera is NOT vertical! Tilt the camera and lens visibly toward the rear/robot: its optical axis goes DOWN AND LEFT in the guide, about 25 degrees from vertical. Do not point it straight down. Blue Back looks steeply DOWN AND RIGHT, about 65 degrees below horizontal. Agent looks DOWN AND LEFT, about 39 degrees below horizontal. Left looks down/right toward the table, about 31 degrees below horizontal. Right looks diagonally down/left across the table, about 19 degrees below horizontal. Wrist looks vertically down from gripper.
+Physical source coordinates for clarity, not to print: robot base(-0.66,0,0.912), Agent(0.659,0,1.610) forward(-0.778,0,-0.628); Back(-0.812,0,2.205) forward(0.421,0,-0.907); Left(-0.168,-1.158,1.842) forward(-0.078,0.849,-0.522); Right(-0.469,1.251,1.624) forward(0.169,-0.931,-0.324); Top(0.343,0,2.552) forward(-0.417,0,-0.909); Wrist attached to gripper. Preserve these spatial relationships rather than equal-spacing cameras.
+Use shorter transparent view-cone wedges or short optical-axis arrows, not giant overlapping cones, to show orientations clearly; not all axes point at exactly the same bowl. No added stands/tripods or coordinate axes.
+
+STYLE:
+Crisp thin charcoal outlines, neutral gray table, white and dark-gray Panda arm. Compact SQUARE composition; content fills canvas with small white margins. Exactly one table, one robot, six cameras, one bowl and one plate. Render real two-finger gripper and wrist-mounted camera. Color ONLY camera bodies, labels, and short viewing indicators: Back #0072B2; Left #E69F00; Right #009E73; Top #CC79A7; Agent and Wrist #374151. Readable Times-like serif labels. Camera lens directions must visually agree with arrows. No model photo thumbnails, no plots, no numeric values, no heading.
+Exact labels once each: "Back", "Left", "Right", "Top", "Agent", "Wrist".
+Exact bottom legend two lines: "Teacher: Agent + Wrist" and "Student: one of four fixed views".
+Do not copy incorrect camera directions from image 2. Image 1 geometry takes precedence.
+
+PROVENANCE
+Generated with the built-in image_gen tool using Camera_layout_geometry_guide.png as the geometric reference and Camera_layout_material.png only as a style reference.
+The coordinate-derived guide and Camera_layout_geometry.json were exported by gen_camera_layout_guide.py from the recorded Spatial task-0, demo_0, state 43.
+Final material: Camera_layout_material_v2.png. The generated image remains an approximate illustration; calibrated positions and optical axes are recorded in the JSON and geometric guide, not guaranteed by the AI rendering.
