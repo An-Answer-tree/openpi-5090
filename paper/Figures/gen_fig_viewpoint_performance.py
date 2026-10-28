@@ -44,7 +44,7 @@ def main():
         }
     )
     fig, axes = plt.subplots(1, 4, figsize=(data["width_cm"] / 2.54, data["height_cm"] / 2.54))
-    fig.subplots_adjust(left=0.057, right=0.998, bottom=0.098, top=0.835, wspace=0.25)
+    fig.subplots_adjust(left=0.057, right=0.998, bottom=0.098, top=0.89, wspace=0.25)
 
     colors = ["#0072B2", "#E69F00", "#009E73", "#CC79A7"]
     hatches = ["", "//", "\\\\", ".."]
@@ -74,17 +74,6 @@ def main():
         ax.tick_params(axis="y", length=2.5, width=0.6, pad=3)
         ax.set_axisbelow(True)
         ax.grid(axis="y", color="#E5E5E5", linewidth=0.45)
-        ax.text(
-            0.5,
-            1.015,
-            f"Gap: {np.ptp(suite_rates):.1f} pp",
-            transform=ax.transAxes,
-            ha="center",
-            va="bottom",
-            fontsize=8,
-            fontweight="bold",
-            color="#222222",
-        )
         # The break mark makes the cropped baseline explicit in every panel.
         ax.plot(
             [0, 0],
