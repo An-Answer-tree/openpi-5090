@@ -8,6 +8,7 @@ Run with `uv run --script paper/Figures/gen_fig_viewpoint_performance.py`.
 Alternatively, run with the existing openpi Conda environment's Python.
 The adjacent JSON records the plotted counts and their archive sources.
 Exports retain the placeholder's 15.75 x 4 cm size, without tight cropping.
+Each suite has a magnified panel with an explicitly marked, nonzero baseline.
 """
 
 import json
@@ -42,39 +43,65 @@ def main():
             "hatch.linewidth": 0.35,
         }
     )
-    fig, ax = plt.subplots(figsize=(data["width_cm"] / 2.54, data["height_cm"] / 2.54))
-    fig.subplots_adjust(left=0.078, right=0.995, bottom=0.195, top=0.80)
+    fig, axes = plt.subplots(1, 4, figsize=(data["width_cm"] / 2.54, data["height_cm"] / 2.54))
+    fig.subplots_adjust(left=0.078, right=0.995, bottom=0.20, top=0.74, wspace=0.33)
 
     colors = ["#0072B2", "#E69F00", "#009E73", "#CC79A7"]
     hatches = ["", "//", "\\\\", ".."]
-    positions = np.arange(len(data["suite_order"]))
-    bar_width = 0.18
-    for index, view in enumerate(data["views"]):
-        offset = (index - (len(data["views"]) - 1) / 2) * bar_width
-        bars = ax.bar(
-            positions + offset,
-            rates[index],
-            width=bar_width * 0.94,
-            color=colors[index],
-            hatch=hatches[index],
-            edgecolor="#FFFFFF",
-            linewidth=0.45,
-            label=view["label"],
-            zorder=3,
-        )
-        ax.bar_label(bars, fmt="%.1f", padding=2, fontsize=7.5, color="#222222")
+    y_ranges = [(60, 90), (60, 90), (60, 90), (20, 80)]
+    for suite_index, ax in enumerate(axes):
+        suite_rates = rates[:, suite_index]
+        for view_index, view in enumerate(data["views"]):
+            bars = ax.bar(
+                view_index,
+                suite_rates[view_index],
+                width=0.82,
+                color=colors[view_index],
+                hatch=hatches[view_index],
+                edgecolor="#FFFFFF",
+                linewidth=0.45,
+                label=view["label"],
+                zorder=3,
+            )
+            ax.bar_label(bars, fmt="%.1f", padding=2, fontsize=7.5, color="#222222")
 
-    ax.set_ylabel("Success rate (%)", labelpad=4)
-    ax.set_xticks(positions, data["suite_labels"])
-    ax.set_ylim(0, 103)
-    ax.set_yticks([0, 25, 50, 75, 100])
-    ax.set_xlim(-0.55, len(positions) - 0.45)
-    ax.tick_params(axis="x", length=0, pad=4)
-    ax.tick_params(axis="y", length=2.5, width=0.6, pad=3)
-    ax.set_axisbelow(True)
-    ax.grid(axis="y", color="#E5E5E5", linewidth=0.45)
+        low, high = y_ranges[suite_index]
+        ax.set_ylim(low, high)
+        ax.set_yticks(np.linspace(low, high, 4))
+        ax.set_xlim(-0.65, 3.65)
+        ax.set_xticks([])
+        ax.set_xlabel(data["suite_labels"][suite_index], labelpad=5)
+        ax.tick_params(axis="y", length=2.5, width=0.6, pad=3)
+        ax.set_axisbelow(True)
+        ax.grid(axis="y", color="#E5E5E5", linewidth=0.45)
+        ax.text(
+            0.5,
+            1.07,
+            f"Gap: {np.ptp(suite_rates):.1f} pp",
+            transform=ax.transAxes,
+            ha="center",
+            va="bottom",
+            fontsize=8,
+            fontweight="bold",
+            color="#222222",
+        )
+        # The break mark makes the cropped baseline explicit in every panel.
+        ax.plot(
+            [0, 0],
+            [0, 0],
+            transform=ax.transAxes,
+            marker=[(-1, -0.5), (1, 0.5)],
+            markersize=7,
+            markeredgewidth=0.8,
+            color="#222222",
+            linestyle="none",
+            clip_on=False,
+            zorder=5,
+        )
+
+    axes[0].set_ylabel("Success rate (%)", labelpad=4)
     fig.legend(
-        *ax.get_legend_handles_labels(),
+        *axes[0].get_legend_handles_labels(),
         loc="upper center",
         bbox_to_anchor=(0.54, 1.01),
         ncol=4,
