@@ -41,6 +41,7 @@
 \usepackage{geometry}
 \geometry{a4paper,top=2.5cm,bottom=1.9cm,left=1.75cm,right=1.75cm,headsep=12bp}
 \usepackage{float}
+\usepackage{afterpage}
 \usepackage{placeins}
 \usepackage{enumerate}
 \usepackage{enumitem}
@@ -121,6 +122,20 @@
 %\hfill \textbf{\large Type of the paper}
 \thispagestyle{firstpage}
 
+\afterpage{%
+    \begin{figure}[H]
+    \centering
+    \fbox{%
+        \begin{minipage}[c][4cm][c]{0.9\linewidth}
+            \centering
+            Success-rate comparison across camera viewpoints
+        \end{minipage}%
+    }
+    \caption{Effect of camera viewpoint on task success on LIBERO.}
+    \label{fig:motivation}
+    \end{figure}
+}
+
 \let\thefootnote\relax
 \footnotetext{
 \newline
@@ -192,18 +207,6 @@ We evaluate ACPD with $\pi_{0.5}$ using synchronized multi-view demonstrations f
 % 
 
 \section{Introduction}
-
-\begin{figure}[!t]
-\centering
-\fbox{%
-    \begin{minipage}[c][4cm][c]{0.9\linewidth}
-        \centering
-        Success-rate comparison across camera viewpoints
-    \end{minipage}%
-}
-\caption{Effect of camera viewpoint on task success on LIBERO.}
-\label{fig:motivation}
-\end{figure}
 
 Vision-language-action (VLA) policies map language instructions and visual observations to robot actions, providing a general framework for language-conditioned manipulation. 
 Diffusion and flow-matching action generators have been widely adopted in VLA policies to model continuous action trajectories for robot control~\cite{chi2025diffusionpolicy,wen2025diffusionvla,black2025pi0}.
