@@ -421,10 +421,12 @@ The student's existing action output projection maps
 $\tilde{\mathbf{H}}^s$ to flow-velocity predictions.
 
 The stop-gradient operator $\operatorname{sg}$ blocks flow-matching
-and ACL gradients through the cue-prediction branch.
-The cue loss updates the predictors and their upstream student
-parameters. The action losses update the gate and the student
-through its action-generation path.
+and ACL gradients through the predicted cues. The cue loss updates
+the predictors and their upstream student parameters. The action
+losses optimize the gate and the student's action-generation path.
+This keeps cue prediction guided by teacher supervision while
+allowing the gate to learn how strongly the predicted cues
+contribute to action generation.
 
 % \begin{figure}[!t]
 % \centering
