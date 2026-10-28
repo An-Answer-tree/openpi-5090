@@ -1,0 +1,31 @@
+{
+  "description": "Single-view SFT success counts from the final inference archive, matching the manuscript's main-results table.",
+  "archive_root": "/opt/liutong/openpi_checkpoints/fixed_dataset/curated",
+  "suite_order": ["spatial", "object", "goal", "libero_10"],
+  "suite_labels": ["Spatial", "Object", "Goal", "Long"],
+  "episodes_per_suite": 500,
+  "width_cm": 15.75,
+  "height_cm": 4.0,
+  "views": [
+    {
+      "label": "Back",
+      "source": "results/baseline/backview_bs64/summary.json",
+      "successes": [329, 342, 323, 149]
+    },
+    {
+      "label": "Left",
+      "source": "results/baseline/leftview_bs64/summary.json",
+      "successes": [420, 398, 397, 358]
+    },
+    {
+      "label": "Right",
+      "source": "results/baseline/rightview_bs64/summary.json",
+      "successes": [425, 424, 420, 271]
+    },
+    {
+      "label": "Top",
+      "source": "results/baseline/topview_bs64/summary.json",
+      "successes": [405, 403, 396, 227]
+    }
+  ]
+}
