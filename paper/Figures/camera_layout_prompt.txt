@@ -1,0 +1,41 @@
+Use case: scientific-educational / infographic-diagram.
+Asset type: standalone camera-layout illustration for a robot-learning journal paper, to be placed as the LEFT panel beside six synchronized camera images. Generate ONE polished image, not an entire paper figure.
+
+1. FRAMING
+A clean high-resolution scientific illustration of a LIBERO tabletop robot manipulation setup with SIX named cameras. Compact near-square composition, white background, small margins, designed to remain intelligible printed 5 cm wide. Isometric oblique view; convey the camera positions and their viewing directions instantly.
+
+2. VISUAL STYLE
+Precise, elegant technical illustration, consistent thin charcoal outlines, light neutral gray table and white/dark-gray articulated Franka Panda arm, flat restrained colors with just enough shading to understand 3D geometry. Publication-quality, no cartoon expression, no heavy 3D effects, no cast shadows, no gradients on the background, no decorative panels or section bands. Camera icons are small industrial machine-vision cameras with one lens, not movie cameras. Typography clean serif similar to Times New Roman, large legible labels, no tiny text. Simple tabletop, one target bowl and one plate as visual anchors, no scene clutter.
+
+3. COLOR PALETTE
+Back camera and its label: #0072B2 blue.
+Left camera and its label: #E69F00 orange.
+Right camera and its label: #009E73 green.
+Top camera and its label: #CC79A7 muted pink.
+Agent and Wrist cameras and their labels: charcoal/slate #374151, to identify the two teacher cameras.
+White background, table #F1F2F3, robot white-gray with dark joints. The color assignments MUST NOT be swapped.
+
+4. LAYOUT AND GEOMETRY
+Single table and one articulated Panda robot mounted at the rear edge, reaching toward bowl in the center/front work area. The robot is a normal seven-joint arm with a two-finger gripper, not a humanoid.
+Reference physical layout ONLY to determine relative positions, do not print numbers or coordinate axes: table surface z=0.875; robot base at world (x=-0.66,y=0,z=0.912), work area around (0,0,0.9). Agent camera at (+0.659,0,1.610), in FRONT of the robot, looking back/down at the workspace. Back camera at (-0.812,0,2.205), BEHIND and ABOVE the robot, looking forward/down at workspace. Left camera at (-0.168,-1.158,1.842), on one lateral side. Right camera at (-0.469,+1.251,1.624), on the OPPOSITE lateral side. Top camera at (+0.343,0,2.552), highest above workspace, looking downward. Wrist camera is physically ATTACHED to the gripper/wrist, not floating elsewhere or on a tripod.
+Choose an oblique observer position that separates all six icons clearly and reveals their opposite-side relationships; overhead Top icon is near upper middle, robot/base toward rear of table, Agent nearer the viewer and Back beyond robot. Preserve actual adjacency rather than arbitrary circular equal spacing.
+Exactly six cameras, one for each label. All table edges and robot remain visible, no crop of cameras or labels. No unnecessary stands; camera symbols may float at their installation points. Do not put all cameras at the same height.
+
+5. CONNECTIONS AND LABELS
+Use subtle short optical direction arrows or very faint open field-of-view outlines, color-matched to the camera, aimed at the work area; avoid a tangle of six lines crossing the robot. Wrist lens points down toward bowl. Put the six exact labels beside their OWN icons: "Agent", "Wrist", "Back", "Left", "Right", "Top". Clear separation between every label, object and line. Labels are not on the table surface.
+At bottom use a concise two-line unobtrusive legend, exact text:
+"Teacher: Agent + Wrist"
+"Student: one of four fixed views"
+No big title, no panel (a)/(b), no other text.
+
+6. CONSTRAINTS
+This is an explanatory SCHEMATIC, not a claimed simulator screenshot. Do not fabricate empirical charts, camera dimensions, numeric data, equations or extra equipment. Exactly one arm, one table, six cameras. No photo thumbnails, no plots, no logos, no watermark. Avoid extra duplicate cameras and duplicated labels. Crisp detail, balanced compact composition, minimal blank border.
+
+FINAL TARGETED EDIT
+Raise only the dark slate Agent camera from the table edge to an elevated front-side position, below Back and Top. Aim the lens down toward the workspace. Move its label and optical cone accordingly. Keep the remaining cameras, robot, table, objects, labels, colors, bottom legend and image style unchanged.
+
+PROVENANCE
+Generated using the built-in image_gen tool, followed by one targeted image edit.
+Final project asset: Camera_layout_material.png.
+Camera positions in the prompt were read from data/demo_0/model_file in the Spatial task-0 HDF5 referenced by Figure1_views/manifest.json.
+This AI-generated illustration depicts approximate relative placement, not calibrated camera geometry or exact field-of-view boundaries. It is not an experimental observation or quantitative result.
