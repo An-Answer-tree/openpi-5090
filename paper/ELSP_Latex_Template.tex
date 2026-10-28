@@ -519,51 +519,37 @@ action chunk.
 \subsection{Experimental Setup}
 
 \paragraph{Policy configurations.}
-We evaluate four single-view deployment settings using the back,
-left, right, and top cameras. Each student receives its designated
-camera view, the language instruction, and the robot state.
-Single-view supervised fine-tuning (Single-view SFT) optimizes the standard flow-matching
-objective. ACPD additionally uses a frozen $\pi_{0.5}$ teacher
-fine-tuned with the fixed third-person agent view and
-robot-mounted wrist view. These two views provide
-privileged visual inputs during distillation, while
-each student receives only its designated deployment view.
 All students are initialized from the same pretrained
 $\pi_{0.5}$ checkpoint~\cite{black2025pi05}.
-At deployment, ACPD retains its cue predictors and fusion gate,
-and requires only the student's designated camera view.
+Each student receives one camera view (back, left, right,
+or top), the language instruction, and robot state.
+Single-view SFT uses the standard flow-matching objective.
+ACPD additionally uses a frozen $\pi_{0.5}$ teacher
+fine-tuned with agent and wrist views.
+Within each deployment view, both methods share demonstrations,
+student inputs, initialization, and optimization settings.
 
 \paragraph{Training settings.}
-Students are fine-tuned using LoRA with ranks of 16 for the
-vision-language backbone and 32 for the action expert.
-Training uses four NVIDIA RTX 5090 GPUs with fully sharded data
-parallelism and a global batch size of 64.
-We use AdamW with gradient clipping at a norm of 1.0.
-The learning rate follows a linear warmup to $2.5\times10^{-5}$,
-followed by cosine decay to $2.5\times10^{-6}$ and a constant
-learning rate thereafter. The training seed is 42.
-For ACPD, cues are extracted and predicted at action-expert
-layer 10, with feature dimension $D=1024$.
-We set $\lambda_{\mathrm{cue}}=0.2$ and
+We use LoRA ranks of 16 for the vision-language backbone
+and 32 for the action expert.
+Training uses four NVIDIA RTX 5090 GPUs, fully sharded
+data parallelism, and a global batch size of 64.
+We use AdamW, gradient clipping at 1.0, and training seed 42.
+The learning rate warms up linearly to $2.5\times10^{-5}$,
+decays to $2.5\times10^{-6}$ following a cosine schedule,
+and then remains constant.
+ACPD uses layer 10 with $D=1024$,
+$\lambda_{\mathrm{cue}}=0.2$, and
 $\lambda_{\mathrm{ACL}}=0.5$.
 
-Within each deployment view, Single-view SFT and ACPD share the training
-demonstrations, student inputs, pretrained initialization,
-and optimization settings.
-The configurations used for the distillation baseline and
-component studies are specified in their respective subsections.
-
 \paragraph{Evaluation protocol.}
-All policies predict action chunks of length $H=10$ and
-replan after executing five actions.
-We evaluate each policy on all four LIBERO suites, using
-50 rollouts per task and the same initial-state sequence
-and evaluation seed of 7.
-Each suite contains 10 tasks, yielding 500 rollouts per suite
-and 2,000 rollouts per policy.
-We report task success rates, with suite scores averaged
-over tasks and the overall score averaged equally over
-the four suites.
+All policies predict action chunks of length $H=10$
+and replan after executing five actions.
+We evaluate each policy on all four suites with
+50 rollouts per task, identical initial-state sequences,
+and evaluation seed 7.
+We report success rates averaged over tasks within
+each suite and equally across suites.
 
 
 \subsection{Distillation Layer Selection}
