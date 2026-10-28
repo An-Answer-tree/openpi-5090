@@ -44,7 +44,7 @@ def main():
         }
     )
     fig, axes = plt.subplots(1, 4, figsize=(data["width_cm"] / 2.54, data["height_cm"] / 2.54))
-    fig.subplots_adjust(left=0.078, right=0.995, bottom=0.20, top=0.74, wspace=0.33)
+    fig.subplots_adjust(left=0.057, right=0.998, bottom=0.098, top=0.835, wspace=0.25)
 
     colors = ["#0072B2", "#E69F00", "#009E73", "#CC79A7"]
     hatches = ["", "//", "\\\\", ".."]
@@ -70,13 +70,13 @@ def main():
         ax.set_yticks(np.linspace(low, high, 4))
         ax.set_xlim(-0.65, 3.65)
         ax.set_xticks([])
-        ax.set_xlabel(data["suite_labels"][suite_index], labelpad=5)
+        ax.set_xlabel(data["suite_labels"][suite_index], labelpad=1.5)
         ax.tick_params(axis="y", length=2.5, width=0.6, pad=3)
         ax.set_axisbelow(True)
         ax.grid(axis="y", color="#E5E5E5", linewidth=0.45)
         ax.text(
             0.5,
-            1.07,
+            1.015,
             f"Gap: {np.ptp(suite_rates):.1f} pp",
             transform=ax.transAxes,
             ha="center",
@@ -99,17 +99,19 @@ def main():
             zorder=5,
         )
 
-    axes[0].set_ylabel("Success rate (%)", labelpad=4)
+    axes[0].set_ylabel("Success rate (%)", labelpad=2)
     fig.legend(
         *axes[0].get_legend_handles_labels(),
         loc="upper center",
-        bbox_to_anchor=(0.54, 1.01),
+        bbox_to_anchor=(0.54, 0.99),
         ncol=4,
         frameon=False,
         handlelength=1.4,
         handleheight=0.85,
         handletextpad=0.5,
         columnspacing=1.6,
+        borderpad=0,
+        borderaxespad=0,
     )
     fig.savefig(figure_dir / "Figure1_viewpoint_performance.pdf", facecolor="white")
     fig.savefig(figure_dir / "Figure1_viewpoint_performance.png", dpi=600, facecolor="white")
