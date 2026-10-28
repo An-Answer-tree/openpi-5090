@@ -275,17 +275,17 @@ More directly related to weak-view deployment, Acar et al. distill a multi-camer
 
 \section{Action-Conditioned Privileged Distillation}
 
-ACPD uses a frozen privileged-view teacher to supervise a weak-view flow-matching student during training. We extract visual cues from each privileged view using the teacher's attention during action prediction. The student learns to predict these cues from its own observations. A learned gate controls how strongly the predicted cues are added to the student's action representations. An action correlation loss (ACL) aligns the relative variation of teacher and student flow-velocity predictions, complementing ground-truth flow-matching supervision. The ACPD framework is illustrated in Figure~\ref{fig:framework}.
+ACPD uses a frozen privileged-view teacher to supervise a weak-view flow-matching student. The teacher's attention provides visual cues for each privileged view and future control step. The student predicts these cues from its own observations. A learned gate controls their addition to the student's action representations. An action correlation loss (ACL) aligns the relative variation of teacher and student flow-velocity predictions. It complements ground-truth flow-matching supervision. Figure~\ref{fig:framework} illustrates the ACPD framework.
 
-We first formulate the learning problem in Section~\ref{sec:problem}. Sections~\ref{sec:cue_extraction} and~\ref{sec:cue_fusion} describe visual cue extraction and student cue prediction with gated fusion, respectively. We then introduce ACL in Section~\ref{sec:acl} and present the overall training objective and deployment procedure in Section~\ref{sec:training}.
+Section~\ref{sec:problem} formulates the learning problem. Sections~\ref{sec:cue_extraction} and~\ref{sec:cue_fusion} describe cue extraction and student prediction with gated fusion. Sections~\ref{sec:acl} and~\ref{sec:training} present ACL and the training and deployment procedures.
 
 \subsection{Problem Formulation}
 \label{sec:problem}
 
-Each training sample $(o^s,o^t,\mathbf{a})\sim\mathcal{D}$ contains synchronized student and teacher conditions from the same episode and timestep, together with a shared action target $\mathbf{a}$. The two conditions contain the same language instruction and proprioceptive state but differ in their camera observations. The student condition $o^s$ contains a single weak view, whereas the teacher condition $o^t$ contains one or more informative views available only during training. The goal is to improve the student through supervision from $o^t$ while requiring only $o^s$ at deployment.
+Each sample $(o^s,o^t,\mathbf{a})\sim\mathcal{D}$ pairs synchronized student and teacher conditions with a shared action target $\mathbf{a}$. The conditions come from the same episode and timestep and share the language instruction and proprioceptive state. They differ only in camera observations. The student condition $o^s$ contains a single weak view. The teacher condition $o^t$ contains one or more informative views available only during training. The student learns with supervision from $o^t$ but requires only $o^s$ at deployment.
 
-Both the teacher and student are flow-matching VLA policies. The action chunk $\mathbf{a}=(\mathbf{a}_1,\ldots,\mathbf{a}_H)\in\mathbb{R}^{H\times d}$ contains the next $H$ actions, each of dimension $d$. For each training sample, a flow time $\tau\in[0,1]$ and Gaussian noise $\boldsymbol{\epsilon}\sim\mathcal{N}(0,\mathbf{I})$ with the same shape as $\mathbf{a}$ are sampled. The noisy action at flow time $\tau$ is $\mathbf{a}^{\tau}=\tau\boldsymbol{\epsilon}+(1-\tau)\mathbf{a}$. The action expert encodes the noisy action chunk as $H$ feature vectors, termed action tokens, with one token corresponding to each future control step. The target velocity is $\mathbf{u}=\boldsymbol{\epsilon}-\mathbf{a}$, which points from the action chunk toward the sampled noise.
-The student is trained by minimizing the mean-squared error between its predicted velocity and the target velocity $\mathbf{u}$:
+Both policies use flow matching. The action chunk $\mathbf{a}=(\mathbf{a}_1,\ldots,\mathbf{a}_H)\in\mathbb{R}^{H\times d}$ contains the next $H$ actions, each of dimension $d$. For each sample, we draw a flow time $\tau\in[0,1]$ and Gaussian noise $\boldsymbol{\epsilon}\sim\mathcal{N}(0,\mathbf{I})$ with the same shape as $\mathbf{a}$. The noisy action is $\mathbf{a}^{\tau}=\tau\boldsymbol{\epsilon}+(1-\tau)\mathbf{a}$. The action expert encodes it as $H$ feature vectors, termed action tokens, one per future control step. The target velocity $\mathbf{u}=\boldsymbol{\epsilon}-\mathbf{a}$ points from the action chunk toward the noise.
+The student minimizes the mean-squared velocity error:
 \begin{equation}
 \mathcal{L}_{\text{flow}}
 =
@@ -296,7 +296,7 @@ The student is trained by minimizing the mean-squared error between its predicte
 \right].
 \label{eq:flow}
 \end{equation}
-The parameters $\theta$ and $\theta_{\mathrm{T}}$ denote the trainable student and frozen teacher parameters, respectively. The teacher predicts $\mathbf{v}_{\theta_{\mathrm{T}}}(\mathbf{a}^{\tau},\tau,o^t)$ from the same interpolated action and flow time. 
+Here, $\theta$ and $\theta_{\mathrm{T}}$ are the trainable student and frozen teacher parameters, respectively. The teacher predicts $\mathbf{v}_{\theta_{\mathrm{T}}}(\mathbf{a}^{\tau},\tau,o^t)$ using the same noisy action and flow time.
 
 
 \subsection{Action-Conditioned Visual Cue Extraction}
@@ -354,7 +354,6 @@ apply the teacher's output projection and time-conditioned scaling:
 \end{equation}
 Here, $\mathbf{W}_O$ denotes the attention output projection and
 $\mathbf{s}(\tau)$ denotes the time-conditioned elementwise scale.
-Cue extraction uses only frozen teacher parameters.
 
 The resulting matrix $\mathbf{C}_r\in\mathbb{R}^{H\times D}$ provides
 one $D$-dimensional prediction target per future control step. Each
@@ -385,9 +384,8 @@ learnable affine parameters.
 Teacher targets and student predictions are computed using the
 same noisy action chunk $\mathbf{a}^{\tau}$ and flow time $\tau$.
 
-PCD trains each predictor to regress the teacher cue, with the
-prediction error normalized by the mean squared target magnitude
-for its view. For $R$ privileged views, the cue loss is
+We normalize each view's cue-prediction error by its mean squared
+target magnitude. The loss over $R$ privileged views is
 \begin{equation}
 \mathcal{L}_{\mathrm{cue}}
 =
@@ -418,18 +416,16 @@ representations $\mathbf{H}_{\mathrm{final}}^s$:
 \label{eq:cue_fusion}
 \end{equation}
 The learnable scalar $\gamma$ is shared across views and action
-positions. It is initialized to zero, so that
-$\tilde{\mathbf{H}}^s=\mathbf{H}_{\mathrm{final}}^s$
-at initialization.
+positions. It is initialized to zero, giving
+$\tilde{\mathbf{H}}^s=\mathbf{H}_{\mathrm{final}}^s$.
 The student's existing action output projection maps
 $\tilde{\mathbf{H}}^s$ to flow-velocity predictions.
 
-The stop-gradient operator $\operatorname{sg}$ blocks gradients
-from the flow-matching and action correlation losses through
-the cue-prediction branch.
+The stop-gradient operator $\operatorname{sg}$ blocks flow-matching
+and ACL gradients through the cue-prediction branch.
 The cue loss updates the predictors and their upstream student
-parameters, while the action losses update the gate and the
-student through its action-generation path.
+parameters. The action losses update the gate and the student
+through its action-generation path.
 
 % \begin{figure}[!t]
 % \centering
@@ -442,9 +438,9 @@ student through its action-generation path.
 \subsection{Action Correlation Loss}
 \label{sec:acl}
 
-At the representation level, privileged-cue distillation supervises the student's intermediate action-token states. At the action level, ACL aligns the teacher's and student's flow-velocity predictions through correlation rather than direct value matching.
+ACL aligns teacher and student flow-velocity predictions through correlation rather than direct value matching.
 
-Let $\mathbf{v}^{s}$ and $\mathbf{v}^{t}$ denote the student and teacher flow-velocity predictions over the task's action dimensions, computed from the same interpolated action $\mathbf{a}^{\tau}$ and flow time $\tau$, conditioned on $o^s$ and $o^t$, respectively. We flatten the action horizon and action dimensions for each sample as $\mathbf{x}^{s}=\operatorname{vec}(\mathbf{v}^{s})$ and $\mathbf{x}^{t}=\operatorname{vec}(\mathbf{v}^{t})$. The resulting loss is
+Let $\mathbf{v}^{s}$ and $\mathbf{v}^{t}$ denote the student and teacher predictions over the task's action dimensions. Both are computed from the same noisy action $\mathbf{a}^{\tau}$ and flow time $\tau$, conditioned on $o^s$ and $o^t$, respectively. For each sample, we flatten the action horizon and action dimensions as $\mathbf{x}^{s}=\operatorname{vec}(\mathbf{v}^{s})$ and $\mathbf{x}^{t}=\operatorname{vec}(\mathbf{v}^{t})$. The ACL loss is
 \begin{equation}
 \mathcal{L}_{\text{ACL}}
 =
@@ -457,9 +453,9 @@ Let $\mathbf{v}^{s}$ and $\mathbf{v}^{t}$ denote the student and teacher flow-ve
 \right].
 \label{eq:acl}
 \end{equation}
-In Equation~\eqref{eq:acl}, $\rho$ denotes Pearson correlation. The operator $\operatorname{sg}[\cdot]$ stops gradients through the teacher prediction.
+Here, $\rho$ is Pearson correlation, and $\operatorname{sg}[\cdot]$ stops gradients through the teacher prediction.
 
-Pearson correlation compares centered and normalized vectors, making ACL invariant to a global offset and positive rescaling of the flattened velocity chunk. Minimizing ACL therefore encourages the teacher and student predictions to exhibit a similar centered pattern across their velocity entries. The flow loss continues to anchor the velocity values to the ground-truth target $\mathbf{u}$, while ACL provides complementary guidance on their relative variation.
+Pearson correlation compares centered, normalized vectors. ACL is therefore invariant to a global offset and positive rescaling of each flattened velocity chunk. It aligns the relative variation across velocity entries. The flow loss anchors their absolute values to the ground-truth target $\mathbf{u}$.
 
 \subsection{Training Objective and Deployment}
 \label{sec:training}
@@ -477,7 +473,7 @@ The complete ACPD objective combines the base flow loss with the PCD and ACL los
 \end{equation}
 The teacher remains frozen, while the student, cue predictors, and fusion gate are optimized jointly.
 
-After training, the teacher is discarded. The deployed student receives only $o^s$ and retains the cue predictors and fusion gate, using the same cue prediction and gated fusion as during training.
+After training, the teacher is discarded. The student receives only $o^s$ and retains the cue predictors and fusion gate. Cue prediction and gated fusion remain the same as during training.
 
 
 \section{Experiments}
