@@ -303,10 +303,10 @@ Here, $\theta$ and $\theta_{\mathrm{T}}$ are the trainable student and frozen te
 \label{sec:cue_extraction}
 
 ACPD extracts action-conditioned visual cues from a frozen multi-view
-teacher as prediction targets for a single-view student. At a selected
-layer of the teacher's flow-matching action expert, the action-token
-queries guide the extraction of a separate cue for each future control
-step and privileged view.
+teacher as prediction targets for a single-view student. We extract
+cues at a selected layer of the teacher's flow-matching action expert.
+For each future control step, we aggregate visual features from each
+privileged view using the corresponding action token's attention weights.
 
 For attention head $m$, let $\mathbf{Q}^{(m)}$ denote the action-token
 queries, and let $\mathbf{K}^{(m)}$ and $\mathbf{V}^{(m)}$ denote the
