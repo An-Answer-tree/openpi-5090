@@ -201,7 +201,7 @@ We evaluate ACPD with $\pi_{0.5}$ using synchronized multi-view demonstrations f
 % \end{figure}
 
 Vision-language-action (VLA) policies map language instructions and visual observations to robot actions, providing a general framework for language-conditioned manipulation. 
-Recent VLA policies increasingly employ diffusion or flow-matching action generators to model continuous action trajectories for robot control~\cite{chi2025diffusionpolicy,wen2025diffusionvla,black2025pi0}.
+Diffusion and flow-matching action generators have been widely adopted in VLA policies to model continuous action trajectories for robot control~\cite{chi2025diffusionpolicy,wen2025diffusionvla,black2025pi0}.
 However, their performance is constrained by the visual evidence available from the camera view at deployment. 
 When object pose, spatial relations, or gripper-object contact are occluded or only weakly visible, a policy relying on that view can perform substantially worse than one with access to a more informative view.
 In practical systems, workspace geometry and robot hardware can constrain camera placement, leaving the policy with a less informative deployment view. 
