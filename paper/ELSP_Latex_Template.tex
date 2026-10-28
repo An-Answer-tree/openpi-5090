@@ -193,17 +193,22 @@ We evaluate ACPD with $\pi_{0.5}$ using synchronized multi-view demonstrations f
 
 \section{Introduction}
 
-% \begin{figure}[t]
-% \centering
-% \includegraphics[width=0.5\linewidth]{Figures/motivation.pdf}
-% \caption{Single-view fine-tuning is sensitive to camera viewpoint on LIBERO. Each policy is trained and evaluated using only the indicated view, and the bars show mean task success rate across four LIBERO suites. The agent-view policy serves as the reference, with gap labels showing absolute differences in percentage points. The example observations show the same task-relevant object clearly visible in some views but occluded in others.}
-% \label{fig:motivation}
-% \end{figure}
+\begin{figure}[!t]
+\centering
+\fbox{%
+    \begin{minipage}[c][4cm][c]{0.9\linewidth}
+        \centering
+        Success-rate comparison across camera viewpoints
+    \end{minipage}%
+}
+\caption{Effect of camera viewpoint on task success on LIBERO.}
+\label{fig:motivation}
+\end{figure}
 
 Vision-language-action (VLA) policies map language instructions and visual observations to robot actions, providing a general framework for language-conditioned manipulation. 
 Diffusion and flow-matching action generators have been widely adopted in VLA policies to model continuous action trajectories for robot control~\cite{chi2025diffusionpolicy,wen2025diffusionvla,black2025pi0}.
 However, their performance is constrained by the visual evidence available from the camera view at deployment. 
-When object pose, spatial relations, or gripper-object contact are occluded or only weakly visible, a policy relying on that view can perform substantially worse than one with access to a more informative view.
+When object pose, spatial relations, or gripper-object contact are occluded or only weakly visible, a policy relying on that view can perform substantially worse than one with access to a more informative view (Figure~\ref{fig:motivation}).
 In practical systems, workspace geometry and robot hardware can constrain camera placement, leaving the policy with a less informative deployment view. 
 This practical constraint motivates weak-view policy learning, where a policy is deployed with a limited camera view but can receive training-time supervision from a more informative view.
 
