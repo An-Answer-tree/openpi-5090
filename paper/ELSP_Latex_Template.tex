@@ -666,13 +666,10 @@ supervision into single-view action generation.
 
 We compare ACPD with MV-SV-KD, a $\pi_{0.5}$ adaptation of
 Acar et al.~\cite{acar2024multicamera}.
-It distills a multi-camera teacher into a single-camera student
+Their method distills a multi-camera teacher into a single-camera student
 through action and visual-feature matching.
-For offline flow-matching training, we match flow velocities
-and normalized final action-expert states. The latter replace
-the original visual-encoder features.
-The ground-truth flow loss is retained, with output and feature
-distillation weights of 0.5 and 0.1, respectively.
+Our adaptation retains joint output and feature distillation
+alongside ground-truth flow-matching supervision.
 Both methods train a back-view student using the same
 demonstrations and frozen teacher with agent and wrist inputs.
 Teacher and student share the noisy action chunk and flow time.
