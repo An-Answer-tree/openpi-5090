@@ -783,11 +783,12 @@ Neither configuration uses cue fusion.
 
 ACL + PCD reaches 58.90\%, compared with 53.10\% for ACL + LCD,
 with higher success on three suites.
-In LCD, cue selection and prediction are learned jointly.
-Updating the selector also changes the prediction targets,
-which may complicate optimization.
-PCD instead derives its targets from the frozen teacher's
-visual aggregation for action prediction.
+LCD constructs cue targets using a separate cross-attention
+selector. Its attention weights are not explicitly constrained
+to reflect the teacher's use of visual information for action
+prediction. PCD directly reuses the frozen teacher's visual
+aggregation, grounding its supervision targets in the teacher's
+own action computation.
 
 \paragraph{Gated cue fusion.}
 To use the learned visual information for control, GCF combines
