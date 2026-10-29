@@ -511,14 +511,13 @@ to assess the contributions of ACPD's components.
 LIBERO is a language-conditioned robot manipulation benchmark with human-teleoperated demonstrations~\cite{liu2023libero}. We use four suites: LIBERO-Spatial varies the spatial relation identifying the target bowl; LIBERO-Object varies the manipulated object; LIBERO-Goal changes the task goal while keeping the scene fixed; and LIBERO-Long contains 10 long-horizon tasks with diverse interactions and motor skills.
 
 We construct synchronized multi-view data by re-rendering all
-demonstrations from six cameras. The setup includes LIBERO's
+demonstrations from six cameras (Figure~\ref{fig:multiview_examples}).
+The setup includes LIBERO's
 fixed third-person \textit{agent view},
 the robot-mounted \textit{wrist view}, and four additional fixed views:
 back, top, left, and right. We manually inspect the additional camera
 placements across task scenes to obtain distinct viewing perspectives
-while retaining task-relevant visual information. Each timestep is
-rendered from all six views, producing synchronized frames
-(Figure~\ref{fig:multiview_examples}). Frames across views
+while retaining task-relevant visual information. Frames across views
 share the same language instruction, proprioceptive state, and target
 action chunk.
 
@@ -569,11 +568,9 @@ layers 6--12 by evaluating how well the student can
 predict the teacher's visual cues.
 At each layer, separate affine probes predict the agent-view
 and wrist-view cues from the student's action representations.
-Teacher and student receive the same noisy action chunk and
-flow time. We reserve 10\% of demonstration episodes for
+We reserve 10\% of demonstration episodes for
 validation and average results over three probe initializations.
 
-We evaluate cue prediction using two metrics.
 Prediction $R^2$ measures the reduction in mean squared
 error relative to predicting the mean teacher cue.
 The cosine gap measures how much more similar a prediction
