@@ -724,12 +724,12 @@ the evaluated viewpoint gap.
 \subsection{Ablation Studies}
 \label{sec:ablations}
 
-We examine action correlation supervision, cue distillation,
-and gated cue fusion for a back-view student.
-All configurations retain the ground-truth flow-matching objective.
-Teacher-based variants use the same frozen teacher with agent and
-wrist inputs. Table~\ref{tab:controlled_ablations} reports success
-on the four suites and their equally weighted mean.
+We compare back-view configurations that add ACL, cue
+distillation, and gated cue fusion (GCF) to the flow-matching
+student (Table~\ref{tab:controlled_ablations}).
+All retain ground-truth flow-matching supervision.
+Teacher-based variants use the same frozen teacher with
+agent and wrist inputs.
 
 \begin{table}[!htbp]
 \centering
@@ -759,58 +759,54 @@ Configuration & Spatial $\uparrow$ & Object $\uparrow$
 \end{table}
 
 \paragraph{Action correlation supervision.}
-Row (a) uses only flow-matching supervision.
-Row (b) adds ACL with weight 0.5, without cue supervision or
-injection during training or inference.
-ACL raises mean success from 57.15\% to 59.75\%, with gains
-on all four suites. This improvement establishes a useful
-action-level transfer signal before introducing visual-cue learning.
+ACL only (b) achieves 59.75\% mean success, compared with
+57.15\% for Single-view SFT (a), with gains on all four suites.
+The largest gain occurs on Object, from 68.40\% to 72.80\%.
+These consistent improvements support transferring relative
+velocity variation as supervision complementary to the
+ground-truth flow loss, without requiring pointwise agreement
+with teacher predictions.
 
 \paragraph{Cue distillation.}
-Row (c) adds learned cue distillation (LCD) to ACL.
-LCD constructs prediction targets with a trainable
-cross-attention selector. At action-expert layers 6 and 12,
-the selector uses projected student action representations as
-queries and concatenated teacher image and action representations
-as keys and values. Three-layer MLPs project these representations
-into a shared 1024-dimensional space. A separate three-layer
-student predictor estimates the selected cues.
-The selector and predictor are optimized jointly using cosine
-prediction loss and a variance penalty that discourages constant
-cue targets. The combined cue loss has weight 0.2, with relative
-weight 0.1 for the variance term; ACL retains weight 0.5.
-Selected cues serve only as training targets and are not injected
-into action generation. This configuration uses a batch size of
-32; the other configurations use 64.
+We compare two ways of constructing and distilling cues while
+retaining ACL. Learned cue distillation (LCD, c) uses a trainable
+cross-attention selector at action-expert layers 6 and 12.
+MLPs project student action representations and teacher image
+and action representations into a shared 1024-dimensional space.
+The student representations query the teacher features to form
+cue targets. A three-layer MLP predicts these targets; the
+selector and predictor are jointly optimized with cosine loss
+and a variance penalty that discourages constant targets.
+Privileged cue distillation (PCD, d) instead uses cues extracted
+from the frozen teacher's own attention at layer 10, with the
+normalized regression loss in Equation~\eqref{eq:cue_loss}.
+Neither configuration uses cue fusion. LCD uses batch size 32;
+the remaining configurations use 64.
 
-Row (d) combines ACL with PCD, using the normalized
-cue-prediction MSE in Equation~\eqref{eq:cue_loss} and
-teacher-attention cues extracted at layer 10, without cue fusion
-during training or inference.
-Unlike LCD, which jointly optimizes the cue selector and
-student predictor, PCD defines its targets using the frozen
-teacher's own attention computation.
-ACL + PCD reaches 58.90\%, compared with 53.10\% for
-ACL + LCD, a gain of 5.80 percentage points with higher
-success on three suites.
-Relative to ACL alone, PCD improves Object and Long but
-reduces the four-suite mean by 0.85 percentage points.
-Cue prediction alone therefore does not provide an additional
-mean success gain over ACL in this setting.
+ACL + PCD reaches 58.90\%, compared with 53.10\% for ACL + LCD,
+with higher success on three suites.
+Joint optimization in LCD may favor cues that are easy to
+predict over cues that best support action generation.
+PCD grounds its targets in the teacher's existing visual
+aggregation for action prediction.
+Its mean nevertheless remains below the 59.75\% of ACL only:
+learning to predict privileged cues does not by itself improve
+average task success in this setting.
 
 \paragraph{Gated cue fusion.}
-Row (e) additionally uses GCF to add predicted cues to the
-student's final action representations through a learnable gate,
-as defined in Equation~\eqref{eq:cue_fusion}.
-GCF raises mean success from 58.90\% to 61.05\%, a gain of
-2.15 percentage points, with improvements on three suites.
-The largest gain is on Spatial, from 65.00\% to 73.20\%;
+Full ACPD (e) makes the predicted cues available to action
+decoding through GCF (Equation~\eqref{eq:cue_fusion}).
+Mean success reaches 61.05\%, 2.15 percentage points above
+ACL + PCD. The improvement is concentrated on Spatial, where
+success increases from 65.00\% to 73.20\%.
 Object and Long also improve, while Goal decreases from
 64.40\% to 63.60\%.
-The complete ACPD model exceeds ACL alone by 1.30 percentage
-points and Single-view SFT by 3.90 points on average.
-These results support coupling privileged-cue prediction
-with gated fusion to improve task success.
+The complete model achieves the highest four-suite mean,
+exceeding ACL only by 1.30 points and Single-view SFT by
+3.90 points. These results support ACPD's combination of ACL
+and privileged cues that the student both predicts and uses
+for action generation. GCF provides the direct connection
+between cue learning and action decoding.
 
 \FloatBarrier
 \section{Conclusion}
