@@ -289,7 +289,7 @@ Section~\ref{sec:problem} formulates the learning problem. Sections~\ref{sec:cue
 \subsection{Problem Formulation}
 \label{sec:problem}
 
-Each sample in the training dataset $\mathcal{D}$ contains a student input $o^s$, a teacher input $o^t$, and a target action chunk $\mathbf{a}$. The two inputs come from the same episode and timestep and share the language instruction and proprioceptive state. They differ only in camera observations. The student input $o^s$ contains a single weak view. The teacher input $o^t$ contains more informative multi-view observations available only during training. The teacher processes $o^t$ to provide distillation targets for the student. At deployment, the student requires only $o^s$.
+Each sample in the training dataset $\mathcal{D}$ contains student input $o^s$, teacher input $o^t$, and a target action chunk $\mathbf{a}$. Both inputs come from the same episode and timestep and share the language instruction and proprioceptive state. The student uses one weak view. The teacher provides distillation targets from informative multi-view observations available only during training. At deployment, the student uses only $o^s$.
 
 Both policies use flow matching. The action chunk $\mathbf{a}=(\mathbf{a}_1,\ldots,\mathbf{a}_H)\in\mathbb{R}^{H\times d}$ contains the next $H$ actions, each of dimension $d$. For each sample, we draw a flow time $\tau\in[0,1]$ and Gaussian noise $\boldsymbol{\epsilon}\sim\mathcal{N}(0,\mathbf{I})$ with the same shape as $\mathbf{a}$. The noisy action is $\mathbf{a}^{\tau}=\tau\boldsymbol{\epsilon}+(1-\tau)\mathbf{a}$. The action expert encodes it as $H$ feature vectors, termed action tokens, one per future control step. The target velocity $\mathbf{u}=\boldsymbol{\epsilon}-\mathbf{a}$ points from the action chunk toward the noise.
 The student minimizes the mean-squared velocity error:
@@ -468,7 +468,7 @@ The training objective combines flow, PCD, and ACL losses:
 \end{equation}
 With the teacher frozen, we jointly optimize the student, cue predictors, and fusion gate.
 
-The teacher is discarded at deployment. The student uses only $o^s$, with cue prediction and gated fusion unchanged from training.
+At deployment, the student uses only $o^s$, retaining cue prediction and gated fusion.
 
 \begin{figure}[H]
 \centering
@@ -482,14 +482,11 @@ the back, top, left, or right views.}
 
 \section{Experiments}
 
-We evaluate ACPD on four LIBERO suites using synchronized multi-view
-data obtained by re-rendering demonstrations from multiple camera
-viewpoints. We examine layer selection for privileged-cue distillation
-and compare ACPD with single-view fine-tuning across four deployment
-views. In the back-view setting, we further compare ACPD with a
-multi-view-to-single-view distillation baseline. We also investigate
-alternative distillation objectives and conduct incremental ablation studies
-to assess the contributions of ACPD's components.
+We evaluate ACPD on four LIBERO suites across four deployment views.
+We examine layer selection and compare ACPD with single-view fine-tuning.
+Back-view experiments compare ACPD with a distillation baseline,
+explore alternative distillation objectives, and assess its components
+through incremental ablations.
 
 % \begin{figure}[t]
 % \centering
@@ -508,7 +505,7 @@ to assess the contributions of ACPD's components.
 
 \subsection{Synchronized Multi-View Data Construction}
 
-LIBERO is a language-conditioned robot manipulation benchmark with human-teleoperated demonstrations~\cite{liu2023libero}. We use four suites: LIBERO-Spatial varies the spatial relation identifying the target bowl; LIBERO-Object varies the manipulated object; LIBERO-Goal changes the task goal while keeping the scene fixed; and LIBERO-Long contains 10 long-horizon tasks with diverse interactions and motor skills.
+LIBERO is a language-conditioned robot manipulation benchmark with human-teleoperated demonstrations~\cite{liu2023libero}. We use four suites: LIBERO-Spatial varies the spatial relation identifying the target bowl; LIBERO-Object varies the manipulated object; LIBERO-Goal changes the task goal while keeping the scene fixed; and LIBERO-Long contains 10 long-horizon tasks.
 
 We construct synchronized multi-view data by re-rendering all
 demonstrations from six cameras (Figure~\ref{fig:multiview_examples}).
