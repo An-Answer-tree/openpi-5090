@@ -661,19 +661,20 @@ showing the practical value of transferring multi-view teacher
 supervision into single-view action generation.
 
 \FloatBarrier
-\subsection{Comparison with Multi-View Distillation}
+\subsection{Comparison with Camera-View Distillation}
 \label{sec:distillation_comparison}
 
-We compare ACPD with a $\pi_{0.5}$ adaptation of the joint
-output and feature distillation proposed by Acar et
-al.~\cite{acar2024multicamera}, denoted MV-SV-KD.
+We compare ACPD with MV-SV-KD, a camera-view distillation
+baseline adapted from Acar et al.~\cite{acar2024multicamera}
+to $\pi_{0.5}$. It transfers knowledge from a multi-camera
+teacher to a single-camera student through joint action-output
+and feature matching.
 Both methods use the same frozen teacher observing the agent
 and wrist views, and train a back-view student on the same
 demonstrations.
-We adapt the baseline to offline flow-matching training by
-matching flow-velocity predictions and normalized final
-action-expert features in place of the original action and
-visual-encoder targets.
+In our flow-matching implementation, action-output matching
+uses flow-velocity predictions. Feature matching uses normalized
+final action-expert states instead of visual-encoder outputs.
 The student retains the ground-truth flow-matching objective,
 with weights of 0.5 and 0.1 for output and feature distillation,
 respectively. Teacher and student receive the same noisy action
