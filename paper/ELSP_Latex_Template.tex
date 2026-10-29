@@ -664,21 +664,18 @@ supervision into single-view action generation.
 \subsection{Comparison with Multi-View Distillation}
 \label{sec:distillation_comparison}
 
-We compare ACPD with a $\pi_{0.5}$ adaptation of the
-multi-camera-to-single-camera distillation method of Acar
-et al.~\cite{acar2024multicamera}, denoted MV-SV-KD.
-The adaptation retains the original method's joint action-output
-and feature-matching formulation.
-For offline flow-matching training, output distillation matches
-flow-velocity predictions, while feature distillation matches
-normalized final action-expert states in place of visual-encoder
-features. The student retains ground-truth flow-matching
-supervision, with weights of 0.5 and 0.1 for output and feature
-distillation, respectively.
-Both methods use the same frozen teacher observing the agent
-and wrist views and train a back-view student on the same
-demonstrations. Teacher and student receive the same noisy
-action chunk and flow time when computing the distillation losses.
+We compare ACPD with MV-SV-KD, a $\pi_{0.5}$ adaptation of
+Acar et al.~\cite{acar2024multicamera}.
+It distills a multi-camera teacher into a single-camera student
+through action and visual-feature matching.
+For offline flow-matching training, we match flow velocities
+and normalized final action-expert states. The latter replace
+the original visual-encoder features.
+The ground-truth flow loss is retained, with output and feature
+distillation weights of 0.5 and 0.1, respectively.
+Both methods train a back-view student using the same
+demonstrations and frozen teacher with agent and wrist inputs.
+Teacher and student share the noisy action chunk and flow time.
 
 \begin{table}[!htbp]
 \centering
@@ -698,25 +695,21 @@ ACPD & \textbf{73.20} & \textbf{73.80} & \underline{63.60}
 \end{tabular*}
 \end{table}
 
-In Table~\ref{tab:distillation_baseline}, ACPD achieves a mean
-success rate of 61.05\%, exceeding MV-SV-KD by 8.65 percentage
-points, with improvements on all four suites.
-The adapted MV-SV-KD reaches 52.40\%, below Single-view SFT's
-57.15\%. This result highlights the challenge of direct output
-and feature matching when teacher and student observations
-differ substantially, as in this back-view setting.
-Matching the teacher's full action representations may require
-the student to reproduce information that is poorly observable
-from its own camera.
+Table~\ref{tab:distillation_baseline} shows that ACPD reaches
+61.05\% mean success, compared with 52.40\% for MV-SV-KD,
+with gains on all four suites.
+MV-SV-KD also falls below Single-view SFT in this back-view
+setting. With the substantial viewpoint difference, direct
+feature matching may require the student to reproduce
+information that is difficult to infer from its own camera.
 
-ACPD instead extracts visual cues for each future control step
-and learns to incorporate their predictions into action generation.
-These cues focus supervision on the visual information used
-by the teacher for the corresponding action prediction.
-ACL further transfers relative velocity variation without
-requiring pointwise agreement with teacher outputs.
-The results support this action-conditioned transfer formulation
-for the evaluated weak-view setting.
+ACPD focuses supervision on visual cues used by the teacher
+for each future control step. Their student predictions guide
+action generation through a learned gate.
+ACL complements this transfer by aligning relative velocity
+variation without pointwise output matching.
+These results support action-conditioned cue transfer across
+the evaluated viewpoint gap.
 
 \FloatBarrier
 \subsection{Ablation Studies}
