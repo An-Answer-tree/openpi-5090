@@ -234,16 +234,16 @@ We evaluate ACPD with $\pi_{0.5}$ using synchronized multi-view demonstrations f
 \section{Introduction}
 
 Vision-language-action (VLA) policies map language instructions and visual observations to robot actions.
-Diffusion and flow-matching action generators have been widely adopted in VLA policies~\cite{chi2025diffusionpolicy,wen2025diffusionvla,black2025pi0}.
+Diffusion and flow-matching action generators have been widely adopted in VLA policies~\cite{doi:10.1177/02783649241273668,pmlr-v267-wen25g,BlackK-RSS-25}.
 However, their performance is constrained by the visual evidence available at deployment.
 When object pose, spatial relations, or gripper-object contact are occluded or poorly visible, a policy can perform substantially worse than one using a more informative view.
 On LIBERO, policies trained and evaluated separately for each camera view exhibit substantial differences in task success (Figure~\ref{fig:motivation}).
 Workspace geometry and robot hardware can constrain camera placement, leaving a less informative deployment view.
 This motivates weak-view policy learning, where a policy uses a limited view at deployment but can receive training-time supervision from a more informative view.
 
-View-diversity methods address viewpoint sensitivity using synchronized multi-camera demonstrations or synthesized novel views~\cite{ablett2021multiview,tian2025vista}. Auxiliary views also support visual representation learning~\cite{seo2023multiview}, while geometry-aware methods encode scenes using explicit 3D representations~\cite{shridhar2023peract,goyal2023rvt}. These strategies improve viewpoint robustness but do not explicitly identify the visual evidence needed for each action prediction under weak-view deployment.
+View-diversity methods address viewpoint sensitivity using synchronized multi-camera demonstrations or synthesized novel views~\cite{9636440,pmlr-v270-tian25a}. Auxiliary views also support visual representation learning~\cite{pmlr-v202-seo23a}, while geometry-aware methods encode scenes using explicit 3D representations~\cite{pmlr-v205-shridhar23a,pmlr-v229-goyal23a}. These strategies improve viewpoint robustness but do not explicitly identify the visual evidence needed for each action prediction under weak-view deployment.
 
-Privileged distillation supervises a weak-view policy using a teacher with more informative views during training. Prior work transfers knowledge from a multi-camera teacher to a single-camera policy by matching teacher actions and visual features~\cite{acar2024multicamera}. However, cross-view supervision faces a correspondence problem: relevant evidence may be occluded in the weak view, while shared scene elements can appear at different image locations and token positions. Consequently, matching complete representations across views can impose poorly aligned targets on the student. Effective cross-view supervision must identify teacher information useful for each future action, since different actions may require different visual evidence.
+Privileged distillation supervises a weak-view policy using a teacher with more informative views during training. Prior work transfers knowledge from a multi-camera teacher to a single-camera policy by matching teacher actions and visual features~\cite{10327777}. However, cross-view supervision faces a correspondence problem: relevant evidence may be occluded in the weak view, while shared scene elements can appear at different image locations and token positions. Consequently, matching complete representations across views can impose poorly aligned targets on the student. Effective cross-view supervision must identify teacher information useful for each future action, since different actions may require different visual evidence.
 
 To address these challenges, we propose \textbf{Action-Conditioned Privileged Distillation (ACPD)}, a cross-view distillation framework that transfers action-conditioned visual cues from a privileged-view teacher to a weak-view student.
 ACPD trains the student alongside a frozen teacher using synchronized observations with the same instruction, robot state, and action target. The teacher receives informative camera views, while the student receives a single weak view. For each future control step, ACPD uses attention weights from the teacher's action expert to aggregate visual features from each privileged view into a compact cue. The student learns to predict these cues from its own action representations and incorporates them into action generation. These cues provide supervision without requiring visual-token alignment across views.
@@ -263,22 +263,22 @@ Our contributions are:
 
 \subsection{Generative VLA Policies}
 
-Large-scale datasets such as BridgeData V2, Open X-Embodiment, and DROID support generalist robot learning~\cite{walke2023bridgev2,oneill2024oxe,khazatsky2024droid}. RT-1 learns language-conditioned control from visual observations, while RT-2 adapts pretrained vision-language models for action prediction~\cite{brohan2023rt1,zitkovich2023rt2}. Octo and OpenVLA are pretrained on heterogeneous robot data for adaptation across robot embodiments~\cite{ghosh2024octo,kim2025openvla}.
+Large-scale datasets such as BridgeData V2, Open X-Embodiment, and DROID support generalist robot learning~\cite{pmlr-v229-walke23a,10611477,Khazatsky-RSS-24}. RT-1 learns language-conditioned control from visual observations, while RT-2 adapts pretrained vision-language models for action prediction~\cite{Brohan-RSS-23,pmlr-v229-zitkovich23a}. Octo and OpenVLA are pretrained on heterogeneous robot data for adaptation across robot embodiments~\cite{Ghosh-RSS-24,pmlr-v270-kim25c}.
 
-Beyond data and pretraining, VLA policies also differ in how they represent and generate action sequences. Action chunking predicts sequences of future actions~\cite{zhao2023act}. FAST encodes action chunks as discrete tokens, while OpenVLA-OFT predicts continuous action chunks in parallel~\cite{pertsch2025fast,kim2025openvlaoft}. Diffusion-based policies generate continuous action sequences through iterative denoising~\cite{chi2025diffusionpolicy,ze2024dp3,liu2025rdt,wen2025diffusionvla}. Flow-matching VLAs, including $\pi_0$ and $\pi_{0.5}$, generate continuous actions by integrating a learned velocity field~\cite{black2025pi0,black2025pi05}.
+Beyond data and pretraining, VLA policies also differ in how they represent and generate action sequences. Action chunking predicts sequences of future actions~\cite{Zhao-RSS-23}. FAST encodes action chunks as discrete tokens, while OpenVLA-OFT predicts continuous action chunks in parallel~\cite{PertschK-RSS-25,KimM1-RSS-25}. Diffusion-based policies generate continuous action sequences through iterative denoising~\cite{doi:10.1177/02783649241273668,Ze-RSS-24,ICLR2025_49f80e4d,pmlr-v267-wen25g}. Flow-matching VLAs, including $\pi_0$ and $\pi_{0.5}$, generate continuous actions by integrating a learned velocity field~\cite{BlackK-RSS-25,pmlr-v305-black25a}.
 
 
 \subsection{Viewpoint Robustness in Robot Manipulation}
 
-Prior work addresses viewpoint variation using demonstrations collected across views~\cite{ablett2021multiview} or auxiliary views for representation learning~\cite{seo2023multiview}. SPARTN, VISTA, and RoVi-Aug expand viewpoint coverage by synthesizing training observations from alternative camera poses~\cite{zhou2023spartn,tian2025vista,chen2025roviaug}.
+Prior work addresses viewpoint variation using demonstrations collected across views~\cite{9636440} or auxiliary views for representation learning~\cite{pmlr-v202-seo23a}. SPARTN, VISTA, and RoVi-Aug expand viewpoint coverage by synthesizing training observations from alternative camera poses~\cite{Zhou_2023_CVPR,pmlr-v270-tian25a,pmlr-v270-chen25a}.
 
-Another line of work represents scene geometry explicitly. PerAct operates on voxelized scenes, while RVT projects 3D observations into virtual views~\cite{shridhar2023peract,goyal2023rvt}. 3D-MVP learns geometric representations through multi-view pretraining, whereas Act3D uses a continuous 3D feature field~\cite{qian20253dmvp,gervet2023act3d}. DP3 combines point-cloud observations with diffusion-based action generation~\cite{ze2024dp3}.
+Another line of work represents scene geometry explicitly. PerAct operates on voxelized scenes, while RVT projects 3D observations into virtual views~\cite{pmlr-v205-shridhar23a,pmlr-v229-goyal23a}. 3D-MVP learns geometric representations through multi-view pretraining, whereas Act3D uses a continuous 3D feature field~\cite{Qian_2025_CVPR,pmlr-v229-gervet23a}. DP3 combines point-cloud observations with diffusion-based action generation~\cite{Ze-RSS-24}.
 
 \subsection{Privileged Distillation for Weak-View Policies}
 
-Learning with privileged information uses additional information available only during training~\cite{vapnik2015lupi}. Knowledge distillation transfers teacher predictions to a student~\cite{hinton2015distilling}. Privileged distillation trains a student using predictions from a teacher with access to additional information unavailable to the student~\cite{lopezpaz2016generalized}. In embodied control, privileged states and sensors support asymmetric critics and auxiliary models~\cite{pinto2018asymmetric,hu2024scaffolder}. State-based or depth-guided teachers supervise visual policies~\cite{xu2024humanvla,wang2025monolift}.
+Learning with privileged information uses additional information available only during training~\cite{JMLR:v16:vapnik15b}. Knowledge distillation transfers teacher predictions to a student~\cite{hinton2015distilling}. Privileged distillation trains a student using predictions from a teacher with access to additional information unavailable to the student~\cite{lopezpaz2016generalized}. In embodied control, privileged states and sensors support asymmetric critics and auxiliary models~\cite{Pinto-RSS-18,ICLR2024_0b334c64}. State-based or depth-guided teachers supervise visual policies~\cite{NEURIPS2024_215aeb07,NEURIPS2025_07bdb30a}.
 
-More directly related to weak-view deployment, Acar et al. distill a multi-camera reinforcement-learning teacher into a single-camera student through action and visual-feature matching, combined with camera-view augmentation~\cite{acar2024multicamera}. However, viewpoint changes alter object visibility and image location, making direct visual-feature matching difficult. ACPD extracts visual cues for each future control step using the teacher's attention weights. The student predicts and uses these cues for action generation.
+More directly related to weak-view deployment, Acar et al. distill a multi-camera reinforcement-learning teacher into a single-camera student through action and visual-feature matching, combined with camera-view augmentation~\cite{10327777}. However, viewpoint changes alter object visibility and image location, making direct visual-feature matching difficult. ACPD extracts visual cues for each future control step using the teacher's attention weights. The student predicts and uses these cues for action generation.
 
 \section{Action-Conditioned Privileged Distillation}
 
@@ -505,7 +505,7 @@ through incremental ablations.
 
 \subsection{Synchronized Multi-View Data Construction}
 
-LIBERO is a language-conditioned robot manipulation benchmark with human-teleoperated demonstrations~\cite{liu2023libero}. We use four suites: LIBERO-Spatial varies the spatial relation identifying the target bowl; LIBERO-Object varies the manipulated object; LIBERO-Goal changes the task goal while keeping the scene fixed; and LIBERO-Long contains 10 long-horizon tasks.
+LIBERO is a language-conditioned robot manipulation benchmark with human-teleoperated demonstrations~\cite{NEURIPS2023_8c3c6668}. We use four suites: LIBERO-Spatial varies the spatial relation identifying the target bowl; LIBERO-Object varies the manipulated object; LIBERO-Goal changes the task goal while keeping the scene fixed; and LIBERO-Long contains 10 long-horizon tasks.
 
 We construct synchronized multi-view data by re-rendering all
 demonstrations from six cameras (Figure~\ref{fig:multiview_examples}).
@@ -523,7 +523,7 @@ action chunk.
 
 \paragraph{Policy configurations.}
 All students are initialized from the same pretrained
-$\pi_{0.5}$ checkpoint~\cite{black2025pi05}.
+$\pi_{0.5}$ checkpoint~\cite{pmlr-v305-black25a}.
 Each student receives one camera view (back, left, right,
 or top), the language instruction, and robot state.
 Single-view SFT uses the standard flow-matching objective.
@@ -678,7 +678,7 @@ Frames are uniformly sampled from randomly selected episodes.}
 \label{sec:distillation_comparison}
 
 We compare ACPD with MV-SV-KD, a $\pi_{0.5}$ adaptation of
-Acar et al.~\cite{acar2024multicamera}.
+Acar et al.~\cite{10327777}.
 Their method distills a multi-camera teacher into a single-camera student
 through action and visual-feature matching.
 Our adaptation retains joint output and feature distillation
