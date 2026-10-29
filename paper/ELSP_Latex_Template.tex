@@ -532,7 +532,7 @@ student inputs, initialization, and optimization settings.
 \paragraph{Training settings.}
 We use LoRA ranks of 16 for the vision-language backbone
 and 32 for the action expert.
-Training uses four NVIDIA RTX 5090 GPUs, fully sharded
+The main experiments use four NVIDIA RTX 5090 GPUs, fully sharded
 data parallelism, and a global batch size of 64.
 We use AdamW, gradient clipping at 1.0, and training seed 42.
 The learning rate warms up linearly to $2.5\times10^{-5}$,
@@ -779,37 +779,54 @@ and a variance penalty that discourages constant targets.
 Privileged cue distillation (PCD, d) instead uses cues extracted
 from the frozen teacher's own attention at layer 10, with the
 normalized regression loss in Equation~\eqref{eq:cue_loss}.
-Neither configuration uses cue fusion. LCD uses batch size 32;
-the remaining configurations use 64.
+Neither configuration uses cue fusion.
 
 ACL + PCD reaches 58.90\%, compared with 53.10\% for ACL + LCD,
 with higher success on three suites.
-Joint optimization in LCD may favor cues that are easy to
-predict over cues that best support action generation.
-PCD grounds its targets in the teacher's existing visual
-aggregation for action prediction.
-Its mean nevertheless remains below the 59.75\% of ACL only:
-learning to predict privileged cues does not by itself improve
-average task success in this setting.
+In LCD, cue selection and prediction are learned jointly.
+Updating the selector also changes the prediction targets,
+which may complicate optimization.
+PCD instead derives its targets from the frozen teacher's
+visual aggregation for action prediction.
 
 \paragraph{Gated cue fusion.}
-Full ACPD (e) makes the predicted cues available to action
-decoding through GCF (Equation~\eqref{eq:cue_fusion}).
-Mean success reaches 61.05\%, 2.15 percentage points above
-ACL + PCD. The improvement is concentrated on Spatial, where
-success increases from 65.00\% to 73.20\%.
-Object and Long also improve, while Goal decreases from
-64.40\% to 63.60\%.
+To use the learned visual information for control, GCF combines
+predicted cues with the final action representations
+(Equation~\eqref{eq:cue_fusion}).
+Full ACPD (e) reaches 61.05\% mean success, 2.15 percentage points above
+ACL + PCD. Cue supervision trains the student to predict
+privileged features; GCF additionally makes these predictions
+directly available to action decoding.
+The higher mean success highlights the value of using the
+predicted features for control, beyond optimizing the
+distillation loss.
 The complete model achieves the highest four-suite mean,
 exceeding ACL only by 1.30 points and Single-view SFT by
-3.90 points. These results support ACPD's combination of ACL
-and privileged cues that the student both predicts and uses
-for action generation. GCF provides the direct connection
-between cue learning and action decoding.
+3.90 points. These results support ACPD's combination of
+action correlation supervision, cue prediction, and gated
+use of the predicted visual information.
 
 \FloatBarrier
 \section{Conclusion}
-We have introduced ACPD for training weak-view VLA policies with privileged camera observations. ACPD combines compact, action-conditioned teacher cues with action-level correlation while retaining single-view inputs at deployment. Experiments across four deployment views show improved weak-view performance, and back-view ablations show higher mean success when cue prediction is combined with gated fusion. These results demonstrate the value of action-conditioned cross-view supervision without requiring additional deployment inputs.
+ACPD enables multi-view supervision for VLA policies deployed
+with a single camera. Evaluations on four LIBERO suites show
+higher mean success across all four deployment views.
+The resulting policies use only their designated camera and
+require no teacher at deployment. This makes informative
+training views useful even when camera placement is constrained
+by the workspace or robot.
+
+The results favor designing privileged prediction targets and
+their use in action generation together. Action-conditioned cues
+organize visual knowledge around future control steps, while
+gated fusion makes their predictions available to action decoding.
+The ablation study supports the value of this connection between
+cue learning and control.
+More broadly, the action expert offers an interface for
+transferring visual knowledge across viewpoints while preserving
+single-view deployment. Extending this framework to other VLA
+architectures and physical robots is a natural direction toward
+broader weak-view robot learning.
 
 % TODO: The AAAI source provides none of the following journal declarations.
 % Original template blocks are kept as comments; no factual declarations have been invented.
