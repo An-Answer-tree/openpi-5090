@@ -811,25 +811,25 @@ use of the predicted visual information.
 
 \FloatBarrier
 \section{Conclusion}
-ACPD enables multi-view supervision for VLA policies deployed
-with a single camera. Evaluations on four LIBERO suites show
-higher mean success across all four deployment views.
-The resulting policies use only their designated camera and
-require no teacher at deployment. This makes informative
-training views useful even when camera placement is constrained
-by the workspace or robot.
+We presented ACPD, a framework for transferring multi-view visual
+knowledge to VLA policies deployed with a single camera.
+ACPD extracts teacher cues for each future control step and trains
+the student to predict and incorporate them into action generation.
+ACL complements this visual transfer by aligning the relative
+variation of teacher and student flow velocities.
+Across four LIBERO suites, ACPD improves mean success over
+single-view fine-tuning in all four deployment views, without
+requiring the teacher at deployment.
 
-The results favor designing privileged prediction targets and
-their use in action generation together. Action-conditioned cues
-organize visual knowledge around future control steps, while
-gated fusion makes their predictions available to action decoding.
-The ablation study supports the value of this connection between
-cue learning and control.
-More broadly, the action expert offers an interface for
-transferring visual knowledge across viewpoints while preserving
-single-view deployment. Extending this framework to other VLA
-architectures and physical robots is a natural direction toward
-broader weak-view robot learning.
+The ablation results highlight the value of connecting
+privileged-cue prediction to action decoding.
+These findings support organizing teacher supervision around
+future actions and providing an explicit path for the student
+to use the predicted visual information.
+This connection between cue learning and action generation
+is central to ACPD's design.
+Future work will examine how this action-conditioned transfer
+generalizes across VLA architectures and physical robot platforms.
 
 % TODO: The AAAI source provides none of the following journal declarations.
 % Original template blocks are kept as comments; no factual declarations have been invented.
