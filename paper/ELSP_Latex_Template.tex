@@ -611,12 +611,18 @@ privileged supervision for action generation.
 \FloatBarrier
 \subsection{Overall Performance}
 
-Table~\ref{tab:main_results} compares ACPD with Single-view SFT
-across four deployment views and four LIBERO suites.
+Table~\ref{tab:main_results} shows that ACPD improves the
+four-suite mean success rate over Single-view SFT in every
+deployment view. The overall mean increases from 71.09\%
+to 74.78\%, a gain of 3.69 percentage points.
+Per-view gains range from 2.90 to 4.00 points across camera
+configurations with substantially different baseline performance.
+This cross-view consistency supports ACPD's use of privileged
+supervision for different single-view deployment settings.
 
 \begin{table}[!htbp]
 \centering
-\caption{Task success rates (\%) across four deployment views and four LIBERO suites. \textit{Avg.} averages the four suites; \textit{Overall} averages each metric across deployment views. $\Delta$ denotes the gain over Single-view SFT in \textit{Avg.}, measured in percentage points.}
+\caption{Task success rates (\%) across four deployment views and four LIBERO suites. \textit{Avg.} averages the four suites; \textit{Overall} averages each metric across deployment views. $\Delta$ denotes the gain over Single-view SFT in \textit{Avg.}, measured in percentage points. ACPD achieves a higher mean success rate than Single-view SFT in every deployment view.}
 \label{tab:main_results}
 \begin{tabular*}{0.95\columnwidth}{@{\extracolsep{\fill}}llrrrrrr@{}}
 \toprule
@@ -646,25 +652,15 @@ Overall & Single-view SFT & 78.95 & 78.35 & 76.80 & 50.25 & 71.09 & -- \\
 \end{tabular*}
 \end{table}
 
-Averaged equally over views and suites, ACPD raises task success
-from 71.09\% to 74.78\%, a gain of 3.69 percentage points.
-The four-suite average improves for every deployment view:
-by 3.90 points for back, 2.90 for left, 4.00 for right,
-and 3.95 for top. The gains persist across camera configurations
-whose Single-view SFT success ranges from 57.15\% to 78.65\%.
-
-ACPD improves success in 14 of the 16 view--suite settings,
-and the average over deployment views increases on every suite.
-LIBERO-Spatial improves from 78.95\% to 83.40\%, while
-LIBERO-Object and LIBERO-Goal gain 2.50 and 1.90 percentage
-points, respectively.
+ACPD improves success in 14 of the 16 view--suite settings.
 The largest suite-level gain occurs on LIBERO-Long, where
-mean success rises from 50.25\% to 56.15\%.
-Long-horizon performance improves under all four views,
-with the largest gain in the top view, from 45.40\% to 54.80\%.
-Together, these results demonstrate improved single-view
-performance across camera configurations and task suites,
-including long-horizon manipulation.
+mean success increases from 50.25\% to 56.15\%.
+All four views improve on this suite; the top view gains
+9.40 percentage points, from 45.40\% to 54.80\%.
+These gains extend ACPD's benefit to long-horizon manipulation.
+Each student uses only its designated camera at deployment,
+showing the practical value of transferring multi-view teacher
+supervision into single-view action generation.
 
 \FloatBarrier
 \subsection{Comparison with Multi-View Distillation}
