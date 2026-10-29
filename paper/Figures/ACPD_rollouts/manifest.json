@@ -1,0 +1,779 @@
+{
+  "method": "ACPD",
+  "selection": "Uniform independent draw from 10 tasks x 50 evaluation initial-state episodes per view-suite cell; no outcome filtering or rerolls.",
+  "selection_seed": 20261029,
+  "frame_selection": "Six uniformly spaced recorded frames, including the first and last recorded frames.",
+  "pixels": "Original decoded RGB frames; no cropping, enhancement, retouching, or generated content.",
+  "step_labels": "Zero-based indices within the recorded policy rollout, after the evaluator's initial settling steps. Playback fps does not specify physical simulation time.",
+  "outcome_source": "Success/failure labels are read from the evaluator's original video filenames; the final displayed image is the last recorded pre-action frame.",
+  "rollouts": [
+    {
+      "view": "back",
+      "suite": "spatial",
+      "task_id": 5,
+      "episode": 23,
+      "task_name": "pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate",
+      "instruction": "pick up the black bowl on the ramekin and place it on the plate",
+      "result": "failure",
+      "source_video": "/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/spatial/videos/pick_up_the_black_bowl_on_the_ramekin_and_place_it_on_the_plate_23_failure.mp4",
+      "source_sha256": "d342dfcb822646d1932c89bc1c61b742dd6726634e26755903dc201d123b30ac",
+      "model_archive": "student/backview_acpdv2_layer10_bs64",
+      "policy_config": "pi05_libero_backview_acpd_v2_layer10_lora",
+      "evaluation_summary": "/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/summary.txt",
+      "frame_count": 220,
+      "video_fps": 10.0,
+      "frame_size": [
+        224,
+        224
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "path": "frames/back_spatial/frame_000.png"
+        },
+        {
+          "index": 44,
+          "path": "frames/back_spatial/frame_044.png"
+        },
+        {
+          "index": 88,
+          "path": "frames/back_spatial/frame_088.png"
+        },
+        {
+          "index": 131,
+          "path": "frames/back_spatial/frame_131.png"
+        },
+        {
+          "index": 175,
+          "path": "frames/back_spatial/frame_175.png"
+        },
+        {
+          "index": 219,
+          "path": "frames/back_spatial/frame_219.png"
+        }
+      ],
+      "log_outcome_verified": true,
+      "evaluation_log": "/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/logs/spatial.log"
+    },
+    {
+      "view": "back",
+      "suite": "object",
+      "task_id": 4,
+      "episode": 26,
+      "task_name": "pick_up_the_ketchup_and_place_it_in_the_basket",
+      "instruction": "pick up the ketchup and place it in the basket",
+      "result": "success",
+      "source_video": "/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/object/videos/pick_up_the_ketchup_and_place_it_in_the_basket_26_success.mp4",
+      "source_sha256": "2be9e831ea0f40bb4f03a058ea80a10a1ce71d3458fb929353eea472b8247578",
+      "model_archive": "student/backview_acpdv2_layer10_bs64",
+      "policy_config": "pi05_libero_backview_acpd_v2_layer10_lora",
+      "evaluation_summary": "/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/summary.txt",
+      "frame_count": 198,
+      "video_fps": 10.0,
+      "frame_size": [
+        224,
+        224
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "path": "frames/back_object/frame_000.png"
+        },
+        {
+          "index": 39,
+          "path": "frames/back_object/frame_039.png"
+        },
+        {
+          "index": 79,
+          "path": "frames/back_object/frame_079.png"
+        },
+        {
+          "index": 118,
+          "path": "frames/back_object/frame_118.png"
+        },
+        {
+          "index": 158,
+          "path": "frames/back_object/frame_158.png"
+        },
+        {
+          "index": 197,
+          "path": "frames/back_object/frame_197.png"
+        }
+      ],
+      "log_outcome_verified": true,
+      "evaluation_log": "/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/logs/object.log"
+    },
+    {
+      "view": "back",
+      "suite": "goal",
+      "task_id": 2,
+      "episode": 15,
+      "task_name": "put_the_wine_bottle_on_top_of_the_cabinet",
+      "instruction": "put the wine bottle on top of the cabinet",
+      "result": "success",
+      "source_video": "/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/goal/videos/put_the_wine_bottle_on_top_of_the_cabinet_15_success.mp4",
+      "source_sha256": "a09b3e1385d53330a25c970f9d9c5dcc0c546b21efb99159ad0fa495dc9f6854",
+      "model_archive": "student/backview_acpdv2_layer10_bs64",
+      "policy_config": "pi05_libero_backview_acpd_v2_layer10_lora",
+      "evaluation_summary": "/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/summary.txt",
+      "frame_count": 109,
+      "video_fps": 10.0,
+      "frame_size": [
+        224,
+        224
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "path": "frames/back_goal/frame_000.png"
+        },
+        {
+          "index": 22,
+          "path": "frames/back_goal/frame_022.png"
+        },
+        {
+          "index": 43,
+          "path": "frames/back_goal/frame_043.png"
+        },
+        {
+          "index": 65,
+          "path": "frames/back_goal/frame_065.png"
+        },
+        {
+          "index": 86,
+          "path": "frames/back_goal/frame_086.png"
+        },
+        {
+          "index": 108,
+          "path": "frames/back_goal/frame_108.png"
+        }
+      ],
+      "log_outcome_verified": true,
+      "evaluation_log": "/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/logs/goal.log"
+    },
+    {
+      "view": "back",
+      "suite": "long",
+      "task_id": 6,
+      "episode": 27,
+      "task_name": "LIVING_ROOM_SCENE6_put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate",
+      "instruction": "put the white mug on the plate and put the chocolate pudding to the right of the plate",
+      "result": "failure",
+      "source_video": "/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/libero_10/videos/put_the_white_mug_on_the_plate_and_put_the_chocolate_pudding_to_the_right_of_the_plate_27_failure.mp4",
+      "source_sha256": "07a262a9253ff14c2a267be414995dfd6c7f969d86ca1abe602f880d0599342f",
+      "model_archive": "student/backview_acpdv2_layer10_bs64",
+      "policy_config": "pi05_libero_backview_acpd_v2_layer10_lora",
+      "evaluation_summary": "/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/summary.txt",
+      "frame_count": 520,
+      "video_fps": 10.0,
+      "frame_size": [
+        224,
+        224
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "path": "frames/back_long/frame_000.png"
+        },
+        {
+          "index": 104,
+          "path": "frames/back_long/frame_104.png"
+        },
+        {
+          "index": 208,
+          "path": "frames/back_long/frame_208.png"
+        },
+        {
+          "index": 311,
+          "path": "frames/back_long/frame_311.png"
+        },
+        {
+          "index": 415,
+          "path": "frames/back_long/frame_415.png"
+        },
+        {
+          "index": 519,
+          "path": "frames/back_long/frame_519.png"
+        }
+      ],
+      "log_outcome_verified": true,
+      "evaluation_log": "/opt/liutong/openpi-5090-evals/acpd-v2-training-trajectory/final-hidden/34999/logs/libero_10.log"
+    },
+    {
+      "view": "left",
+      "suite": "spatial",
+      "task_id": 9,
+      "episode": 46,
+      "task_name": "pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate",
+      "instruction": "pick up the black bowl on the wooden cabinet and place it on the plate",
+      "result": "success",
+      "source_video": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/leftview/31999/spatial/videos/pick_up_the_black_bowl_on_the_wooden_cabinet_and_place_it_on_the_plate_46_success.mp4",
+      "source_sha256": "0d50d460546668c81ebc2ae7abc0828cd40429019424e1f30671b404506e1385",
+      "model_archive": "student/leftview_acpdv2_layer10_bs64",
+      "policy_config": "pi05_libero_leftview_acpd_v2_layer10_lora",
+      "evaluation_summary": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/leftview/31999/summary.txt",
+      "frame_count": 118,
+      "video_fps": 10.0,
+      "frame_size": [
+        224,
+        224
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "path": "frames/left_spatial/frame_000.png"
+        },
+        {
+          "index": 23,
+          "path": "frames/left_spatial/frame_023.png"
+        },
+        {
+          "index": 47,
+          "path": "frames/left_spatial/frame_047.png"
+        },
+        {
+          "index": 70,
+          "path": "frames/left_spatial/frame_070.png"
+        },
+        {
+          "index": 94,
+          "path": "frames/left_spatial/frame_094.png"
+        },
+        {
+          "index": 117,
+          "path": "frames/left_spatial/frame_117.png"
+        }
+      ],
+      "log_outcome_verified": true,
+      "evaluation_log": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/leftview/31999/logs/spatial.log"
+    },
+    {
+      "view": "left",
+      "suite": "object",
+      "task_id": 3,
+      "episode": 28,
+      "task_name": "pick_up_the_bbq_sauce_and_place_it_in_the_basket",
+      "instruction": "pick up the bbq sauce and place it in the basket",
+      "result": "success",
+      "source_video": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/leftview/31999/object/videos/pick_up_the_bbq_sauce_and_place_it_in_the_basket_28_success.mp4",
+      "source_sha256": "b261dc21186a134de00be1ed9dcb7aaf905484837a6337a10f48578d24d37065",
+      "model_archive": "student/leftview_acpdv2_layer10_bs64",
+      "policy_config": "pi05_libero_leftview_acpd_v2_layer10_lora",
+      "evaluation_summary": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/leftview/31999/summary.txt",
+      "frame_count": 127,
+      "video_fps": 10.0,
+      "frame_size": [
+        224,
+        224
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "path": "frames/left_object/frame_000.png"
+        },
+        {
+          "index": 25,
+          "path": "frames/left_object/frame_025.png"
+        },
+        {
+          "index": 50,
+          "path": "frames/left_object/frame_050.png"
+        },
+        {
+          "index": 76,
+          "path": "frames/left_object/frame_076.png"
+        },
+        {
+          "index": 101,
+          "path": "frames/left_object/frame_101.png"
+        },
+        {
+          "index": 126,
+          "path": "frames/left_object/frame_126.png"
+        }
+      ],
+      "log_outcome_verified": true,
+      "evaluation_log": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/leftview/31999/logs/object.log"
+    },
+    {
+      "view": "left",
+      "suite": "goal",
+      "task_id": 4,
+      "episode": 35,
+      "task_name": "put_the_bowl_on_top_of_the_cabinet",
+      "instruction": "put the bowl on top of the cabinet",
+      "result": "success",
+      "source_video": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/leftview/31999/goal/videos/put_the_bowl_on_top_of_the_cabinet_35_success.mp4",
+      "source_sha256": "35a2f61288b9fe22a376af3038c85fb37465a7f5227a32a7b6aafc0ed7109ce5",
+      "model_archive": "student/leftview_acpdv2_layer10_bs64",
+      "policy_config": "pi05_libero_leftview_acpd_v2_layer10_lora",
+      "evaluation_summary": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/leftview/31999/summary.txt",
+      "frame_count": 102,
+      "video_fps": 10.0,
+      "frame_size": [
+        224,
+        224
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "path": "frames/left_goal/frame_000.png"
+        },
+        {
+          "index": 20,
+          "path": "frames/left_goal/frame_020.png"
+        },
+        {
+          "index": 40,
+          "path": "frames/left_goal/frame_040.png"
+        },
+        {
+          "index": 61,
+          "path": "frames/left_goal/frame_061.png"
+        },
+        {
+          "index": 81,
+          "path": "frames/left_goal/frame_081.png"
+        },
+        {
+          "index": 101,
+          "path": "frames/left_goal/frame_101.png"
+        }
+      ],
+      "log_outcome_verified": true,
+      "evaluation_log": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/leftview/31999/logs/goal.log"
+    },
+    {
+      "view": "left",
+      "suite": "long",
+      "task_id": 2,
+      "episode": 45,
+      "task_name": "KITCHEN_SCENE3_turn_on_the_stove_and_put_the_moka_pot_on_it",
+      "instruction": "turn on the stove and put the moka pot on it",
+      "result": "success",
+      "source_video": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/leftview/31999/libero_10/videos/turn_on_the_stove_and_put_the_moka_pot_on_it_45_success.mp4",
+      "source_sha256": "c20f8fdf45755d49949f9d860b32ab672407766b76adb9e97f32da81b1b4d57c",
+      "model_archive": "student/leftview_acpdv2_layer10_bs64",
+      "policy_config": "pi05_libero_leftview_acpd_v2_layer10_lora",
+      "evaluation_summary": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/leftview/31999/summary.txt",
+      "frame_count": 229,
+      "video_fps": 10.0,
+      "frame_size": [
+        224,
+        224
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "path": "frames/left_long/frame_000.png"
+        },
+        {
+          "index": 46,
+          "path": "frames/left_long/frame_046.png"
+        },
+        {
+          "index": 91,
+          "path": "frames/left_long/frame_091.png"
+        },
+        {
+          "index": 137,
+          "path": "frames/left_long/frame_137.png"
+        },
+        {
+          "index": 182,
+          "path": "frames/left_long/frame_182.png"
+        },
+        {
+          "index": 228,
+          "path": "frames/left_long/frame_228.png"
+        }
+      ],
+      "log_outcome_verified": true,
+      "evaluation_log": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/leftview/31999/logs/libero_10.log"
+    },
+    {
+      "view": "right",
+      "suite": "spatial",
+      "task_id": 1,
+      "episode": 42,
+      "task_name": "pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate",
+      "instruction": "pick up the black bowl next to the ramekin and place it on the plate",
+      "result": "success",
+      "source_video": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview/31999/spatial/videos/pick_up_the_black_bowl_next_to_the_ramekin_and_place_it_on_the_plate_42_success.mp4",
+      "source_sha256": "f1914209adccfdec1b98f67e433e58deefb18a1150a6a070766600be83c5c520",
+      "model_archive": "student/rightview_acpdv2_layer10_bs64",
+      "policy_config": "pi05_libero_rightview_acpd_v2_layer10_lora",
+      "evaluation_summary": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview/31999/summary.txt",
+      "frame_count": 104,
+      "video_fps": 10.0,
+      "frame_size": [
+        224,
+        224
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "path": "frames/right_spatial/frame_000.png"
+        },
+        {
+          "index": 21,
+          "path": "frames/right_spatial/frame_021.png"
+        },
+        {
+          "index": 41,
+          "path": "frames/right_spatial/frame_041.png"
+        },
+        {
+          "index": 62,
+          "path": "frames/right_spatial/frame_062.png"
+        },
+        {
+          "index": 82,
+          "path": "frames/right_spatial/frame_082.png"
+        },
+        {
+          "index": 103,
+          "path": "frames/right_spatial/frame_103.png"
+        }
+      ],
+      "log_outcome_verified": true,
+      "evaluation_log": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview/31999/logs/spatial.log"
+    },
+    {
+      "view": "right",
+      "suite": "object",
+      "task_id": 7,
+      "episode": 19,
+      "task_name": "pick_up_the_milk_and_place_it_in_the_basket",
+      "instruction": "pick up the milk and place it in the basket",
+      "result": "failure",
+      "source_video": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview/31999/object/videos/pick_up_the_milk_and_place_it_in_the_basket_19_failure.mp4",
+      "source_sha256": "2d2b3b6a64c9cc56999b7aa9cda4d8b84d8be0fc28bd23d37e1f004863960575",
+      "model_archive": "student/rightview_acpdv2_layer10_bs64",
+      "policy_config": "pi05_libero_rightview_acpd_v2_layer10_lora",
+      "evaluation_summary": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview/31999/summary.txt",
+      "frame_count": 280,
+      "video_fps": 10.0,
+      "frame_size": [
+        224,
+        224
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "path": "frames/right_object/frame_000.png"
+        },
+        {
+          "index": 56,
+          "path": "frames/right_object/frame_056.png"
+        },
+        {
+          "index": 112,
+          "path": "frames/right_object/frame_112.png"
+        },
+        {
+          "index": 167,
+          "path": "frames/right_object/frame_167.png"
+        },
+        {
+          "index": 223,
+          "path": "frames/right_object/frame_223.png"
+        },
+        {
+          "index": 279,
+          "path": "frames/right_object/frame_279.png"
+        }
+      ],
+      "log_outcome_verified": true,
+      "evaluation_log": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview/31999/logs/object.log"
+    },
+    {
+      "view": "right",
+      "suite": "goal",
+      "task_id": 7,
+      "episode": 0,
+      "task_name": "turn_on_the_stove",
+      "instruction": "turn on the stove",
+      "result": "success",
+      "source_video": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview/31999/goal/videos/turn_on_the_stove_00_success.mp4",
+      "source_sha256": "14ba87d89c412db784f62ca779256953a970ef15ec4fcd37ee094d33dea8ff53",
+      "model_archive": "student/rightview_acpdv2_layer10_bs64",
+      "policy_config": "pi05_libero_rightview_acpd_v2_layer10_lora",
+      "evaluation_summary": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview/31999/summary.txt",
+      "frame_count": 92,
+      "video_fps": 10.0,
+      "frame_size": [
+        224,
+        224
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "path": "frames/right_goal/frame_000.png"
+        },
+        {
+          "index": 18,
+          "path": "frames/right_goal/frame_018.png"
+        },
+        {
+          "index": 36,
+          "path": "frames/right_goal/frame_036.png"
+        },
+        {
+          "index": 55,
+          "path": "frames/right_goal/frame_055.png"
+        },
+        {
+          "index": 73,
+          "path": "frames/right_goal/frame_073.png"
+        },
+        {
+          "index": 91,
+          "path": "frames/right_goal/frame_091.png"
+        }
+      ],
+      "log_outcome_verified": true,
+      "evaluation_log": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview/31999/logs/goal.log"
+    },
+    {
+      "view": "right",
+      "suite": "long",
+      "task_id": 4,
+      "episode": 34,
+      "task_name": "LIVING_ROOM_SCENE5_put_the_white_mug_on_the_left_plate_and_put_the_yellow_and_white_mug_on_the_right_plate",
+      "instruction": "put the white mug on the left plate and put the yellow and white mug on the right plate",
+      "result": "success",
+      "source_video": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview/31999/libero_10/videos/put_the_white_mug_on_the_left_plate_and_put_the_yellow_and_white_mug_on_the_right_plate_34_success.mp4",
+      "source_sha256": "28d17880c8d32260aa6f051ce894448c23cb85e410268d82c4855cc2ecd9cb4b",
+      "model_archive": "student/rightview_acpdv2_layer10_bs64",
+      "policy_config": "pi05_libero_rightview_acpd_v2_layer10_lora",
+      "evaluation_summary": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview/31999/summary.txt",
+      "frame_count": 254,
+      "video_fps": 10.0,
+      "frame_size": [
+        224,
+        224
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "path": "frames/right_long/frame_000.png"
+        },
+        {
+          "index": 51,
+          "path": "frames/right_long/frame_051.png"
+        },
+        {
+          "index": 101,
+          "path": "frames/right_long/frame_101.png"
+        },
+        {
+          "index": 152,
+          "path": "frames/right_long/frame_152.png"
+        },
+        {
+          "index": 202,
+          "path": "frames/right_long/frame_202.png"
+        },
+        {
+          "index": 253,
+          "path": "frames/right_long/frame_253.png"
+        }
+      ],
+      "log_outcome_verified": true,
+      "evaluation_log": "/opt/liutong/openpi-5090-evals/acpd-v2-trajectory-31k-34k/rightview/31999/logs/libero_10.log"
+    },
+    {
+      "view": "top",
+      "suite": "spatial",
+      "task_id": 7,
+      "episode": 4,
+      "task_name": "pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate",
+      "instruction": "pick up the black bowl on the stove and place it on the plate",
+      "result": "success",
+      "source_video": "/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/spatial/videos/pick_up_the_black_bowl_on_the_stove_and_place_it_on_the_plate_04_success.mp4",
+      "source_sha256": "0834a0b06683aae31f8dd4a1af97746c67814fc87b34a6ffae28f729065767d3",
+      "model_archive": "student/topview_acpdv2_layer10_bs64",
+      "policy_config": "pi05_libero_topview_acpd_v2_layer10_lora",
+      "evaluation_summary": "/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/summary.txt",
+      "frame_count": 183,
+      "video_fps": 10.0,
+      "frame_size": [
+        224,
+        224
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "path": "frames/top_spatial/frame_000.png"
+        },
+        {
+          "index": 36,
+          "path": "frames/top_spatial/frame_036.png"
+        },
+        {
+          "index": 73,
+          "path": "frames/top_spatial/frame_073.png"
+        },
+        {
+          "index": 109,
+          "path": "frames/top_spatial/frame_109.png"
+        },
+        {
+          "index": 146,
+          "path": "frames/top_spatial/frame_146.png"
+        },
+        {
+          "index": 182,
+          "path": "frames/top_spatial/frame_182.png"
+        }
+      ],
+      "log_outcome_verified": true,
+      "evaluation_log": "/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/logs/spatial.log"
+    },
+    {
+      "view": "top",
+      "suite": "object",
+      "task_id": 4,
+      "episode": 17,
+      "task_name": "pick_up_the_ketchup_and_place_it_in_the_basket",
+      "instruction": "pick up the ketchup and place it in the basket",
+      "result": "success",
+      "source_video": "/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/object/videos/pick_up_the_ketchup_and_place_it_in_the_basket_17_success.mp4",
+      "source_sha256": "2edabb77584e138fda8846eedbf3abb2b2f2674c86a7cb2bb81e6ac4d048c1aa",
+      "model_archive": "student/topview_acpdv2_layer10_bs64",
+      "policy_config": "pi05_libero_topview_acpd_v2_layer10_lora",
+      "evaluation_summary": "/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/summary.txt",
+      "frame_count": 162,
+      "video_fps": 10.0,
+      "frame_size": [
+        224,
+        224
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "path": "frames/top_object/frame_000.png"
+        },
+        {
+          "index": 32,
+          "path": "frames/top_object/frame_032.png"
+        },
+        {
+          "index": 64,
+          "path": "frames/top_object/frame_064.png"
+        },
+        {
+          "index": 97,
+          "path": "frames/top_object/frame_097.png"
+        },
+        {
+          "index": 129,
+          "path": "frames/top_object/frame_129.png"
+        },
+        {
+          "index": 161,
+          "path": "frames/top_object/frame_161.png"
+        }
+      ],
+      "log_outcome_verified": true,
+      "evaluation_log": "/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/logs/object.log"
+    },
+    {
+      "view": "top",
+      "suite": "goal",
+      "task_id": 9,
+      "episode": 2,
+      "task_name": "put_the_wine_bottle_on_the_rack",
+      "instruction": "put the wine bottle on the rack",
+      "result": "failure",
+      "source_video": "/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/goal/videos/put_the_wine_bottle_on_the_rack_02_failure.mp4",
+      "source_sha256": "920fa6ad88c53714c1d6731eb496c6a28dd0fc96a68318772e4c632a3fd725d6",
+      "model_archive": "student/topview_acpdv2_layer10_bs64",
+      "policy_config": "pi05_libero_topview_acpd_v2_layer10_lora",
+      "evaluation_summary": "/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/summary.txt",
+      "frame_count": 300,
+      "video_fps": 10.0,
+      "frame_size": [
+        224,
+        224
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "path": "frames/top_goal/frame_000.png"
+        },
+        {
+          "index": 60,
+          "path": "frames/top_goal/frame_060.png"
+        },
+        {
+          "index": 120,
+          "path": "frames/top_goal/frame_120.png"
+        },
+        {
+          "index": 179,
+          "path": "frames/top_goal/frame_179.png"
+        },
+        {
+          "index": 239,
+          "path": "frames/top_goal/frame_239.png"
+        },
+        {
+          "index": 299,
+          "path": "frames/top_goal/frame_299.png"
+        }
+      ],
+      "log_outcome_verified": true,
+      "evaluation_log": "/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/logs/goal.log"
+    },
+    {
+      "view": "top",
+      "suite": "long",
+      "task_id": 0,
+      "episode": 44,
+      "task_name": "LIVING_ROOM_SCENE2_put_both_the_alphabet_soup_and_the_tomato_sauce_in_the_basket",
+      "instruction": "put both the alphabet soup and the tomato sauce in the basket",
+      "result": "success",
+      "source_video": "/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/libero_10/videos/put_both_the_alphabet_soup_and_the_tomato_sauce_in_the_basket_44_success.mp4",
+      "source_sha256": "48ee1a200427aa2a16233232853c4ee38227a520ffd8529193b7a7c2780f3464",
+      "model_archive": "student/topview_acpdv2_layer10_bs64",
+      "policy_config": "pi05_libero_topview_acpd_v2_layer10_lora",
+      "evaluation_summary": "/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/summary.txt",
+      "frame_count": 438,
+      "video_fps": 10.0,
+      "frame_size": [
+        224,
+        224
+      ],
+      "frames": [
+        {
+          "index": 0,
+          "path": "frames/top_long/frame_000.png"
+        },
+        {
+          "index": 87,
+          "path": "frames/top_long/frame_087.png"
+        },
+        {
+          "index": 175,
+          "path": "frames/top_long/frame_175.png"
+        },
+        {
+          "index": 262,
+          "path": "frames/top_long/frame_262.png"
+        },
+        {
+          "index": 350,
+          "path": "frames/top_long/frame_350.png"
+        },
+        {
+          "index": 437,
+          "path": "frames/top_long/frame_437.png"
+        }
+      ],
+      "log_outcome_verified": true,
+      "evaluation_log": "/opt/liutong/openpi-5090-evals/acpd-v2-multiview-35k/topview/31999/logs/libero_10.log"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "back_spatial": "Bowl on ramekin → plate",
+  "back_object": "Ketchup → basket",
+  "back_goal": "Wine bottle → cabinet top",
+  "back_long": "Mug → plate; pudding → right of plate",
+  "left_spatial": "Bowl on cabinet → plate",
+  "left_object": "BBQ sauce → basket",
+  "left_goal": "Bowl → cabinet top",
+  "left_long": "Turn on stove; moka pot → stove",
+  "right_spatial": "Bowl beside ramekin → plate",
+  "right_object": "Milk → basket",
+  "right_goal": "Turn on stove",
+  "right_long": "Two mugs → left and right plates",
+  "top_spatial": "Bowl on stove → plate",
+  "top_object": "Ketchup → basket",
+  "top_goal": "Wine bottle → rack",
+  "top_long": "Soup and tomato sauce → basket"
+}
