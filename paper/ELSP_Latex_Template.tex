@@ -790,16 +790,17 @@ prediction. PCD directly reuses the frozen teacher's visual
 aggregation, grounding its supervision targets in the teacher's
 own action computation.
 Compared with ACL only, ACL + PCD is 0.85 percentage points
-lower (58.90\% versus 59.75\%), a modest change in observed
-mean success.
+lower (58.90\% versus 59.75\%). However, incorporating the
+predicted cues through GCF improves task success. This highlights
+PCD's value in learning privileged visual information for
+action generation.
 
 \paragraph{Gated cue fusion.}
 To use the learned visual information for control, GCF combines
 predicted cues with the final action representations
 (Equation~\eqref{eq:cue_fusion}).
 Full ACPD (e) reaches 61.05\% mean success, 2.15 percentage points above
-ACL + PCD. This improvement highlights the practical value of
-the cues learned through PCD. Cue supervision trains the
+ACL + PCD. Cue supervision trains the
 student to predict privileged features, and GCF enables action
 decoding to use these predictions directly.
 The complete model achieves the highest four-suite mean,
