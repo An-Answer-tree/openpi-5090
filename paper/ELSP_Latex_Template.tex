@@ -599,12 +599,16 @@ Layer & Prediction $R^2$ $\uparrow$
 \end{tabular*}
 \end{table}
 
-Layer 10 achieves the largest cosine gap of 0.3992 and
-the highest prediction $R^2$ of 0.3556 among the evaluated
-layers. Its cosine gap exceeds that of the next-ranked
-layer, layer 11, by 0.0485.
-We therefore use layer 10 for teacher cue extraction
-and student cue prediction in the subsequent experiments.
+Table~\ref{tab:layer_selection} shows stronger cue prediction
+in the central part of the evaluated layer range.
+Layer 10 achieves the highest prediction $R^2$ (0.3556)
+and cosine gap (0.3992).
+Its cues are more predictable from student representations
+while retaining information associated with the paired
+visual input.
+We therefore use layer 10 for cue extraction and prediction,
+providing ACPD's lightweight predictors with learnable
+privileged supervision for action generation.
 
 \FloatBarrier
 \subsection{Overall Performance}
