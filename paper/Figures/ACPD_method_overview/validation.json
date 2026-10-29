@@ -5,9 +5,21 @@
   "original_slides_unchanged_in_xml_and_render": true,
   "slide_overflow_test": "passed",
   "layout_overlap_warnings": 0,
-  "native_shapes_and_text": 166,
+  "native_shapes_and_text": 159,
   "photos": 3,
-  "deck_sha256": "27542e99133d280dd2ff77f920605026531822f204d2de57202f05e71f68db70",
+  "deck_sha256": "65a369c33f97516589376b90954c6540ffffb2dc8c627b452d6226405cf140a0",
+  "compact_canvas_inches": [
+    16.6666667,
+    5.75
+  ],
   "pdf_width_cm": 17,
+  "pdf_height_cm": 5.86504618,
+  "height_reduction_vs_previous_percent": 38.66666666666667,
+  "removed": [
+    "title",
+    "shared-input banner",
+    "objective/deployment footer",
+    "full-width loss aisle"
+  ],
   "source_of_truth": "paper/ELSP_Latex_Template.tex, current ACPD method"
 }
