@@ -223,7 +223,9 @@
 Existing approaches typically improve viewpoint robustness by synthesizing novel views or learning 3D representations that preserve scene structure across viewpoints. However, they do not explicitly determine which visual evidence a weak-view policy needs for each action prediction. We introduce \textbf{Action-Conditioned Privileged Distillation (ACPD)}, which uses a frozen privileged-view teacher to supervise a weak-view student. ACPD uses the teacher's attention weights to extract visual cues for each future control step and trains the student to predict and use these cues for action generation. An action correlation loss aligns the relative variation of teacher and student flow-velocity predictions. At deployment, the student uses a single camera view and operates without the teacher.
 We evaluate ACPD with $\pi_{0.5}$ using synchronized multi-view demonstrations from four LIBERO suites. ACPD improves over single-view fine-tuning across all four deployment views, raising the overall mean success rate from 71.09\% to 74.78\%. In the back-view setting, ACPD achieves 61.05\% success, compared with 52.40\% for a multi-view-to-single-view knowledge distillation baseline.
 
-% TODO: Keywords are absent from the source; the template block is retained below as comments.
+\vspace{12pt}
+\noindent\textbf{\textcolor[RGB]{0,131,255}{Keywords:}} vision-language-action models; knowledge distillation; privileged information; multi-view learning; robotic manipulation.
+
 % \vspace{+12pt}
 % \noindent\textbf{\textcolor[RGB]{0,131,255}{Keywords:}} Please supply up to 10 keywords, main 3 or 4 key phrases and at least 3 or 4 additional key words to make it more discoverable in search engines like google, web of science.
 % 
