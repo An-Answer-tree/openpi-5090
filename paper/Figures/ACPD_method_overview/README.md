@@ -42,7 +42,9 @@ npm ci
 node generate_method_overview.js ../Figure2_ACPD_method_overview.pptx
 ```
 
-依赖版本见 `package-lock.json`。字体使用 Arial 和 Times New Roman，
+依赖版本见 `package-lock.json`。所有文字和数学符号统一使用 Arial，
+字号较紧凑初稿整体增加 2 pt。输入图像放大约 28–31%，模块框同步放大，
+边框和连接线适当加粗，减少模块间留白。
 文字框禁用自动换行，并给 Layer 10 等标签预留宽度。
 独立单页采用 `16.6667 × 5.75` 英寸的宽幅画布，方便直接作为论文主图导出。
 原三页 PPT 保持 16:9 画布以保留前两页，新版图居中放在第三页。
