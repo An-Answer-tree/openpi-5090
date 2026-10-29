@@ -143,12 +143,16 @@
             \begin{figure}[H]
             \centering
             \includegraphics[width=\linewidth]{Figures/Figure2_ACPD_method_overview.pdf}
-            \caption{Overview of ACPD. A single-view student predicts
-            action-conditioned teacher cues through privileged cue distillation
-            (PCD) and uses gated fusion for action generation. Action correlation
-            loss (ACL) aligns relative flow-velocity variation. Solid arrows
-            indicate forward computation; dashed arrows indicate PCD and ACL
-            supervision. $\operatorname{sg}$ denotes stop-gradient.}
+            \caption{Overview of ACPD. A frozen multi-view teacher extracts
+            visual cues for each future control step using its action-expert
+            attention weights. Privileged cue distillation (PCD) trains the
+            single-view student to predict these cues. A learned gate adds the
+            predictions to the student's final action representations.
+            Action correlation loss (ACL) aligns the relative variation of
+            teacher and student flow velocities. Solid arrows indicate forward
+            computation; dashed arrows indicate supervision for PCD and ACL.
+            $\operatorname{sg}$ denotes
+            stop-gradient.}
             \label{fig:framework}
             \end{figure}
         }
