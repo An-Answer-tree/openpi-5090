@@ -1,0 +1,32 @@
+{
+  "source_hdf5": "/opt/liutong/libero_multiview_tuned_6view_hdf5/libero_spatial/pick_up_the_black_bowl_between_the_plate_and_the_ramekin_and_place_it_on_the_plate_demo.hdf5",
+  "episode": "demo_0",
+  "step_index_zero_based": 43,
+  "teacher_images": [
+    {
+      "view": "agentview",
+      "feature": "agentview_image",
+      "frame_index_zero_based": 43,
+      "frame_number_one_based": 44,
+      "path": "agentview/04_frame_043.png",
+      "size": [
+        256,
+        256
+      ],
+      "packaged_as": "agent.png"
+    },
+    {
+      "view": "wristview",
+      "feature": "wrist_image",
+      "frame_index_zero_based": 43,
+      "frame_number_one_based": 44,
+      "path": "wristview/04_frame_043.png",
+      "size": [
+        256,
+        256
+      ],
+      "packaged_as": "wrist.png"
+    }
+  ],
+  "student_image": "Figure1_views/backview.png; recorded state re-rendered at 1536x1536"
+}
