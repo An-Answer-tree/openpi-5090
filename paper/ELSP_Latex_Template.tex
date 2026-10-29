@@ -611,14 +611,9 @@ privileged supervision for action generation.
 \FloatBarrier
 \subsection{Overall Performance}
 
-Table~\ref{tab:main_results} shows that ACPD improves the
-four-suite mean success rate over Single-view SFT in every
-deployment view. The overall mean increases from 71.09\%
-to 74.78\%, a gain of 3.69 percentage points.
-Per-view gains range from 2.90 to 4.00 points across camera
-configurations with substantially different baseline performance.
-This cross-view consistency supports ACPD's use of privileged
-supervision for different single-view deployment settings.
+Table~\ref{tab:main_results} shows that ACPD raises the overall
+mean success rate from 71.09\% to 74.78\%, a gain of
+3.69 percentage points.
 
 \begin{table}[!htbp]
 \centering
@@ -653,6 +648,9 @@ Overall & Single-view SFT & 78.95 & 78.35 & 76.80 & 50.25 & 71.09 & -- \\
 \end{table}
 
 ACPD improves success in 14 of the 16 view--suite settings.
+The four-suite mean also improves in every deployment view,
+demonstrating consistent gains across camera configurations.
+
 The largest suite-level gain occurs on LIBERO-Long, where
 mean success increases from 50.25\% to 56.15\%.
 All four views improve on this suite; the top view gains
