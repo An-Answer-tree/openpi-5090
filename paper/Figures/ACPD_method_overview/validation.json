@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-29",
+  "updated_deck": "ACPD_method_overview.pptx",
+  "new_slide_number": 3,
+  "original_slides_unchanged_in_xml_and_render": true,
+  "slide_overflow_test": "passed",
+  "layout_overlap_warnings": 0,
+  "native_shapes_and_text": 166,
+  "photos": 3,
+  "deck_sha256": "27542e99133d280dd2ff77f920605026531822f204d2de57202f05e71f68db70",
+  "pdf_width_cm": 17,
+  "source_of_truth": "paper/ELSP_Latex_Template.tex, current ACPD method"
+}

@@ -9,6 +9,7 @@
 |---|---|---|
 | Figure 1：视角敏感性 | `paper/Figures/gen_fig_viewpoint_performance.py`、同目录 JSON | Python 调整布局、字体、颜色；JSON 保存成功次数和画布尺寸 |
 | Figure 1：同步四视角高清素材 | `paper/Figures/Figure1_views/` | 四张 1536×1536 PNG，可直接替换或重新排版；manifest 保存来源 |
+| Figure 2：主方法图 | `ACPD_method_overview.pptx`、`paper/Figures/ACPD_method_overview/` | 根目录 PPT 第三页为新版；附独立单页 PPT、JS 排版源码和原始相机图片 |
 | Figure 3：同步多视角过程图 | `paper/Figures/Figure3_synchronized_multiview.pdf` | 保存当前工作区 PDF；另附六视角 × 八帧的原始图片，可重新排版 |
 | Figure 4：ACPD 执行切片 | `paper/Figures/Figure4_ACPD_rollouts.pptx` | 五页可编辑 PPT；图片、文字、标签都是独立对象 |
 | Figure 4：排版源码 | `paper/Figures/ACPD_rollouts/generate_rollouts.js` | 调整版式后重新生成 PPT；字体、颜色、间距等集中在脚本开头 |
@@ -16,11 +17,15 @@
 | 相机位置示意图 | `paper/Figures/Camera_layout_material*.png` | PNG 素材及生成提示词；不是分层矢量图或可编辑 PPT |
 | 相机几何依据 | `paper/Figures/Camera_layout_geometry.json`、`gen_camera_layout_guide.py` | 保存实际相机坐标、方向和几何参考图 |
 
-当前保留的可编辑 PPT 是 Figure 4。Figure 1 可通过源码重绘；
+当前保留的可编辑 PPT 包括 Figure 2 和 Figure 4。Figure 1 可通过源码重绘；
 Figure 3 未找到原始可编辑排版文件，本包保留现有 PDF 和过程图素材。
 相机示意图 v2 是按实际几何参考生成的近似插画，精确相机方位以 JSON 为准。
 
 ## 最快的修改方式：直接编辑 PPT
+
+主方法图打开根目录 `ACPD_method_overview.pptx`：第一、二页为原图，
+第三页为当前 ACPD 的重设计版本。第三页的模块、箭头和文字均可编辑。
+`paper/Figures/ACPD_method_overview/README.md` 说明源码生成方法。
 
 用 PowerPoint 或 LibreOffice Impress 打开：
 

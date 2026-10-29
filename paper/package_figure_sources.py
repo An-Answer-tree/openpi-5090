@@ -34,6 +34,9 @@ def main() -> None:
     files = [(source, source.relative_to(root).as_posix()) for source in collect_files(figure_dir)]
     files.append((Path(__file__).resolve(), "paper/package_figure_sources.py"))
     files.append((figure_dir / "EDITING_GUIDE.md", "README.md"))
+    method_overview = root / "ACPD_method_overview.pptx"
+    if method_overview.exists():
+        files.append((method_overview, method_overview.name))
 
     episode_dir = root / "tmp/libero_spatial_episode0_6view_8frames"
     if not episode_dir.exists():
