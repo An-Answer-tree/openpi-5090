@@ -1,6 +1,6 @@
 # 实验结果台账
 
-更新时间：2026-10-26（新增用户报告的训练期无注入重跑结果）
+更新时间：2026-10-29（新增 ACL/PCD loss 与梯度方向核验）
 
 本文件只记录实际运行的配置、指标、结论和证据。详细协议与分析见
 [`experiments/README.md`](experiments/README.md)。工程故障不作为实验结果。
@@ -9,6 +9,7 @@
 
 | 实验 | 目的 | 配置 | 状态 | 结论 |
 |---|---|---|---|---|
+| ACL / PCD loss 与梯度核验 | 为动作相关监督与视觉线索监督提供分析证据 | 只读重分析 ACL-only 与 SFT 的349个对齐训练日志点；复核已有完整ACPD两个检查点的各200个BS32梯度诊断批次 | 完成；未运行新训练或GPU评测 | flow MSE全程均值相差`+0.0226%`，未见更快拟合；ACL/PCD与flow的cosine中位数分别为`0.921→0.901`、`0.170→0.096`，辅助合成仍同向。梯度结果来自完整ACPD而非ACL-only；[分析与来源](experiments/mechanism/acl-supervision-loss-audit-2026-10-29/analysis.md) |
 | ACL + PCD，无注入重跑 | 补齐论文训练期无GCF消融 | 用户说明为重新运行的无注入实验；保留ACL与PCD，训练和推理均无GCF；任务号、checkpoint及原始日志尚未提供 | 用户报告验证完成；均值复核通过 | Spatial/Object/Goal/Long为`65.00/73.00/64.40/33.20%`，均值`58.90%`；比论文ACL only低0.85点，比完整ACPD低2.15点。与历史仅推理关闭注入的记录分别保留；[结果与来源](experiments/ablation/acpd-v2-no-injection-rerun-2026-10-26.md) |
 | ACL-only backview 30K→34K | 补齐31K–34K checkpoint轨迹 | 沿用原ACL-only；4×5090 FSDP、BS64、累计1；flow/ACL=1/0.5、contribution=0、无注入；模型/Adam和data batch30000接续；LR保持2.5e-6；每1K全部保留、独立输出 | 149325完成；10月16日10:34最终33999保存成功，31K–34K全部保留 | 训练完成；验证见下行；已有35K不变；[协议](experiments/ablation/acpd-v2-acl-only-bs64-35k/trajectory-31k-34k-protocol.md)、[执行](experiments/ablation/acpd-v2-acl-only-bs64-35k/trajectory-31k-34k-execution.md) |
 | ACL-only backview 31K–34K验证 | 测量ACL-only后期成功率轨迹 | 关闭注入，与训练一致；每模型四套各500回合；4个单卡子任务及1个汇总，无数组并发上限 | 10月18日核对：四个模型全部完成四套验证及汇总；33K补跑150185_3完成 | 31K/32K/33K/34K分别`59.75%/58.75%/57.40%/59.25%`，各2000回合；31K为新增点中最高观测值；未计算配对区间，不作显著性判断；[四套计数与证据](experiments/ablation/acpd-v2-acl-only-bs64-35k/evaluation-31k-34k.md#已完成结果) |

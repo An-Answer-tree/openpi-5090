@@ -1,0 +1,149 @@
+{
+  "study_type": "Exploratory reanalysis of existing training logs and gradient diagnostics; no new training or evaluation.",
+  "sources": {
+    "sft_logs": [
+      "/home/liutong/Projects/openpi-5090/slurm-log/pi05-bv-sft-bs64-5k_130285.out",
+      "/home/liutong/Projects/openpi-5090/slurm-log/pi05-bv-sft-bs64-r30k_130762.out",
+      "/home/liutong/Projects/openpi-5090/slurm-log/pi05-bv-sft-bs64-r60k_132791.out"
+    ],
+    "acl_only_log": "/opt/liutong/openpi-5090-research/acpd-v2-acl-only-bs64-35k/slurm-log/pi05-bv-acl-only-bs64-35k_135724.out"
+  },
+  "matched_logged_points": 349,
+  "flow_loss_correlation": 0.9983615728515985,
+  "sft_mean_flow_loss": 0.024114613180515762,
+  "acl_only_mean_flow_loss": 0.024120057306590257,
+  "mean_flow_relative_difference_percent": 0.022576045627364927,
+  "acl_loss_reduction_between_endpoint_windows_percent": 55.60273286593218,
+  "windows": [
+    {
+      "start_step": 0,
+      "end_step_exclusive": 5000,
+      "logged_points": 49,
+      "sft_flow_loss": 0.0374530612244898,
+      "acl_only_flow_loss": 0.03739387755102041,
+      "acl_loss": 0.05705306122448979,
+      "teacher_student_correlation": 0.9429469387755102,
+      "flow_relative_difference_percent": -0.15802092414995972
+    },
+    {
+      "start_step": 5000,
+      "end_step_exclusive": 10000,
+      "logged_points": 50,
+      "sft_flow_loss": 0.02738,
+      "acl_only_flow_loss": 0.027498,
+      "acl_loss": 0.041016000000000004,
+      "teacher_student_correlation": 0.958984,
+      "flow_relative_difference_percent": 0.43097151205260253
+    },
+    {
+      "start_step": 10000,
+      "end_step_exclusive": 15000,
+      "logged_points": 50,
+      "sft_flow_loss": 0.024763999999999998,
+      "acl_only_flow_loss": 0.024811999999999997,
+      "acl_loss": 0.036678,
+      "teacher_student_correlation": 0.963322,
+      "flow_relative_difference_percent": 0.1938297528670585
+    },
+    {
+      "start_step": 15000,
+      "end_step_exclusive": 20000,
+      "logged_points": 50,
+      "sft_flow_loss": 0.022463999999999998,
+      "acl_only_flow_loss": 0.022382,
+      "acl_loss": 0.03267,
+      "teacher_student_correlation": 0.96733,
+      "flow_relative_difference_percent": -0.36502849002848503
+    },
+    {
+      "start_step": 20000,
+      "end_step_exclusive": 25000,
+      "logged_points": 50,
+      "sft_flow_loss": 0.020312,
+      "acl_only_flow_loss": 0.020339999999999997,
+      "acl_loss": 0.029331999999999997,
+      "teacher_student_correlation": 0.970668,
+      "flow_relative_difference_percent": 0.13784954706574926
+    },
+    {
+      "start_step": 25000,
+      "end_step_exclusive": 30000,
+      "logged_points": 50,
+      "sft_flow_loss": 0.018728,
+      "acl_only_flow_loss": 0.018758,
+      "acl_loss": 0.026785999999999997,
+      "teacher_student_correlation": 0.973214,
+      "flow_relative_difference_percent": 0.1601879538658535
+    },
+    {
+      "start_step": 30000,
+      "end_step_exclusive": 35000,
+      "logged_points": 50,
+      "sft_flow_loss": 0.017967999999999998,
+      "acl_only_flow_loss": 0.017922,
+      "acl_loss": 0.02533,
+      "teacher_student_correlation": 0.97467,
+      "flow_relative_difference_percent": -0.25601068566338814
+    }
+  ],
+  "archived_full_acpd_gradient_diagnostics": {
+    "h9-5k": {
+      "source": "/opt/liutong/openpi-5090-research/acpd-v2-gradient-conflict/h9-5k/summary.json",
+      "student_params": "/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/trajectory_recovery_20k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_20k_keep_all/4999/params",
+      "batch_size": 32,
+      "num_batches": 200,
+      "components": {
+        "PCD": {
+          "flow_cosine_median": 0.16992568969726562,
+          "flow_norm_ratio_median": 1.2386289238929749,
+          "observed_conflict_fraction": 0.02
+        },
+        "ACL": {
+          "flow_cosine_median": 0.9208371937274933,
+          "flow_norm_ratio_median": 0.8439733386039734,
+          "observed_conflict_fraction": 0.0
+        },
+        "combined_auxiliary": {
+          "flow_cosine_median": 0.6279376745223999,
+          "flow_norm_ratio_median": 1.6258631944656372,
+          "observed_conflict_fraction": 0.0
+        }
+      },
+      "derived_total_flow_cosine_median": 0.8507233232026044,
+      "derived_pcd_acl_cosine_median": 0.16870338544272856,
+      "weighted_gradient_sum_dot_identity_max_error": 3.854193026953112e-07
+    },
+    "h9-30k": {
+      "source": "/opt/liutong/openpi-5090-research/acpd-v2-gradient-conflict/h9-30k/summary.json",
+      "student_params": "/opt/liutong/openpi_checkpoints/fixed_dataset/distillation/acpd_v2/batch_scaling_30k/pi05_libero_backview_acpd_v2_layer10/pi05_libero_backview_acpd_v2_lora_fsdp4_bs64_30k/29999/params",
+      "batch_size": 32,
+      "num_batches": 200,
+      "components": {
+        "PCD": {
+          "flow_cosine_median": 0.0956605076789856,
+          "flow_norm_ratio_median": 1.175366997718811,
+          "observed_conflict_fraction": 0.025
+        },
+        "ACL": {
+          "flow_cosine_median": 0.9011970460414886,
+          "flow_norm_ratio_median": 0.8513200581073761,
+          "observed_conflict_fraction": 0.0
+        },
+        "combined_auxiliary": {
+          "flow_cosine_median": 0.5919873416423798,
+          "flow_norm_ratio_median": 1.5010848641395569,
+          "observed_conflict_fraction": 0.0
+        }
+      },
+      "derived_total_flow_cosine_median": 0.8380106405477075,
+      "derived_pcd_acl_cosine_median": 0.0965603457918015,
+      "weighted_gradient_sum_dot_identity_max_error": 3.2039741526546095e-07
+    }
+  },
+  "interpretation_limits": [
+    "Training losses are recorded on training batches, rounded to four decimals, and aligned by optimizer step, not reevaluated on held-out paired samples.",
+    "SFT did not log teacher/student correlations; within-run ACL reduction does not establish an improvement over SFT on this metric.",
+    "Gradient diagnostics measure individual loss gradients at full ACPD checkpoints with 200 BS32 probe batches, not the ACL-only training trajectory.",
+    "No claim of faster convergence, improved generalization, or causal explanation of success is established by these observations."
+  ]
+}

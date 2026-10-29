@@ -5,6 +5,20 @@ project:
   started: "2026-09-11"
 
 experiment_names:
+  acl_pcd_loss_gradient_audit_20261029:
+    type: exploratory_reanalysis_of_existing_logs
+    status: complete
+    new_training_or_gpu_evaluation: false
+    analysis: experiments/mechanism/acl-supervision-loss-audit-2026-10-29/analysis.md
+    results: experiments/mechanism/acl-supervision-loss-audit-2026-10-29/results/summary.json
+    matched_training_log_points: 349
+    acl_only_vs_sft_mean_flow_difference_percent: 0.022576045627364927
+    gradient_checkpoints: full_acpd_h9_5k_and_30k
+    diagnostic_batches_per_checkpoint: 200
+    diagnostic_batch_size: 32
+    acl_flow_cosine_medians: [0.9208371937274933, 0.9011970460414886]
+    pcd_flow_cosine_medians: [0.16992568969726562, 0.0956605076789856]
+    interpretation: flow拟合轨迹几乎相同；ACL与flow高度同向，PCD接近正交，合成辅助梯度仍正向；不据此断言成功率因果机制
   acl_only_bs64_checkpoint_trajectory_31k_34k:
     display_name: "ACL-only backview BS64 30K→34K"
     parent: backview_acl_only_bs64
