@@ -238,7 +238,7 @@ Vision-language-action (VLA) policies map language instructions and visual obser
 Diffusion and flow-matching action generators have been widely adopted in VLA policies~\cite{doi:10.1177/02783649241273668,pmlr-v267-wen25g,BlackK-RSS-25}.
 However, their performance is constrained by the visual evidence available at deployment.
 When object pose, spatial relations, or gripper-object contact are occluded or poorly visible, a policy can perform substantially worse than one using a more informative view.
-On LIBERO, policies trained and evaluated separately for each camera view exhibit substantial differences in task success (Figure~\ref{fig:motivation}).
+On LIBERO~\cite{NEURIPS2023_8c3c6668}, policies trained and evaluated separately for each camera view exhibit substantial differences in task success (Figure~\ref{fig:motivation}).
 Workspace geometry and robot hardware can constrain camera placement, leaving a less informative deployment view.
 This motivates weak-view policy learning, where a policy uses a limited view at deployment but can receive training-time supervision from a more informative view.
 
