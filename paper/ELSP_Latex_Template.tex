@@ -46,6 +46,16 @@
 \usepackage{enumerate}
 \usepackage{enumitem}
 \usepackage{stfloats}
+% Let large figures share a page with text instead of forcing sparse float pages.
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.08}
+\renewcommand{\floatpagefraction}{0.85}
+\setlength{\textfloatsep}{14pt plus 2pt minus 2pt}
+\setlength{\floatsep}{10pt plus 2pt minus 2pt}
+\makeatletter
+\setlength{\@fptop}{0pt}
+\makeatother
 \usepackage{ragged2e}
 \usepackage{titlesec}
 \usepackage{ragged2e}
@@ -487,7 +497,7 @@ With the teacher frozen, we jointly optimize the student, cue predictors, and fu
 
 At deployment, the student uses only $o^s$, retaining cue prediction and gated fusion.
 
-\begin{figure}[H]
+\begin{figure}[!tbp]
 \centering
 \includegraphics[width=\linewidth]{Figures/Figure3_synchronized_multiview.pdf}
 \caption{Synchronized multi-view observations from a LIBERO demonstration.
@@ -680,7 +690,7 @@ supervision into single-view action generation.
 Figure~\ref{fig:acpd_rollouts} visualizes ACPD rollouts across
 the four deployment views and LIBERO suites.
 
-\begin{figure}[!tbp]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=\linewidth]{Figures/Figure4_ACPD_rollouts.pdf}
 \caption{Qualitative results of ACPD from closed-loop evaluation
@@ -690,7 +700,6 @@ Frames are uniformly sampled from randomly selected episodes.}
 \label{fig:acpd_rollouts}
 \end{figure}
 
-\FloatBarrier
 \subsection{Comparison with Multi-View Distillation}
 \label{sec:distillation_comparison}
 
